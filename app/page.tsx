@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
+// Type for the API response (kept exactly as before)
 interface RiskData {
   system_risk: number;
   status: string;
@@ -12,33 +13,87 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/get_risk`, {
-      headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
-    })
-      .then(res => res.ok ? res.json() : Promise.reject(res.status))
-      .then(data => setRisk(data))
-      .catch(err => setError(err.toString()))
-      .finally(() => setLoading(false));
+  // Use a ref to track mounted state (prevents state updates after unmount)
+  const isMounted = useRef(true);
+
+  // Fetch function with timeout, abort controller, and proper error handling
+  const fetchRisk = useCallback(async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/get_risk`, {
+        headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        // Provide a meaningful message based on HTTP status
+        if (response.status === 401) throw new Error('Unauthorized – check API key');
+        if (response.status === 404) throw new Error('Risk endpoint not found');
+        if (response.status >= 500) throw new Error('Server error – please try later');
+        throw new Error(`HTTP error ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (isMounted.current) {
+        setRisk(data);
+        setError(null);
+      }
+    } catch (err: any) {
+      if (isMounted.current) {
+        if (err.name === 'AbortError') {
+          setError('Request timed out – please check your connection');
+        } else {
+          setError(err.message || 'Failed to load risk data');
+        }
+      }
+    } finally {
+      if (isMounted.current) {
+        setLoading(false);
+      }
+    }
   }, []);
 
+  // Run fetch on mount and clean up
+  useEffect(() => {
+    isMounted.current = true;
+    fetchRisk();
+
+    return () => {
+      isMounted.current = false;
+    };
+  }, [fetchRisk]);
+
+  // --- Rendering (exactly the same as before, only error messages may differ) ---
+
   if (loading) {
-    return <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="text-xl">Loading risk data...</div>
-    </div>;
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-xl" role="status" aria-label="Loading">
+          Loading risk data...
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="min-h-screen bg-gray-100 flex items-center justify-center text-red-600">
-      Error: {error}
-    </div>;
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center text-red-600">
+        <div role="alert">Error: {error}</div>
+      </div>
+    );
   }
 
-  // At this point, risk is guaranteed to be non‑null
   if (!risk) {
-    return <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      No risk data available
-    </div>;
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        No risk data available
+      </div>
+    );
   }
 
   const statusColor = risk.status === 'critical' ? 'bg-red-600' : 'bg-yellow-500';
