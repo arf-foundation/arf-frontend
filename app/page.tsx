@@ -2,23 +2,44 @@
 
 import { useEffect, useState } from 'react';
 
+interface RiskData {
+  system_risk: number;
+  status: string;
+}
+
 export default function Home() {
-  const [risk, setRisk] = useState(null);
+  const [risk, setRisk] = useState<RiskData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/get_risk`, {
       headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
     })
       .then(res => res.ok ? res.json() : Promise.reject(res.status))
-      .then(setRisk)
+      .then(data => setRisk(data))
       .catch(err => setError(err.toString()))
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center"><div className="text-xl">Loading risk data...</div></div>;
-  if (error) return <div className="min-h-screen bg-gray-100 flex items-center justify-center text-red-600">Error: {error}</div>;
+  if (loading) {
+    return <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="text-xl">Loading risk data...</div>
+    </div>;
+  }
+
+  if (error) {
+    return <div className="min-h-screen bg-gray-100 flex items-center justify-center text-red-600">
+      Error: {error}
+    </div>;
+  }
+
+  // At this point, risk is guaranteed to be non‑null
+  if (!risk) {
+    return <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      No risk data available
+    </div>;
+  }
 
   const statusColor = risk.status === 'critical' ? 'bg-red-600' : 'bg-yellow-500';
 
