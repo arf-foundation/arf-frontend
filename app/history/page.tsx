@@ -9,7 +9,7 @@ export default function History() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/risk/history`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/history`)
       .then(res => res.ok ? res.json() : Promise.reject(res.status))
       .then(setData)
       .catch(err => setError(err.toString()))
