@@ -1,3 +1,4 @@
+// app/dashboard/MemoryStats.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
