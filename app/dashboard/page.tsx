@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { RiskData, Decision } from '../types';
+import { RiskData, HistoryDataPoint } from '../types';
 import EvaluateForm from './EvaluateForm';
 import MemoryStats from './MemoryStats';
 import RecentDecisions from './RecentDecisions';
@@ -10,7 +10,7 @@ import RiskChart from './RiskChart';
 
 export default function DashboardPage() {
   const [risk, setRisk] = useState<RiskData | null>(null);
-  const [history, setHistory] = useState<{ timestamp: string; risk: number }[]>([]);
+  const [history, setHistory] = useState<HistoryDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,21 +25,21 @@ export default function DashboardPage() {
         const riskData = await riskRes.json();
         setRisk(riskData);
 
-        // Fetch history (assuming endpoint returns array of { timestamp, risk_score })
+        // Fetch history (assuming endpoint returns array of decisions)
         const historyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/history`, {
           headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
         });
         if (historyRes.ok) {
           const historyData = await historyRes.json();
-          // Transform if needed: maybe API returns decisions with risk_score
-          const formatted = historyData.map((item: any) => ({
+          // Transform to chart data
+          const formatted: HistoryDataPoint[] = historyData.map((item: any) => ({
             timestamp: item.timestamp,
             risk: item.risk_score || 0,
           }));
           setHistory(formatted);
         }
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
       } finally {
         setLoading(false);
       }
