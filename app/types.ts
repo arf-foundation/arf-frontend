@@ -1,17 +1,25 @@
-// ... existing RiskData, MemoryStats, etc. ...
-
-// Incident report sent to /v1/incidents/evaluate
-export interface IncidentReport {
-  service_name: string;
-  event_type: string;          // e.g., "latency", "error_rate"
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  metrics: Record<string, number>; // e.g., { latency_ms: 450, error_rate: 0.02 }
+// Risk data for the main dashboard
+export interface RiskData {
+  system_risk: number;
+  status: string;
+  confidence_interval?: [number, number];
 }
 
-// Risk contribution factor
-export interface RiskContribution {
-  factor: string;              // e.g., "past_similar_incidents", "policy_violation"
-  contribution: number;         // 0-1
+// Memory statistics from the backend
+export interface MemoryStats {
+  incident_nodes: number;
+  outcome_nodes: number;
+  edges: number;
+  cache_hit_rate: number;
+  is_operational: boolean;
+}
+
+// Decision history item
+export interface Decision {
+  decision_id: string;
+  outcome: string; // e.g., 'success', 'failure', 'escalate'
+  timestamp: string;
+  risk_score?: number;
 }
 
 // Similar incident from memory
@@ -22,7 +30,13 @@ export interface SimilarIncident {
   timestamp: string;
   metrics: Record<string, number>;
   similarity_score: number;
-  outcome_success?: boolean;    // optional, if outcome recorded
+  outcome_success?: boolean; // optional, if outcome recorded
+}
+
+// Risk contribution factor
+export interface RiskContribution {
+  factor: string;              // e.g., "past_similar_incidents", "policy_violation"
+  contribution: number;         // 0-1
 }
 
 // Healing action recommendation
@@ -33,7 +47,7 @@ export interface HealingAction {
   prerequisites?: string[];
 }
 
-// The full HealingIntent response
+// The full HealingIntent response from /v1/incidents/evaluate
 export interface EvaluateResponse {
   risk_score: number;
   epistemic_uncertainty: number; // 0-1 or classification
@@ -44,4 +58,18 @@ export interface EvaluateResponse {
   explanation: string;
   policy_violations?: string[];
   requires_escalation: boolean;
+}
+
+// Incident report sent to /v1/incidents/evaluate
+export interface IncidentReport {
+  service_name: string;
+  event_type: string;          // e.g., "latency", "error_rate"
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  metrics: Record<string, number>; // e.g., { latency_ms: 450, error_rate: 0.02 }
+}
+
+// Historical data point for charts
+export interface HistoryDataPoint {
+  timestamp: string;
+  risk: number;
 }
