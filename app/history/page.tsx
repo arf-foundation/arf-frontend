@@ -3,13 +3,18 @@
 import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+interface HistoryDataPoint {
+  time: string;
+  risk: number;
+}
+
 export default function History() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<HistoryDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/history`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/history`)
       .then(res => res.ok ? res.json() : Promise.reject(res.status))
       .then(setData)
       .catch(err => setError(err.toString()))
