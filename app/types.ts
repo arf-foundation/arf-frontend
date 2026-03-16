@@ -1,4 +1,5 @@
 // app/types.ts
+
 export interface RiskData {
   system_risk: number;
   status: string;
@@ -15,7 +16,7 @@ export interface MemoryStats {
 
 export interface Decision {
   decision_id: string;
-  outcome: string;
+  outcome: string; // e.g., 'success', 'failure', 'escalate'
   timestamp: string;
   risk_score?: number;
 }
@@ -26,7 +27,7 @@ export interface SimilarEvent {
   severity: string;
   timestamp: string;
   metrics: Record<string, number>;
-  agent_analysis: any;
+  agent_analysis: Record<string, unknown>; // Flexible for future extensions
   similarity_score: number;
 }
 
