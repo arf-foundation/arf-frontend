@@ -3,10 +3,13 @@
 import { useState } from 'react';
 import { EvaluateResponse, IncidentReport } from '../types';
 
+// Define the severity type locally for clarity (also available from IncidentReport)
+type SeverityLevel = 'low' | 'medium' | 'high' | 'critical';
+
 export default function EvaluateForm() {
   const [service, setService] = useState('');
   const [eventType, setEventType] = useState('');
-  const [severity, setSeverity] = useState<'low' | 'medium' | 'high' | 'critical'>('low');
+  const [severity, setSeverity] = useState<SeverityLevel>('low');
   const [metrics, setMetrics] = useState('{}');
   const [result, setResult] = useState<EvaluateResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -67,7 +70,9 @@ export default function EvaluateForm() {
           <label className="block text-sm font-medium mb-1">Severity</label>
           <select
             value={severity}
-            onChange={(e) => setSeverity(e.target.value as any)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setSeverity(e.target.value as SeverityLevel)
+            }
             className="w-full p-2 border rounded"
           >
             <option value="low">Low</option>
@@ -113,17 +118,22 @@ export default function EvaluateForm() {
               </div>
               <div>
                 <div className="text-sm text-gray-600">Epistemic Uncertainty</div>
-                <div className="text-2xl font-bold">{(result.epistemic_uncertainty * 100).toFixed(1)}%</div>
+                <div className="text-2xl font-bold">
+                  {(result.epistemic_uncertainty * 100).toFixed(1)}%
+                </div>
               </div>
               <div>
                 <div className="text-sm text-gray-600">Confidence Interval</div>
                 <div className="text-xl font-mono">
-                  [{result.confidence_interval[0].toFixed(3)}, {result.confidence_interval[1].toFixed(3)}]
+                  [{result.confidence_interval[0].toFixed(3)},{' '}
+                  {result.confidence_interval[1].toFixed(3)}]
                 </div>
               </div>
               <div>
                 <div className="text-sm text-gray-600">Requires Escalation</div>
-                <div className="text-xl font-bold">{result.requires_escalation ? 'Yes' : 'No'}</div>
+                <div className="text-xl font-bold">
+                  {result.requires_escalation ? 'Yes' : 'No'}
+                </div>
               </div>
             </div>
           </div>
@@ -147,7 +157,9 @@ export default function EvaluateForm() {
                       style={{ width: `${rc.contribution * 100}%` }}
                     />
                   </div>
-                  <span className="text-sm ml-2">{(rc.contribution * 100).toFixed(1)}%</span>
+                  <span className="text-sm ml-2">
+                    {(rc.contribution * 100).toFixed(1)}%
+                  </span>
                 </div>
               ))}
             </div>
@@ -161,12 +173,25 @@ export default function EvaluateForm() {
                 {result.similar_incidents.map((inc) => (
                   <div key={inc.incident_id} className="border rounded p-3 bg-white">
                     <div className="grid grid-cols-3 gap-2 text-sm">
-                      <div><span className="font-medium">Component:</span> {inc.component}</div>
-                      <div><span className="font-medium">Severity:</span> {inc.severity}</div>
-                      <div><span className="font-medium">Similarity:</span> {inc.similarity_score.toFixed(3)}</div>
-                      <div><span className="font-medium">Time:</span> {new Date(inc.timestamp).toLocaleString()}</div>
+                      <div>
+                        <span className="font-medium">Component:</span> {inc.component}
+                      </div>
+                      <div>
+                        <span className="font-medium">Severity:</span> {inc.severity}
+                      </div>
+                      <div>
+                        <span className="font-medium">Similarity:</span>{' '}
+                        {inc.similarity_score.toFixed(3)}
+                      </div>
+                      <div>
+                        <span className="font-medium">Time:</span>{' '}
+                        {new Date(inc.timestamp).toLocaleString()}
+                      </div>
                       {inc.outcome_success !== undefined && (
-                        <div><span className="font-medium">Outcome:</span> {inc.outcome_success ? 'Success' : 'Failure'}</div>
+                        <div>
+                          <span className="font-medium">Outcome:</span>{' '}
+                          {inc.outcome_success ? 'Success' : 'Failure'}
+                        </div>
                       )}
                     </div>
                     <div className="mt-2 text-xs text-gray-600">
@@ -208,7 +233,9 @@ export default function EvaluateForm() {
             <div className="p-4 bg-red-50 rounded border border-red-200">
               <h3 className="font-semibold mb-2 text-red-800">Policy Violations</h3>
               <ul className="list-disc list-inside text-sm text-red-700">
-                {result.policy_violations.map((v, i) => <li key={i}>{v}</li>)}
+                {result.policy_violations.map((v, i) => (
+                  <li key={i}>{v}</li>
+                ))}
               </ul>
             </div>
           )}
