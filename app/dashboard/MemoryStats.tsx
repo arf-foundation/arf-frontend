@@ -19,8 +19,28 @@ export default function MemoryStats() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="animate-pulse h-24 bg-gray-200 rounded"></div>;
-  if (error) return <div className="text-red-600">Error loading memory stats</div>;
+  if (loading) return (
+    <div className="bg-white rounded-lg shadow p-6 animate-pulse">
+      <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
+      <div className="space-y-2">
+        <div className="h-4 bg-gray-200 rounded w-full"></div>
+        <div className="h-4 bg-gray-200 rounded w-full"></div>
+        <div className="h-4 bg-gray-200 rounded w-full"></div>
+        <div className="h-4 bg-gray-200 rounded w-full"></div>
+        <div className="h-4 bg-gray-200 rounded w-full"></div>
+      </div>
+    </div>
+  );
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Memory Stats</h2>
+        <p className="text-gray-500">Memory statistics are not available from the API yet.</p>
+      </div>
+    );
+  }
+
   if (!stats) return null;
 
   return (
