@@ -10,7 +10,7 @@ export default function MemoryStats() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/memory/stats`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/memory/stats`, {
       headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
     })
       .then(res => res.ok ? res.json() : Promise.reject(res.status))
