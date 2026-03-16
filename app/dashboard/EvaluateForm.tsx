@@ -19,7 +19,7 @@ export default function EvaluateForm() {
     setError(null);
     try {
       const parsedMetrics = JSON.parse(metrics);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/incidents/evaluate`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/incidents/evaluate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
