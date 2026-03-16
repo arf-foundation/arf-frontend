@@ -24,22 +24,6 @@ export default function RootLayout({
               href="https://arf-foundation.github.io/arf-spec/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline"
-            >
-              Spec
-            </a>
-            <a
-              href="https://arf-foundation.github.io/arf-spec/enterprise/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline"
-            >
-              Start‑ups
-            </a>
-            <a
-              href="https://arf-foundation.github.io/arf-spec/"
-              target="_blank"
-              rel="noopener noreferrer"
               className="hover:underline ml-auto"
             >
               Documentation
