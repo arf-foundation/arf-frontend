@@ -20,11 +20,26 @@ export interface Decision {
   risk_score?: number;
 }
 
+export interface SimilarEvent {
+  incident_id: string;
+  component: string;
+  severity: string;
+  timestamp: string;
+  metrics: Record<string, number>;
+  agent_analysis: any;
+  similarity_score: number;
+}
+
 export interface EvaluateResponse {
   risk_score: number;
   base_risk: number;
   memory_risk: number | null;
   weight: number;
-  similar_events: any[];
+  similar_events: SimilarEvent[];
   confidence: number;
+}
+
+export interface HistoryDataPoint {
+  timestamp: string;
+  risk: number;
 }
