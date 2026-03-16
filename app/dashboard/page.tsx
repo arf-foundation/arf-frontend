@@ -1,4 +1,3 @@
-// app/dashboard/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -21,7 +20,7 @@ export default function DashboardPage() {
         const riskRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/get_risk`, {
           headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
         });
-        if (!riskRes.ok) throw new Error('Failed to fetch risk');
+        if (!riskRes.ok) throw new Error(`Risk API error: ${riskRes.status}`);
         const riskData: RiskData = await riskRes.json();
         setRisk(riskData);
 
@@ -37,10 +36,10 @@ export default function DashboardPage() {
           }));
           setHistory(formatted);
         } else {
-          console.warn('Failed to fetch history');
+          console.warn('History API not available');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : 'Failed to connect to API. Please check that the backend is running.');
       } finally {
         setLoading(false);
       }
@@ -58,8 +57,20 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-red-600">
-        Error: {error}
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <div className="bg-red-100 text-red-700 p-6 rounded-lg shadow max-w-md text-center">
+          <h2 className="text-2xl font-bold mb-2">Connection Error</h2>
+          <p className="mb-4">{error}</p>
+          <p className="text-sm text-gray-600">
+            Make sure the ARF API is running at: {process.env.NEXT_PUBLIC_API_URL}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
