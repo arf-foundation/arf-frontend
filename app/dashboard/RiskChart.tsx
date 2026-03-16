@@ -1,4 +1,3 @@
-// app/dashboard/RiskChart.tsx
 'use client';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -21,7 +20,6 @@ export default function RiskChart({ data }: { data: HistoryDataPoint[] }) {
         <Tooltip
           labelFormatter={(label) => new Date(label).toLocaleString()}
           formatter={(value, name) => {
-            // value can be number or string; format numbers nicely
             if (typeof value === 'number') {
               return value.toFixed(3);
             }
