@@ -30,7 +30,7 @@ export default function EvaluateForm() {
         }),
       });
       if (!response.ok) throw new Error('Evaluation failed');
-      const data = await response.json();
+      const data: EvaluateResponse = await response.json();
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
