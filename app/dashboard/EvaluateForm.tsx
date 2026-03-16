@@ -2,15 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-
-interface EvaluateResponse {
-  risk_score: number;
-  base_risk: number;
-  memory_risk: number | null;
-  weight: number;
-  similar_events: any[];
-  confidence: number;
-}
+import { EvaluateResponse } from '../types';
 
 export default function EvaluateForm() {
   const [service, setService] = useState('');
@@ -40,8 +32,8 @@ export default function EvaluateForm() {
       if (!response.ok) throw new Error('Evaluation failed');
       const data = await response.json();
       setResult(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
