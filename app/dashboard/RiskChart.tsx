@@ -20,7 +20,7 @@ export default function RiskChart({ data }: { data: HistoryDataPoint[] }) {
         <YAxis domain={[0, 1]} />
         <Tooltip
           labelFormatter={(label) => new Date(label).toLocaleString()}
-          formatter={(value: number) => value.toFixed(3)}
+          formatter={(value: number | undefined) => (value?.toFixed(3) ?? 'N/A')}
         />
         <Line type="monotone" dataKey="risk" stroke="#2563eb" strokeWidth={2} dot={false} />
       </LineChart>
