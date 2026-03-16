@@ -1,13 +1,10 @@
+// app/dashboard/RiskChart.tsx
 'use client';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { HistoryDataPoint } from '../types';
 
-interface RiskHistoryPoint {
-  timestamp: string;
-  risk: number;
-}
-
-export default function RiskChart({ data }: { data: RiskHistoryPoint[] }) {
+export default function RiskChart({ data }: { data: HistoryDataPoint[] }) {
   if (!data.length) {
     return <div className="text-gray-500 text-center py-8">No risk history available</div>;
   }
@@ -16,7 +13,10 @@ export default function RiskChart({ data }: { data: RiskHistoryPoint[] }) {
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="timestamp" tickFormatter={(t) => new Date(t).toLocaleTimeString()} />
+        <XAxis 
+          dataKey="timestamp" 
+          tickFormatter={(t) => new Date(t).toLocaleTimeString()} 
+        />
         <YAxis domain={[0, 1]} />
         <Tooltip
           labelFormatter={(label) => new Date(label).toLocaleString()}
