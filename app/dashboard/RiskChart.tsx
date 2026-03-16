@@ -19,7 +19,7 @@ export default function RiskChart({ data }: { data: HistoryDataPoint[] }) {
         <YAxis domain={[0, 1]} />
         <Tooltip
           labelFormatter={(label) => new Date(label).toLocaleString()}
-          formatter={(value, name) => {
+          formatter={(value, _name) => {
             if (typeof value === 'number') {
               return value.toFixed(3);
             }
