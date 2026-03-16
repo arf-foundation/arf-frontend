@@ -1,3 +1,4 @@
+// app/dashboard/RecentDecisions.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
