@@ -1,118 +1,108 @@
-'use client';
+// app/page.tsx
+import Link from 'next/link';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-20 text-center">
+        <h1 className="text-5xl font-bold text-gray-900 mb-4">
+          Agentic Reliability Framework
+        </h1>
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+          Bayesian governance for agentic systems – approve, deny, or escalate with mathematical rigor.
+        </p>
+        <div className="flex gap-4 justify-center">
+          <Link
+            href="/dashboard"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+          >
+            Launch Dashboard
+          </Link>
+          <a
+            href="https://github.com/arf-foundation"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition"
+          >
+            GitHub
+          </a>
+        </div>
+      </section>
 
-// Type for the API response (kept exactly as before)
-interface RiskData {
-  system_risk: number;
-  status: string;
+      {/* Features Grid */}
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">Why ARF?</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <FeatureCard
+            title="Bayesian Online Learning"
+            description="Fast conjugate updates for per‑category risk using beta‑binomial models."
+            icon="📈"
+          />
+          <FeatureCard
+            title="HMC Pattern Discovery"
+            description="Hamiltonian Monte Carlo captures complex interactions (time, role, environment)."
+            icon="🔍"
+          />
+          <FeatureCard
+            title="Composable Policies"
+            description="Build fine‑grained rules with AND/OR/NOT combinators."
+            icon="⚙️"
+          />
+          <FeatureCard
+            title="Semantic Memory"
+            description="FAISS‑based retrieval of similar past incidents for context‑aware decisions."
+            icon="🧠"
+          />
+        </div>
+      </section>
+
+      {/* Architecture Diagram (placeholder) */}
+      <section className="container mx-auto px-4 py-16 bg-gray-50 rounded-xl">
+        <h2 className="text-3xl font-bold text-center mb-8">Architecture</h2>
+        <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+          [Architecture diagram will be added here]
+        </div>
+        <p className="text-center mt-4 text-gray-600">
+          See the <a href="https://github.com/arf-foundation/agentic-reliability-framework/blob/main/docs/architecture.mmd" className="text-blue-600 underline">full diagram</a> on GitHub.
+        </p>
+      </section>
+
+      {/* CTA / Community */}
+      <section className="container mx-auto px-4 py-16 text-center">
+        <h2 className="text-3xl font-bold mb-4">Join the community</h2>
+        <p className="text-lg text-gray-600 mb-8">
+          ARF is open source (Apache 2.0). Contributions welcome!
+        </p>
+        <div className="flex gap-4 justify-center">
+          <a
+            href="https://github.com/arf-foundation"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-gray-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition"
+          >
+            GitHub
+          </a>
+          <a
+            href="https://huggingface.co/A-R-F"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition"
+          >
+            Hugging Face
+          </a>
+        </div>
+      </section>
+    </div>
+  );
 }
 
-export default function Home() {
-  const [risk, setRisk] = useState<RiskData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Use a ref to track mounted state (prevents state updates after unmount)
-  const isMounted = useRef(true);
-
-  // Fetch function with timeout, abort controller, and proper error handling
-  const fetchRisk = useCallback(async () => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/get_risk`, {
-        headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        // Provide a meaningful message based on HTTP status
-        if (response.status === 401) throw new Error('Unauthorized – check API key');
-        if (response.status === 404) throw new Error('Risk endpoint not found');
-        if (response.status >= 500) throw new Error('Server error – please try later');
-        throw new Error(`HTTP error ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (isMounted.current) {
-        setRisk(data);
-        setError(null);
-      }
-    } catch (err: any) {
-      if (isMounted.current) {
-        if (err.name === 'AbortError') {
-          setError('Request timed out – please check your connection');
-        } else {
-          setError(err.message || 'Failed to load risk data');
-        }
-      }
-    } finally {
-      if (isMounted.current) {
-        setLoading(false);
-      }
-    }
-  }, []);
-
-  // Run fetch on mount and clean up
-  useEffect(() => {
-    isMounted.current = true;
-    fetchRisk();
-
-    return () => {
-      isMounted.current = false;
-    };
-  }, [fetchRisk]);
-
-  // --- Rendering (exactly the same as before, only error messages may differ) ---
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl" role="status" aria-label="Loading">
-          Loading risk data...
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center text-red-600">
-        <div role="alert">Error: {error}</div>
-      </div>
-    );
-  }
-
-  if (!risk) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        No risk data available
-      </div>
-    );
-  }
-
-  const statusColor = risk.status === 'critical' ? 'bg-red-600' : 'bg-yellow-500';
-
+function FeatureCard({ title, description, icon }: { title: string; description: string; icon: string }) {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">ARF System Risk</h1>
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-gray-600">Risk Score</span>
-          <span className="text-3xl font-mono">{risk.system_risk}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-gray-600">Status</span>
-          <span className={`px-3 py-1 rounded-full text-white font-medium ${statusColor}`}>
-            {risk.status.toUpperCase()}
-          </span>
-        </div>
-      </div>
+    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+      <div className="text-4xl mb-4">{icon}</div>
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p className="text-gray-600">{description}</p>
     </div>
   );
 }
