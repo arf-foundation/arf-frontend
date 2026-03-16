@@ -25,6 +25,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Existing animations */
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -41,4 +42,23 @@ body {
 
 .animate-slide-up {
   animation: slide-up 0.8s ease-out;
+}
+
+/* New animations for deep‑tech vibes */
+@keyframes glow {
+  0%, 100% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+  50% { text-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
+}
+
+.glow-text {
+  animation: glow 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.float-icon {
+  animation: float 4s ease-in-out infinite;
 }
