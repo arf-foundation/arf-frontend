@@ -17,7 +17,7 @@ export default function DashboardPage() {
     const fetchData = async () => {
       try {
         // Fetch current risk
-        const riskRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/get_risk`, {
+        const riskRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/get_risk`, {
           headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
         });
         if (!riskRes.ok) throw new Error(`Risk API error: ${riskRes.status}`);
@@ -25,7 +25,7 @@ export default function DashboardPage() {
         setRisk(riskData);
 
         // Fetch history (decisions)
-        const historyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/history`, {
+        const historyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/history`, {
           headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
         });
         if (historyRes.ok) {
