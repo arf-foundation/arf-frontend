@@ -1,46 +1,47 @@
-// app/types.ts
+// ... existing RiskData, MemoryStats, etc. ...
 
-export interface RiskData {
-  system_risk: number;
-  status: string;
-  confidence_interval?: [number, number];
+// Incident report sent to /v1/incidents/evaluate
+export interface IncidentReport {
+  service_name: string;
+  event_type: string;          // e.g., "latency", "error_rate"
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  metrics: Record<string, number>; // e.g., { latency_ms: 450, error_rate: 0.02 }
 }
 
-export interface MemoryStats {
-  incident_nodes: number;
-  outcome_nodes: number;
-  edges: number;
-  cache_hit_rate: number;
-  is_operational: boolean;
+// Risk contribution factor
+export interface RiskContribution {
+  factor: string;              // e.g., "past_similar_incidents", "policy_violation"
+  contribution: number;         // 0-1
 }
 
-export interface Decision {
-  decision_id: string;
-  outcome: string; // e.g., 'success', 'failure', 'escalate'
-  timestamp: string;
-  risk_score?: number;
-}
-
-export interface SimilarEvent {
+// Similar incident from memory
+export interface SimilarIncident {
   incident_id: string;
   component: string;
   severity: string;
   timestamp: string;
   metrics: Record<string, number>;
-  agent_analysis: Record<string, unknown>; // Flexible for future extensions
   similarity_score: number;
+  outcome_success?: boolean;    // optional, if outcome recorded
 }
 
+// Healing action recommendation
+export interface HealingAction {
+  action_type: string;          // e.g., "restart_service", "scale_up"
+  description: string;
+  confidence: number;            // 0-1
+  prerequisites?: string[];
+}
+
+// The full HealingIntent response
 export interface EvaluateResponse {
   risk_score: number;
-  base_risk: number;
-  memory_risk: number | null;
-  weight: number;
-  similar_events: SimilarEvent[];
-  confidence: number;
-}
-
-export interface HistoryDataPoint {
-  timestamp: string;
-  risk: number;
+  epistemic_uncertainty: number; // 0-1 or classification
+  confidence_interval: [number, number];
+  risk_contributions: RiskContribution[];
+  similar_incidents: SimilarIncident[];
+  recommended_actions: HealingAction[];
+  explanation: string;
+  policy_violations?: string[];
+  requires_escalation: boolean;
 }
