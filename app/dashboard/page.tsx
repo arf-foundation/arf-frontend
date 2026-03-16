@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { RiskData, HistoryDataPoint } from '../types';
+import { RiskData, Decision, HistoryDataPoint } from '../types';
 import EvaluateForm from './EvaluateForm';
 import MemoryStats from './MemoryStats';
 import RecentDecisions from './RecentDecisions';
@@ -22,21 +22,22 @@ export default function DashboardPage() {
           headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
         });
         if (!riskRes.ok) throw new Error('Failed to fetch risk');
-        const riskData = await riskRes.json();
+        const riskData: RiskData = await riskRes.json();
         setRisk(riskData);
 
-        // Fetch history (assuming endpoint returns array of decisions)
+        // Fetch history (decisions)
         const historyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/history`, {
           headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
         });
         if (historyRes.ok) {
-          const historyData = await historyRes.json();
-          // Transform to chart data
-          const formatted: HistoryDataPoint[] = historyData.map((item: any) => ({
+          const historyData: Decision[] = await historyRes.json();
+          const formatted: HistoryDataPoint[] = historyData.map((item) => ({
             timestamp: item.timestamp,
-            risk: item.risk_score || 0,
+            risk: item.risk_score ?? 0,
           }));
           setHistory(formatted);
+        } else {
+          console.warn('Failed to fetch history');
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
