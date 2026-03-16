@@ -30,8 +30,13 @@ export default function RecentDecisions() {
       ) : (
         <ul className="divide-y">
           {decisions.slice(0, 5).map((dec) => (
-            <li key={dec.decision_id} className="py-2 flex justify-between">
-              <span className="font-mono text-sm">{dec.decision_id.slice(0, 8)}…</span>
+            <li key={dec.decision_id} className="py-2 flex justify-between group relative">
+              <span 
+                className="font-mono text-sm cursor-help"
+                title={`Full ID: ${dec.decision_id}`}
+              >
+                {dec.decision_id.slice(0, 8)}…
+              </span>
               <span className={`px-2 py-1 rounded text-xs ${
                 dec.outcome === 'success' ? 'bg-green-100 text-green-800' :
                 dec.outcome === 'failure' ? 'bg-red-100 text-red-800' :
