@@ -1,5 +1,8 @@
-// Updated by ARF Coding Agent: Contact/Footer sections enhanced with links and emojis
+// Updated by ARF Coding Agent: Contact/Footer sections enhanced with links, emojis, copy email, Slack tracking, and newsletter
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
 import {
   ArrowRight,
   Github,
@@ -14,10 +17,55 @@ import {
   Mail,
   Linkedin,
   Calendar,
-  MessageSquare
+  MessageSquare,
+  Copy,
+  Check,
+  Send
 } from 'lucide-react';
 
 export default function LandingPage() {
+  const [copied, setCopied] = useState(false);
+  const [email, setEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText('petter2025us@outlook.com');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy email:', err);
+    }
+  };
+
+  const trackSlackClick = () => {
+    // Example tracking - replace with your analytics implementation
+    console.log('Slack invite clicked at:', new Date().toISOString());
+    // You could send this to Google Analytics, Plausible, etc.
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'slack_invite_click', {
+        event_category: 'engagement',
+        event_label: 'footer_slack_link'
+      });
+    }
+  };
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setNewsletterStatus('loading');
+    // Simulate API call - replace with actual newsletter subscription endpoint
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Newsletter subscription for:', email);
+      setNewsletterStatus('success');
+      setEmail('');
+      setTimeout(() => setNewsletterStatus('idle'), 3000);
+    } catch (error) {
+      setNewsletterStatus('error');
+      setTimeout(() => setNewsletterStatus('idle'), 3000);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       {/* Hero Section */}
@@ -147,19 +195,32 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Community & Footer - Enhanced with Contact Info */}
+      {/* Community & Footer - Enhanced with Contact Info, Copy Email, Tracking, Newsletter */}
       <footer className="border-t border-gray-700 py-12 text-center text-gray-400">
         <div className="container mx-auto px-4">
           {/* Contact Section */}
           <div className="mb-8">
             <h3 className="text-xl font-semibold text-white mb-4">Connect with Us</h3>
             <div className="flex flex-wrap justify-center gap-6">
-              <ContactLink
-                href="mailto:petter2025us@outlook.com"
-                icon={<Mail className="w-5 h-5" />}
-                text="petter2025us@outlook.com"
-                emoji="📬"
-              />
+              <div className="flex items-center gap-2">
+                <ContactLink
+                  href="mailto:petter2025us@outlook.com"
+                  icon={<Mail className="w-5 h-5" />}
+                  text="petter2025us@outlook.com"
+                  emoji="📬"
+                />
+                <button
+                  onClick={handleCopyEmail}
+                  className="p-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  aria-label="Copy email address"
+                >
+                  {copied ? (
+                    <Check className="w-4 h-4 text-green-400" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-gray-400 group-hover:text-white" />
+                  )}
+                </button>
+              </div>
               <ContactLink
                 href="https://www.linkedin.com/in/juan-petter"
                 icon={<Linkedin className="w-5 h-5" />}
@@ -167,7 +228,7 @@ export default function LandingPage() {
                 emoji="🔗"
               />
               <ContactLink
-                href="https://calendly.com/"
+                href="https://calendly.com/petter2025us/30min"
                 icon={<Calendar className="w-5 h-5" />}
                 text="Book a Call"
                 emoji="📅"
@@ -177,8 +238,44 @@ export default function LandingPage() {
                 icon={<MessageSquare className="w-5 h-5" />}
                 text="Join Slack"
                 emoji="💬"
+                onClick={trackSlackClick}
               />
             </div>
+          </div>
+
+          {/* Newsletter Signup */}
+          <div className="mb-8 max-w-md mx-auto">
+            <h4 className="text-lg font-semibold text-white mb-2">Stay Updated</h4>
+            <p className="text-sm text-gray-400 mb-4">Get the latest ARF news and updates</p>
+            <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Your email address"
+                required
+                className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white placeholder-gray-500"
+              />
+              <button
+                type="submit"
+                disabled={newsletterStatus === 'loading'}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-blue-400 flex items-center gap-2"
+              >
+                {newsletterStatus === 'loading' ? (
+                  'Sending...'
+                ) : (
+                  <>
+                    Subscribe <Send size={16} />
+                  </>
+                )}
+              </button>
+            </form>
+            {newsletterStatus === 'success' && (
+              <p className="text-sm text-green-400 mt-2">✓ Thanks for subscribing!</p>
+            )}
+            {newsletterStatus === 'error' && (
+              <p className="text-sm text-red-400 mt-2">✗ Something went wrong. Please try again.</p>
+            )}
           </div>
 
           {/* Social / Community Links */}
@@ -189,7 +286,13 @@ export default function LandingPage() {
             <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">
               🤗 Hugging Face
             </a>
-            <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">
+            <a
+              href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={trackSlackClick}
+              className="hover:text-white transition flex items-center gap-1"
+            >
               <MessageSquare size={18} /> Slack
             </a>
             <a href="#" className="hover:text-white transition">Contact</a>
@@ -197,6 +300,13 @@ export default function LandingPage() {
           <p className="text-sm">© 2026 ARF Foundation – Open source (Apache 2.0)</p>
         </div>
       </footer>
+
+      {/* Toast Notification (for copy email) - conditionally rendered */}
+      {copied && (
+        <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
+          Email copied to clipboard! ✉️
+        </div>
+      )}
     </div>
   );
 }
@@ -256,12 +366,13 @@ function RepoCard({ name, desc, url }: { name: string; desc: string; url: string
   );
 }
 
-function ContactLink({ href, icon, text, emoji }: { href: string; icon: React.ReactNode; text: string; emoji: string }) {
+function ContactLink({ href, icon, text, emoji, onClick }: { href: string; icon: React.ReactNode; text: string; emoji: string; onClick?: () => void }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={onClick}
       className="group flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300"
     >
       <span className="text-xl group-hover:scale-110 transition-transform">{emoji}</span>
