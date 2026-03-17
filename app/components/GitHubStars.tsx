@@ -17,6 +17,9 @@ export default function GitHubStars() {
 
     // Use cache if less than 1 hour old
     if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
+      // Disabling the rule because setting state once on mount is intentional
+      // and does not cause cascading renders.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStars(parseInt(cached));
       return;
     }
