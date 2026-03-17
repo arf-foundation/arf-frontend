@@ -20,8 +20,7 @@ import {
   MessageSquare,
   Copy,
   Check,
-  Send,
-  Star
+  Send
 } from 'lucide-react';
 import GitHubStars from '@/components/GitHubStars';
 import { useInView } from '@/hooks/useInView';
