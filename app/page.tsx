@@ -1,4 +1,4 @@
-// Updated by ARF Coding Agent: Contact/Footer sections enhanced with links, emojis, copy email, Slack tracking, and newsletter
+// Updated by ARF Coding Agent: Added GitHub stars, tooltips, enhanced newsletter, quick start button, scroll animations
 'use client';
 
 import Link from 'next/link';
@@ -20,10 +20,13 @@ import {
   MessageSquare,
   Copy,
   Check,
-  Send
+  Send,
+  Star
 } from 'lucide-react';
+import GitHubStars from '@/components/GitHubStars';
+import { useInView } from '@/hooks/useInView';
 
-// Declare gtag for analytics (if used) – using unknown[] to avoid any
+// Declare gtag for analytics (if used)
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
@@ -46,9 +49,7 @@ export default function LandingPage() {
   };
 
   const trackSlackClick = () => {
-    // Example tracking - replace with your analytics implementation
     console.log('Slack invite clicked at:', new Date().toISOString());
-    // Safely call gtag if available
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'slack_invite_click', {
         event_category: 'engagement',
@@ -60,7 +61,6 @@ export default function LandingPage() {
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setNewsletterStatus('loading');
-    // Simulate API call - replace with actual newsletter subscription endpoint
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       console.log('Newsletter subscription for:', email);
@@ -68,23 +68,38 @@ export default function LandingPage() {
       setEmail('');
       setTimeout(() => setNewsletterStatus('idle'), 3000);
     } catch {
-      // Error object intentionally unused – we only update status
       setNewsletterStatus('error');
       setTimeout(() => setNewsletterStatus('idle'), 3000);
     }
   };
 
+  // Scroll animation hooks
+  const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2 });
+  const { ref: ecosystemRef, inView: ecosystemInView } = useInView({ threshold: 0.2 });
+  const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2 });
+  const { ref: demosRef, inView: demosInView } = useInView({ threshold: 0.2 });
+  const { ref: reposRef, inView: reposInView } = useInView({ threshold: 0.2 });
+  const { ref: footerRef, inView: footerInView } = useInView({ threshold: 0.1 });
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center animate-fade-in">
-        <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 glow-text">
-          Agentic Reliability Framework
-        </h1>
+      <section
+        ref={heroRef}
+        className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
+          heroInView ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="flex justify-center items-center gap-3 mb-4">
+          <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent glow-text">
+            Agentic Reliability Framework
+          </h1>
+          <GitHubStars />
+        </div>
         <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
           Auditable cloud governance powered by Bayesian intelligence.
         </p>
-        <div className="flex gap-4 justify-center">
+        <div className="flex gap-4 justify-center flex-wrap">
           <Link
             href="/dashboard"
             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2"
@@ -99,11 +114,22 @@ export default function LandingPage() {
           >
             Explore API
           </a>
+          <Link
+            href="https://arf-foundation.github.io/arf-spec/getting-started/"
+            className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
+          >
+            Quick Start <ArrowRight size={18} />
+          </Link>
         </div>
       </section>
 
       {/* Ecosystem Overview */}
-      <section className="container mx-auto px-4 py-16 animate-slide-up">
+      <section
+        ref={ecosystemRef}
+        className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
+          ecosystemInView ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
         <h2 className="text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
         <div className="grid md:grid-cols-5 gap-4 text-center">
           <EcoCard
@@ -135,34 +161,48 @@ export default function LandingPage() {
       </section>
 
       {/* Key Capabilities */}
-      <section className="container mx-auto px-4 py-16 animate-slide-up">
+      <section
+        ref={capabilitiesRef}
+        className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
+          capabilitiesInView ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
         <h2 className="text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
             title="Bayesian Risk Scoring"
             description="Conjugate priors + HMC for calibrated uncertainty."
             icon={<Brain className="w-8 h-8 text-blue-400 float-icon" />}
+            tooltip="Uses prior knowledge and observed data to compute a probability distribution of risk."
           />
           <FeatureCard
             title="Semantic Memory"
             description="FAISS‑based retrieval of similar past incidents."
             icon={<Network className="w-8 h-8 text-green-400 float-icon" />}
+            tooltip="Stores incident embeddings in a FAISS index for fast similarity search."
           />
           <FeatureCard
             title="DPT Thresholds"
             description="Deterministic approve/deny/escalate (0.2/0.8)."
             icon={<Scale className="w-8 h-8 text-yellow-400 float-icon" />}
+            tooltip="Clear decision boundaries based on risk score: approve (<0.2), escalate (0.2–0.8), deny (>0.8)."
           />
           <FeatureCard
             title="Multi‑Agent Orchestration"
             description="Anomaly detection, root cause, forecasting."
             icon={<Cpu className="w-8 h-8 text-purple-400 float-icon" />}
+            tooltip="Coordinates multiple agents to detect anomalies, find root causes, and forecast future reliability."
           />
         </div>
       </section>
 
       {/* Live Demos */}
-      <section className="container mx-auto px-4 py-16 animate-slide-up">
+      <section
+        ref={demosRef}
+        className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
+          demosInView ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
         <h2 className="text-3xl font-bold text-center mb-12">Live Demos</h2>
         <div className="grid md:grid-cols-3 gap-6">
           <DemoCard
@@ -193,7 +233,12 @@ export default function LandingPage() {
       </section>
 
       {/* Repository Links */}
-      <section className="container mx-auto px-4 py-16 animate-slide-up">
+      <section
+        ref={reposRef}
+        className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
+          reposInView ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
         <h2 className="text-3xl font-bold text-center mb-12">Repository Links</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           <RepoCard name="agentic-reliability-framework" desc="OSS Engine" url="https://github.com/arf-foundation/agentic-reliability-framework" />
@@ -203,8 +248,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Community & Footer - Enhanced with Contact Info, Copy Email, Tracking, Newsletter */}
-      <footer className="border-t border-gray-700 py-12 text-center text-gray-400">
+      {/* Community & Footer */}
+      <footer
+        ref={footerRef}
+        className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
+          footerInView ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
         <div className="container mx-auto px-4">
           {/* Contact Section */}
           <div className="mb-8">
@@ -254,7 +304,9 @@ export default function LandingPage() {
           {/* Newsletter Signup */}
           <div className="mb-8 max-w-md mx-auto">
             <h4 className="text-lg font-semibold text-white mb-2">Stay Updated</h4>
-            <p className="text-sm text-gray-400 mb-4">Get the latest ARF news and updates</p>
+            <p className="text-sm text-gray-400 mb-4">
+              Get monthly updates, best practices, and early access to new features.
+            </p>
             <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
               <input
                 type="email"
@@ -279,10 +331,14 @@ export default function LandingPage() {
               </button>
             </form>
             {newsletterStatus === 'success' && (
-              <p className="text-sm text-green-400 mt-2">✓ Thanks for subscribing!</p>
+              <p className="text-sm text-green-400 mt-2">
+                ✓ Thanks! Please check your inbox to confirm your subscription.
+              </p>
             )}
             {newsletterStatus === 'error' && (
-              <p className="text-sm text-red-400 mt-2">✗ Something went wrong. Please try again.</p>
+              <p className="text-sm text-red-400 mt-2">
+                ✗ Something went wrong. Please try again.
+              </p>
             )}
           </div>
 
@@ -309,7 +365,7 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Toast Notification (for copy email) - conditionally rendered */}
+      {/* Toast Notification */}
       {copied && (
         <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
           Email copied to clipboard! ✉️
@@ -329,12 +385,17 @@ function EcoCard({ icon, title, description }: { icon: React.ReactNode; title: s
   );
 }
 
-function FeatureCard({ title, description, icon }: { title: string; description: string; icon: React.ReactNode }) {
+function FeatureCard({ title, description, icon, tooltip }: { title: string; description: string; icon: React.ReactNode; tooltip?: string }) {
   return (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition">
+    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
       <div className="mb-4 flex justify-center">{icon}</div>
       <h3 className="text-xl font-semibold mb-2 text-center">{title}</h3>
       <p className="text-gray-400 text-center">{description}</p>
+      {tooltip && (
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap z-10 border border-gray-700">
+          {tooltip}
+        </div>
+      )}
     </div>
   );
 }
