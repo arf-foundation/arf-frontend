@@ -23,6 +23,13 @@ import {
   Send
 } from 'lucide-react';
 
+// Declare gtag for analytics (if used)
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
 export default function LandingPage() {
   const [copied, setCopied] = useState(false);
   const [email, setEmail] = useState('');
@@ -41,7 +48,7 @@ export default function LandingPage() {
   const trackSlackClick = () => {
     // Example tracking - replace with your analytics implementation
     console.log('Slack invite clicked at:', new Date().toISOString());
-    // You could send this to Google Analytics, Plausible, etc.
+    // Safely call gtag if available
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'slack_invite_click', {
         event_category: 'engagement',
