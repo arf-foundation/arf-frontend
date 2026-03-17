@@ -1,4 +1,4 @@
-// Updated by ARF Coding Agent: Added GitHub stars, tooltips, enhanced newsletter, quick start button, scroll animations
+// Updated by ARF Coding Agent: Added GitHub stars, tooltips, enhanced newsletter, documentation button, scroll animations
 'use client';
 
 import Link from 'next/link';
@@ -100,12 +100,14 @@ export default function LandingPage() {
           Auditable cloud governance powered by Bayesian intelligence.
         </p>
         <div className="flex gap-4 justify-center flex-wrap">
-          <Link
-            href="/dashboard"
+          <a
+            href="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4"
+            target="_blank"
+            rel="noopener noreferrer"
             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2"
           >
             Try Demo <ArrowRight size={18} />
-          </Link>
+          </a>
           <a
             href="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-API"
             target="_blank"
@@ -115,10 +117,10 @@ export default function LandingPage() {
             Explore API
           </a>
           <Link
-            href="https://arf-foundation.github.io/arf-spec/getting-started/"
+            href="https://arf-foundation.github.io/arf-spec/"
             className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
           >
-            Quick Start <ArrowRight size={18} />
+            Documentation <ArrowRight size={18} />
           </Link>
         </div>
       </section>
