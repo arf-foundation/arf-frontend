@@ -22,8 +22,9 @@ import {
   Check,
   Send
 } from 'lucide-react';
-import GitHubStars from '@/components/GitHubStars';
-import { useInView } from '@/hooks/useInView';
+// Corrected imports: use relative paths instead of '@/' alias
+import GitHubStars from './components/GitHubStars';
+import { useInView } from './hooks/useInView';
 
 // Declare gtag for analytics (if used)
 declare global {
