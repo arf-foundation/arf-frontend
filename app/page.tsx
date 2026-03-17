@@ -23,10 +23,10 @@ import {
   Send
 } from 'lucide-react';
 
-// Declare gtag for analytics (if used)
+// Declare gtag for analytics (if used) – using unknown[] to avoid any
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
@@ -67,7 +67,8 @@ export default function LandingPage() {
       setNewsletterStatus('success');
       setEmail('');
       setTimeout(() => setNewsletterStatus('idle'), 3000);
-    } catch (error) {
+    } catch {
+      // Error object intentionally unused – we only update status
       setNewsletterStatus('error');
       setTimeout(() => setNewsletterStatus('idle'), 3000);
     }
