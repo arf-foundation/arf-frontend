@@ -1,5 +1,21 @@
+// Updated by ARF Coding Agent: Contact/Footer sections enhanced with links and emojis
 import Link from 'next/link';
-import { ArrowRight, Github, Rocket, BookOpen, Users, Code, Cpu, Brain, Scale, Network } from 'lucide-react';
+import {
+  ArrowRight,
+  Github,
+  Rocket,
+  BookOpen,
+  Users,
+  Code,
+  Cpu,
+  Brain,
+  Scale,
+  Network,
+  Mail,
+  Linkedin,
+  Calendar,
+  MessageSquare
+} from 'lucide-react';
 
 export default function LandingPage() {
   return (
@@ -131,16 +147,54 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Community & Footer */}
-      <footer className="border-t border-gray-700 py-8 text-center text-gray-400">
+      {/* Community & Footer - Enhanced with Contact Info */}
+      <footer className="border-t border-gray-700 py-12 text-center text-gray-400">
         <div className="container mx-auto px-4">
-          <div className="flex justify-center gap-6 mb-4">
-            <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white">GitHub</a>
-            <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white">Hugging Face</a>
-            <a href="#" className="hover:text-white">Join Forum</a>
-            <a href="#" className="hover:text-white">Contact</a>
+          {/* Contact Section */}
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold text-white mb-4">Connect with Us</h3>
+            <div className="flex flex-wrap justify-center gap-6">
+              <ContactLink
+                href="mailto:petter2025us@outlook.com"
+                icon={<Mail className="w-5 h-5" />}
+                text="petter2025us@outlook.com"
+                emoji="📬"
+              />
+              <ContactLink
+                href="https://www.linkedin.com/in/juan-petter"
+                icon={<Linkedin className="w-5 h-5" />}
+                text="Juan Petter"
+                emoji="🔗"
+              />
+              <ContactLink
+                href="https://calendly.com/"
+                icon={<Calendar className="w-5 h-5" />}
+                text="Book a Call"
+                emoji="📅"
+              />
+              <ContactLink
+                href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
+                icon={<MessageSquare className="w-5 h-5" />}
+                text="Join Slack"
+                emoji="💬"
+              />
+            </div>
           </div>
-          <p>© 2026 ARF Foundation – Open source (Apache 2.0)</p>
+
+          {/* Social / Community Links */}
+          <div className="flex justify-center gap-6 mb-4">
+            <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">
+              <Github size={18} /> GitHub
+            </a>
+            <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">
+              🤗 Hugging Face
+            </a>
+            <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">
+              <MessageSquare size={18} /> Slack
+            </a>
+            <a href="#" className="hover:text-white transition">Contact</a>
+          </div>
+          <p className="text-sm">© 2026 ARF Foundation – Open source (Apache 2.0)</p>
         </div>
       </footer>
     </div>
@@ -198,6 +252,23 @@ function RepoCard({ name, desc, url }: { name: string; desc: string; url: string
     <a href={url} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition block">
       <h3 className="font-mono text-sm text-gray-300">{name}</h3>
       <p className="text-gray-400 text-sm mt-1">{desc}</p>
+    </a>
+  );
+}
+
+function ContactLink({ href, icon, text, emoji }: { href: string; icon: React.ReactNode; text: string; emoji: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300"
+    >
+      <span className="text-xl group-hover:scale-110 transition-transform">{emoji}</span>
+      <span className="flex items-center gap-1 text-gray-300 group-hover:text-white">
+        {icon}
+        <span className="text-sm font-medium">{text}</span>
+      </span>
     </a>
   );
 }
