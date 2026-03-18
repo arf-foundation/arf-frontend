@@ -25,7 +25,7 @@ jobs:
         if: steps.lockfile-check.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ARF_GITHUB_PAT }}
           commit-message: Update yarn.lock [skip ci]
           title: 'Update yarn.lock'
           body: |
