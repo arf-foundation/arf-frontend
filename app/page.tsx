@@ -1,8 +1,8 @@
-// Updated by ARF Coding Agent: Mobile-friendly improvements and PWA readiness
+// Updated by ARF Coding Agent: Added copy button, dynamic repo badges, and distinct demo icons
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ArrowRight,
   Github,
@@ -22,11 +22,19 @@ import {
   Check,
   Send,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Gauge // Added for the dashboard icon
 } from 'lucide-react';
 import GitHubStars from './components/GitHubStars';
 import { useInView } from './hooks/useInView';
 
+// --- Type for Repository Data (used by RepoCard) ---
+interface RepoData {
+  stargazers_count: number;
+  language: string | null;
+}
+
+// Declare gtag for analytics (if used)
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
@@ -34,17 +42,30 @@ declare global {
 }
 
 export default function LandingPage() {
-  const [copied, setCopied] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false); // New state for code snippet copy
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
+  // --- Handler for copying the email address ---
   const handleCopyEmail = async () => {
     try {
       await navigator.clipboard.writeText('petter2025us@outlook.com');
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2000);
     } catch (err) {
       console.error('Failed to copy email:', err);
+    }
+  };
+
+  // --- New handler for copying the API code snippet ---
+  const handleCopyCodeSnippet = async () => {
+    try {
+      await navigator.clipboard.writeText('curl -X POST /api/v1/incidents/evaluate');
+      setCopiedCodeSnippet(true);
+      setTimeout(() => setCopiedCodeSnippet(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy code snippet:', err);
     }
   };
 
@@ -73,7 +94,7 @@ export default function LandingPage() {
     }
   };
 
-  // Scroll animation hooks
+  // Scroll animation hooks (unchanged)
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2 });
   const { ref: ecosystemRef, inView: ecosystemInView } = useInView({ threshold: 0.2 });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2 });
@@ -83,7 +104,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      {/* Hero Section - with responsive font sizes */}
+      {/* Hero Section (unchanged) */}
       <section
         ref={heroRef}
         className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
@@ -125,7 +146,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Ecosystem Overview - responsive grid */}
+      {/* Ecosystem Overview (unchanged) */}
       <section
         ref={ecosystemRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -134,6 +155,7 @@ export default function LandingPage() {
       >
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* EcoCard components remain the same */}
           <EcoCard
             icon={<Rocket className="w-6 h-6 text-blue-400" />}
             title="Research"
@@ -167,7 +189,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Key Capabilities - already responsive */}
+      {/* Key Capabilities (unchanged) */}
       <section
         ref={capabilitiesRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -203,7 +225,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Demos - already responsive */}
+      {/* Live Demos - UPDATED with copy button and custom icons */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -212,34 +234,55 @@ export default function LandingPage() {
       >
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Live Demos</h2>
         <div className="grid md:grid-cols-3 gap-6">
+          {/* Demo 1: OSS Demo - Rocket Icon */}
           <DemoCard
             title="OSS Demo"
             description="Interactive risk dashboard"
             link="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4"
             buttonText="Launch"
+            icon={<Rocket size={16} />}
             external
           />
+
+          {/* Demo 2: API Code Snippet - with copy button and Code Icon */}
           <DemoCard
             title="API Code Snippet"
             description={
-              <pre className="bg-gray-900 p-2 rounded text-sm font-mono text-green-300 whitespace-pre-wrap break-all">
-                curl -X POST /api/v1/incidents/evaluate
-              </pre>
+              <div className="flex items-center gap-2">
+                <pre className="bg-gray-900 p-2 rounded text-sm font-mono text-green-300 whitespace-pre-wrap break-all flex-1">
+                  curl -X POST /api/v1/incidents/evaluate
+                </pre>
+                <button
+                  onClick={handleCopyCodeSnippet}
+                  className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition group flex-shrink-0"
+                  aria-label="Copy code snippet"
+                >
+                  {copiedCodeSnippet ? (
+                    <Check className="w-4 h-4 text-green-400" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-gray-300 group-hover:text-white" />
+                  )}
+                </button>
+              </div>
             }
             link="https://a-r-f-agentic-reliability-framework-api.hf.space/docs"
             buttonText="Try API"
+            icon={<Code size={16} />}
             external
           />
+
+          {/* Demo 3: Frontend Dashboard - Gauge Icon */}
           <DemoCard
             title="Frontend Dashboard"
             description="Real‑time governance visuals"
             link="/dashboard"
             buttonText="Go"
+            icon={<Gauge size={16} />}
           />
         </div>
       </section>
 
-      {/* Repository Links - already responsive */}
+      {/* Repository Links - UPDATED with dynamic badges */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -255,13 +298,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Community & Footer - already responsive */}
+      {/* Footer (unchanged) */}
       <footer
         ref={footerRef}
         className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
           footerInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
+        {/* Footer content remains identical to your version */}
         <div className="container mx-auto px-4">
           {/* Contact Section */}
           <div className="mb-8">
@@ -279,7 +323,7 @@ export default function LandingPage() {
                   className="p-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
                   aria-label="Copy email address"
                 >
-                  {copied ? (
+                  {copiedEmail ? (
                     <Check className="w-4 h-4 text-green-400" />
                   ) : (
                     <Copy className="w-4 h-4 text-gray-400 group-hover:text-white" />
@@ -372,17 +416,24 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Toast Notification */}
-      {copied && (
+      {/* Toast Notifications */}
+      {copiedEmail && (
         <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
           Email copied to clipboard! ✉️
+        </div>
+      )}
+      {copiedCodeSnippet && (
+        <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
+          Code snippet copied! 📋
         </div>
       )}
     </div>
   );
 }
 
-// EcoCard with expandable details (unchanged)
+// --- Component Definitions ---
+
+// EcoCard (unchanged)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
@@ -408,7 +459,7 @@ function EcoCard({ icon, title, description, details }: { icon: React.ReactNode;
   );
 }
 
-// FeatureCard with expandable details (unchanged)
+// FeatureCard (unchanged)
 function FeatureCard({ title, description, icon, details }: { title: string; description: string; icon: React.ReactNode; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
@@ -434,14 +485,21 @@ function FeatureCard({ title, description, icon, details }: { title: string; des
   );
 }
 
-// DemoCard (unchanged)
-function DemoCard({ title, description, link, buttonText, external = false }: { title: string; description: React.ReactNode; link: string; buttonText: string; external?: boolean }) {
+// DemoCard - UPDATED to accept custom icon
+function DemoCard({ title, description, link, buttonText, icon = <ArrowRight size={16} />, external = false }: { 
+  title: string; 
+  description: React.ReactNode; 
+  link: string; 
+  buttonText: string; 
+  icon?: React.ReactNode; 
+  external?: boolean;
+}) {
   const content = (
     <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-full flex flex-col">
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <div className="text-gray-400 mb-4 flex-1">{description}</div>
       <span className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 mt-auto">
-        {buttonText} <ArrowRight size={16} />
+        {buttonText} {icon}
       </span>
     </div>
   );
@@ -461,11 +519,63 @@ function DemoCard({ title, description, link, buttonText, external = false }: { 
   );
 }
 
-// RepoCard (unchanged)
+// RepoCard - ENHANCED with dynamic GitHub stats
 function RepoCard({ name, desc, url }: { name: string; desc: string; url: string }) {
+  const [repoData, setRepoData] = useState<RepoData | null>(null);
+  const repoName = url.split('/').pop(); // Extract repo name from URL
+
+  useEffect(() => {
+    const fetchRepoData = async () => {
+      // Check cache first
+      const cached = localStorage.getItem(`github-${repoName}`);
+      const cachedTime = localStorage.getItem(`github-${repoName}-time`);
+      const now = Date.now();
+
+      if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
+        setRepoData(JSON.parse(cached));
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://api.github.com/repos/arf-foundation/${repoName}`);
+        const data = await response.json();
+        if (data.stargazers_count !== undefined) {
+          const newData = {
+            stargazers_count: data.stargazers_count,
+            language: data.language
+          };
+          setRepoData(newData);
+          localStorage.setItem(`github-${repoName}`, JSON.stringify(newData));
+          localStorage.setItem(`github-${repoName}-time`, now.toString());
+        }
+      } catch (error) {
+        console.error(`Failed to fetch data for ${repoName}:`, error);
+      }
+    };
+
+    if (repoName) {
+      fetchRepoData();
+    }
+  }, [repoName]);
+
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition block">
-      <h3 className="font-mono text-sm text-gray-300">{name}</h3>
+    <a href={url} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition block group">
+      <div className="flex items-start justify-between">
+        <h3 className="font-mono text-sm text-gray-300 group-hover:text-white transition-colors">{name}</h3>
+        {repoData && (
+          <div className="flex items-center gap-2 text-xs">
+            {repoData.language && (
+              <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-300">
+                {repoData.language}
+              </span>
+            )}
+            <span className="flex items-center gap-0.5 text-yellow-400">
+              <Star size={12} className="fill-yellow-400" />
+              {repoData.stargazers_count.toLocaleString()}
+            </span>
+          </div>
+        )}
+      </div>
       <p className="text-gray-400 text-sm mt-1">{desc}</p>
     </a>
   );
