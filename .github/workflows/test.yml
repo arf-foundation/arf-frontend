@@ -2,6 +2,10 @@ name: Test Frontend
 
 on: [push, pull_request]
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,12 +16,10 @@ jobs:
           node-version: 20
           cache: 'yarn'
       - name: Install dependencies
-        # Temporarily remove frozen-lockfile to allow updates
         run: yarn install
       - name: Check if yarn.lock changed
         id: lockfile-check
         run: |
-          # Check if yarn.lock is different from HEAD
           git diff --quiet yarn.lock || echo "changed=true" >> $GITHUB_OUTPUT
       - name: Create Pull Request
         if: steps.lockfile-check.outputs.changed == 'true'
