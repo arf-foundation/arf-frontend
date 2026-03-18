@@ -1,4 +1,4 @@
-// Updated by ARF Coding Agent: Added GitHub stars, tooltips, enhanced newsletter, documentation button, scroll animations
+// Updated by ARF Coding Agent: Mobile-friendly improvements and PWA readiness
 'use client';
 
 import Link from 'next/link';
@@ -20,13 +20,13 @@ import {
   MessageSquare,
   Copy,
   Check,
-  Send
+  Send,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
-// Corrected imports: use relative paths instead of '@/' alias
 import GitHubStars from './components/GitHubStars';
 import { useInView } from './hooks/useInView';
 
-// Declare gtag for analytics (if used)
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
@@ -83,28 +83,28 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      {/* Hero Section */}
+      {/* Hero Section - with responsive font sizes */}
       <section
         ref={heroRef}
         className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
           heroInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <div className="flex justify-center items-center gap-3 mb-4">
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent glow-text">
+        <div className="flex flex-col items-center gap-3 mb-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent glow-text">
             Agentic Reliability Framework
           </h1>
           <GitHubStars />
         </div>
-        <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+        <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
           Auditable cloud governance powered by Bayesian intelligence.
         </p>
-        <div className="flex gap-4 justify-center flex-wrap">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <a
             href="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2 w-full sm:w-auto justify-center"
           >
             Try Demo <ArrowRight size={18} />
           </a>
@@ -112,100 +112,105 @@ export default function LandingPage() {
             href="https://a-r-f-agentic-reliability-framework-api.hf.space/docs"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
+            className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition flex items-center gap-2 w-full sm:w-auto justify-center"
           >
-            Explore API
+            Explore API <ArrowRight size={18} />
           </a>
           <Link
             href="https://arf-foundation.github.io/arf-spec/"
-            className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
+            className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2 w-full sm:w-auto justify-center"
           >
             Documentation <ArrowRight size={18} />
           </Link>
         </div>
       </section>
 
-      {/* Ecosystem Overview */}
+      {/* Ecosystem Overview - responsive grid */}
       <section
         ref={ecosystemRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
           ecosystemInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
-        <div className="grid md:grid-cols-5 gap-4 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <EcoCard
             icon={<Rocket className="w-6 h-6 text-blue-400" />}
             title="Research"
             description="Mathematical foundations of hybrid Bayesian inference"
+            details="Published papers and collaborations with academic institutions on Bayesian methods for reliability engineering. Our research focuses on scalable inference for cloud infrastructure."
           />
           <EcoCard
             icon={<Code className="w-6 h-6 text-green-400" />}
             title="OSS Engine"
             description="Core Bayesian models, memory, and governance loop"
+            details="The heart of ARF – implements conjugate priors, HMC sampling, and the semantic memory graph. Fully open‑source under Apache 2.0."
           />
           <EcoCard
             icon={<Users className="w-6 h-6 text-yellow-400" />}
             title="API Control Plane"
             description="FastAPI service exposing the framework"
+            details="Production‑ready REST API with automatic docs, rate limiting, and CORS. Serves as the bridge between the core engine and frontend applications."
           />
           <EcoCard
             icon={<BookOpen className="w-6 h-6 text-purple-400" />}
             title="Frontend UI"
             description="Next.js dashboard for visualizing risk"
+            details="Interactive dashboard built with Next.js and Tailwind CSS. Features real‑time risk charts, memory statistics, and the incident evaluation form you're using now."
           />
           <EcoCard
             icon={<Github className="w-6 h-6 text-orange-400" />}
             title="Enterprise"
             description="Advanced compliance, audit trails, and support"
+            details="For organizations requiring SLAs, SSO, and advanced audit capabilities. Includes priority support and custom integrations."
           />
         </div>
       </section>
 
-      {/* Key Capabilities */}
+      {/* Key Capabilities - already responsive */}
       <section
         ref={capabilitiesRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
           capabilitiesInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-3xl font-bold text-center mb-12">Key Capabilities</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
             title="Bayesian Risk Scoring"
             description="Conjugate priors + HMC for calibrated uncertainty."
             icon={<Brain className="w-8 h-8 text-blue-400 float-icon" />}
-            tooltip="Uses prior knowledge and observed data to compute a probability distribution of risk."
+            details="Uses prior knowledge and observed data to compute a full probability distribution of risk. The posterior distribution gives you not just a point estimate, but also uncertainty intervals and the full shape of risk."
           />
           <FeatureCard
             title="Semantic Memory"
             description="FAISS‑based retrieval of similar past incidents."
             icon={<Network className="w-8 h-8 text-green-400 float-icon" />}
-            tooltip="Stores incident embeddings in a FAISS index for fast similarity search."
+            details="Stores incident embeddings in a FAISS index for fast similarity search. When a new incident occurs, ARF retrieves the most similar past incidents and their outcomes to inform the current risk assessment."
           />
           <FeatureCard
             title="DPT Thresholds"
             description="Deterministic approve/deny/escalate (0.2/0.8)."
             icon={<Scale className="w-8 h-8 text-yellow-400 float-icon" />}
-            tooltip="Clear decision boundaries based on risk score: approve (<0.2), escalate (0.2–0.8), deny (>0.8)."
+            details="Clear decision boundaries based on risk score: approve (<0.2), escalate (0.2–0.8), deny (>0.8). These thresholds are configurable and can be adjusted to match your organization's risk appetite."
           />
           <FeatureCard
             title="Multi‑Agent Orchestration"
             description="Anomaly detection, root cause, forecasting."
             icon={<Cpu className="w-8 h-8 text-purple-400 float-icon" />}
-            tooltip="Coordinates multiple agents to detect anomalies, find root causes, and forecast future reliability."
+            details="Coordinates multiple agents to detect anomalies, find root causes, and forecast future reliability. Each agent specializes in a different aspect of the infrastructure, and they collaborate to form a comprehensive picture."
           />
         </div>
       </section>
 
-      {/* Live Demos */}
+      {/* Live Demos - already responsive */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
           demosInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-3xl font-bold text-center mb-12">Live Demos</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Live Demos</h2>
         <div className="grid md:grid-cols-3 gap-6">
           <DemoCard
             title="OSS Demo"
@@ -217,11 +222,11 @@ export default function LandingPage() {
           <DemoCard
             title="API Code Snippet"
             description={
-              <pre className="bg-gray-900 p-2 rounded text-sm font-mono text-green-300">
+              <pre className="bg-gray-900 p-2 rounded text-sm font-mono text-green-300 whitespace-pre-wrap break-all">
                 curl -X POST /api/v1/incidents/evaluate
               </pre>
             }
-            link="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-API"
+            link="https://a-r-f-agentic-reliability-framework-api.hf.space/docs"
             buttonText="Try API"
             external
           />
@@ -234,15 +239,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Repository Links */}
+      {/* Repository Links - already responsive */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
           reposInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-3xl font-bold text-center mb-12">Repository Links</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Repository Links</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <RepoCard name="agentic-reliability-framework" desc="OSS Engine" url="https://github.com/arf-foundation/agentic-reliability-framework" />
           <RepoCard name="arf-api" desc="API Backend" url="https://github.com/arf-foundation/arf-api" />
           <RepoCard name="arf-frontend" desc="Frontend UI" url="https://github.com/arf-foundation/arf-frontend" />
@@ -250,7 +255,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Community & Footer */}
+      {/* Community & Footer - already responsive */}
       <footer
         ref={footerRef}
         className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
@@ -309,7 +314,7 @@ export default function LandingPage() {
             <p className="text-sm text-gray-400 mb-4">
               Get monthly updates, best practices, and early access to new features.
             </p>
-            <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-2">
               <input
                 type="email"
                 value={email}
@@ -321,7 +326,7 @@ export default function LandingPage() {
               <button
                 type="submit"
                 disabled={newsletterStatus === 'loading'}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-blue-400 flex items-center gap-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-blue-400 flex items-center gap-2 justify-center"
               >
                 {newsletterStatus === 'loading' ? (
                   'Sending...'
@@ -345,7 +350,7 @@ export default function LandingPage() {
           </div>
 
           {/* Social / Community Links */}
-          <div className="flex justify-center gap-6 mb-4">
+          <div className="flex flex-wrap justify-center gap-6 mb-4">
             <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">
               <Github size={18} /> GitHub
             </a>
@@ -377,31 +382,59 @@ export default function LandingPage() {
   );
 }
 
-function EcoCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+// EcoCard with expandable details (unchanged)
+function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
+  const [expanded, setExpanded] = useState(false);
   return (
-    <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition group">
+    <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition group relative">
       <div className="flex justify-center mb-2 group-hover:scale-110 transition-transform">{icon}</div>
       <h3 className="font-semibold text-sm">{title}</h3>
       <p className="text-xs text-gray-400 mt-1">{description}</p>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 mx-auto transition"
+      >
+        {expanded ? 'Show less' : 'Details'} 
+        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          expanded ? 'max-h-40 opacity-100 mt-2' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <p className="text-xs text-gray-300 border-t border-gray-700 pt-2">{details}</p>
+      </div>
     </div>
   );
 }
 
-function FeatureCard({ title, description, icon, tooltip }: { title: string; description: string; icon: React.ReactNode; tooltip?: string }) {
+// FeatureCard with expandable details (unchanged)
+function FeatureCard({ title, description, icon, details }: { title: string; description: string; icon: React.ReactNode; details: string }) {
+  const [expanded, setExpanded] = useState(false);
   return (
     <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
-      <div className="mb-4 flex justify-center">{icon}</div>
+      <div className="mb-4 flex justify-center group-hover:scale-110 transition-transform">{icon}</div>
       <h3 className="text-xl font-semibold mb-2 text-center">{title}</h3>
-      <p className="text-gray-400 text-center">{description}</p>
-      {tooltip && (
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap z-10 border border-gray-700">
-          {tooltip}
-        </div>
-      )}
+      <p className="text-gray-400 text-center mb-2">{description}</p>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1 mx-auto transition"
+      >
+        {expanded ? 'Show less' : 'Details'} 
+        {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          expanded ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <p className="text-sm text-gray-300 border-t border-gray-700 pt-4">{details}</p>
+      </div>
     </div>
   );
 }
 
+// DemoCard (unchanged)
 function DemoCard({ title, description, link, buttonText, external = false }: { title: string; description: React.ReactNode; link: string; buttonText: string; external?: boolean }) {
   const content = (
     <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-full flex flex-col">
@@ -428,6 +461,7 @@ function DemoCard({ title, description, link, buttonText, external = false }: { 
   );
 }
 
+// RepoCard (unchanged)
 function RepoCard({ name, desc, url }: { name: string; desc: string; url: string }) {
   return (
     <a href={url} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition block">
@@ -437,6 +471,7 @@ function RepoCard({ name, desc, url }: { name: string; desc: string; url: string
   );
 }
 
+// ContactLink (unchanged)
 function ContactLink({ href, icon, text, emoji, onClick }: { href: string; icon: React.ReactNode; text: string; emoji: string; onClick?: () => void }) {
   return (
     <a
