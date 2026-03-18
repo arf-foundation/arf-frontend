@@ -3,8 +3,39 @@ import Link from 'next/link';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'ARF – Agentic Reliability Framework',
-  description: 'Bayesian governance for agentic systems',
+  title: {
+    default: 'ARF – Agentic Reliability Framework',
+    template: '%s | ARF',
+  },
+  description: 'Bayesian governance for cloud infrastructure. Real‑time risk scoring, semantic memory, and policy enforcement.',
+  keywords: ['cloud governance', 'Bayesian inference', 'reliability', 'HMC', 'FAISS', 'Next.js'],
+  authors: [{ name: 'Juan Petter', url: 'https://www.linkedin.com/in/juan-petter' }],
+  creator: 'ARF Foundation',
+  publisher: 'ARF Foundation',
+  robots: 'index, follow',
+  openGraph: {
+    title: 'ARF – Agentic Reliability Framework',
+    description: 'Auditable cloud governance powered by Bayesian intelligence.',
+    url: 'https://arf-frontend-sandy.vercel.app',
+    siteName: 'ARF',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'ARF Dashboard Preview',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ARF – Agentic Reliability Framework',
+    description: 'Bayesian governance for cloud infrastructure.',
+    creator: '@arf_foundation',
+    images: ['/og-image.png'],
+  },
   manifest: '/site.webmanifest',
   themeColor: '#3b82f6',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
@@ -12,6 +43,9 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'ARF',
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 
