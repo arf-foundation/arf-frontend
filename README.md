@@ -7,6 +7,8 @@
 Interactive frontend for the **Agentic Reliability Framework (ARF)** – a Bayesian‑powered governance system for cloud infrastructure. Visualize risk scores, simulate incidents, and explore governance decisions in real time.
 
 🔗 **Live demo**: [arf-frontend-sandy.vercel.app](https://arf-frontend-sandy.vercel.app)
+🔗 **Live API**: [a-r-f-agentic-reliability-framework-api.hf.space](https://a-r-f-agentic-reliability-framework-api.hf.space)
+🔗 **API Docs**: [a-r-f-agentic-reliability-framework-api.hf.space/docs](https://a-r-f-agentic-reliability-framework-api.hf.space/docs)
 
 ## Overview
 
@@ -46,7 +48,7 @@ yarn install
 Create a .env.local file in the root directory:
 
 ```env
-NEXT_PUBLIC_API_URL=https://your-arf-api-url.com
+NEXT_PUBLIC_API_URL=https://a-r-f-agentic-reliability-framework-api.hf.space
 NEXT_PUBLIC_API_KEY=your-api-key   # if required
 ```
 
