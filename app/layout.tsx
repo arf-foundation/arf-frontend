@@ -1,8 +1,9 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import './globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://arf-frontend-sandy.vercel.app'),
   title: {
     default: 'ARF – Agentic Reliability Framework',
     template: '%s | ARF',
@@ -37,8 +38,6 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
   },
   manifest: '/site.webmanifest',
-  themeColor: '#3b82f6',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -47,6 +46,13 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#3b82f6',
 };
 
 export default function RootLayout({
