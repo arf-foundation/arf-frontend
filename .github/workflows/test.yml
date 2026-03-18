@@ -8,14 +8,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # This is important: we need to fetch the full history and have write access
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'yarn'
       - name: Install dependencies
-        # Temporarily remove frozen-lockfile to allow updates
         run: yarn install
       - name: Check if yarn.lock changed
         id: lockfile-check
@@ -32,7 +30,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add yarn.lock
           git commit -m "Update yarn.lock [skip ci]"
-          git push
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/arf-foundation/arf-frontend.git HEAD:${{ github.ref }}
       - name: Lint
         run: yarn lint
       - name: Build
