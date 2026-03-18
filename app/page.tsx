@@ -23,7 +23,8 @@ import {
   Send,
   ChevronDown,
   ChevronUp,
-  Gauge // Added for the dashboard icon
+  Gauge,
+  Star
 } from 'lucide-react';
 import GitHubStars from './components/GitHubStars';
 import { useInView } from './hooks/useInView';
@@ -43,11 +44,10 @@ declare global {
 
 export default function LandingPage() {
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false); // New state for code snippet copy
+  const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false);
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  // --- Handler for copying the email address ---
   const handleCopyEmail = async () => {
     try {
       await navigator.clipboard.writeText('petter2025us@outlook.com');
@@ -58,7 +58,6 @@ export default function LandingPage() {
     }
   };
 
-  // --- New handler for copying the API code snippet ---
   const handleCopyCodeSnippet = async () => {
     try {
       await navigator.clipboard.writeText('curl -X POST /api/v1/incidents/evaluate');
@@ -94,7 +93,7 @@ export default function LandingPage() {
     }
   };
 
-  // Scroll animation hooks (unchanged)
+  // Scroll animation hooks
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2 });
   const { ref: ecosystemRef, inView: ecosystemInView } = useInView({ threshold: 0.2 });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2 });
@@ -104,7 +103,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      {/* Hero Section (unchanged) */}
+      {/* Hero Section */}
       <section
         ref={heroRef}
         className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
@@ -146,7 +145,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Ecosystem Overview (unchanged) */}
+      {/* Ecosystem Overview */}
       <section
         ref={ecosystemRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -155,7 +154,6 @@ export default function LandingPage() {
       >
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {/* EcoCard components remain the same */}
           <EcoCard
             icon={<Rocket className="w-6 h-6 text-blue-400" />}
             title="Research"
@@ -189,7 +187,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Key Capabilities (unchanged) */}
+      {/* Key Capabilities */}
       <section
         ref={capabilitiesRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -225,7 +223,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Demos - UPDATED with copy button and custom icons */}
+      {/* Live Demos */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -234,7 +232,6 @@ export default function LandingPage() {
       >
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Live Demos</h2>
         <div className="grid md:grid-cols-3 gap-6">
-          {/* Demo 1: OSS Demo - Rocket Icon */}
           <DemoCard
             title="OSS Demo"
             description="Interactive risk dashboard"
@@ -243,8 +240,6 @@ export default function LandingPage() {
             icon={<Rocket size={16} />}
             external
           />
-
-          {/* Demo 2: API Code Snippet - with copy button and Code Icon */}
           <DemoCard
             title="API Code Snippet"
             description={
@@ -270,8 +265,6 @@ export default function LandingPage() {
             icon={<Code size={16} />}
             external
           />
-
-          {/* Demo 3: Frontend Dashboard - Gauge Icon */}
           <DemoCard
             title="Frontend Dashboard"
             description="Real‑time governance visuals"
@@ -282,7 +275,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Repository Links - UPDATED with dynamic badges */}
+      {/* Repository Links */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -298,14 +291,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer (unchanged) */}
+      {/* Footer */}
       <footer
         ref={footerRef}
         className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
           footerInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        {/* Footer content remains identical to your version */}
         <div className="container mx-auto px-4">
           {/* Contact Section */}
           <div className="mb-8">
@@ -431,8 +423,6 @@ export default function LandingPage() {
   );
 }
 
-// --- Component Definitions ---
-
 // EcoCard (unchanged)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -485,7 +475,7 @@ function FeatureCard({ title, description, icon, details }: { title: string; des
   );
 }
 
-// DemoCard - UPDATED to accept custom icon
+// DemoCard (updated with icon prop)
 function DemoCard({ title, description, link, buttonText, icon = <ArrowRight size={16} />, external = false }: { 
   title: string; 
   description: React.ReactNode; 
@@ -519,14 +509,13 @@ function DemoCard({ title, description, link, buttonText, icon = <ArrowRight siz
   );
 }
 
-// RepoCard - ENHANCED with dynamic GitHub stats
+// RepoCard (enhanced with dynamic GitHub stats)
 function RepoCard({ name, desc, url }: { name: string; desc: string; url: string }) {
   const [repoData, setRepoData] = useState<RepoData | null>(null);
-  const repoName = url.split('/').pop(); // Extract repo name from URL
+  const repoName = url.split('/').pop();
 
   useEffect(() => {
     const fetchRepoData = async () => {
-      // Check cache first
       const cached = localStorage.getItem(`github-${repoName}`);
       const cachedTime = localStorage.getItem(`github-${repoName}-time`);
       const now = Date.now();
