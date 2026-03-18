@@ -13,6 +13,13 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Allow require in .cjs files (e.g., jest.config.cjs)
+  {
+    files: ["**/*.cjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
