@@ -3,8 +3,28 @@
 import { useState } from 'react';
 import { EvaluateResponse, IncidentReport } from '../types';
 
-// Define the severity type locally for clarity (also available from IncidentReport)
 type SeverityLevel = 'low' | 'medium' | 'high' | 'critical';
+
+const EXAMPLES = {
+  latency: {
+    service_name: 'api-gateway',
+    event_type: 'latency',
+    severity: 'high' as SeverityLevel,
+    metrics: { latency_ms: 450, error_rate: 0.02 }
+  },
+  error: {
+    service_name: 'auth-service',
+    event_type: 'error_rate',
+    severity: 'critical' as SeverityLevel,
+    metrics: { error_rate: 0.15, throughput: 120 }
+  },
+  cpu: {
+    service_name: 'compute-node',
+    event_type: 'cpu',
+    severity: 'medium' as SeverityLevel,
+    metrics: { cpu_util: 92, memory_util: 78 }
+  }
+};
 
 export default function EvaluateForm() {
   const [service, setService] = useState('');
@@ -14,9 +34,38 @@ export default function EvaluateForm() {
   const [result, setResult] = useState<EvaluateResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [jsonError, setJsonError] = useState<string | null>(null);
+
+  const validateJSON = (str: string): boolean => {
+    try {
+      JSON.parse(str);
+      setJsonError(null);
+      return true;
+    } catch (e) {
+      setJsonError('Invalid JSON format');
+      return false;
+    }
+  };
+
+  const handleMetricsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setMetrics(value);
+    validateJSON(value);
+  };
+
+  const loadExample = (key: keyof typeof EXAMPLES) => {
+    const ex = EXAMPLES[key];
+    setService(ex.service_name);
+    setEventType(ex.event_type);
+    setSeverity(ex.severity);
+    setMetrics(JSON.stringify(ex.metrics, null, 2));
+    setJsonError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateJSON(metrics)) return;
+
     setLoading(true);
     setError(null);
     try {
@@ -45,6 +94,33 @@ export default function EvaluateForm() {
   return (
     <div className="bg-white rounded-lg shadow p-6 mt-8">
       <h2 className="text-xl font-bold mb-4">Test an Incident</h2>
+
+      {/* Example buttons */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        <span className="text-sm text-gray-600 mr-2">Load example:</span>
+        <button
+          type="button"
+          onClick={() => loadExample('latency')}
+          className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
+        >
+          Latency spike
+        </button>
+        <button
+          type="button"
+          onClick={() => loadExample('error')}
+          className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
+        >
+          Error burst
+        </button>
+        <button
+          type="button"
+          onClick={() => loadExample('cpu')}
+          className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
+        >
+          High CPU
+        </button>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">Service Name</label>
@@ -85,15 +161,18 @@ export default function EvaluateForm() {
           <label className="block text-sm font-medium mb-1">Metrics (JSON)</label>
           <textarea
             value={metrics}
-            onChange={(e) => setMetrics(e.target.value)}
-            className="w-full p-2 border rounded font-mono text-sm"
+            onChange={handleMetricsChange}
+            className={`w-full p-2 border rounded font-mono text-sm ${
+              jsonError ? 'border-red-500' : ''
+            }`}
             rows={4}
             placeholder='{"latency_ms": 450, "error_rate": 0.02}'
           />
+          {jsonError && <p className="text-red-500 text-sm mt-1">{jsonError}</p>}
         </div>
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !!jsonError}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-300"
         >
           {loading ? 'Evaluating...' : 'Evaluate'}
