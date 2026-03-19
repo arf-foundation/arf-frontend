@@ -198,54 +198,70 @@ export default function EvaluateForm() {
               <div>
                 <div className="text-sm text-gray-600">Epistemic Uncertainty</div>
                 <div className="text-2xl font-bold">
-                  {(result.epistemic_uncertainty * 100).toFixed(1)}%
+                  {result.epistemic_uncertainty !== undefined
+                    ? (result.epistemic_uncertainty * 100).toFixed(1) + '%'
+                    : 'N/A'}
                 </div>
               </div>
               <div>
                 <div className="text-sm text-gray-600">Confidence Interval</div>
                 <div className="text-xl font-mono">
-                  [{result.confidence_interval[0].toFixed(3)},{' '}
-                  {result.confidence_interval[1].toFixed(3)}]
+                  {result.confidence_interval ? (
+                    <>
+                      [{result.confidence_interval[0].toFixed(3)},{' '}
+                      {result.confidence_interval[1].toFixed(3)}]
+                    </>
+                  ) : (
+                    'N/A'
+                  )}
                 </div>
               </div>
               <div>
                 <div className="text-sm text-gray-600">Requires Escalation</div>
                 <div className="text-xl font-bold">
-                  {result.requires_escalation ? 'Yes' : 'No'}
+                  {result.requires_escalation !== undefined
+                    ? result.requires_escalation
+                      ? 'Yes'
+                      : 'No'
+                    : 'N/A'}
                 </div>
               </div>
             </div>
           </div>
 
           {/* Explanation */}
-          <div className="p-4 bg-gray-50 rounded border">
-            <h3 className="font-semibold mb-2">Explanation</h3>
-            <p className="text-sm text-gray-700">{result.explanation}</p>
-          </div>
+          {result.explanation && (
+            <div className="p-4 bg-gray-50 rounded border">
+              <h3 className="font-semibold mb-2">Explanation</h3>
+              <p className="text-sm text-gray-700">{result.explanation}</p>
+            </div>
+          )}
 
           {/* Risk Contributions */}
-          <div className="p-4 bg-gray-50 rounded border">
-            <h3 className="font-semibold mb-3">Risk Contributions</h3>
-            <div className="space-y-2">
-              {result.risk_contributions.map((rc, idx) => (
-                <div key={idx} className="flex items-center">
-                  <span className="text-sm w-48">{rc.factor}:</span>
-                  <div className="flex-1 h-4 bg-gray-200 rounded">
-                    <div
-                      className="h-4 bg-blue-600 rounded"
-                      style={{ width: `${rc.contribution * 100}%` }}
-                    />
+          {result.risk_contributions && result.risk_contributions.length > 0 && (
+            <div className="p-4 bg-gray-50 rounded border">
+              <h3 className="font-semibold mb-3">Risk Contributions</h3>
+              <div className="space-y-2">
+                {result.risk_contributions.map((rc, idx) => (
+                  <div key={idx} className="flex items-center">
+                    <span className="text-sm w-48">{rc.factor}:</span>
+                    <div className="flex-1 h-4 bg-gray-200 rounded">
+                      <div
+                        className="h-4 bg-blue-600 rounded"
+                        style={{ width: `${rc.contribution * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-sm ml-2">
+                      {(rc.contribution * 100).toFixed(1)}%
+                    </span>
                   </div>
-                  <span className="text-sm ml-2">
-                    {(rc.contribution * 100).toFixed(1)}%
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Similar Incidents */}
-          {result.similar_incidents.length > 0 && (
+          {result.similar_incidents && result.similar_incidents.length > 0 && (
             <div className="p-4 bg-gray-50 rounded border">
               <h3 className="font-semibold mb-3">Similar Incidents</h3>
               <div className="space-y-3 max-h-60 overflow-y-auto">
@@ -283,7 +299,7 @@ export default function EvaluateForm() {
           )}
 
           {/* Recommended Actions */}
-          {result.recommended_actions.length > 0 && (
+          {result.recommended_actions && result.recommended_actions.length > 0 && (
             <div className="p-4 bg-gray-50 rounded border">
               <h3 className="font-semibold mb-3">Recommended Actions</h3>
               <div className="space-y-3">
