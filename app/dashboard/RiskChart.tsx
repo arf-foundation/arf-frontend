@@ -7,7 +7,6 @@ import { HistoryDataPoint } from '../types';
 interface TooltipPayload {
   value: number;
   payload: HistoryDataPoint;
-  // other fields exist but are not used
 }
 
 interface CustomTooltipProps {
@@ -18,7 +17,6 @@ interface CustomTooltipProps {
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
-    const data = payload[0].payload;
     return (
       <div className="bg-white p-3 border border-gray-200 shadow-lg rounded">
         <p className="text-sm font-medium text-gray-900">
@@ -27,9 +25,6 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
         <p className="text-sm text-gray-700">
           Risk: <span className="font-mono font-bold">{payload[0].value.toFixed(3)}</span>
         </p>
-        {data.incident && (
-          <p className="text-xs text-gray-500 mt-1">Incident: {data.incident}</p>
-        )}
       </div>
     );
   }
