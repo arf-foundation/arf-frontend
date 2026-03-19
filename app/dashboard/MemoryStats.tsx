@@ -1,29 +1,35 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { MemoryStats as MemoryStatsType } from '../types';
+import { HelpCircle } from 'lucide-react';
 
 export default function MemoryStats() {
   const [stats, setStats] = useState<MemoryStatsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+
+  const fetchStats = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/memory/stats`);
+      if (!response.ok) throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+      const data: MemoryStatsType = await response.json();
+      setStats(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/memory/stats`);
-        if (!response.ok) throw new Error('Failed to fetch memory stats');
-        const data: MemoryStatsType = await response.json();
-        setStats(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStats();
-  }, []);
+  }, [fetchStats, retryCount]);
+
+  const handleRetry = () => setRetryCount(c => c + 1);
 
   if (loading) {
     return (
@@ -38,7 +44,13 @@ export default function MemoryStats() {
     return (
       <div className="bg-white rounded-lg shadow p-4">
         <h3 className="font-semibold mb-2">Memory Stats</h3>
-        <p className="text-sm text-red-600">Error: {error}</p>
+        <p className="text-sm text-red-600 mb-2">Error: {error}</p>
+        <button
+          onClick={handleRetry}
+          className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -56,29 +68,50 @@ export default function MemoryStats() {
     <div className="bg-white rounded-lg shadow p-4">
       <h3 className="font-semibold mb-2">Memory Stats</h3>
       <div className="space-y-2 text-sm">
-        <div className="flex justify-between">
-          <span className="text-gray-600">Incident Nodes:</span>
-          <span className="font-mono">{stats.incident_nodes}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Outcome Nodes:</span>
-          <span className="font-mono">{stats.outcome_nodes}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Edges:</span>
-          <span className="font-mono">{stats.edges}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Cache Hit Rate:</span>
-          <span className="font-mono">{(stats.cache_hit_rate * 100).toFixed(1)}%</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Operational:</span>
-          <span className={`font-mono ${stats.is_operational ? 'text-green-600' : 'text-red-600'}`}>
-            {stats.is_operational ? 'Yes' : 'No'}
-          </span>
-        </div>
+        <StatRow
+          label="Incident Nodes"
+          value={stats.incident_nodes}
+          tooltip="Number of incidents stored in semantic memory"
+        />
+        <StatRow
+          label="Outcome Nodes"
+          value={stats.outcome_nodes}
+          tooltip="Number of outcomes (actions taken) recorded"
+        />
+        <StatRow
+          label="Edges"
+          value={stats.edges}
+          tooltip="Connections between incidents and outcomes"
+        />
+        <StatRow
+          label="Cache Hit Rate"
+          value={`${(stats.cache_hit_rate * 100).toFixed(1)}%`}
+          tooltip="How often similar incidents are retrieved from cache vs. recomputed"
+        />
+        <StatRow
+          label="Operational"
+          value={stats.is_operational ? 'Yes' : 'No'}
+          tooltip="Memory system is ready to serve queries"
+          valueClass={stats.is_operational ? 'text-green-600' : 'text-red-600'}
+        />
       </div>
+    </div>
+  );
+}
+
+function StatRow({ label, value, tooltip, valueClass = '' }: { label: string; value: string | number; tooltip: string; valueClass?: string }) {
+  return (
+    <div className="flex justify-between items-center group">
+      <span className="text-gray-600 flex items-center gap-1">
+        {label}
+        <span className="relative inline-block">
+          <HelpCircle size={14} className="text-gray-400 cursor-help" />
+          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap z-10">
+            {tooltip}
+          </span>
+        </span>
+      </span>
+      <span className={`font-mono ${valueClass}`}>{value}</span>
     </div>
   );
 }
