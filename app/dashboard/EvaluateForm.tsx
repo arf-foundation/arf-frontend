@@ -41,7 +41,7 @@ export default function EvaluateForm() {
       JSON.parse(str);
       setJsonError(null);
       return true;
-    } catch (e) {
+    } catch {
       setJsonError('Invalid JSON format');
       return false;
     }
