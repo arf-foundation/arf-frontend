@@ -1,9 +1,9 @@
 'use client';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
 import { HistoryDataPoint } from '../types';
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -12,7 +12,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           {new Date(label).toLocaleString()}
         </p>
         <p className="text-sm text-gray-700">
-          Risk: <span className="font-mono font-bold">{payload[0].value.toFixed(3)}</span>
+          Risk: <span className="font-mono font-bold">{payload[0].value?.toFixed(3)}</span>
         </p>
         {data.incident && (
           <p className="text-xs text-gray-500 mt-1">Incident: {data.incident}</p>
