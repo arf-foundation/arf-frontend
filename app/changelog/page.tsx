@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { ExternalLink, Calendar, Tag } from 'lucide-react';
 
 // Types for GitHub release data
@@ -11,6 +10,15 @@ interface GitHubRelease {
   tag_name: string;
   published_at: string;
   body: string;
+  html_url: string;
+}
+
+// Type for raw GitHub API response
+interface GitHubApiRelease {
+  name: string | null;
+  tag_name: string;
+  published_at: string;
+  body: string | null;
   html_url: string;
 }
 
@@ -52,9 +60,9 @@ export default function ChangelogPage() {
           REPOS.map(async (repo) => {
             const response = await fetch(`https://api.github.com/repos/arf-foundation/${repo}/releases`);
             if (!response.ok) throw new Error(`Failed to fetch ${repo} releases`);
-            const data = await response.json();
+            const data: GitHubApiRelease[] = await response.json();
             // Map to our format
-            return data.map((release: any) => ({
+            return data.map((release) => ({
               repo,
               name: release.name || release.tag_name,
               tag_name: release.tag_name,
