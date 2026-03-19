@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import './globals.css';
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     creator: '@arf_foundation',
     images: ['/og-image.png'],
   },
-  manifest: '/site.webmanifest',
+  manifest: '/manifest.json',   // <-- changed from '/site.webmanifest'
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -68,7 +69,7 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="manifest" href="/manifest.json" />   {/* also update this if present */}
         {/* Additional PWA meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
