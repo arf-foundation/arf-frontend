@@ -1,4 +1,3 @@
-// Updated by ARF Coding Agent: Added copy button, dynamic repo badges, and distinct demo icons
 'use client';
 
 import Link from 'next/link';
@@ -223,7 +222,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Demos */}
+      {/* Live Demos (updated with 4th card) */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -231,7 +230,7 @@ export default function LandingPage() {
         }`}
       >
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Live Demos</h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-4 gap-6">
           <DemoCard
             title="OSS Demo"
             description="Interactive risk dashboard"
@@ -271,6 +270,14 @@ export default function LandingPage() {
             link="/dashboard"
             buttonText="Go"
             icon={<Gauge size={16} />}
+          />
+          <DemoCard
+            title="Reliable AI Systems Stack"
+            description="Curated tools for AI reliability"
+            link="https://huggingface.co/collections/petter2025/reliable-ai-systems-stack"
+            buttonText="Explore"
+            icon={<Star size={16} />}
+            external
           />
         </div>
       </section>
