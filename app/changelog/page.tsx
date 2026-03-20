@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ExternalLink, Calendar, Tag } from 'lucide-react';
+import { ExternalLink, Calendar, Tag, ArrowRight, Copy, Check, Github, Rocket, Code } from 'lucide-react';
 
 // Types for GitHub release data
 interface GitHubRelease {
@@ -40,6 +40,18 @@ export default function ChangelogPage() {
   const [releases, setReleases] = useState<GitHubRelease[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+
+  // Set page title
+  useEffect(() => {
+    document.title = "Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane";
+  }, []);
+
+  const copyCode = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
+  };
 
   useEffect(() => {
     const fetchAllReleases = async () => {
@@ -131,17 +143,16 @@ export default function ChangelogPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 py-12">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">Changelog</h1>
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-lg shadow p-6 animate-pulse">
-                <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              </div>
-            ))}
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+              Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane
+            </h1>
+            <div className="animate-pulse space-y-4 mt-8">
+              <div className="h-8 bg-gray-700 rounded w-2/3 mx-auto"></div>
+              <div className="h-4 bg-gray-700 rounded w-1/2 mx-auto"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -150,17 +161,21 @@ export default function ChangelogPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 py-12">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">Changelog</h1>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-800">
-            <p>Error loading releases: {error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-            >
-              Retry
-            </button>
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+              Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane
+            </h1>
+            <div className="bg-red-900/50 border border-red-700 rounded-lg p-6 mt-8">
+              <p>Error loading releases: {error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+              >
+                Retry
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -168,58 +183,179 @@ export default function ChangelogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Changelog</h1>
-        <p className="text-gray-600 mb-8">
-          Latest releases from across the ARF ecosystem.
-        </p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Hero / Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+              Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane
+            </h1>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+              v4.2.0 – Bayesian governance for auditable, self‑healing AI systems
+            </p>
+          </div>
 
-        {releases.length === 0 ? (
-          <p className="text-gray-500">No releases found.</p>
-        ) : (
-          <div className="space-y-6">
-            {releases.map((release, idx) => (
-              <div
-                key={`${release.repo}-${release.tag_name}-${idx}`}
-                className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow"
+          {/* Problem‑Solution‑Outcome */}
+          <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700 mb-8">
+            <div className="grid md:grid-cols-3 gap-6 text-center">
+              <div>
+                <div className="text-red-400 font-bold text-xl mb-2">⚠️ Problem</div>
+                <p className="text-gray-300">Most AI systems fail silently in production.</p>
+              </div>
+              <div>
+                <div className="text-green-400 font-bold text-xl mb-2">🔧 Solution</div>
+                <p className="text-gray-300">ARF turns probabilistic AI into deterministic, auditable action.</p>
+              </div>
+              <div>
+                <div className="text-blue-400 font-bold text-xl mb-2">📈 Outcome</div>
+                <p className="text-gray-300">Reduce MTTR by up to 85% with self‑healing systems.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Block */}
+          <div className="flex flex-wrap justify-center gap-4 mb-12">
+            <a
+              href="https://a-r-f-agentic-reliability-framework-api.hf.space/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2"
+            >
+              API Docs <ArrowRight size={18} />
+            </a>
+            <a
+              href="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition flex items-center gap-2"
+            >
+              Live Demo <Rocket size={18} />
+            </a>
+            <a
+              href="https://github.com/arf-foundation/agentic-reliability-framework"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition flex items-center gap-2"
+            >
+              GitHub <Github size={18} />
+            </a>
+            <a
+              href="https://calendly.com/petter2025us/30min"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
+            >
+              Book a Call <Calendar size={18} />
+            </a>
+          </div>
+
+          {/* Diagram */}
+          <div className="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 text-center">How ARF Works</h2>
+            <div className="overflow-x-auto">
+              <pre className="text-sm text-left text-gray-300 font-mono">
+{`flowchart TD
+    subgraph Input["🔌 Input Sources"]
+        Services[Agents / Services]
+        Metrics[Metrics / Logs]
+    end
+
+    Services --> Signals[Observability Signals]
+    Metrics --> Signals
+
+    Signals --> Interpreter[ARF Reliability Interpreter]
+    
+    subgraph Engine["⚙️ ARF Core Engine"]
+        Interpreter --> Risk[Bayesian Risk Engine]
+        Risk --> Intent[Healing Intent Engine]
+    end
+    
+    Intent --> Recovery[Recovery Actions]
+    
+    style Interpreter fill:#e1f5fe,stroke:#01579b
+    style Risk fill:#fff3e0,stroke:#e65100
+    style Intent fill:#e8f5e8,stroke:#1b5e20`}
+              </pre>
+            </div>
+            <p className="text-xs text-gray-500 mt-2 text-center">(Mermaid diagram – view source for rendered version)</p>
+          </div>
+
+          {/* Code Snippet */}
+          <div className="bg-gray-800 rounded-lg p-6 mb-12 border border-gray-700">
+            <h2 className="text-xl font-semibold mb-4">Try It Now</h2>
+            <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
+              <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">
+                curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/api/v1/incidents/evaluate \
+                  -H "Content-Type: application/json" \
+                  -d '{{"service_name":"api","event_type":"latency","severity":"high","metrics":{{"latency_ms":450}}}}'
+              </pre>
+              <button
+                onClick={() => copyCode('curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/api/v1/incidents/evaluate -H "Content-Type: application/json" -d \'{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}\'')}
+                className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                aria-label="Copy code"
               >
-                <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                      {getRepoDisplay(release.repo)}
-                    </span>
-                    <span className="text-gray-500 text-sm flex items-center gap-1">
-                      <Tag size={14} />
-                      {release.tag_name}
+                {copiedCode ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
+              </button>
+            </div>
+            <p className="text-sm text-gray-400 mt-2">
+              Returns a full <span className="font-mono">HealingIntent</span> with risk score, risk factors, and recommended action.
+            </p>
+          </div>
+
+          {/* Changelog Header */}
+          <div className="border-b border-gray-700 pb-4 mb-6">
+            <h2 className="text-2xl font-bold">Latest Releases</h2>
+            <p className="text-gray-400">From the ARF ecosystem – Core Engine, API, and Frontend</p>
+          </div>
+
+          {/* Release List */}
+          {releases.length === 0 ? (
+            <p className="text-gray-500">No releases found.</p>
+          ) : (
+            <div className="space-y-6">
+              {releases.map((release, idx) => (
+                <div
+                  key={`${release.repo}-${release.tag_name}-${idx}`}
+                  className="bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow border border-gray-700"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 bg-blue-900 text-blue-200 rounded-full text-sm font-medium">
+                        {getRepoDisplay(release.repo)}
+                      </span>
+                      <span className="text-gray-400 text-sm flex items-center gap-1">
+                        <Tag size={14} />
+                        {release.tag_name}
+                      </span>
+                    </div>
+                    <span className="text-gray-400 text-sm flex items-center gap-1">
+                      <Calendar size={14} />
+                      {formatDate(release.published_at)}
                     </span>
                   </div>
-                  <span className="text-gray-500 text-sm flex items-center gap-1">
-                    <Calendar size={14} />
-                    {formatDate(release.published_at)}
-                  </span>
+
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    {release.name}
+                  </h3>
+
+                  <p className="text-gray-300 mb-4">
+                    {truncateBody(release.body)}
+                  </p>
+
+                  <a
+                    href={release.html_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 font-medium transition"
+                  >
+                    View on GitHub <ExternalLink size={16} />
+                  </a>
                 </div>
-
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  {release.name}
-                </h2>
-
-                <p className="text-gray-600 mb-4">
-                  {truncateBody(release.body)}
-                </p>
-
-                <a
-                  href={release.html_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium transition"
-                >
-                  View on GitHub <ExternalLink size={16} />
-                </a>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
