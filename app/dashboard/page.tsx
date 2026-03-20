@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { RiskData, Decision, HistoryDataPoint } from '../types';
 import EvaluateForm from './EvaluateForm';
 import MemoryStats from './MemoryStats';
@@ -18,7 +19,6 @@ export default function DashboardPage() {
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     try {
-      // Fetch current risk
       const riskRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/get_risk`, {
         headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
       });
@@ -26,7 +26,6 @@ export default function DashboardPage() {
       const riskData: RiskData = await riskRes.json();
       setRisk(riskData);
 
-      // Fetch history (decisions)
       const historyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/history`, {
         headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
       });
@@ -90,7 +89,15 @@ export default function DashboardPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">ARF Dashboard</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold">ARF Dashboard</h1>
+          <Link
+            href="/changelog"
+            className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full hover:bg-blue-200 transition"
+          >
+            v4.2.0
+          </Link>
+        </div>
         <div className="flex items-center gap-4">
           {lastUpdated && (
             <span className="text-sm text-gray-500">
@@ -119,7 +126,6 @@ export default function DashboardPage() {
 
       {/* Top row: current risk + memory stats */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
-        {/* Current Risk Card (unchanged) */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Current System Risk</h2>
           {risk && (
@@ -158,7 +164,6 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Memory Stats (enhanced version) */}
         <MemoryStats />
       </div>
 
@@ -168,13 +173,45 @@ export default function DashboardPage() {
         <RiskChart data={history} />
       </div>
 
-      {/* Evaluate Form (enhanced version) */}
+      {/* Evaluate Form (enhanced) */}
       <div className="mb-8">
         <EvaluateForm />
       </div>
 
-      {/* Recent Decisions */}
-      <RecentDecisions />
+      {/* Recent Decisions (enhanced) */}
+      <div className="mb-8">
+        <RecentDecisions />
+      </div>
+
+      {/* Additional Cards */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-2">🤗 Explore the Stack</h3>
+          <p className="text-gray-600 mb-3">
+            Discover complementary tools for AI reliability, forecasting, and incident triage.
+          </p>
+          <a
+            href="https://huggingface.co/collections/petter2025/reliable-ai-systems-stack"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-blue-600 hover:underline"
+          >
+            Visit Reliable AI Systems Stack →
+          </a>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-2">📢 What's New in v4.2.0</h3>
+          <p className="text-gray-600 mb-3">
+            Full risk factor decomposition, traceable governance loop, and improved API docs.
+          </p>
+          <Link
+            href="/changelog"
+            className="inline-flex items-center text-blue-600 hover:underline"
+          >
+            Read the changelog →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
