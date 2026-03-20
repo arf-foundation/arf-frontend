@@ -3,7 +3,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '../types';
 
-// Define the shape of the tooltip payload based on recharts structure
 interface TooltipPayload {
   value: number;
   payload: HistoryDataPoint;
@@ -18,12 +17,12 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 border border-gray-200 shadow-lg rounded">
-        <p className="text-sm font-medium text-gray-900">
+      <div className="bg-gray-800 border border-gray-700 p-3 rounded shadow-lg">
+        <p className="text-sm font-medium text-gray-300">
           {new Date(label!).toLocaleString()}
         </p>
-        <p className="text-sm text-gray-700">
-          Risk: <span className="font-mono font-bold">{payload[0].value.toFixed(3)}</span>
+        <p className="text-sm text-gray-400">
+          Risk: <span className="font-mono font-bold text-blue-400">{payload[0].value.toFixed(3)}</span>
         </p>
       </div>
     );
@@ -39,14 +38,15 @@ export default function RiskChart({ data }: { data: HistoryDataPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
         <XAxis
           dataKey="timestamp"
           tickFormatter={(t) => new Date(t).toLocaleTimeString()}
+          stroke="#9ca3af"
         />
-        <YAxis domain={[0, 1]} />
+        <YAxis domain={[0, 1]} stroke="#9ca3af" />
         <Tooltip content={<CustomTooltip />} />
-        <Line type="monotone" dataKey="risk" stroke="#2563eb" strokeWidth={2} dot={false} />
+        <Line type="monotone" dataKey="risk" stroke="#3b82f6" strokeWidth={2} dot={false} />
       </LineChart>
     </ResponsiveContainer>
   );
