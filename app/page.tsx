@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import GitHubStars from './components/GitHubStars';
 import { useInView } from './hooks/useInView';
+import Mermaid from './components/Mermaid';
 
 // --- Type for Repository Data (used by RepoCard) ---
 interface RepoData {
@@ -240,14 +241,14 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Architecture Diagram */}
+      {/* Architecture Diagram - now uses Mermaid */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <div className="overflow-x-auto">
-            <pre className="text-sm text-left text-gray-300 font-mono">{DIAGRAM}</pre>
-          </div>
-          <p className="text-xs text-gray-500 mt-2 text-center">(Mermaid diagram – view source for rendered version)</p>
+          <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
+          <p className="text-xs text-gray-500 mt-2 text-center">
+            (Mermaid diagram – interactive)
+          </p>
         </div>
       </div>
 
