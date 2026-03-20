@@ -1,34 +1,35 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
 
-export default function FAQPage() {
-  const [copied, setCopied] = useState<string | null>(null);
+// Helper component for code blocks with copy buttons (defined outside render)
+const CodeBlock = ({ code, id }: { code: string; id: string }) => {
+  const [copied, setCopied] = useState(false);
 
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(id);
-    setTimeout(() => setCopied(null), 2000);
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  // Helper to render code blocks with copy buttons
-  const CodeBlock = ({ code, id }: { code: string; id: string }) => (
+  return (
     <div className="relative group">
       <pre className="bg-gray-900 p-3 rounded-lg text-sm text-green-300 overflow-x-auto whitespace-pre-wrap font-mono">
         {code}
       </pre>
       <button
-        onClick={() => copyToClipboard(code, id)}
+        onClick={copyToClipboard}
         className="absolute top-2 right-2 p-1 bg-gray-700 rounded opacity-0 group-hover:opacity-100 transition"
         aria-label="Copy code"
       >
-        {copied === id ? <Check size={16} className="text-green-400" /> : <Copy size={16} className="text-gray-300" />}
+        {copied ? <Check size={16} className="text-green-400" /> : <Copy size={16} className="text-gray-300" />}
       </button>
     </div>
   );
+};
 
+export default function FAQPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -234,7 +235,7 @@ export default function FAQPage() {
   );
 }
 
-// Collapsible FAQ item component
+// Collapsible FAQ item component (defined inside is fine, it’s a component but not created during render)
 function FAQItem({ question, answer }: { question: string; answer: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
