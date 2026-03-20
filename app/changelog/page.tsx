@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ExternalLink, Calendar, Tag, ArrowRight, Copy, Check, Github, Rocket, Code } from 'lucide-react';
+import { ExternalLink, Calendar, Tag, ArrowRight, Copy, Check, Github, Rocket } from 'lucide-react';
+import Mermaid from '../components/Mermaid';
 
 // Types for GitHub release data
 interface GitHubRelease {
@@ -218,100 +219,16 @@ export default function ChangelogPage() {
             </p>
           </div>
 
-          {/* Problem‑Solution‑Outcome */}
-          <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700 mb-8">
-            <div className="grid md:grid-cols-3 gap-6 text-center">
-              <div>
-                <div className="text-red-400 font-bold text-xl mb-2">⚠️ Problem</div>
-                <p className="text-gray-300">Most AI systems fail silently in production.</p>
-              </div>
-              <div>
-                <div className="text-green-400 font-bold text-xl mb-2">🔧 Solution</div>
-                <p className="text-gray-300">ARF turns probabilistic AI into deterministic, auditable action.</p>
-              </div>
-              <div>
-                <div className="text-blue-400 font-bold text-xl mb-2">📈 Outcome</div>
-                <p className="text-gray-300">Reduce MTTR by up to 85% with self‑healing systems.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA Block */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            <a
-              href="https://a-r-f-agentic-reliability-framework-api.hf.space/docs"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2"
-            >
-              API Docs <ArrowRight size={18} />
-            </a>
-            <a
-              href="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition flex items-center gap-2"
-            >
-              Live Demo <Rocket size={18} />
-            </a>
-            <a
-              href="https://github.com/arf-foundation/agentic-reliability-framework"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition flex items-center gap-2"
-            >
-              GitHub <Github size={18} />
-            </a>
-            <a
-              href="https://calendly.com/petter2025us/30min"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
-            >
-              Book a Call <Calendar size={18} />
-            </a>
-          </div>
-
-          {/* Diagram */}
-          <div className="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 text-center">How ARF Works</h2>
-            <div className="overflow-x-auto">
-              <pre className="text-sm text-left text-gray-300 font-mono">{DIAGRAM}</pre>
-            </div>
-            <p className="text-xs text-gray-500 mt-2 text-center">(Mermaid diagram – view source for rendered version)</p>
-          </div>
-
-          {/* Code Snippet */}
-          <div className="bg-gray-800 rounded-lg p-6 mb-12 border border-gray-700">
-            <h2 className="text-xl font-semibold mb-4">Try It Now</h2>
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
-                <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{CURL_COMMAND}</pre>
-                <button
-                  onClick={() => copyCode(CURL_COMMAND)}
-                  className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
-                  aria-label="Copy code"
-                >
-                  {copiedCode ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
-                </button>
-              </div>
-              <p className="text-sm text-gray-400">
-                Returns a full <span className="font-mono">HealingIntent</span> with risk score, risk factors, and recommended action.
-              </p>
-            </div>
-          </div>
-
-          {/* Changelog Header */}
+          {/* ---------- LATEST RELEASES (now first) ---------- */}
           <div className="border-b border-gray-700 pb-4 mb-6">
             <h2 className="text-2xl font-bold">Latest Releases</h2>
             <p className="text-gray-400">From the ARF ecosystem – Core Engine, API, and Frontend</p>
           </div>
 
-          {/* Release List */}
           {releases.length === 0 ? (
             <p className="text-gray-500">No releases found.</p>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-6 mb-16">
               {releases.map((release, idx) => (
                 <div
                   key={`${release.repo}-${release.tag_name}-${idx}`}
@@ -353,6 +270,92 @@ export default function ChangelogPage() {
               ))}
             </div>
           )}
+
+          {/* ---------- MARKETING BLOCK (moved after releases) ---------- */}
+          <div className="mt-8">
+            {/* Problem‑Solution‑Outcome */}
+            <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700 mb-8">
+              <div className="grid md:grid-cols-3 gap-6 text-center">
+                <div>
+                  <div className="text-red-400 font-bold text-xl mb-2">⚠️ Problem</div>
+                  <p className="text-gray-300">Most AI systems fail silently in production.</p>
+                </div>
+                <div>
+                  <div className="text-green-400 font-bold text-xl mb-2">🔧 Solution</div>
+                  <p className="text-gray-300">ARF turns probabilistic AI into deterministic, auditable action.</p>
+                </div>
+                <div>
+                  <div className="text-blue-400 font-bold text-xl mb-2">📈 Outcome</div>
+                  <p className="text-gray-300">Reduce MTTR by up to 85% with self‑healing systems.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Block */}
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              <a
+                href="https://a-r-f-agentic-reliability-framework-api.hf.space/docs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2"
+              >
+                API Docs <ArrowRight size={18} />
+              </a>
+              <a
+                href="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition flex items-center gap-2"
+              >
+                Live Demo <Rocket size={18} />
+              </a>
+              <a
+                href="https://github.com/arf-foundation/agentic-reliability-framework"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition flex items-center gap-2"
+              >
+                GitHub <Github size={18} />
+              </a>
+              <a
+                href="https://calendly.com/petter2025us/30min"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
+              >
+                Book a Call <Calendar size={18} />
+              </a>
+            </div>
+
+            {/* Diagram */}
+            <div className="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-700">
+              <h2 className="text-xl font-semibold mb-4 text-center">How ARF Works</h2>
+              <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                (Mermaid diagram – interactive)
+              </p>
+            </div>
+
+            {/* Code Snippet */}
+            <div className="bg-gray-800 rounded-lg p-6 mb-12 border border-gray-700">
+              <h2 className="text-xl font-semibold mb-4">Try It Now</h2>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
+                  <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{CURL_COMMAND}</pre>
+                  <button
+                    onClick={() => copyCode(CURL_COMMAND)}
+                    className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                    aria-label="Copy code"
+                  >
+                    {copiedCode ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
+                  </button>
+                </div>
+                <p className="text-sm text-gray-400">
+                  Returns a full <span className="font-mono">HealingIntent</span> with risk score, risk factors, and recommended action.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
