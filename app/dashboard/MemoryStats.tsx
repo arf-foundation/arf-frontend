@@ -33,18 +33,18 @@ export default function MemoryStats() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="font-semibold mb-2">Memory Stats</h3>
-        <p className="text-sm text-gray-500">Loading...</p>
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
+        <h3 className="font-semibold mb-2 text-gray-200">Memory Stats</h3>
+        <p className="text-sm text-gray-400">Loading...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="font-semibold mb-2">Memory Stats</h3>
-        <p className="text-sm text-red-600 mb-2">Error: {error}</p>
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
+        <h3 className="font-semibold mb-2 text-gray-200">Memory Stats</h3>
+        <p className="text-sm text-red-400 mb-2">Error: {error}</p>
         <button
           onClick={handleRetry}
           className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
@@ -57,9 +57,9 @@ export default function MemoryStats() {
 
   if (!stats) {
     return (
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="font-semibold mb-2">Memory Stats</h3>
-        <p className="text-sm text-gray-500">No data available</p>
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
+        <h3 className="font-semibold mb-2 text-gray-200">Memory Stats</h3>
+        <p className="text-sm text-gray-400">No data available</p>
       </div>
     );
   }
@@ -67,12 +67,12 @@ export default function MemoryStats() {
   // If not operational, show helpful message
   if (!stats.is_operational) {
     return (
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="font-semibold mb-2">Memory Stats</h3>
-        <p className="text-sm text-gray-600">
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
+        <h3 className="font-semibold mb-2 text-gray-200">Memory Stats</h3>
+        <p className="text-sm text-gray-300">
           Memory is not yet populated – start by evaluating incidents to build semantic memory.
         </p>
-        <p className="text-xs text-gray-400 mt-2">
+        <p className="text-xs text-gray-500 mt-2">
           (In OSS edition, memory is in‑memory only and resets on restart.)
         </p>
       </div>
@@ -80,8 +80,8 @@ export default function MemoryStats() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-4">
-      <h3 className="font-semibold mb-2">Memory Stats</h3>
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
+      <h3 className="font-semibold mb-2 text-gray-200">Memory Stats</h3>
       <div className="space-y-2 text-sm">
         <StatRow
           label="Incident Nodes"
@@ -107,7 +107,7 @@ export default function MemoryStats() {
           label="Operational"
           value={stats.is_operational ? 'Yes' : 'No'}
           tooltip="Memory system is ready to serve queries"
-          valueClass={stats.is_operational ? 'text-green-600' : 'text-red-600'}
+          valueClass={stats.is_operational ? 'text-green-400' : 'text-red-400'}
         />
       </div>
     </div>
@@ -117,16 +117,16 @@ export default function MemoryStats() {
 function StatRow({ label, value, tooltip, valueClass = '' }: { label: string; value: string | number; tooltip: string; valueClass?: string }) {
   return (
     <div className="flex justify-between items-center group">
-      <span className="text-gray-600 flex items-center gap-1">
+      <span className="text-gray-400 flex items-center gap-1">
         {label}
         <span className="relative inline-block">
-          <HelpCircle size={14} className="text-gray-400 cursor-help" />
+          <HelpCircle size={14} className="text-gray-500 cursor-help" />
           <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap z-10">
             {tooltip}
           </span>
         </span>
       </span>
-      <span className={`font-mono ${valueClass}`}>{value}</span>
+      <span className={`font-mono ${valueClass || 'text-gray-300'}`}>{value}</span>
     </div>
   );
 }
