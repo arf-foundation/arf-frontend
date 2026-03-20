@@ -1,4 +1,3 @@
-// app/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import './globals.css';
@@ -6,11 +5,11 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL('https://arf-frontend-sandy.vercel.app'),
   title: {
-    default: 'ARF – Agentic Reliability Framework',
+    default: 'Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane',
     template: '%s | ARF',
   },
-  description: 'Bayesian governance for cloud infrastructure. Real‑time risk scoring, semantic memory, and policy enforcement.',
-  keywords: ['cloud governance', 'Bayesian inference', 'reliability', 'HMC', 'FAISS', 'Next.js'],
+  description: 'Turn probabilistic AI into deterministic, auditable action. Reduce MTTR by up to 85% with self‑healing systems powered by Bayesian governance.',
+  keywords: ['AI reliability', 'self-healing systems', 'AI governance', 'agent orchestration', 'production AI', 'SRE automation', 'Bayesian inference', 'cloud governance'],
   authors: [{ name: 'Juan Petter', url: 'https://www.linkedin.com/in/juan-petter' }],
   creator: 'ARF Foundation',
   publisher: 'ARF Foundation',
@@ -38,7 +37,7 @@ export const metadata: Metadata = {
     creator: '@arf_foundation',
     images: ['/og-image.png'],
   },
-  manifest: '/manifest.json',   // <-- changed from '/site.webmanifest'
+  manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -69,7 +68,7 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/manifest.json" />   {/* also update this if present */}
+        <link rel="manifest" href="/manifest.json" />
         {/* Additional PWA meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
