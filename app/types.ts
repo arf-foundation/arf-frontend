@@ -20,6 +20,7 @@ export interface Decision {
   outcome: string; // e.g., 'success', 'failure', 'escalate'
   timestamp: string;
   risk_score?: number;
+  action?: 'approve' | 'deny' | 'escalate'; // derived from risk_score
 }
 
 // Similar incident from memory
@@ -33,10 +34,9 @@ export interface SimilarIncident {
   outcome_success?: boolean; // optional, if outcome recorded
 }
 
-// Risk contribution factor
-export interface RiskContribution {
-  factor: string;              // e.g., "past_similar_incidents", "policy_violation"
-  contribution: number;         // 0-1
+// Risk contribution factor (additive contributions from Bayesian components)
+export interface RiskFactor {
+  [key: string]: number; // e.g., "conjugate", "hyperprior", "hmc"
 }
 
 // Healing action recommendation
@@ -52,12 +52,19 @@ export interface EvaluateResponse {
   risk_score: number;
   epistemic_uncertainty: number; // 0-1 or classification
   confidence_interval: [number, number];
-  risk_contributions: RiskContribution[];
+  risk_contributions?: RiskContribution[]; // legacy, kept for compatibility
+  risk_factors?: RiskFactor;               // new additive factors (preferred)
   similar_incidents: SimilarIncident[];
   recommended_actions: HealingAction[];
   explanation: string;
   policy_violations?: string[];
   requires_escalation: boolean;
+}
+
+// Risk contribution factor (legacy)
+export interface RiskContribution {
+  factor: string;              // e.g., "past_similar_incidents", "policy_violation"
+  contribution: number;         // 0-1
 }
 
 // Incident report sent to /v1/incidents/evaluate
