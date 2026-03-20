@@ -91,35 +91,6 @@ export default function EvaluateForm() {
     }
   };
 
-  // Helper to render risk factors as a bar chart
-  const renderRiskFactors = (riskFactors: Record<string, number>) => {
-    if (!riskFactors || Object.keys(riskFactors).length === 0) return null;
-    const total = Object.values(riskFactors).reduce((a, b) => a + b, 0);
-    if (total === 0) return null;
-    return (
-      <div className="space-y-2">
-        <h4 className="font-medium">Risk Factor Breakdown</h4>
-        {Object.entries(riskFactors).map(([name, value]) => (
-          <div key={name}>
-            <div className="flex justify-between text-sm">
-              <span className="capitalize">{name}</span>
-              <span>{(value * 100).toFixed(1)}%</span>
-            </div>
-            <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-500 rounded-full"
-                style={{ width: `${(value / total) * 100}%` }}
-              />
-            </div>
-          </div>
-        ))}
-        <p className="text-xs text-gray-500 mt-1">
-          Total contributions sum to risk score.
-        </p>
-      </div>
-    );
-  };
-
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-bold mb-4">Test an Incident</h2>
@@ -291,7 +262,7 @@ export default function EvaluateForm() {
             </div>
           )}
 
-          {/* Risk Factors (from risk_factors) */}
+          {/* Risk Contributions (from risk_contributions) */}
           {result.risk_contributions && result.risk_contributions.length > 0 && (
             <div className="p-4 bg-gray-50 rounded border">
               <h3 className="font-semibold mb-3">Risk Contributions</h3>
