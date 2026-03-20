@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
 
 // Helper component for code blocks with copy buttons (defined outside render)
-const CodeBlock = ({ code, id }: { code: string; id: string }) => {
+const CodeBlock = ({ code }: { code: string }) => {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
@@ -83,7 +83,6 @@ export default function FAQPage() {
               answer={
                 <CodeBlock
                   code="git clone https://github.com/petter2025us/agentic-reliability-framework.git\ncd agentic-reliability-framework\npip install -e ."
-                  id="install-source"
                 />
               }
             />
@@ -94,7 +93,6 @@ export default function FAQPage() {
                   Those are optional dependencies. If you don’t need HMC or advanced embeddings, you can ignore the error. To install them, run:
                   <CodeBlock
                     code="pip install pymc arviz torch sentence-transformers"
-                    id="install-optional"
                   />
                 </>
               }
@@ -235,7 +233,7 @@ export default function FAQPage() {
   );
 }
 
-// Collapsible FAQ item component (defined inside is fine, it’s a component but not created during render)
+// Collapsible FAQ item component
 function FAQItem({ question, answer }: { question: string; answer: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
