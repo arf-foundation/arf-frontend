@@ -64,6 +64,21 @@ export default function MemoryStats() {
     );
   }
 
+  // If not operational, show helpful message
+  if (!stats.is_operational) {
+    return (
+      <div className="bg-white rounded-lg shadow p-4">
+        <h3 className="font-semibold mb-2">Memory Stats</h3>
+        <p className="text-sm text-gray-600">
+          Memory is not yet populated – start by evaluating incidents to build semantic memory.
+        </p>
+        <p className="text-xs text-gray-400 mt-2">
+          (In OSS edition, memory is in‑memory only and resets on restart.)
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <h3 className="font-semibold mb-2">Memory Stats</h3>
