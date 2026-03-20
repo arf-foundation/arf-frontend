@@ -13,7 +13,6 @@ interface GitHubRelease {
   html_url: string;
 }
 
-// Type for raw GitHub API response
 interface GitHubApiRelease {
   name: string | null;
   tag_name: string;
@@ -73,7 +72,6 @@ export default function ChangelogPage() {
             const response = await fetch(`https://api.github.com/repos/arf-foundation/${repo}/releases`);
             if (!response.ok) throw new Error(`Failed to fetch ${repo} releases`);
             const data: GitHubApiRelease[] = await response.json();
-            // Map to our format
             return data.map((release) => ({
               repo,
               name: release.name || release.tag_name,
@@ -116,13 +114,11 @@ export default function ChangelogPage() {
     fetchAllReleases();
   }, []);
 
-  // Helper to truncate release body
   const truncateBody = (body: string, maxLength = 250) => {
     if (body.length <= maxLength) return body;
     return body.slice(0, maxLength).replace(/\n/g, ' ') + '…';
   };
 
-  // Helper to format date
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -131,7 +127,6 @@ export default function ChangelogPage() {
     });
   };
 
-  // Helper to get repo display name
   const getRepoDisplay = (repo: string) => {
     switch (repo) {
       case 'agentic-reliability-framework': return 'Core Engine';
@@ -284,23 +279,25 @@ export default function ChangelogPage() {
           {/* Code Snippet */}
           <div className="bg-gray-800 rounded-lg p-6 mb-12 border border-gray-700">
             <h2 className="text-xl font-semibold mb-4">Try It Now</h2>
-            <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
-              <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">
-                curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/api/v1/incidents/evaluate \
-                  -H "Content-Type: application/json" \
-                  -d '{{"service_name":"api","event_type":"latency","severity":"high","metrics":{{"latency_ms":450}}}}'
-              </pre>
-              <button
-                onClick={() => copyCode('curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/api/v1/incidents/evaluate -H "Content-Type: application/json" -d \'{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}\'')}
-                className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
-                aria-label="Copy code"
-              >
-                {copiedCode ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
-              </button>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
+                <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">
+                  curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/api/v1/incidents/evaluate \
+                    -H "Content-Type: application/json" \
+                    -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'
+                </pre>
+                <button
+                  onClick={() => copyCode('curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/api/v1/incidents/evaluate -H "Content-Type: application/json" -d \'{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}\'')}
+                  className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                  aria-label="Copy code"
+                >
+                  {copiedCode ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
+                </button>
+              </div>
+              <p className="text-sm text-gray-400">
+                Returns a full <span className="font-mono">HealingIntent</span> with risk score, risk factors, and recommended action.
+              </p>
             </div>
-            <p className="text-sm text-gray-400 mt-2">
-              Returns a full <span className="font-mono">HealingIntent</span> with risk score, risk factors, and recommended action.
-            </p>
           </div>
 
           {/* Changelog Header */}
