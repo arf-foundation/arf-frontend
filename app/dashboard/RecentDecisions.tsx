@@ -23,11 +23,11 @@ export default function RecentDecisions() {
       });
       if (!res.ok) throw new Error('Failed to fetch history');
       const data: Decision[] = await res.json();
-      // Enrich with action based on risk_score
+      // Enrich with action based on risk_score, cast to literal union
       const enriched = data.map(d => ({
         ...d,
         action: d.risk_score !== undefined
-          ? d.risk_score < 0.2 ? 'approve' : d.risk_score > 0.8 ? 'deny' : 'escalate'
+          ? (d.risk_score < 0.2 ? 'approve' : d.risk_score > 0.8 ? 'deny' : 'escalate') as 'approve' | 'deny' | 'escalate'
           : undefined
       }));
       setDecisions(enriched);
