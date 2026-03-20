@@ -91,8 +91,37 @@ export default function EvaluateForm() {
     }
   };
 
+  // Helper to render risk factors as a bar chart
+  const renderRiskFactors = (riskFactors: Record<string, number>) => {
+    if (!riskFactors || Object.keys(riskFactors).length === 0) return null;
+    const total = Object.values(riskFactors).reduce((a, b) => a + b, 0);
+    if (total === 0) return null;
+    return (
+      <div className="space-y-2">
+        <h4 className="font-medium">Risk Factor Breakdown</h4>
+        {Object.entries(riskFactors).map(([name, value]) => (
+          <div key={name}>
+            <div className="flex justify-between text-sm">
+              <span className="capitalize">{name}</span>
+              <span>{(value * 100).toFixed(1)}%</span>
+            </div>
+            <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-500 rounded-full"
+                style={{ width: `${(value / total) * 100}%` }}
+              />
+            </div>
+          </div>
+        ))}
+        <p className="text-xs text-gray-500 mt-1">
+          Total contributions sum to risk score.
+        </p>
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow p-6 mt-8">
+    <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-bold mb-4">Test an Incident</h2>
 
       {/* Example buttons */}
@@ -237,7 +266,32 @@ export default function EvaluateForm() {
             </div>
           )}
 
-          {/* Risk Contributions */}
+          {/* Recommended Action */}
+          {result.recommended_actions && result.recommended_actions.length > 0 && (
+            <div className="p-4 bg-gray-50 rounded border">
+              <h3 className="font-semibold mb-2">Recommended Action</h3>
+              <div className="space-y-2">
+                {result.recommended_actions.map((action, idx) => (
+                  <div key={idx} className="border-b pb-2 last:border-0">
+                    <div className="flex justify-between">
+                      <span className="font-medium">{action.action_type}</span>
+                      <span className="text-sm text-gray-600">
+                        Confidence: {(action.confidence * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-700">{action.description}</p>
+                    {action.prerequisites && action.prerequisites.length > 0 && (
+                      <div className="mt-1 text-xs text-gray-500">
+                        Prerequisites: {action.prerequisites.join(', ')}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Risk Factors (from risk_factors) */}
           {result.risk_contributions && result.risk_contributions.length > 0 && (
             <div className="p-4 bg-gray-50 rounded border">
               <h3 className="font-semibold mb-3">Risk Contributions</h3>
@@ -292,31 +346,6 @@ export default function EvaluateForm() {
                     <div className="mt-2 text-xs text-gray-600">
                       Metrics: {JSON.stringify(inc.metrics)}
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recommended Actions */}
-          {result.recommended_actions && result.recommended_actions.length > 0 && (
-            <div className="p-4 bg-gray-50 rounded border">
-              <h3 className="font-semibold mb-3">Recommended Actions</h3>
-              <div className="space-y-3">
-                {result.recommended_actions.map((action, idx) => (
-                  <div key={idx} className="border rounded p-3 bg-white">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{action.action_type}</span>
-                      <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">
-                        Confidence: {(action.confidence * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-700 mt-1">{action.description}</p>
-                    {action.prerequisites && action.prerequisites.length > 0 && (
-                      <div className="mt-2 text-xs text-gray-600">
-                        Prerequisites: {action.prerequisites.join(', ')}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
