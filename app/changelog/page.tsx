@@ -35,6 +35,33 @@ const REPOS = [
 const CACHE_KEY = 'arf-changelog';
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 
+// Constants for diagram and code snippet
+const DIAGRAM = `flowchart TD
+    subgraph Input["🔌 Input Sources"]
+        Services[Agents / Services]
+        Metrics[Metrics / Logs]
+    end
+
+    Services --> Signals[Observability Signals]
+    Metrics --> Signals
+
+    Signals --> Interpreter[ARF Reliability Interpreter]
+    
+    subgraph Engine["⚙️ ARF Core Engine"]
+        Interpreter --> Risk[Bayesian Risk Engine]
+        Risk --> Intent[Healing Intent Engine]
+    end
+    
+    Intent --> Recovery[Recovery Actions]
+    
+    style Interpreter fill:#e1f5fe,stroke:#01579b
+    style Risk fill:#fff3e0,stroke:#e65100
+    style Intent fill:#e8f5e8,stroke:#1b5e20`;
+
+const CURL_COMMAND = `curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/api/v1/incidents/evaluate \\
+  -H "Content-Type: application/json" \\
+  -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
+
 export default function ChangelogPage() {
   const [releases, setReleases] = useState<GitHubRelease[]>([]);
   const [loading, setLoading] = useState(true);
@@ -249,29 +276,7 @@ export default function ChangelogPage() {
           <div className="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-700">
             <h2 className="text-xl font-semibold mb-4 text-center">How ARF Works</h2>
             <div className="overflow-x-auto">
-              <pre className="text-sm text-left text-gray-300 font-mono">
-{`flowchart TD
-    subgraph Input["🔌 Input Sources"]
-        Services[Agents / Services]
-        Metrics[Metrics / Logs]
-    end
-
-    Services --> Signals[Observability Signals]
-    Metrics --> Signals
-
-    Signals --> Interpreter[ARF Reliability Interpreter]
-    
-    subgraph Engine["⚙️ ARF Core Engine"]
-        Interpreter --> Risk[Bayesian Risk Engine]
-        Risk --> Intent[Healing Intent Engine]
-    end
-    
-    Intent --> Recovery[Recovery Actions]
-    
-    style Interpreter fill:#e1f5fe,stroke:#01579b
-    style Risk fill:#fff3e0,stroke:#e65100
-    style Intent fill:#e8f5e8,stroke:#1b5e20`}
-              </pre>
+              <pre className="text-sm text-left text-gray-300 font-mono">{DIAGRAM}</pre>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">(Mermaid diagram – view source for rendered version)</p>
           </div>
@@ -281,13 +286,9 @@ export default function ChangelogPage() {
             <h2 className="text-xl font-semibold mb-4">Try It Now</h2>
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
-                <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">
-                  curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/api/v1/incidents/evaluate \
-                    -H "Content-Type: application/json" \
-                    -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'
-                </pre>
+                <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{CURL_COMMAND}</pre>
                 <button
-                  onClick={() => copyCode('curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/api/v1/incidents/evaluate -H "Content-Type: application/json" -d \'{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}\'')}
+                  onClick={() => copyCode(CURL_COMMAND)}
                   className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
                   aria-label="Copy code"
                 >
