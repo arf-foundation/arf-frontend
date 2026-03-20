@@ -275,7 +275,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Ecosystem Overview (unchanged) */}
+      {/* Ecosystem Overview */}
       <section
         ref={ecosystemRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -317,7 +317,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Key Capabilities (unchanged) */}
+      {/* Key Capabilities */}
       <section
         ref={capabilitiesRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -353,7 +353,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Demos (unchanged) */}
+      {/* Live Demos */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -413,7 +413,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Repository Links (unchanged) */}
+      {/* Repository Links */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -429,7 +429,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer (unchanged) */}
+      {/* Footer */}
       <footer
         ref={footerRef}
         className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
@@ -566,5 +566,165 @@ export default function LandingPage() {
   );
 }
 
-// All helper components remain exactly the same as before (EcoCard, FeatureCard, DemoCard, RepoCard, ContactLink)
-// [Their code is unchanged – omitted here for brevity but must be present in the final file]
+// Helper components (unchanged)
+
+function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition group relative">
+      <div className="flex justify-center mb-2 group-hover:scale-110 transition-transform">{icon}</div>
+      <h3 className="font-semibold text-sm">{title}</h3>
+      <p className="text-xs text-gray-400 mt-1">{description}</p>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 mx-auto transition"
+      >
+        {expanded ? 'Show less' : 'Details'} 
+        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          expanded ? 'max-h-40 opacity-100 mt-2' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <p className="text-xs text-gray-300 border-t border-gray-700 pt-2">{details}</p>
+      </div>
+    </div>
+  );
+}
+
+function FeatureCard({ title, description, icon, details }: { title: string; description: string; icon: React.ReactNode; details: string }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
+      <div className="mb-4 flex justify-center group-hover:scale-110 transition-transform">{icon}</div>
+      <h3 className="text-xl font-semibold mb-2 text-center">{title}</h3>
+      <p className="text-gray-400 text-center mb-2">{description}</p>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1 mx-auto transition"
+      >
+        {expanded ? 'Show less' : 'Details'} 
+        {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          expanded ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <p className="text-sm text-gray-300 border-t border-gray-700 pt-4">{details}</p>
+      </div>
+    </div>
+  );
+}
+
+function DemoCard({ title, description, link, buttonText, icon = <ArrowRight size={16} />, external = false }: { 
+  title: string; 
+  description: React.ReactNode; 
+  link: string; 
+  buttonText: string; 
+  icon?: React.ReactNode; 
+  external?: boolean;
+}) {
+  const content = (
+    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-full flex flex-col">
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <div className="text-gray-400 mb-4 flex-1">{description}</div>
+      <span className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 mt-auto">
+        {buttonText} {icon}
+      </span>
+    </div>
+  );
+
+  if (external) {
+    return (
+      <a href={link} target="_blank" rel="noopener noreferrer" className="block h-full">
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={link} className="block h-full">
+      {content}
+    </Link>
+  );
+}
+
+function RepoCard({ name, desc, url }: { name: string; desc: string; url: string }) {
+  const [repoData, setRepoData] = useState<RepoData | null>(null);
+  const repoName = url.split('/').pop();
+
+  useEffect(() => {
+    const fetchRepoData = async () => {
+      const cached = localStorage.getItem(`github-${repoName}`);
+      const cachedTime = localStorage.getItem(`github-${repoName}-time`);
+      const now = Date.now();
+
+      if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
+        setRepoData(JSON.parse(cached));
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://api.github.com/repos/arf-foundation/${repoName}`);
+        const data = await response.json();
+        if (data.stargazers_count !== undefined) {
+          const newData = {
+            stargazers_count: data.stargazers_count,
+            language: data.language
+          };
+          setRepoData(newData);
+          localStorage.setItem(`github-${repoName}`, JSON.stringify(newData));
+          localStorage.setItem(`github-${repoName}-time`, now.toString());
+        }
+      } catch (error) {
+        console.error(`Failed to fetch data for ${repoName}:`, error);
+      }
+    };
+
+    if (repoName) {
+      fetchRepoData();
+    }
+  }, [repoName]);
+
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition block group">
+      <div className="flex items-start justify-between">
+        <h3 className="font-mono text-sm text-gray-300 group-hover:text-white transition-colors">{name}</h3>
+        {repoData && (
+          <div className="flex items-center gap-2 text-xs">
+            {repoData.language && (
+              <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-300">
+                {repoData.language}
+              </span>
+            )}
+            <span className="flex items-center gap-0.5 text-yellow-400">
+              <Star size={12} className="fill-yellow-400" />
+              {repoData.stargazers_count.toLocaleString()}
+            </span>
+          </div>
+        )}
+      </div>
+      <p className="text-gray-400 text-sm mt-1">{desc}</p>
+    </a>
+  );
+}
+
+function ContactLink({ href, icon, text, emoji, onClick }: { href: string; icon: React.ReactNode; text: string; emoji: string; onClick?: () => void }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={onClick}
+      className="group flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300"
+    >
+      <span className="text-xl group-hover:scale-110 transition-transform">{emoji}</span>
+      <span className="flex items-center gap-1 text-gray-300 group-hover:text-white">
+        {icon}
+        <span className="text-sm font-medium">{text}</span>
+      </span>
+    </a>
+  );
+}
