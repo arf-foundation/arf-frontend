@@ -80,6 +80,7 @@ export default function RootLayout({
             <Link href="/dashboard" className="hover:underline">Dashboard</Link>
             <Link href="/history" className="hover:underline">History</Link>
             <Link href="/changelog" className="hover:underline">Changelog</Link>
+            <Link href="/faq" className="hover:underline">FAQ</Link>
             <a
               href="https://arf-foundation.github.io/arf-spec/"
               target="_blank"
