@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Decision } from '../types';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 
-// Extend Decision type locally to include action (we'll compute)
 interface ExtendedDecision extends Decision {
   action?: 'approve' | 'deny' | 'escalate';
 }
@@ -23,7 +22,6 @@ export default function RecentDecisions() {
       });
       if (!res.ok) throw new Error('Failed to fetch history');
       const data: Decision[] = await res.json();
-      // Enrich with action based on risk_score, cast to literal union
       const enriched = data.map(d => ({
         ...d,
         action: d.risk_score !== undefined
@@ -50,7 +48,6 @@ export default function RecentDecisions() {
         { method: 'POST', headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' } }
       );
       if (!res.ok) throw new Error('Feedback failed');
-      // Refresh list to reflect updated outcome
       await fetchDecisions();
     } catch (err) {
       console.error('Feedback error:', err);
@@ -59,44 +56,44 @@ export default function RecentDecisions() {
     }
   };
 
-  if (loading) return <div className="animate-pulse h-24 bg-gray-200 rounded"></div>;
-  if (error) return <div className="text-red-600">Error loading recent decisions</div>;
+  if (loading) return <div className="animate-pulse h-24 bg-gray-800 rounded"></div>;
+  if (error) return <div className="text-red-400">Error loading recent decisions</div>;
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-semibold mb-4">Recent Decisions</h2>
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6 hover:border-blue-500/50 transition-all duration-300 shadow-lg">
+      <h2 className="text-lg font-semibold mb-4 text-gray-200">Recent Decisions</h2>
       {decisions.length === 0 ? (
-        <p className="text-gray-500">No decisions yet</p>
+        <p className="text-gray-400">No decisions yet</p>
       ) : (
-        <ul className="divide-y">
+        <ul className="divide-y divide-gray-700">
           {decisions.slice(0, 5).map((dec) => (
             <li key={dec.decision_id} className="py-3 flex justify-between items-center">
               <div className="flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span 
-                    className="font-mono text-sm cursor-help"
+                    className="font-mono text-sm cursor-help text-gray-300"
                     title={`Full ID: ${dec.decision_id}`}
                   >
                     {dec.decision_id.slice(0, 8)}…
                   </span>
                   {dec.risk_score !== undefined && (
-                    <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">
+                    <span className="text-xs bg-gray-700 px-2 py-0.5 rounded text-gray-300">
                       Risk: {dec.risk_score.toFixed(3)}
                     </span>
                   )}
                   {dec.action && (
                     <span className={`text-xs px-2 py-0.5 rounded ${
-                      dec.action === 'approve' ? 'bg-green-100 text-green-800' :
-                      dec.action === 'deny' ? 'bg-red-100 text-red-800' :
-                      'bg-yellow-100 text-yellow-800'
+                      dec.action === 'approve' ? 'bg-green-900/50 text-green-300' :
+                      dec.action === 'deny' ? 'bg-red-900/50 text-red-300' :
+                      'bg-yellow-900/50 text-yellow-300'
                     }`}>
                       {dec.action}
                     </span>
                   )}
                   <span className={`text-xs px-2 py-0.5 rounded ${
-                    dec.outcome === 'success' ? 'bg-green-100 text-green-800' :
-                    dec.outcome === 'failure' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
+                    dec.outcome === 'success' ? 'bg-green-900/50 text-green-300' :
+                    dec.outcome === 'failure' ? 'bg-red-900/50 text-red-300' :
+                    'bg-gray-700 text-gray-400'
                   }`}>
                     {dec.outcome || 'pending'}
                   </span>
@@ -109,8 +106,8 @@ export default function RecentDecisions() {
                 <button
                   onClick={() => handleFeedback(dec.decision_id, true)}
                   disabled={feedbackLoading === dec.decision_id}
-                  className={`p-1 rounded hover:bg-gray-100 transition ${
-                    dec.outcome === 'success' ? 'text-green-600' : 'text-gray-400'
+                  className={`p-1 rounded hover:bg-gray-700 transition ${
+                    dec.outcome === 'success' ? 'text-green-400' : 'text-gray-500'
                   }`}
                   title="Mark as success"
                 >
@@ -119,8 +116,8 @@ export default function RecentDecisions() {
                 <button
                   onClick={() => handleFeedback(dec.decision_id, false)}
                   disabled={feedbackLoading === dec.decision_id}
-                  className={`p-1 rounded hover:bg-gray-100 transition ${
-                    dec.outcome === 'failure' ? 'text-red-600' : 'text-gray-400'
+                  className={`p-1 rounded hover:bg-gray-700 transition ${
+                    dec.outcome === 'failure' ? 'text-red-400' : 'text-gray-500'
                   }`}
                   title="Mark as failure"
                 >
