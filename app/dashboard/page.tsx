@@ -200,7 +200,7 @@ export default function DashboardPage() {
           </a>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-2">📢 What's New in v4.2.0</h3>
+          <h3 className="text-lg font-semibold mb-2">📢 What&apos;s New in v4.2.0</h3>
           <p className="text-gray-600 mb-3">
             Full risk factor decomposition, traceable governance loop, and improved API docs.
           </p>
