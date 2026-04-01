@@ -460,7 +460,7 @@ export default function LandingPage() {
                 </button>
               </div>
               <ContactLink
-                href="https://www.linkedin.com/in/juan-petter"
+                href="https://www.linkedin.com/in/petterjuan/"
                 icon={<Linkedin className="w-5 h-5" />}
                 text="Juan Petter"
                 emoji="🔗"
