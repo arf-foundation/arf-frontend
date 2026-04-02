@@ -3,6 +3,14 @@ import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
   turbopack: {},
+  async rewrites() {
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: 'https://a-r-f-agentic-reliability-framework-api.hf.space/v1/:path*',
+      },
+    ];
+  },
 };
 
 export default withPWA({
@@ -11,6 +19,6 @@ export default withPWA({
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development",
   fallbacks: {
-    document: '/offline', // fallback page when offline
+    document: '/offline',
   },
 })(nextConfig);
