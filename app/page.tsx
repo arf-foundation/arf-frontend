@@ -58,7 +58,7 @@ const DIAGRAM = `flowchart TD
     style Risk fill:#fff3e0,stroke:#e65100
     style Intent fill:#e8f5e8,stroke:#1b5e20`;
 
-const CURL_COMMAND = `curl -X POST /api/v1/incidents/evaluate \\
+const CURL_COMMAND = `curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
@@ -88,7 +88,7 @@ export default function LandingPage() {
 
   const handleCopyCodeSnippet = async () => {
     try {
-      await navigator.clipboard.writeText('curl -X POST /api/v1/incidents/evaluate');
+      await navigator.clipboard.writeText('curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate');
       setCopiedCodeSnippet(true);
       setTimeout(() => setCopiedCodeSnippet(false), 2000);
     } catch (err) {
@@ -374,7 +374,7 @@ export default function LandingPage() {
             description={
               <div className="flex items-center gap-2">
                 <pre className="bg-gray-900 p-2 rounded text-sm font-mono text-green-300 whitespace-pre-wrap break-all flex-1">
-                  curl -X POST /api/v1/incidents/evaluate
+                  curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate
                 </pre>
                 <button
                   onClick={handleCopyCodeSnippet}
