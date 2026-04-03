@@ -155,7 +155,7 @@ export default function LandingPage() {
           <GitHubStars />
         </div>
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-          ARF provides a control and confidence layer that enforces deterministic execution policies, graduated autonomy levels, risk modeling, and production audit hooks for AI agents in regulated financial services environments.
+          ARF provides a control and confidence layer that enforces deterministic execution policies, graduated autonomy levels, risk modeling, and production audit hooks for AI agents in regulated environments.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <a
