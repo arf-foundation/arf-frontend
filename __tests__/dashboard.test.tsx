@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
-import Home from '@/app/page'
+import Home from '@/app/dashboard/page'
 
 // Mock fetch
 const mockFetch = jest.fn()
