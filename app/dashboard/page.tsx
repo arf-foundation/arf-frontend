@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { z } from 'zod';
+import Link from 'next/link';
+import { ArrowRight, AlertCircle } from 'lucide-react';
 
 // Schema for risk API response
 const RiskDataSchema = z.object({
@@ -11,20 +13,38 @@ const RiskDataSchema = z.object({
 
 type RiskData = z.infer<typeof RiskDataSchema>;
 
+// Schema for quota API response
+const QuotaSchema = z.object({
+  tier: z.enum(['free', 'pro', 'premium', 'enterprise']),
+  remaining: z.number().nullable(), // null for unlimited
+  limit: z.number().nullable(),
+});
+
+type QuotaData = z.infer<typeof QuotaSchema>;
+
 export default function Dashboard() {
   const [risk, setRisk] = useState<RiskData | null>(null);
+  const [quota, setQuota] = useState<QuotaData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
   const isMounted = useRef(true);
+
+  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('arf_api_key') : null;
 
   const fetchRisk = useCallback(async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     try {
+      const headers: HeadersInit = {};
+      if (apiKey) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
+
       const response = await fetch(`/api/v1/get_risk`, {
         signal: controller.signal,
+        headers,
       });
 
       clearTimeout(timeoutId);
@@ -37,8 +57,6 @@ export default function Dashboard() {
       }
 
       const rawData = await response.json();
-      
-      // Validate response schema
       const validatedData = RiskDataSchema.parse(rawData);
 
       if (isMounted.current) {
@@ -63,16 +81,46 @@ export default function Dashboard() {
         setLoading(false);
       }
     }
-  }, []);
+  }, [apiKey]);
+
+  const fetchQuota = useCallback(async () => {
+    if (!apiKey) return;
+
+    try {
+      const response = await fetch('/api/v1/users/quota', {
+        headers: { 'Authorization': `Bearer ${apiKey}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const validated = QuotaSchema.parse(data);
+        if (isMounted.current) setQuota(validated);
+      } else {
+        console.warn('Failed to fetch quota:', response.status);
+      }
+    } catch (err) {
+      console.error('Quota fetch error:', err);
+    }
+  }, [apiKey]);
 
   useEffect(() => {
     isMounted.current = true;
     fetchRisk();
+    fetchQuota();
 
     return () => {
       isMounted.current = false;
     };
-  }, [fetchRisk]);
+  }, [fetchRisk, fetchQuota]);
+
+  const getTierBadgeColor = (tier: string) => {
+    switch (tier) {
+      case 'free': return 'bg-gray-500';
+      case 'pro': return 'bg-blue-600';
+      case 'premium': return 'bg-purple-600';
+      case 'enterprise': return 'bg-yellow-600';
+      default: return 'bg-gray-500';
+    }
+  };
 
   if (loading) {
     return (
@@ -120,36 +168,95 @@ export default function Dashboard() {
     'bg-green-500';
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">ARF System Risk</h1>
-        
-        <div className="mb-6">
-          <div className="flex justify-between mb-2">
-            <span className="text-gray-600 text-sm font-medium">Risk Score</span>
-            <span className="font-mono text-2xl font-bold text-gray-900">
-              {(risk.system_risk * 100).toFixed(0)}%
+    <div className="min-h-screen bg-gray-100 p-4">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Risk Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">ARF System Risk</h1>
+          
+          <div className="mb-6">
+            <div className="flex justify-between mb-2">
+              <span className="text-gray-600 text-sm font-medium">Risk Score</span>
+              <span className="font-mono text-2xl font-bold text-gray-900">
+                {(risk.system_risk * 100).toFixed(0)}%
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded h-2">
+              <div
+                className={`h-2 rounded transition-all ${statusColor}`}
+                style={{ width: `${risk.system_risk * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mb-6">
+            <span className="text-gray-600">Status</span>
+            <span className={`px-3 py-1 rounded-full text-white font-medium text-sm ${statusColor}`}>
+              {risk.status.toUpperCase()}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded h-2">
-            <div
-              className={`h-2 rounded transition-all ${statusColor}`}
-              style={{ width: `${risk.system_risk * 100}%` }}
-            />
+
+          {fetchedAt && (
+            <p className="text-xs text-gray-500 text-center">
+              Last updated: {fetchedAt.toLocaleTimeString()}
+            </p>
+          )}
+        </div>
+
+        {/* Quota Card */}
+        {quota && (
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="flex justify-between items-start mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">Your Plan</h2>
+              <span className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getTierBadgeColor(quota.tier)}`}>
+                {quota.tier.toUpperCase()}
+              </span>
+            </div>
+
+            <div className="mb-4">
+              {quota.remaining !== null ? (
+                <>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Remaining evaluations this month</span>
+                    <span className="font-mono font-medium">{quota.remaining.toLocaleString()}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded h-2">
+                    <div
+                      className="bg-blue-500 h-2 rounded"
+                      style={{ width: `${(quota.remaining / (quota.limit || 1)) * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Limit: {quota.limit?.toLocaleString()} evaluations/month
+                  </p>
+                </>
+              ) : (
+                <p className="text-gray-600">Unlimited evaluations</p>
+              )}
+            </div>
+
+            {quota.tier === 'free' && (
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-2 mt-2 text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Upgrade to Pro <ArrowRight size={16} />
+              </Link>
+            )}
           </div>
-        </div>
+        )}
 
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-gray-600">Status</span>
-          <span className={`px-3 py-1 rounded-full text-white font-medium text-sm ${statusColor}`}>
-            {risk.status.toUpperCase()}
-          </span>
-        </div>
-
-        {fetchedAt && (
-          <p className="text-xs text-gray-500 text-center">
-            Last updated: {fetchedAt.toLocaleTimeString()}
-          </p>
+        {/* No API key warning */}
+        {!apiKey && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl shadow-xl p-8 flex items-start gap-3">
+            <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-yellow-800">API key not found</h3>
+              <p className="text-yellow-700 text-sm mt-1">
+                Please <Link href="/signup" className="underline font-medium">sign up</Link> to get an API key and see your quota.
+              </p>
+            </div>
+          </div>
         )}
       </div>
     </div>
