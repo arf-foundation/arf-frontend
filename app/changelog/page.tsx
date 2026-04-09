@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ExternalLink, Calendar, Tag, ArrowRight, Copy, Check, Github, Rocket } from 'lucide-react';
-import Mermaid from '../components/Mermaid';
+import Mermaid from '../../components/Mermaid';
 
 // Types for GitHub release data
 interface GitHubRelease {
