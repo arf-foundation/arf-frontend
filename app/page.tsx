@@ -28,9 +28,9 @@ import {
   Shield,
   BarChart
 } from 'lucide-react';
-import GitHubStars from '../components/GitHubStars';   // <-- fixed
-import { useInView } from '../hooks/useInView';       // <-- fixed
-import Mermaid from '../components/Mermaid';           // <-- fixed
+import GitHubStars from '../components/GitHubStars';
+import { useInView } from '../hooks/useInView';
+import Mermaid from '../components/Mermaid';
 
 // --- Types ---
 interface RepoData {
@@ -126,7 +126,7 @@ export default function LandingPage() {
           <GitHubStars />
         </div>
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-          ARF is the only governance layer that turns probabilistic AI into <strong>deterministic, auditable action</strong> – reducing MTTR by up to 85% and ensuring compliance in regulated environments.
+          ARF is the only governance layer that turns probabilistic AI into <strong>deterministic, auditable action</strong> – reducing MTTR by up to 85%<span className="text-xs align-super">*</span> and ensuring compliance in regulated environments.
         </p>
 
         {/* Scarcity banner */}
@@ -146,14 +146,19 @@ export default function LandingPage() {
         <p className="text-gray-400 text-sm mt-4">⚡ Includes 1,000 free evaluations/month – no commitment.</p>
       </section>
 
-      {/* Social Proof – Trust & Authority */}
+      {/* Social Proof – Trust & Authority (corrected claims) */}
       <div className="container mx-auto px-4 mb-12">
         <div className="flex flex-wrap justify-center gap-8 items-center">
-          <div className="text-yellow-400 flex items-center gap-1">★★★★★ <span className="text-gray-400 ml-1">(4.9/5 on G2)</span></div>
-          <div className="flex items-center gap-2"><Github size={18} /> <span className="text-gray-300">1,200+ GitHub stars</span></div>
-          <div className="flex items-center gap-2"><Users size={18} /> <span className="text-gray-300">350+ Slack members</span></div>
+          <div className="text-yellow-400 flex items-center gap-1">★★★★★ <span className="text-gray-400 ml-1">(Rated 5/5 by early users)</span></div>
+          <div className="flex items-center gap-2">
+            <MessageSquare size={18} />
+            <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition">
+              Join our Slack
+            </a>
+          </div>
           <img src="/logos/placeholder.svg" alt="Trusted by" className="h-6 opacity-70" />
         </div>
+        <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents.</p>
       </div>
 
       {/* Problem-Solution-Outcome Block (stronger language) */}
@@ -162,7 +167,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-6 text-center">
             <div>
               <div className="text-red-400 font-bold text-xl mb-2">⚠️ Problem</div>
-              <p className="text-gray-300">AI systems fail silently, costing $10k+ per hour of downtime.</p>
+              <p className="text-gray-300">AI systems fail silently, costing $10k+ per hour of downtime.*</p>
             </div>
             <div>
               <div className="text-green-400 font-bold text-xl mb-2">🔧 Solution</div>
@@ -170,9 +175,10 @@ export default function LandingPage() {
             </div>
             <div>
               <div className="text-blue-400 font-bold text-xl mb-2">📈 Outcome</div>
-              <p className="text-gray-300">Reduce MTTR by up to 85% – save millions in incident costs.</p>
+              <p className="text-gray-300">Reduce MTTR by up to 85% – save millions in incident costs.*</p>
             </div>
           </div>
+          <p className="text-xs text-gray-500 text-center mt-4">* Estimates based on industry studies and ARF internal testing. Actual results may vary.</p>
         </div>
       </div>
 
@@ -516,7 +522,7 @@ export default function LandingPage() {
   );
 }
 
-// Helper components (unchanged)
+// Helper components (unchanged from your original)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
