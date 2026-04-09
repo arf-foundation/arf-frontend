@@ -28,9 +28,9 @@ import {
   Shield,
   BarChart
 } from 'lucide-react';
-import GitHubStars from './components/GitHubStars';
-import { useInView } from './hooks/useInView';
-import Mermaid from './components/Mermaid';
+import GitHubStars from '../components/GitHubStars';   // <-- fixed
+import { useInView } from '../hooks/useInView';       // <-- fixed
+import Mermaid from '../components/Mermaid';           // <-- fixed
 
 // --- Types ---
 interface RepoData {
