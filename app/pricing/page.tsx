@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Check } from 'lucide-react';
+import { useState } from 'react';
+import { Check, Loader2 } from 'lucide-react';
 
 const TIERS = [
   {
@@ -10,9 +11,10 @@ const TIERS = [
     currency: 'USD',
     description: 'Up to 1,000 evals/mo',
     limits: { evaluations: 1000 },
-    support: 'Community',
-    savings: 99,
     features: ['Community support'],
+    savings: 99,
+    cta: 'Get started',
+    href: '/signup',
   },
   {
     name: 'Pro',
@@ -22,6 +24,8 @@ const TIERS = [
     limits: { evaluations: 10000 },
     features: ['Email support', 'Audit logs (30 days)'],
     label: 'Most Popular',
+    cta: 'Subscribe →',
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID, // Set this in your .env.local
   },
   {
     name: 'Premium',
@@ -29,8 +33,10 @@ const TIERS = [
     currency: 'USD',
     description: 'Up to 50,000 evals/mo',
     limits: { evaluations: 50000 },
-    features: ['Priority email support', 'Audit logs (90 days)'],
+    features: ['Priority email support', 'Audit logs (90 days)', 'Basic SLA'],
     label: 'Best Value',
+    cta: 'Contact sales',
+    href: 'https://calendly.com/petter2025us/30min',
   },
   {
     name: 'Enterprise',
@@ -45,10 +51,56 @@ const TIERS = [
       'On‑premises deployment',
       'Custom audit retention',
     ],
+    cta: 'Contact Sales →',
+    href: 'https://calendly.com/petter2025us/30min',
   },
 ];
 
 export default function PricingPage() {
+  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubscribe = async (tier: typeof TIERS[0]) => {
+    if (!tier.priceId) {
+      setError('Pro plan is not configured. Please contact support.');
+      return;
+    }
+
+    setLoadingTier(tier.name);
+    setError(null);
+
+    // Retrieve API key – adjust this to your actual auth mechanism
+    const apiKey = localStorage.getItem('arf_api_key');
+    if (!apiKey) {
+      setError('Please sign up first to get an API key.');
+      setLoadingTier(null);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/v1/payments/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          api_key: apiKey,
+          success_url: `${window.location.origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: window.location.href,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail || 'Failed to create checkout session');
+      }
+
+      const { url } = await response.json();
+      if (url) window.location.href = url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setLoadingTier(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       <div className="container mx-auto px-4 py-16">
@@ -60,6 +112,12 @@ export default function PricingPage() {
             Start free, scale with confidence. No hidden fees.
           </p>
         </div>
+
+        {error && (
+          <div className="max-w-md mx-auto mb-8 p-4 bg-red-900/50 border border-red-500 rounded-lg text-red-200 text-center">
+            {error}
+          </div>
+        )}
 
         <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {TIERS.map((tier) => (
@@ -105,7 +163,6 @@ export default function PricingPage() {
                     <span className="w-4" /> No audit logs
                   </li>
                 )}
-                {/* Evaluation limit display with null check */}
                 {tier.limits?.evaluations !== undefined && tier.limits.evaluations !== null ? (
                   <li className="flex items-center gap-2 text-sm">
                     <Check size={16} className="text-green-400" />
@@ -129,30 +186,33 @@ export default function PricingPage() {
               <div className="mt-8">
                 {tier.name === 'Free' && (
                   <Link
-                    href="/signup"
+                    href={tier.href || '#'}
                     className="w-full block text-center border border-gray-600 text-gray-300 py-2 rounded-lg hover:border-blue-500 hover:text-white transition"
                   >
-                    Get started
+                    {tier.cta}
                   </Link>
                 )}
                 {tier.name === 'Pro' && (
-                  <button className="w-full bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition">
-                    Subscribe → <span className="text-xs">(Stripe)</span>
+                  <button
+                    onClick={() => handleSubscribe(tier)}
+                    disabled={loadingTier === tier.name}
+                    className="w-full bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {loadingTier === tier.name ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      tier.cta
+                    )}
                   </button>
                 )}
-                {tier.name === 'Premium' && (
-                  <button className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold hover:bg-gray-600 transition">
-                    Contact sales
-                  </button>
-                )}
-                {tier.name === 'Enterprise' && (
+                {(tier.name === 'Premium' || tier.name === 'Enterprise') && (
                   <a
-                    href="https://calendly.com/petter2025us/30min"
+                    href={tier.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full block text-center border border-gray-600 text-gray-300 py-2 rounded-lg hover:border-blue-500 hover:text-white transition"
                   >
-                    Contact Sales →
+                    {tier.cta}
                   </a>
                 )}
               </div>
