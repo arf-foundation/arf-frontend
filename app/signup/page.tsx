@@ -16,12 +16,10 @@ export default function SignupPage() {
     setError(null);
 
     try {
-      // Call your backend to create a free‑tier API key.
-      // Replace the URL with your actual endpoint.
-      const response = await fetch('/api/v1/admin/keys', {
+      // Call the public registration endpoint (rate‑limited, no admin key required)
+      const response = await fetch('/api/v1/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier: 'free' }), // or whatever your backend expects
       });
 
       if (!response.ok) {
@@ -30,7 +28,7 @@ export default function SignupPage() {
       }
 
       const data = await response.json();
-      const newKey = data.api_key; // adjust based on your response format
+      const newKey = data.api_key;
       setApiKey(newKey);
       localStorage.setItem('arf_api_key', newKey);
     } catch (err) {
