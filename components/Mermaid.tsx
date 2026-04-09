@@ -9,7 +9,7 @@ mermaid.initialize({
   securityLevel: 'loose',
 });
 
-export default function Mermaid({ chart }: { chart: string }) {
+export default function Mermaid({ chart, className = "" }: { chart: string; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -18,5 +18,5 @@ export default function Mermaid({ chart }: { chart: string }) {
     }
   }, [chart]);
 
-  return <div ref={ref} className="mermaid">{chart}</div>;
+  return <div ref={ref} className={`mermaid ${className}`}>{chart}</div>;
 }
