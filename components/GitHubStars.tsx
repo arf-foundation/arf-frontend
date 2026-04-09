@@ -7,13 +7,14 @@ export default function GitHubStars() {
   const [stars, setStars] = useState<number | null>(null);
 
   useEffect(() => {
-    const repoName = 'agentic-reliability-framework'; // main OSS engine
+    const repoName = 'agentic-reliability-framework';
     const cacheKey = `github-stars-${repoName}`;
     const cached = localStorage.getItem(cacheKey);
     const cachedTime = localStorage.getItem(`${cacheKey}-time`);
     const now = Date.now();
 
     if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStars(JSON.parse(cached));
       return;
     }
