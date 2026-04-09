@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Check, ArrowRight } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 const TIERS = [
   {
@@ -11,7 +11,7 @@ const TIERS = [
     description: 'Up to 1,000 evals/mo',
     limits: { evaluations: 1000 },
     support: 'Community',
-    savings: 99, // vs Pro
+    savings: 99,
     features: ['Community support'],
   },
   {
@@ -83,9 +83,7 @@ export default function PricingPage() {
                 <span className="text-4xl font-bold">
                   {tier.price === 0 ? 'Free' : `$${tier.price}`}
                 </span>
-                {tier.price > 0 && (
-                  <span className="text-gray-400 text-sm">/mo</span>
-                )}
+                {tier.price > 0 && <span className="text-gray-400 text-sm">/mo</span>}
                 {tier.savings && (
                   <div className="text-green-400 text-sm mt-1">
                     Save ${tier.savings}/mo vs Pro
@@ -107,18 +105,18 @@ export default function PricingPage() {
                     <span className="w-4" /> No audit logs
                   </li>
                 )}
-                {tier.limits?.evaluations !== undefined && (
+                {/* Evaluation limit display with null check */}
+                {tier.limits?.evaluations !== undefined && tier.limits.evaluations !== null ? (
                   <li className="flex items-center gap-2 text-sm">
                     <Check size={16} className="text-green-400" />
                     <span>{tier.limits.evaluations.toLocaleString()} evaluations/month</span>
                   </li>
-                )}
-                {tier.limits?.evaluations === null && (
+                ) : tier.limits?.evaluations === null ? (
                   <li className="flex items-center gap-2 text-sm">
                     <Check size={16} className="text-green-400" />
                     <span>Unlimited evaluations</span>
                   </li>
-                )}
+                ) : null}
               </ul>
 
               {tier.name === 'Enterprise' && (
