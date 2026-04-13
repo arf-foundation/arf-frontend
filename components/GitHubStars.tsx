@@ -3,27 +3,23 @@
 import { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
 
-// Helper to get cached stars (runs only once during initial render)
-const getCachedStars = (repoName: string): number | null => {
-  if (typeof window === 'undefined') return null;
-  const cacheKey = `github-stars-${repoName}`;
-  const cached = localStorage.getItem(cacheKey);
-  const cachedTime = localStorage.getItem(`${cacheKey}-time`);
-  const now = Date.now();
-  if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
-    return JSON.parse(cached);
-  }
-  return null;
-};
-
 export default function GitHubStars() {
   const repoName = 'arf-spec';
-  const [stars, setStars] = useState<number | null>(() => getCachedStars(repoName));
+  const [stars, setStars] = useState<number | null>(null);
 
   useEffect(() => {
-    // Only fetch if no valid cached stars
-    if (stars !== null) return;
+    // Try to read from cache first
+    const cacheKey = `github-stars-${repoName}`;
+    const cached = localStorage.getItem(cacheKey);
+    const cachedTime = localStorage.getItem(`${cacheKey}-time`);
+    const now = Date.now();
 
+    if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
+      setStars(JSON.parse(cached));
+      return;
+    }
+
+    // No valid cache – fetch from GitHub
     fetch(`https://api.github.com/repos/arf-foundation/${repoName}`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -32,14 +28,14 @@ export default function GitHubStars() {
       .then(data => {
         const starCount = data.stargazers_count;
         setStars(starCount);
-        localStorage.setItem(`github-stars-${repoName}`, JSON.stringify(starCount));
-        localStorage.setItem(`github-stars-${repoName}-time`, Date.now().toString());
+        localStorage.setItem(cacheKey, JSON.stringify(starCount));
+        localStorage.setItem(`${cacheKey}-time`, now.toString());
       })
       .catch(err => {
         console.error('Failed to fetch GitHub stars:', err);
         setStars(0);
       });
-  }, [stars, repoName]);
+  }, [repoName]);
 
   if (stars === null) return null;
   return (
