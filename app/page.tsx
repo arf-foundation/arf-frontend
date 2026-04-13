@@ -83,8 +83,9 @@ export default function LandingPage() {
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  // ✅ Fixed: added generic type HTMLDivElement to match the div element
-  const { ref: diagramRef, inView: isDiagramVisible } = useInView<HTMLDivElement>({ threshold: 0.1 });
+  // ✅ Fixed: useInView doesn't accept a generic, so cast the ref
+  const { ref: diagramRefRaw, inView: isDiagramVisible } = useInView({ threshold: 0.1 });
+  const diagramRef = diagramRefRaw as React.RefObject<HTMLDivElement>;
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText('petter2025us@outlook.com');
