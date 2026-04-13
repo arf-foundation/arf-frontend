@@ -167,9 +167,9 @@ export default function ChangelogPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-4 sm:py-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
               Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane
             </h1>
             <div className="animate-pulse space-y-4 mt-8">
@@ -185,9 +185,9 @@ export default function ChangelogPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-4 sm:py-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
               Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane
             </h1>
             <div className="bg-red-900/50 border border-red-700 rounded-lg p-6 mt-8">
@@ -207,54 +207,54 @@ export default function ChangelogPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto">
           {/* Hero / Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
               Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane
             </h1>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto px-2">
               v4.2.0 – Bayesian governance for auditable, self‑healing AI systems
             </p>
           </div>
 
           {/* ---------- LATEST RELEASES (now first) ---------- */}
           <div className="border-b border-gray-700 pb-4 mb-6">
-            <h2 className="text-2xl font-bold">Latest Releases</h2>
-            <p className="text-gray-400">From the ARF ecosystem – Core Engine, API, and Frontend</p>
+            <h2 className="text-xl sm:text-2xl font-bold">Latest Releases</h2>
+            <p className="text-gray-400 text-sm sm:text-base">From the ARF ecosystem – Core Engine, API, and Frontend</p>
           </div>
 
           {releases.length === 0 ? (
             <p className="text-gray-500">No releases found.</p>
           ) : (
-            <div className="space-y-6 mb-16">
+            <div className="space-y-5 sm:space-y-6 mb-12 sm:mb-16">
               {releases.map((release, idx) => (
                 <div
                   key={`${release.repo}-${release.tag_name}-${idx}`}
-                  className="bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow border border-gray-700"
+                  className="bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow border border-gray-700"
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="px-3 py-1 bg-blue-900 text-blue-200 rounded-full text-sm font-medium">
+                  <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="px-3 py-1 bg-blue-900 text-blue-200 rounded-full text-xs sm:text-sm font-medium">
                         {getRepoDisplay(release.repo)}
                       </span>
-                      <span className="text-gray-400 text-sm flex items-center gap-1">
+                      <span className="text-gray-400 text-xs sm:text-sm flex items-center gap-1">
                         <Tag size={14} />
                         {release.tag_name}
                       </span>
                     </div>
-                    <span className="text-gray-400 text-sm flex items-center gap-1">
+                    <span className="text-gray-400 text-xs sm:text-sm flex items-center gap-1">
                       <Calendar size={14} />
                       {formatDate(release.published_at)}
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-semibold text-white mb-2">
+                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
                     {release.name}
                   </h3>
 
-                  <p className="text-gray-300 mb-4">
+                  <p className="text-gray-300 text-sm sm:text-base mb-4">
                     {truncateBody(release.body)}
                   </p>
 
@@ -262,7 +262,7 @@ export default function ChangelogPage() {
                     href={release.html_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 font-medium transition"
+                    className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 font-medium transition text-sm sm:text-base"
                   >
                     View on GitHub <ExternalLink size={16} />
                   </a>
@@ -272,85 +272,87 @@ export default function ChangelogPage() {
           )}
 
           {/* ---------- MARKETING BLOCK (moved after releases) ---------- */}
-          <div className="mt-8">
+          <div className="mt-6 sm:mt-8">
             {/* Problem‑Solution‑Outcome */}
-            <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700 mb-8">
-              <div className="grid md:grid-cols-3 gap-6 text-center">
+            <div className="bg-gray-800/50 rounded-lg p-4 sm:p-6 border border-gray-700 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                 <div>
-                  <div className="text-red-400 font-bold text-xl mb-2">⚠️ Problem</div>
-                  <p className="text-gray-300">Most AI systems fail silently in production.</p>
+                  <div className="text-red-400 font-bold text-lg sm:text-xl mb-2">⚠️ Problem</div>
+                  <p className="text-gray-300 text-sm sm:text-base">Most AI systems fail silently in production.</p>
                 </div>
                 <div>
-                  <div className="text-green-400 font-bold text-xl mb-2">🔧 Solution</div>
-                  <p className="text-gray-300">ARF turns probabilistic AI into deterministic, auditable action.</p>
+                  <div className="text-green-400 font-bold text-lg sm:text-xl mb-2">🔧 Solution</div>
+                  <p className="text-gray-300 text-sm sm:text-base">ARF turns probabilistic AI into deterministic, auditable action.</p>
                 </div>
                 <div>
-                  <div className="text-blue-400 font-bold text-xl mb-2">📈 Outcome</div>
-                  <p className="text-gray-300">Reduce MTTR by up to 85% with self‑healing systems.</p>
+                  <div className="text-blue-400 font-bold text-lg sm:text-xl mb-2">📈 Outcome</div>
+                  <p className="text-gray-300 text-sm sm:text-base">Reduce MTTR by up to 85% with self‑healing systems.</p>
                 </div>
               </div>
             </div>
 
             {/* CTA Block */}
-            <div className="flex flex-wrap justify-center gap-4 mb-12">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-12">
               <a
                 href="https://a-r-f-agentic-reliability-framework-api.hf.space/docs"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2"
+                className="bg-blue-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2 text-sm sm:text-base"
               >
-                API Docs <ArrowRight size={18} />
+                API Docs <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />
               </a>
               <a
                 href="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition flex items-center gap-2"
+                className="bg-purple-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-purple-700 transition flex items-center gap-2 text-sm sm:text-base"
               >
-                Live Demo <Rocket size={18} />
+                Live Demo <Rocket size={16} className="sm:w-[18px] sm:h-[18px]" />
               </a>
               <a
                 href="https://github.com/arf-foundation/agentic-reliability-framework"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition flex items-center gap-2"
+                className="bg-gray-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-gray-600 transition flex items-center gap-2 text-sm sm:text-base"
               >
-                GitHub <Github size={18} />
+                GitHub <Github size={16} className="sm:w-[18px] sm:h-[18px]" />
               </a>
               <a
                 href="https://calendly.com/petter2025us/30min"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
+                className="border border-gray-600 text-gray-300 px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2 text-sm sm:text-base"
               >
-                Book a Call <Calendar size={18} />
+                Book a Call <Calendar size={16} className="sm:w-[18px] sm:h-[18px]" />
               </a>
             </div>
 
             {/* Diagram */}
-            <div className="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-700">
-              <h2 className="text-xl font-semibold mb-4 text-center">How ARF Works</h2>
-              <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
+            <div className="bg-gray-800 rounded-lg p-4 sm:p-6 mb-8 border border-gray-700">
+              <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">How ARF Works</h2>
+              <div className="overflow-x-auto">
+                <Mermaid chart={DIAGRAM} className="flex justify-center min-w-max" />
+              </div>
               <p className="text-xs text-gray-500 mt-2 text-center">
                 (Mermaid diagram – interactive)
               </p>
             </div>
 
             {/* Code Snippet */}
-            <div className="bg-gray-800 rounded-lg p-6 mb-12 border border-gray-700">
-              <h2 className="text-xl font-semibold mb-4">Try It Now</h2>
+            <div className="bg-gray-800 rounded-lg p-4 sm:p-6 mb-12 border border-gray-700">
+              <h2 className="text-lg sm:text-xl font-semibold mb-4">Try It Now</h2>
               <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
-                  <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{CURL_COMMAND}</pre>
+                <div className="flex items-center gap-2 bg-gray-900 p-2 sm:p-3 rounded-lg">
+                  <pre className="text-xs sm:text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{CURL_COMMAND}</pre>
                   <button
                     onClick={() => copyCode(CURL_COMMAND)}
-                    className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                    className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition shrink-0"
                     aria-label="Copy code"
                   >
                     {copiedCode ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
                   </button>
                 </div>
-                <p className="text-sm text-gray-400">
+                <p className="text-xs sm:text-sm text-gray-400">
                   Returns a full <span className="font-mono">HealingIntent</span> with risk score, risk factors, and recommended action.
                 </p>
               </div>
