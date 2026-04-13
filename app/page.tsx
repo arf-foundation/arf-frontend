@@ -220,8 +220,8 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      {/* Hero Section */}
-      <section id="hero" ref={heroRef} className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${heroInView ? 'opacity-100' : 'opacity-0'}`}>
+      {/* Hero Section – reduced vertical padding on mobile */}
+      <section id="hero" ref={heroRef} className={`container mx-auto px-4 py-12 sm:py-20 text-center transition-opacity duration-1000 ${heroInView ? 'opacity-100' : 'opacity-0'}`}>
         <div className="flex flex-col items-center gap-3 mb-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
             Stop guessing. <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Audit every AI decision.</span>
@@ -310,10 +310,10 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities – Lazy‑loaded cards (fixed hook violation and ref type) */}
+      {/* Key Capabilities – Lazy‑loaded cards, now with grid-cols-1 */}
       <section ref={capabilitiesRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${capabilitiesInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {FEATURES.map((feature, idx) => (
             <LazyFeatureCard key={idx} feature={feature} />
           ))}
@@ -450,11 +450,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Demos – all with disclaimers, now including the Interactive Risk Demo */}
+      {/* Live Demos – added grid-cols-1 */}
       <section ref={demosRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${demosInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Live Demos</h2>
-        <div className="grid md:grid-cols-5 gap-6">
-          {/* NEW: Interactive Risk Demo (simulated) */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          {/* Interactive Risk Demo (simulated) */}
           <DemoCard
             title="Interactive Risk Demo"
             description="Simulated Bayesian risk scoring – adjust priors, see MCMC, semantic memory"
