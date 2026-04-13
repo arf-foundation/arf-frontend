@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import {
   ArrowRight,
   Github,
@@ -30,7 +31,12 @@ import {
 } from 'lucide-react';
 import GitHubStars from '../components/GitHubStars';
 import { useInView } from '../hooks/useInView';
-import Mermaid from '../components/Mermaid';
+
+// Lazy-load Mermaid with no SSR to reduce initial bundle size
+const Mermaid = dynamic(() => import('../components/Mermaid'), {
+  ssr: false,
+  loading: () => <div className="h-64 animate-pulse bg-gray-700 rounded-lg" />
+});
 
 // --- Types ---
 interface RepoData {
@@ -76,6 +82,8 @@ export default function LandingPage() {
   const [copiedSandboxSnippet, setCopiedSandboxSnippet] = useState(false);
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const diagramRef = useRef<HTMLDivElement>(null);
+  const isDiagramVisible = useInView({ ref: diagramRef, threshold: 0.1 });
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText('petter2025us@outlook.com');
@@ -98,6 +106,7 @@ export default function LandingPage() {
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setNewsletterStatus('loading');
+    // Simulate API call – replace with actual endpoint
     await new Promise(resolve => setTimeout(resolve, 1000));
     console.log('Newsletter subscription for:', email);
     setNewsletterStatus('success');
@@ -105,7 +114,7 @@ export default function LandingPage() {
     setTimeout(() => setNewsletterStatus('idle'), 3000);
   };
 
-  // Scroll animation hooks
+  // Scroll animation hooks for other sections
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2 });
   const { ref: ecosystemRef, inView: ecosystemInView } = useInView({ threshold: 0.2 });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2 });
@@ -159,12 +168,12 @@ export default function LandingPage() {
               Join our Slack
             </a>
           </div>
-          <img src="/logos/placeholder.svg" alt="Trusted by" className="h-6 opacity-70" />
+          <img src="/logos/placeholder.svg" alt="Trusted by companies" className="h-6 opacity-70" />
         </div>
         <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents. Not a guarantee.</p>
       </div>
 
-      {/* LinkedIn Embed – Social Proof */}
+      {/* LinkedIn Embed – Social Proof (lazy-loaded) */}
       <div className="container mx-auto px-4 mb-12">
         <div className="flex justify-center">
           <div className="w-full max-w-md rounded-lg border border-gray-700 bg-gray-800/50 p-4">
@@ -177,6 +186,7 @@ export default function LandingPage() {
               title="LinkedIn post – ARF access control agent"
               className="mx-auto w-full"
               style={{ maxWidth: '100%', height: 'auto', minHeight: '400px' }}
+              loading="lazy"
             />
           </div>
         </div>
@@ -203,11 +213,12 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* How ARF Works (conceptual diagram) */}
-      <div className="container mx-auto px-4 mb-16">
+      {/* How ARF Works (conceptual diagram) - lazy load when visible */}
+      <div ref={diagramRef} className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
+          {isDiagramVisible && <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />}
+          {!isDiagramVisible && <div className="h-64 animate-pulse bg-gray-700 rounded-lg" />}
           <p className="text-xs text-gray-500 mt-2 text-center">Bayesian risk fusion → Expected loss minimisation → Approve/Deny/Escalate</p>
         </div>
       </div>
@@ -316,7 +327,11 @@ export default function LandingPage() {
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
               <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{SANDBOX_CURL}</pre>
-              <button onClick={handleCopySandboxSnippet} className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition">
+              <button
+                onClick={handleCopySandboxSnippet}
+                className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                aria-label="Copy sandbox command"
+              >
                 {copiedSandboxSnippet ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
               </button>
             </div>
@@ -474,20 +489,22 @@ export default function LandingPage() {
                 placeholder="Your email address"
                 required
                 className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white placeholder-gray-500"
+                aria-label="Email address for newsletter"
               />
               <button
                 type="submit"
                 disabled={newsletterStatus === 'loading'}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-blue-400 flex items-center gap-2 justify-center"
+                aria-label="Subscribe to newsletter"
               >
                 {newsletterStatus === 'loading' ? 'Sending...' : <>Subscribe <Send size={16} /></>}
               </button>
             </form>
             {newsletterStatus === 'success' && (
-              <p className="text-sm text-green-400 mt-2">✓ Thanks! Please check your inbox to confirm your subscription.</p>
+              <p className="text-sm text-green-400 mt-2" role="status">✓ Thanks! Please check your inbox to confirm your subscription.</p>
             )}
             {newsletterStatus === 'error' && (
-              <p className="text-sm text-red-400 mt-2">✗ Something went wrong. Please try again.</p>
+              <p className="text-sm text-red-400 mt-2" role="alert">✗ Something went wrong. Please try again.</p>
             )}
           </div>
 
@@ -518,7 +535,11 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Toast Notifications */}
+      {/* Toast Notifications with aria-live */}
+      <div aria-live="polite" className="sr-only">
+        {copiedEmail && 'Email address copied'}
+        {copiedSandboxSnippet && 'Sandbox command copied'}
+      </div>
       {copiedEmail && (
         <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
           Email copied! ✉️
@@ -533,7 +554,7 @@ export default function LandingPage() {
   );
 }
 
-// Helper components (unchanged except for optional disclaimer prop in DemoCard)
+// Helper components (unchanged except for added aria-labels and security attributes)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
@@ -544,6 +565,8 @@ function EcoCard({ icon, title, description, details }: { icon: React.ReactNode;
       <button
         onClick={() => setExpanded(!expanded)}
         className="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 mx-auto transition"
+        aria-expanded={expanded}
+        aria-label={`${expanded ? 'Show less' : 'Details'} about ${title}`}
       >
         {expanded ? 'Show less' : 'Details'} 
         {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
@@ -569,6 +592,8 @@ function FeatureCard({ title, description, icon, details }: { title: string; des
       <button
         onClick={() => setExpanded(!expanded)}
         className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1 mx-auto transition"
+        aria-expanded={expanded}
+        aria-label={`${expanded ? 'Show less' : 'Details'} about ${title}`}
       >
         {expanded ? 'Show less' : 'Details'} 
         {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
