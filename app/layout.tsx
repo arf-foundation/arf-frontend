@@ -6,18 +6,18 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL('https://arf-frontend-sandy.vercel.app'),
   title: {
-    default: 'Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane',
+    default: 'Agentic Reliability Framework (ARF) – Governance for AI Systems',
     template: '%s | ARF',
   },
-  description: 'Turn probabilistic AI into deterministic, auditable action. Reduce MTTR by up to 85% with self‑healing systems powered by Bayesian governance.',
-  keywords: ['AI reliability', 'self-healing systems', 'AI governance', 'agent orchestration', 'production AI', 'SRE automation', 'Bayesian inference', 'cloud governance'],
+  description: 'ARF is a governance layer for AI systems. The core engine is access‑controlled and offered to qualified pilots under outcome‑based pricing.',
+  keywords: ['AI reliability', 'self-healing systems', 'AI governance', 'pilot program', 'access control', 'Bayesian inference', 'cloud governance', 'enterprise AI'],
   authors: [{ name: 'Juan Petter', url: 'https://www.linkedin.com/in/juan-petter' }],
   creator: 'ARF Foundation',
   publisher: 'ARF Foundation',
   robots: 'index, follow',
   openGraph: {
     title: 'ARF – Agentic Reliability Framework',
-    description: 'Auditable cloud governance powered by Bayesian intelligence.',
+    description: 'Stewarded, pilot‑first reliability framework for AI systems. Core engine is access‑controlled.',
     url: 'https://arf-frontend-sandy.vercel.app',
     siteName: 'ARF',
     images: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'ARF – Agentic Reliability Framework',
-    description: 'Bayesian governance for cloud infrastructure.',
+    description: 'Access‑controlled governance for cloud infrastructure.',
     creator: '@arf_foundation',
     images: ['/og-image.png'],
   },
@@ -81,14 +81,14 @@ export default function RootLayout({
               <Link href="/history" className="hover:underline">History</Link>
               <Link href="/changelog" className="hover:underline">Changelog</Link>
               <Link href="/faq" className="hover:underline">FAQ</Link>
-              <Link href="/pricing" className="hover:underline font-medium text-blue-400">Pricing</Link>
+              <Link href="/pricing" className="hover:underline font-medium text-blue-400">Access Models</Link>
             </div>
             <div className="flex items-center gap-4">
               <Link
                 href="/signup"
                 className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition"
               >
-                Sign Up
+                Request Pilot Access
               </Link>
               <a
                 href="https://arf-foundation.github.io/arf-spec/"
@@ -96,7 +96,7 @@ export default function RootLayout({
                 rel="noopener noreferrer"
                 className="hover:underline text-sm"
               >
-                Docs
+                Spec
               </a>
             </div>
           </div>
