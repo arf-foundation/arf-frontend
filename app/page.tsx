@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import GitHubStars from '../components/GitHubStars';
 import { useInView } from '../hooks/useInView';
+import LinkedInEmbed from '../components/LinkedInEmbed'; // 👈 new import
 
 // Lazy-load Mermaid with no SSR to reduce initial bundle size
 const Mermaid = dynamic(() => import('../components/Mermaid'), {
@@ -169,29 +170,20 @@ export default function LandingPage() {
               Join our Slack
             </a>
           </div>
-          <img src="/logos/placeholder.svg" alt="Trusted by companies" className="h-6 opacity-70" />
+          {/* ✅ replaced broken <img> with inline SVG */}
+          <div className="flex items-center gap-1 text-gray-400">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M12 8v4l3 3" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+            <span>Trusted by leading AI teams</span>
+          </div>
         </div>
         <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents. Not a guarantee.</p>
       </div>
 
-      {/* LinkedIn Embed – Social Proof (lazy-loaded) */}
-      <div className="container mx-auto px-4 mb-12">
-        <div className="flex justify-center">
-          <div className="w-full max-w-md rounded-lg border border-gray-700 bg-gray-800/50 p-4">
-            <iframe
-              src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7436928497408880640?collapsed=1"
-              height="877"
-              width="504"
-              frameBorder="0"
-              allowFullScreen
-              title="LinkedIn post – ARF access control agent"
-              className="mx-auto w-full"
-              style={{ maxWidth: '100%', height: 'auto', minHeight: '400px' }}
-              loading="lazy"
-            />
-          </div>
-        </div>
-      </div>
+      {/* LinkedIn Embed – Social Proof (lazy-loaded via custom component) */}
+      <LinkedInEmbed />
 
       {/* Problem-Solution-Outcome Block */}
       <div className="container mx-auto px-4 mb-12">
