@@ -1,14 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useInView } from '../hooks/useInView';
 
 export default function LinkedInEmbed() {
   const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
   const [shouldLoad, setShouldLoad] = useState(false);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
-    if (inView) setShouldLoad(true);
+    if (inView && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      setShouldLoad(true);
+    }
   }, [inView]);
 
   return (
