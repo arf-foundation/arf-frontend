@@ -2,103 +2,18 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Mail } from 'lucide-react';
 
-const TIERS = [
-  {
-    name: 'Free',
-    price: 0,
-    currency: 'USD',
-    description: 'Up to 1,000 evals/mo',
-    limits: { evaluations: 1000 },
-    features: ['Community support'],
-    savings: 99,
-    cta: 'Get started',
-    href: '/signup',
-  },
-  {
-    name: 'Pro',
-    price: 99,
-    currency: 'USD',
-    description: 'Up to 10,000 evals/mo',
-    limits: { evaluations: 10000 },
-    features: ['Email support', 'Audit logs (30 days)'],
-    label: 'Most Popular',
-    cta: 'Subscribe →',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID, // Set this in your .env.local
-  },
-  {
-    name: 'Premium',
-    price: 299,
-    currency: 'USD',
-    description: 'Up to 50,000 evals/mo',
-    limits: { evaluations: 50000 },
-    features: ['Priority email support', 'Audit logs (90 days)', 'Basic SLA'],
-    label: 'Best Value',
-    cta: 'Contact sales',
-    href: 'https://calendly.com/petter2025us/30min',
-  },
-  {
-    name: 'Enterprise',
-    price: 999,
-    currency: 'USD',
-    description: 'Unlimited evals, SSO, SLA',
-    limits: { evaluations: null },
-    features: [
-      'Single Sign‑On (SSO)',
-      '99.9% uptime SLA',
-      'Dedicated support (< 15 min)',
-      'On‑premises deployment',
-      'Custom audit retention',
-    ],
-    cta: 'Contact Sales →',
-    href: 'https://calendly.com/petter2025us/30min',
-  },
-];
+// This page now describes access models, not per‑seat pricing.
+// Outcome‑based pricing is explained, and the free “tier” is replaced by a sandbox demo.
 
 export default function PricingPage() {
-  const [loadingTier, setLoadingTier] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [copiedEmail, setCopiedEmail] = useState(false);
 
-  const handleSubscribe = async (tier: typeof TIERS[0]) => {
-    if (!tier.priceId) {
-      setError('Pro plan is not configured. Please contact support.');
-      return;
-    }
-
-    setLoadingTier(tier.name);
-    setError(null);
-
-    // Retrieve API key – adjust this to your actual auth mechanism
-    const apiKey = localStorage.getItem('arf_api_key');
-    if (!apiKey) {
-      setError('Please sign up first to get an API key.');
-      setLoadingTier(null);
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/v1/payments/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          api_key: apiKey,
-          success_url: `${window.location.origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: window.location.href,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || 'Failed to create checkout session');
-      }
-
-      const { url } = await response.json();
-      if (url) window.location.href = url;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-      setLoadingTier(null);
-    }
+  const handleCopyEmail = async () => {
+    await navigator.clipboard.writeText('petter2025us@outlook.com');
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
   };
 
   return (
@@ -106,121 +21,133 @@ export default function PricingPage() {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Simple, transparent pricing
+            Access Models & Pilot Program
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Start free, scale with confidence. No hidden fees.
+            The core ARF engine is protected and access‑controlled. Choose the right path for your organisation.
           </p>
         </div>
 
-        {error && (
-          <div className="max-w-md mx-auto mb-8 p-4 bg-red-900/50 border border-red-500 rounded-lg text-red-200 text-center">
-            {error}
-          </div>
-        )}
-
-        <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {TIERS.map((tier) => (
-            <div
-              key={tier.name}
-              className={`bg-gray-800 rounded-2xl border p-6 flex flex-col relative ${
-                tier.label === 'Most Popular'
-                  ? 'border-blue-500 shadow-lg shadow-blue-500/20'
-                  : 'border-gray-700'
-              }`}
-            >
-              {tier.label && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
-                  {tier.label}
-                </div>
-              )}
-
-              <h2 className="text-2xl font-bold mb-2">{tier.name}</h2>
-
-              <div className="mb-4">
-                <span className="text-4xl font-bold">
-                  {tier.price === 0 ? 'Free' : `$${tier.price}`}
-                </span>
-                {tier.price > 0 && <span className="text-gray-400 text-sm">/mo</span>}
-                {tier.savings && (
-                  <div className="text-green-400 text-sm mt-1">
-                    Save ${tier.savings}/mo vs Pro
-                  </div>
-                )}
-              </div>
-
-              <p className="text-gray-400 text-sm mb-4">{tier.description}</p>
-
-              <ul className="space-y-3 flex-1">
-                {tier.features?.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-sm">
-                    <Check size={16} className="text-green-400 flex-shrink-0" />
-                    <span className="text-gray-300">{feature}</span>
-                  </li>
-                ))}
-                {tier.name === 'Free' && (
-                  <li className="flex items-center gap-2 text-sm text-gray-500">
-                    <span className="w-4" /> No audit logs
-                  </li>
-                )}
-                {tier.limits?.evaluations !== undefined && tier.limits.evaluations !== null ? (
-                  <li className="flex items-center gap-2 text-sm">
-                    <Check size={16} className="text-green-400" />
-                    <span>{tier.limits.evaluations.toLocaleString()} evaluations/month</span>
-                  </li>
-                ) : tier.limits?.evaluations === null ? (
-                  <li className="flex items-center gap-2 text-sm">
-                    <Check size={16} className="text-green-400" />
-                    <span>Unlimited evaluations</span>
-                  </li>
-                ) : null}
-              </ul>
-
-              {tier.name === 'Enterprise' && (
-                <div className="mt-4 text-center">
-                  <span className="text-gray-400 line-through text-sm">$999/mo</span>
-                  <div className="text-gray-400 text-xs">Custom pricing – contact sales</div>
-                </div>
-              )}
-
-              <div className="mt-8">
-                {tier.name === 'Free' && (
-                  <Link
-                    href={tier.href || '#'}
-                    className="w-full block text-center border border-gray-600 text-gray-300 py-2 rounded-lg hover:border-blue-500 hover:text-white transition"
-                  >
-                    {tier.cta}
-                  </Link>
-                )}
-                {tier.name === 'Pro' && (
-                  <button
-                    onClick={() => handleSubscribe(tier)}
-                    disabled={loadingTier === tier.name}
-                    className="w-full bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {loadingTier === tier.name ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      tier.cta
-                    )}
-                  </button>
-                )}
-                {(tier.name === 'Premium' || tier.name === 'Enterprise') && (
-                  <a
-                    href={tier.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full block text-center border border-gray-600 text-gray-300 py-2 rounded-lg hover:border-blue-500 hover:text-white transition"
-                  >
-                    {tier.cta}
-                  </a>
-                )}
-              </div>
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {/* Sandbox – free, sanitised demo */}
+          <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 flex flex-col">
+            <h2 className="text-2xl font-bold mb-2">Sandbox</h2>
+            <div className="text-4xl font-bold text-blue-400 mb-2">Free</div>
+            <p className="text-gray-400 text-sm mb-4">No commitment, no engine access</p>
+            <ul className="space-y-3 flex-1">
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>100 evaluations/month</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>Sanitized API endpoint</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>UI dashboard with demo data</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm text-gray-500">
+                <span className="w-4" />✗ No Bayesian core
+              </li>
+              <li className="flex items-center gap-2 text-sm text-gray-500">
+                <span className="w-4" />✗ No audit logs
+              </li>
+            </ul>
+            <div className="mt-8">
+              <Link
+                href="/dashboard"
+                className="w-full block text-center border border-gray-600 text-gray-300 py-2 rounded-lg hover:border-blue-500 hover:text-white transition"
+              >
+                Try Sandbox →
+              </Link>
             </div>
-          ))}
+          </div>
+
+          {/* Pilot – time‑limited trial, qualified access */}
+          <div className="bg-gray-800 rounded-2xl border-2 border-blue-500 shadow-lg shadow-blue-500/20 p-6 flex flex-col relative">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+              Recommended
+            </div>
+            <h2 className="text-2xl font-bold mb-2">Pilot</h2>
+            <div className="text-4xl font-bold text-purple-400 mb-2">Time‑limited</div>
+            <p className="text-gray-400 text-sm mb-4">Free trial for qualified organisations</p>
+            <ul className="space-y-3 flex-1">
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>Full engine access</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>Audit logs & support</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>Up to 10,000 evaluations/month</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>Direct founder support</span>
+              </li>
+            </ul>
+            <p className="text-xs text-gray-400 mt-4 border-t border-gray-700 pt-3">
+              Subject to mutual qualification agreement. No credit card required.
+            </p>
+            <div className="mt-8">
+              <Link
+                href="/signup"
+                className="w-full block text-center bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
+              >
+                Request Pilot Access →
+              </Link>
+            </div>
+          </div>
+
+          {/* Enterprise – outcome‑based pricing */}
+          <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 flex flex-col">
+            <h2 className="text-2xl font-bold mb-2">Enterprise</h2>
+            <div className="text-4xl font-bold text-gray-400 mb-2">Outcome‑based</div>
+            <p className="text-gray-400 text-sm mb-4">Pay for verified risk reduction</p>
+            <ul className="space-y-3 flex-1">
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>Unlimited evaluations</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>99.9% uptime SLA</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>SSO, on‑prem deployment</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check size={16} className="text-green-400" />
+                <span>Pricing tied to MTTR reduction</span>
+              </li>
+            </ul>
+            <p className="text-xs text-gray-400 mt-4 border-t border-gray-700 pt-3">
+              We measure risk reduction via auditable pre/post Bayesian scores – you pay only for verified improvement.
+            </p>
+            <div className="mt-8">
+              <button
+                onClick={handleCopyEmail}
+                className="w-full flex items-center justify-center gap-2 border border-gray-600 text-gray-300 py-2 rounded-lg hover:border-blue-500 hover:text-white transition"
+              >
+                <Mail size={16} /> Copy email to enquire
+              </button>
+              {copiedEmail && (
+                <p className="text-xs text-green-400 text-center mt-2">Email copied! ✉️</p>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="text-center mt-12 text-gray-400 text-sm">
+        <div className="text-center mt-12 text-gray-400 text-sm max-w-2xl mx-auto">
+          <p className="mb-2">
+            <strong>Why outcome‑based pricing?</strong> We believe you should pay for value, not infrastructure.
+            ARF’s pricing is directly tied to the amount of operational risk the system removes from your AI workflows.
+          </p>
           <p>
             Questions?{' '}
             <Link href="/faq" className="text-blue-400 hover:underline">
