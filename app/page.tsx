@@ -83,8 +83,8 @@ export default function LandingPage() {
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  // Use the hook correctly – it returns a ref and an inView boolean
-  const { ref: diagramRef, inView: isDiagramVisible } = useInView({ threshold: 0.1 });
+  // ✅ Fixed: added generic type HTMLDivElement to match the div element
+  const { ref: diagramRef, inView: isDiagramVisible } = useInView<HTMLDivElement>({ threshold: 0.1 });
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText('petter2025us@outlook.com');
