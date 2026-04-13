@@ -73,9 +73,11 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className="min-h-screen bg-gray-100">
+        {/* Navigation – now responsive with flex-wrap */}
         <nav className="bg-gray-800 text-white shadow-md" aria-label="Main navigation">
-          <div className="container mx-auto flex items-center justify-between gap-6 p-4">
-            <div className="flex items-center gap-6">
+          <div className="container mx-auto flex flex-wrap items-center justify-between gap-3 p-4">
+            {/* Left side menu */}
+            <div className="flex flex-wrap items-center gap-4">
               <Link href="/" className="font-bold hover:underline">ARF</Link>
               <Link href="/dashboard" className="hover:underline">Dashboard</Link>
               <Link href="/history" className="hover:underline">History</Link>
@@ -83,7 +85,8 @@ export default function RootLayout({
               <Link href="/faq" className="hover:underline">FAQ</Link>
               <Link href="/pricing" className="hover:underline font-medium text-blue-400">Access Models</Link>
             </div>
-            <div className="flex items-center gap-4">
+            {/* Right side buttons */}
+            <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="/signup"
                 className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition"
