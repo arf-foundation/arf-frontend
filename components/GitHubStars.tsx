@@ -1,20 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Star } from 'lucide-react';
+import { Star } from 'lucide';
 
 export default function GitHubStars() {
   const [stars, setStars] = useState<number | null>(null);
 
   useEffect(() => {
-    const repoName = 'agentic-reliability-framework';
+    // Use a public repository – arf-spec is public and Apache 2.0
+    const repoName = 'arf-spec';
     const cacheKey = `github-stars-${repoName}`;
     const cached = localStorage.getItem(cacheKey);
     const cachedTime = localStorage.getItem(`${cacheKey}-time`);
     const now = Date.now();
 
     if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStars(JSON.parse(cached));
       return;
     }
@@ -32,18 +32,18 @@ export default function GitHubStars() {
       })
       .catch(err => {
         console.error('Failed to fetch GitHub stars:', err);
-        // Fallback to a reasonable default (optional)
-        setStars(1200);
+        setStars(0);
       });
   }, []);
 
   if (stars === null) return null;
   return (
     <a
-      href="https://github.com/arf-foundation/agentic-reliability-framework"
+      href="https://github.com/arf-foundation/arf-spec"
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex items-center gap-1 bg-gray-800 px-3 py-1 rounded-full text-sm"
+      title="Stars for the public specification – the core engine is not open source"
     >
       <Star size={14} className="fill-yellow-400 text-yellow-400" />
       <span>{stars.toLocaleString()}</span>
