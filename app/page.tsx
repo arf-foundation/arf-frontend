@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import {
   ArrowRight,
@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import GitHubStars from '../components/GitHubStars';
 import { useInView } from '../hooks/useInView';
-import LinkedInEmbed from '../components/LinkedInEmbed'; // 👈 new import
+import LinkedInEmbed from '../components/LinkedInEmbed';
 
 // Lazy-load Mermaid with no SSR to reduce initial bundle size
 const Mermaid = dynamic(() => import('../components/Mermaid'), {
@@ -72,6 +72,34 @@ const SANDBOX_CURL = `curl -X POST https://sandbox.arf.dev/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
+// Feature data for lazy-loading
+const FEATURES = [
+  {
+    title: "Bayesian Risk Scoring",
+    description: "Conjugate priors + hyperpriors + HMC for calibrated uncertainty.",
+    icon: <Brain className="w-8 h-8 text-blue-400" />,
+    details: "Uses conjugate Beta priors per action category for fast online updates, optional hierarchical hyperpriors to share strength across categories, and an offline HMC logistic regression model that learns complex patterns (time of day, user role, environment). The final risk is a weighted average."
+  },
+  {
+    title: "Semantic Memory",
+    description: "FAISS‑based retrieval of similar past incidents.",
+    icon: <Network className="w-8 h-8 text-green-400" />,
+    details: "Stores incident embeddings in a FAISS index for fast similarity search. When a new incident occurs, ARF retrieves the most similar past incidents and their outcomes to inform the current risk assessment."
+  },
+  {
+    title: "Expected Loss Minimisation",
+    description: "Bayesian fusion + CVaR for approve/deny/escalate.",
+    icon: <Scale className="w-8 h-8 text-yellow-400" />,
+    details: "Combines conjugate priors (online), hyperpriors (hierarchical), and HMC (offline) into a weighted risk score. Chooses the action that minimises expected loss, optionally using Conditional Value at Risk (CVaR) to account for tail risk."
+  },
+  {
+    title: "Multi‑Agent Orchestration",
+    description: "Anomaly detection, root cause, forecasting.",
+    icon: <Cpu className="w-8 h-8 text-purple-400" />,
+    details: "Coordinates multiple agents to detect anomalies, find root causes, and forecast future reliability. Each agent specialises in a different aspect of the infrastructure, and they collaborate to form a comprehensive picture."
+  }
+];
+
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
@@ -81,23 +109,45 @@ declare global {
 export default function LandingPage() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedSandboxSnippet, setCopiedSandboxSnippet] = useState(false);
+  const [showEmailTooltip, setShowEmailTooltip] = useState(false);
+  const [showSandboxTooltip, setShowSandboxTooltip] = useState(false);
+  const [showFAB, setShowFAB] = useState(false);
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  // ✅ Fixed: useInView doesn't accept a generic, so cast the ref
+  // Lazy-load diagram ref
   const { ref: diagramRefRaw, inView: isDiagramVisible } = useInView({ threshold: 0.1 });
   const diagramRef = diagramRefRaw as React.RefObject<HTMLDivElement>;
+
+  // Handle FAB visibility on mobile
+  useEffect(() => {
+    const handleScroll = () => {
+      const heroSection = document.getElementById('hero');
+      const heroHeight = heroSection?.offsetHeight || 600;
+      setShowFAB(window.scrollY > heroHeight);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText('petter2025us@outlook.com');
     setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2000);
+    setShowEmailTooltip(true);
+    setTimeout(() => {
+      setCopiedEmail(false);
+      setShowEmailTooltip(false);
+    }, 2000);
   };
 
   const handleCopySandboxSnippet = async () => {
     await navigator.clipboard.writeText(SANDBOX_CURL);
     setCopiedSandboxSnippet(true);
-    setTimeout(() => setCopiedSandboxSnippet(false), 2000);
+    setShowSandboxTooltip(true);
+    setTimeout(() => {
+      setCopiedSandboxSnippet(false);
+      setShowSandboxTooltip(false);
+    }, 2000);
   };
 
   const trackSlackClick = () => {
@@ -127,7 +177,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       {/* Hero Section */}
-      <section ref={heroRef} className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${heroInView ? 'opacity-100' : 'opacity-0'}`}>
+      <section id="hero" ref={heroRef} className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${heroInView ? 'opacity-100' : 'opacity-0'}`}>
         <div className="flex flex-col items-center gap-3 mb-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
             Stop guessing. <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Audit every AI decision.</span>
@@ -170,7 +220,7 @@ export default function LandingPage() {
               Join our Slack
             </a>
           </div>
-          {/* ✅ replaced broken <img> with inline SVG */}
+          {/* Inline SVG – no more 404 */}
           <div className="flex items-center gap-1 text-gray-400">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
@@ -182,7 +232,7 @@ export default function LandingPage() {
         <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents. Not a guarantee.</p>
       </div>
 
-      {/* LinkedIn Embed – Social Proof (lazy-loaded via custom component) */}
+      {/* LinkedIn Embed – Lazy‑loaded component */}
       <LinkedInEmbed />
 
       {/* Problem-Solution-Outcome Block */}
@@ -216,34 +266,27 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities */}
+      {/* Key Capabilities – Lazy‑loaded cards */}
       <section ref={capabilitiesRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${capabilitiesInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <FeatureCard
-            title="Bayesian Risk Scoring"
-            description="Conjugate priors + hyperpriors + HMC for calibrated uncertainty."
-            icon={<Brain className="w-8 h-8 text-blue-400" />}
-            details="Uses conjugate Beta priors per action category for fast online updates, optional hierarchical hyperpriors to share strength across categories, and an offline HMC logistic regression model that learns complex patterns (time of day, user role, environment). The final risk is a weighted average."
-          />
-          <FeatureCard
-            title="Semantic Memory"
-            description="FAISS‑based retrieval of similar past incidents."
-            icon={<Network className="w-8 h-8 text-green-400" />}
-            details="Stores incident embeddings in a FAISS index for fast similarity search. When a new incident occurs, ARF retrieves the most similar past incidents and their outcomes to inform the current risk assessment."
-          />
-          <FeatureCard
-            title="Expected Loss Minimisation"
-            description="Bayesian fusion + CVaR for approve/deny/escalate."
-            icon={<Scale className="w-8 h-8 text-yellow-400" />}
-            details="Combines conjugate priors (online), hyperpriors (hierarchical), and HMC (offline) into a weighted risk score. Chooses the action that minimises expected loss, optionally using Conditional Value at Risk (CVaR) to account for tail risk."
-          />
-          <FeatureCard
-            title="Multi‑Agent Orchestration"
-            description="Anomaly detection, root cause, forecasting."
-            icon={<Cpu className="w-8 h-8 text-purple-400" />}
-            details="Coordinates multiple agents to detect anomalies, find root causes, and forecast future reliability. Each agent specialises in a different aspect of the infrastructure, and they collaborate to form a comprehensive picture."
-          />
+          {FEATURES.map((feature, idx) => {
+            const { ref: cardRef, inView: cardInView } = useInView({ threshold: 0.1, triggerOnce: true });
+            return (
+              <div key={idx} ref={cardRef}>
+                {cardInView ? (
+                  <FeatureCard
+                    title={feature.title}
+                    description={feature.description}
+                    icon={feature.icon}
+                    details={feature.details}
+                  />
+                ) : (
+                  <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-64 animate-pulse" />
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -322,10 +365,15 @@ export default function LandingPage() {
               <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{SANDBOX_CURL}</pre>
               <button
                 onClick={handleCopySandboxSnippet}
-                className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                className="relative p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition transform active:scale-95"
                 aria-label="Copy sandbox command"
               >
                 {copiedSandboxSnippet ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
+                {showSandboxTooltip && (
+                  <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                    Copied!
+                  </span>
+                )}
               </button>
             </div>
             <p className="text-sm text-yellow-300">
@@ -440,10 +488,15 @@ export default function LandingPage() {
                 />
                 <button
                   onClick={handleCopyEmail}
-                  className="p-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  className="relative p-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group transform active:scale-95"
                   aria-label="Copy email address"
                 >
                   {copiedEmail ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400 group-hover:text-white" />}
+                  {showEmailTooltip && (
+                    <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                      Copied!
+                    </span>
+                  )}
                 </button>
               </div>
               <ContactLink
@@ -528,7 +581,19 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Toast Notifications */}
+      {/* Sticky Mobile FAB */}
+      {showFAB && (
+        <div className="fixed bottom-6 right-4 z-50 md:hidden">
+          <Link
+            href="/signup"
+            className="bg-blue-600 text-white px-5 py-3 rounded-full shadow-lg hover:bg-blue-700 transition flex items-center gap-2 text-sm font-semibold"
+          >
+            Request Pilot Access <ArrowRight size={16} />
+          </Link>
+        </div>
+      )}
+
+      {/* Toast Notifications (kept for compatibility) */}
       <div aria-live="polite" className="sr-only">
         {copiedEmail && 'Email address copied'}
         {copiedSandboxSnippet && 'Sandbox command copied'}
@@ -547,7 +612,7 @@ export default function LandingPage() {
   );
 }
 
-// Helper components (unchanged)
+// Helper components (unchanged except for FeatureCard which is kept as is)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
