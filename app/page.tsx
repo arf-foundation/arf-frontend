@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import {
   ArrowRight,
@@ -133,6 +133,10 @@ export default function LandingPage() {
   const [showFAB, setShowFAB] = useState(false);
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  // Security: honeypot field (should be empty)
+  const [honeypot, setHoneypot] = useState('');
+  // Security: time token (prevent rapid submissions)
+  const lastSubmitTime = useRef<number>(0);
 
   // Lazy-load diagram ref
   const { ref: diagramRefRaw, inView: isDiagramVisible } = useInView({ threshold: 0.1 });
@@ -175,13 +179,33 @@ export default function LandingPage() {
     }
   };
 
+  // Security-enhanced newsletter submission
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Honeypot check: if this field is filled, it's a bot
+    if (honeypot) {
+      console.log('Honeypot triggered – bot detected');
+      setNewsletterStatus('error');
+      setTimeout(() => setNewsletterStatus('idle'), 3000);
+      return;
+    }
+
+    // Rate limiting: prevent more than 1 submission per 2 seconds
+    const now = Date.now();
+    if (now - lastSubmitTime.current < 2000) {
+      setNewsletterStatus('error');
+      setTimeout(() => setNewsletterStatus('idle'), 3000);
+      return;
+    }
+    lastSubmitTime.current = now;
+
     setNewsletterStatus('loading');
+    // Simulate API call – replace with actual endpoint
     await new Promise(resolve => setTimeout(resolve, 1000));
     console.log('Newsletter subscription for:', email);
     setNewsletterStatus('success');
     setEmail('');
+    setHoneypot('');
     setTimeout(() => setNewsletterStatus('idle'), 3000);
   };
 
@@ -251,7 +275,7 @@ export default function LandingPage() {
         <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents. Not a guarantee.</p>
       </div>
 
-      {/* LinkedIn Embed – Lazy‑loaded component */}
+      {/* LinkedIn Embed – Lazy‑loaded component with sandbox attribute */}
       <LinkedInEmbed />
 
       {/* Problem-Solution-Outcome Block */}
@@ -536,7 +560,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Newsletter Signup */}
+          {/* Newsletter Signup – Security enhanced (honeypot + rate limiting) */}
           <div className="mb-8 max-w-md mx-auto">
             <h4 className="text-lg font-semibold text-white mb-2">Stay Updated</h4>
             <p className="text-sm text-gray-400 mb-4">
@@ -551,6 +575,17 @@ export default function LandingPage() {
                 required
                 className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white placeholder-gray-500"
                 aria-label="Email address for newsletter"
+              />
+              {/* Honeypot field – hidden from real users */}
+              <input
+                type="text"
+                name="website"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                className="hidden"
+                aria-hidden="true"
+                tabIndex={-1}
+                autoComplete="off"
               />
               <button
                 type="submit"
