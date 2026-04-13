@@ -124,7 +124,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="text-xl" role="status" aria-label="Loading">
           <div className="animate-pulse">Loading risk data...</div>
         </div>
@@ -135,7 +135,7 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-md w-full">
           <div role="alert" className="text-red-600 mb-6">
             <p className="font-bold mb-2">Error</p>
             <p>{error}</p>
@@ -156,7 +156,7 @@ export default function Dashboard() {
 
   if (!risk) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         No risk data available
       </div>
     );
@@ -168,16 +168,16 @@ export default function Dashboard() {
     'bg-green-500';
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gray-100 p-3 sm:p-4">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
         {/* Risk Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">ARF System Risk</h1>
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">ARF System Risk</h1>
           
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <div className="flex justify-between mb-2">
               <span className="text-gray-600 text-sm font-medium">Risk Score</span>
-              <span className="font-mono text-2xl font-bold text-gray-900">
+              <span className="font-mono text-xl sm:text-2xl font-bold text-gray-900">
                 {(risk.system_risk * 100).toFixed(0)}%
               </span>
             </div>
@@ -189,7 +189,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
             <span className="text-gray-600">Status</span>
             <span className={`px-3 py-1 rounded-full text-white font-medium text-sm ${statusColor}`}>
               {risk.status.toUpperCase()}
@@ -205,10 +205,10 @@ export default function Dashboard() {
 
         {/* Quota Card */}
         {quota && (
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8">
             <div className="flex justify-between items-start mb-4">
-              <h2 className="text-xl font-semibold text-gray-800">Your Plan</h2>
-              <span className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getTierBadgeColor(quota.tier)}`}>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Your Plan</h2>
+              <span className={`px-3 py-1 rounded-full text-white text-xs sm:text-sm font-medium ${getTierBadgeColor(quota.tier)}`}>
                 {quota.tier.toUpperCase()}
               </span>
             </div>
@@ -238,7 +238,7 @@ export default function Dashboard() {
             {quota.tier === 'free' && (
               <Link
                 href="/pricing"
-                className="inline-flex items-center gap-2 mt-2 text-blue-600 hover:text-blue-700 font-medium"
+                className="inline-flex items-center gap-2 mt-2 text-blue-600 hover:text-blue-700 font-medium text-sm sm:text-base"
               >
                 Upgrade to Pro <ArrowRight size={16} />
               </Link>
@@ -248,11 +248,11 @@ export default function Dashboard() {
 
         {/* No API key warning */}
         {!apiKey && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl shadow-xl p-8 flex items-start gap-3">
-            <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl shadow-xl p-4 sm:p-8 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-yellow-800">API key not found</h3>
-              <p className="text-yellow-700 text-sm mt-1">
+              <h3 className="font-semibold text-yellow-800 text-sm sm:text-base">API key not found</h3>
+              <p className="text-yellow-700 text-xs sm:text-sm mt-1">
                 Please <Link href="/signup" className="underline font-medium">sign up</Link> to get an API key and see your quota.
               </p>
             </div>
