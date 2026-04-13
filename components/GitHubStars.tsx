@@ -1,23 +1,28 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Star } from 'lucide-react';   // ← correct package
+import { Star } from 'lucide-react';
+
+// Helper to get cached stars (runs only once during initial render)
+const getCachedStars = (repoName: string): number | null => {
+  if (typeof window === 'undefined') return null;
+  const cacheKey = `github-stars-${repoName}`;
+  const cached = localStorage.getItem(cacheKey);
+  const cachedTime = localStorage.getItem(`${cacheKey}-time`);
+  const now = Date.now();
+  if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
+    return JSON.parse(cached);
+  }
+  return null;
+};
 
 export default function GitHubStars() {
-  const [stars, setStars] = useState<number | null>(null);
+  const repoName = 'arf-spec';
+  const [stars, setStars] = useState<number | null>(() => getCachedStars(repoName));
 
   useEffect(() => {
-    // Use a public repository – arf-spec is public and Apache 2.0
-    const repoName = 'arf-spec';
-    const cacheKey = `github-stars-${repoName}`;
-    const cached = localStorage.getItem(cacheKey);
-    const cachedTime = localStorage.getItem(`${cacheKey}-time`);
-    const now = Date.now();
-
-    if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
-      setStars(JSON.parse(cached));
-      return;
-    }
+    // Only fetch if no valid cached stars
+    if (stars !== null) return;
 
     fetch(`https://api.github.com/repos/arf-foundation/${repoName}`)
       .then(res => {
@@ -27,14 +32,14 @@ export default function GitHubStars() {
       .then(data => {
         const starCount = data.stargazers_count;
         setStars(starCount);
-        localStorage.setItem(cacheKey, JSON.stringify(starCount));
-        localStorage.setItem(`${cacheKey}-time`, now.toString());
+        localStorage.setItem(`github-stars-${repoName}`, JSON.stringify(starCount));
+        localStorage.setItem(`github-stars-${repoName}-time`, Date.now().toString());
       })
       .catch(err => {
         console.error('Failed to fetch GitHub stars:', err);
         setStars(0);
       });
-  }, []);
+  }, [stars, repoName]);
 
   if (stars === null) return null;
   return (
