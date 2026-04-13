@@ -100,6 +100,25 @@ const FEATURES = [
   }
 ];
 
+// Component that lazy‑loads a single feature card (fixes hook violation)
+function LazyFeatureCard({ feature }: { feature: typeof FEATURES[0] }) {
+  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
+  return (
+    <div ref={ref}>
+      {inView ? (
+        <FeatureCard
+          title={feature.title}
+          description={feature.description}
+          icon={feature.icon}
+          details={feature.details}
+        />
+      ) : (
+        <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-64 animate-pulse" />
+      )}
+    </div>
+  );
+}
+
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
@@ -266,27 +285,13 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities – Lazy‑loaded cards */}
+      {/* Key Capabilities – Lazy‑loaded cards (fixed hook violation) */}
       <section ref={capabilitiesRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${capabilitiesInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {FEATURES.map((feature, idx) => {
-            const { ref: cardRef, inView: cardInView } = useInView({ threshold: 0.1, triggerOnce: true });
-            return (
-              <div key={idx} ref={cardRef}>
-                {cardInView ? (
-                  <FeatureCard
-                    title={feature.title}
-                    description={feature.description}
-                    icon={feature.icon}
-                    details={feature.details}
-                  />
-                ) : (
-                  <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-64 animate-pulse" />
-                )}
-              </div>
-            );
-          })}
+          {FEATURES.map((feature, idx) => (
+            <LazyFeatureCard key={idx} feature={feature} />
+          ))}
         </div>
       </section>
 
