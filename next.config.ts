@@ -3,12 +3,16 @@ import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
   turbopack: {},
+  // The rewrite to the real ARF engine has been removed.
+  // The frontend now uses mock data or a local sandbox.
+  // If a sandbox endpoint is needed later, use a dedicated sandbox URL.
   async rewrites() {
     return [
-      {
-        source: '/api/v1/:path*',
-        destination: 'https://a-r-f-agentic-reliability-framework-api.hf.space/v1/:path*',
-      },
+      // Example: proxy to a mock/sandbox endpoint (optional)
+      // {
+      //   source: '/api/v1/:path*',
+      //   destination: 'https://sandbox.arf.dev/v1/:path*',
+      // },
     ];
   },
 };
