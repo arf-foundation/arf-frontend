@@ -15,6 +15,7 @@ export default function GitHubStars() {
     const now = Date.now();
 
     if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStars(JSON.parse(cached));
       return;
     }
