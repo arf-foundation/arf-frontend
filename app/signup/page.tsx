@@ -50,7 +50,7 @@ export default function SignupPage() {
   if (submitted) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-8 text-center">
+        <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-6 sm:p-8 text-center">
           <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-green-400" />
           </div>
@@ -70,18 +70,18 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white py-16 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white py-8 sm:py-16 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Request Pilot Access</h1>
-          <p className="text-gray-400">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Request Pilot Access</h1>
+          <p className="text-gray-400 text-sm sm:text-base">
             The core ARF engine is access‑controlled and offered under outcome‑based pricing.  
             Fill out this form to start a conversation with our founder.
           </p>
         </div>
 
-        <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 md:p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5 sm:p-6 md:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">
                 Full name *
