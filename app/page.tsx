@@ -100,10 +100,10 @@ const FEATURES = [
   }
 ];
 
-// Component that lazy‑loads a single feature card (fixes hook violation)
+// Component that lazy‑loads a single feature card (fixed TypeScript ref type)
 function LazyFeatureCard({ feature }: { feature: typeof FEATURES[0] }) {
-  // Removed triggerOnce – the hook does not support it, but lazy loading still works
-  const { ref, inView } = useInView({ threshold: 0.1 });
+  const { ref: rawRef, inView } = useInView({ threshold: 0.1 });
+  const ref = rawRef as React.RefObject<HTMLDivElement>;
   return (
     <div ref={ref}>
       {inView ? (
@@ -310,7 +310,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities – Lazy‑loaded cards (fixed hook violation) */}
+      {/* Key Capabilities – Lazy‑loaded cards (fixed hook violation and ref type) */}
       <section ref={capabilitiesRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${capabilitiesInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
