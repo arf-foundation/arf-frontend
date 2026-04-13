@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import {
   ArrowRight,
@@ -82,8 +82,9 @@ export default function LandingPage() {
   const [copiedSandboxSnippet, setCopiedSandboxSnippet] = useState(false);
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const diagramRef = useRef<HTMLDivElement>(null);
-  const isDiagramVisible = useInView({ ref: diagramRef, threshold: 0.1 });
+
+  // Use the hook correctly – it returns a ref and an inView boolean
+  const { ref: diagramRef, inView: isDiagramVisible } = useInView({ threshold: 0.1 });
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText('petter2025us@outlook.com');
@@ -106,7 +107,6 @@ export default function LandingPage() {
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setNewsletterStatus('loading');
-    // Simulate API call – replace with actual endpoint
     await new Promise(resolve => setTimeout(resolve, 1000));
     console.log('Newsletter subscription for:', email);
     setNewsletterStatus('success');
@@ -223,7 +223,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities (descriptions sanitised – no proprietary thresholds) */}
+      {/* Key Capabilities */}
       <section ref={capabilitiesRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${capabilitiesInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -281,7 +281,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Access Models (replaces freemium table) */}
+      {/* Access Models */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 max-w-2xl mx-auto">
           <h3 className="text-xl font-semibold mb-2 text-center">Access Models</h3>
@@ -320,7 +320,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Try the Sandbox API (no referral, no free evaluation bait) */}
+      {/* Try the Sandbox API */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4">Try the Sandbox API</h2>
@@ -342,7 +342,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Ecosystem Overview – corrected descriptions, no “open source” claims */}
+      {/* Ecosystem Overview */}
       <section ref={ecosystemRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${ecosystemInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -379,7 +379,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Demos – all with disclaimers */}
+      {/* Live Demos */}
       <section ref={demosRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${demosInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Live Demos</h2>
         <div className="grid md:grid-cols-4 gap-6">
@@ -420,7 +420,7 @@ export default function LandingPage() {
         <p className="text-center text-xs text-gray-500 mt-4">All demos use simulated or sanitized data and do not expose the protected core engine.</p>
       </section>
 
-      {/* Repository Links – removed private repos, added clarity */}
+      {/* Repository Links */}
       <section ref={reposRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${reposInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Public Repository Links</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
@@ -431,7 +431,7 @@ export default function LandingPage() {
         <p className="text-center text-xs text-gray-500 mt-4">The core engine and API control plane are private and access‑controlled. They are not listed here.</p>
       </section>
 
-      {/* Footer – corrected license and access statement */}
+      {/* Footer */}
       <footer ref={footerRef} className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${footerInView ? 'opacity-100' : 'opacity-0'}`}>
         <div className="container mx-auto px-4">
           {/* Contact Section */}
@@ -535,7 +535,7 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Toast Notifications with aria-live */}
+      {/* Toast Notifications */}
       <div aria-live="polite" className="sr-only">
         {copiedEmail && 'Email address copied'}
         {copiedSandboxSnippet && 'Sandbox command copied'}
@@ -554,7 +554,7 @@ export default function LandingPage() {
   );
 }
 
-// Helper components (unchanged except for added aria-labels and security attributes)
+// Helper components (unchanged)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
