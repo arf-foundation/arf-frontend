@@ -4,7 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useInView } from '../hooks/useInView';
 
 export default function LinkedInEmbed() {
-  const { ref, inView } = useInView({ threshold: 0.1 });
+  const { ref: rawRef, inView } = useInView({ threshold: 0.1 });
+  const ref = rawRef as React.RefObject<HTMLDivElement>;
   const [shouldLoad, setShouldLoad] = useState(false);
   const hasLoadedRef = useRef(false);
 
