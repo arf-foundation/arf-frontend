@@ -5,25 +5,25 @@ export default function TermsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-8 sm:py-16">
         <div className="max-w-4xl mx-auto">
           {/* Header Card */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 sm:mb-12">
             <div className="inline-flex items-center justify-center p-3 bg-blue-600/20 rounded-full mb-4">
               <Shield className="w-8 h-8 text-blue-400" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
               Terms of Service
             </h1>
-            <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
+            <div className="flex items-center justify-center gap-2 text-gray-400 text-xs sm:text-sm">
               <Calendar className="w-4 h-4" />
               <span>Effective Date: {effectiveDate}</span>
             </div>
           </div>
 
           {/* Content Card */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 p-6 md:p-8 shadow-xl">
-            <div className="prose prose-invert max-w-none prose-headings:text-white prose-headings:font-semibold prose-p:text-gray-300 prose-strong:text-white prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-li:text-gray-300">
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 p-5 sm:p-6 md:p-8 shadow-xl">
+            <div className="prose prose-invert max-w-none prose-headings:text-white prose-headings:font-semibold prose-p:text-gray-300 prose-strong:text-white prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-li:text-gray-300 prose-p:text-sm sm:prose-p:text-base prose-li:text-sm sm:prose-li:text-base prose-headings:text-xl sm:prose-headings:text-2xl">
               <h2>1. Acceptance of Terms</h2>
               <p>
                 By accessing or using the Agentic Reliability Framework (“ARF”) hosted API service (the “Service”), you agree to be bound by these Terms of Service (“Terms”). If you do not agree, you may not use the Service.
