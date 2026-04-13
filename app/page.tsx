@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import {
   ArrowRight,
@@ -420,10 +420,20 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Demos */}
+      {/* Live Demos – all with disclaimers, now including the Interactive Risk Demo */}
       <section ref={demosRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${demosInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Live Demos</h2>
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-5 gap-6">
+          {/* NEW: Interactive Risk Demo (simulated) */}
+          <DemoCard
+            title="Interactive Risk Demo"
+            description="Simulated Bayesian risk scoring – adjust priors, see MCMC, semantic memory"
+            link="https://arf-foundation.github.io/arf-risk-demo/"
+            buttonText="Launch Demo"
+            icon={<Rocket size={16} />}
+            external
+            disclaimer="Client‑side simulation – not connected to the real engine"
+          />
           <DemoCard
             title="UI Concept Demo"
             description="Interactive risk dashboard (conceptual only)"
@@ -612,7 +622,7 @@ export default function LandingPage() {
   );
 }
 
-// Helper components (unchanged except for FeatureCard which is kept as is)
+// Helper components (unchanged)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
