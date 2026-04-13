@@ -27,10 +27,11 @@ interface CachedData {
   timestamp: number;
 }
 
+// Only public repos – private core engine repos are excluded
 const REPOS = [
-  'agentic-reliability-framework',
-  'arf-api',
-  'arf-frontend'
+  'arf-frontend',
+  'arf-spec',
+  'pitch-deck'
 ] as const;
 
 const CACHE_KEY = 'arf-changelog';
@@ -48,7 +49,7 @@ const DIAGRAM = `flowchart TD
 
     Signals --> Interpreter[ARF Reliability Interpreter]
     
-    subgraph Engine["⚙️ ARF Core Engine"]
+    subgraph Engine["⚙️ ARF Core Engine (Access‑Controlled)"]
         Interpreter --> Risk[Bayesian Risk Engine]
         Risk --> Intent[Healing Intent Engine]
     end
@@ -59,7 +60,8 @@ const DIAGRAM = `flowchart TD
     style Risk fill:#fff3e0,stroke:#e65100
     style Intent fill:#e8f5e8,stroke:#1b5e20`;
 
-const CURL_COMMAND = `curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/api/v1/incidents/evaluate \\
+// Sandbox API snippet (mock, not real engine)
+const CURL_COMMAND = `curl -X POST https://sandbox.arf.dev/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
@@ -69,7 +71,6 @@ export default function ChangelogPage() {
   const [error, setError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
 
-  // Set page title
   useEffect(() => {
     document.title = "Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane";
   }, []);
@@ -83,7 +84,6 @@ export default function ChangelogPage() {
   useEffect(() => {
     const fetchAllReleases = async () => {
       try {
-        // Check cache first
         const cached = localStorage.getItem(CACHE_KEY);
         if (cached) {
           const { releases, timestamp }: CachedData = JSON.parse(cached);
@@ -94,7 +94,6 @@ export default function ChangelogPage() {
           }
         }
 
-        // Fetch from all repos in parallel
         const results = await Promise.allSettled(
           REPOS.map(async (repo) => {
             const response = await fetch(`https://api.github.com/repos/arf-foundation/${repo}/releases`);
@@ -111,7 +110,6 @@ export default function ChangelogPage() {
           })
         );
 
-        // Combine successful results
         const allReleases: GitHubRelease[] = [];
         results.forEach((result) => {
           if (result.status === 'fulfilled') {
@@ -121,12 +119,10 @@ export default function ChangelogPage() {
           }
         });
 
-        // Sort by date descending
         allReleases.sort((a, b) => 
           new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
         );
 
-        // Cache and set state
         localStorage.setItem(CACHE_KEY, JSON.stringify({
           releases: allReleases,
           timestamp: Date.now(),
@@ -157,9 +153,9 @@ export default function ChangelogPage() {
 
   const getRepoDisplay = (repo: string) => {
     switch (repo) {
-      case 'agentic-reliability-framework': return 'Core Engine';
-      case 'arf-api': return 'API';
-      case 'arf-frontend': return 'Frontend';
+      case 'arf-frontend': return 'Frontend (Demo UI)';
+      case 'arf-spec': return 'Specification';
+      case 'pitch-deck': return 'Pitch Deck';
       default: return repo;
     }
   };
@@ -209,7 +205,6 @@ export default function ChangelogPage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       <div className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Hero / Header */}
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
               Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane
@@ -219,10 +214,10 @@ export default function ChangelogPage() {
             </p>
           </div>
 
-          {/* ---------- LATEST RELEASES (now first) ---------- */}
           <div className="border-b border-gray-700 pb-4 mb-6">
             <h2 className="text-xl sm:text-2xl font-bold">Latest Releases</h2>
-            <p className="text-gray-400 text-sm sm:text-base">From the ARF ecosystem – Core Engine, API, and Frontend</p>
+            <p className="text-gray-400 text-sm sm:text-base">From public ARF repositories – specification, demo UI, and pitch deck</p>
+            <p className="text-xs text-yellow-500 mt-1">⚠️ The core engine is private – releases are not shown here. <a href="/signup" className="underline">Request pilot access</a>.</p>
           </div>
 
           {releases.length === 0 ? (
@@ -271,9 +266,7 @@ export default function ChangelogPage() {
             </div>
           )}
 
-          {/* ---------- MARKETING BLOCK (moved after releases) ---------- */}
           <div className="mt-6 sm:mt-8">
-            {/* Problem‑Solution‑Outcome */}
             <div className="bg-gray-800/50 rounded-lg p-4 sm:p-6 border border-gray-700 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                 <div>
@@ -291,15 +284,14 @@ export default function ChangelogPage() {
               </div>
             </div>
 
-            {/* CTA Block */}
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-12">
               <a
-                href="https://a-r-f-agentic-reliability-framework-api.hf.space/docs"
+                href="https://sandbox.arf.dev/docs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-blue-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2 text-sm sm:text-base"
               >
-                API Docs <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />
+                Sandbox API Docs <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />
               </a>
               <a
                 href="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4"
@@ -310,7 +302,7 @@ export default function ChangelogPage() {
                 Live Demo <Rocket size={16} className="sm:w-[18px] sm:h-[18px]" />
               </a>
               <a
-                href="https://github.com/arf-foundation/agentic-reliability-framework"
+                href="https://github.com/arf-foundation"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gray-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-gray-600 transition flex items-center gap-2 text-sm sm:text-base"
@@ -327,20 +319,16 @@ export default function ChangelogPage() {
               </a>
             </div>
 
-            {/* Diagram */}
             <div className="bg-gray-800 rounded-lg p-4 sm:p-6 mb-8 border border-gray-700">
               <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">How ARF Works</h2>
               <div className="overflow-x-auto">
                 <Mermaid chart={DIAGRAM} className="flex justify-center min-w-max" />
               </div>
-              <p className="text-xs text-gray-500 mt-2 text-center">
-                (Mermaid diagram – interactive)
-              </p>
+              <p className="text-xs text-gray-500 mt-2 text-center">(Conceptual diagram – the real engine is access‑controlled)</p>
             </div>
 
-            {/* Code Snippet */}
             <div className="bg-gray-800 rounded-lg p-4 sm:p-6 mb-12 border border-gray-700">
-              <h2 className="text-lg sm:text-xl font-semibold mb-4">Try It Now</h2>
+              <h2 className="text-lg sm:text-xl font-semibold mb-4">Try the Sandbox API</h2>
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-2 bg-gray-900 p-2 sm:p-3 rounded-lg">
                   <pre className="text-xs sm:text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{CURL_COMMAND}</pre>
@@ -352,8 +340,8 @@ export default function ChangelogPage() {
                     {copiedCode ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
                   </button>
                 </div>
-                <p className="text-xs sm:text-sm text-gray-400">
-                  Returns a full <span className="font-mono">HealingIntent</span> with risk score, risk factors, and recommended action.
+                <p className="text-xs sm:text-sm text-yellow-300">
+                  ⚠️ This is a <strong>sanitized demo endpoint</strong>. It does <strong>not</strong> use the protected Bayesian engine. For pilot access, <a href="/signup" className="underline">request here</a>.
                 </p>
               </div>
             </div>
