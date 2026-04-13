@@ -102,7 +102,8 @@ const FEATURES = [
 
 // Component that lazy‑loads a single feature card (fixes hook violation)
 function LazyFeatureCard({ feature }: { feature: typeof FEATURES[0] }) {
-  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
+  // Removed triggerOnce – the hook does not support it, but lazy loading still works
+  const { ref, inView } = useInView({ threshold: 0.1 });
   return (
     <div ref={ref}>
       {inView ? (
