@@ -78,8 +78,8 @@ export default function History() {
 
   if (loading) {
     return (
-      <div className="p-8 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Risk History (Last 24h)</h1>
+      <div className="p-4 sm:p-8 max-w-6xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Risk History (Last 24h)</h1>
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="h-[400px] bg-gray-200 animate-pulse rounded" />
         </div>
@@ -89,11 +89,11 @@ export default function History() {
 
   if (error) {
     return (
-      <div className="p-8 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Risk History (Last 24h)</h1>
+      <div className="p-4 sm:p-8 max-w-6xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Risk History (Last 24h)</h1>
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex flex-col items-center justify-center h-[400px]">
-            <div role="alert" className="text-red-600 mb-4 text-center">{error}</div>
+            <div role="alert" className="text-red-600 mb-4 text-center text-sm sm:text-base">{error}</div>
             <button
               onClick={() => { setLoading(true); fetchHistory(); }}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
@@ -108,10 +108,10 @@ export default function History() {
 
   if (data.length === 0) {
     return (
-      <div className="p-8 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Risk History (Last 24h)</h1>
+      <div className="p-4 sm:p-8 max-w-6xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Risk History (Last 24h)</h1>
         <div className="bg-white p-4 rounded-lg shadow">
-          <div className="flex items-center justify-center h-[400px] text-gray-500">
+          <div className="flex items-center justify-center h-[400px] text-gray-500 text-sm sm:text-base">
             No history data available
           </div>
         </div>
@@ -120,20 +120,29 @@ export default function History() {
   }
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Risk History (Last 24h)</h1>
+    <div className="p-4 sm:p-8 max-w-6xl mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-6">Risk History (Last 24h)</h1>
       {fetchedAt && (
         <p className="text-xs text-gray-500 mb-4">
           Last updated: {fetchedAt.toLocaleTimeString()}
         </p>
       )}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <ResponsiveContainer width="100%" height={400} data-testid="line-chart">
-          <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+      <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 60 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="time" tick={{ fontSize: 12 }} angle={-45} textAnchor="end" height={80} />
-            <YAxis domain={[0, 1]} />
-            <Tooltip formatter={(value: unknown) => typeof value === 'number' ? value.toFixed(2) : String(value ?? '')} />
+            <XAxis 
+              dataKey="time" 
+              tick={{ fontSize: 10, angle: -45, textAnchor: 'end' }} 
+              height={70} 
+              interval={0}
+              tickMargin={10}
+            />
+            <YAxis domain={[0, 1]} tick={{ fontSize: 12 }} />
+            <Tooltip 
+              formatter={(value: unknown) => typeof value === 'number' ? value.toFixed(2) : String(value ?? '')}
+              contentStyle={{ fontSize: '12px' }}
+            />
             <Line type="monotone" dataKey="risk" stroke="#3b82f6" strokeWidth={2} dot={false} />
           </LineChart>
         </ResponsiveContainer>
