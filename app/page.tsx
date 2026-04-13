@@ -137,7 +137,12 @@ export default function LandingPage() {
           <Link href="/signup" className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2 text-lg">
             Request Pilot Access →
           </Link>
-          <a href="#demo" className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2">
+          <a
+            href="https://www.youtube.com/watch?v=KEL-a-qwZFg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
+          >
             Watch Demo Video <ArrowRight size={18} />
           </a>
         </div>
@@ -157,6 +162,24 @@ export default function LandingPage() {
           <img src="/logos/placeholder.svg" alt="Trusted by" className="h-6 opacity-70" />
         </div>
         <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents. Not a guarantee.</p>
+      </div>
+
+      {/* LinkedIn Embed – Social Proof */}
+      <div className="container mx-auto px-4 mb-12">
+        <div className="flex justify-center">
+          <div className="w-full max-w-md rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+            <iframe
+              src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7436928497408880640?collapsed=1"
+              height="877"
+              width="504"
+              frameBorder="0"
+              allowFullScreen
+              title="LinkedIn post – ARF access control agent"
+              className="mx-auto w-full"
+              style={{ maxWidth: '100%', height: 'auto', minHeight: '400px' }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Problem-Solution-Outcome Block */}
