@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Star } from 'lucide';
+import { Star } from 'lucide-react';   // ← correct package
 
 export default function GitHubStars() {
   const [stars, setStars] = useState<number | null>(null);
