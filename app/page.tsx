@@ -38,7 +38,7 @@ interface RepoData {
   language: string | null;
 }
 
-// Updated diagram with Expected Loss Minimisation
+// Conceptual diagram – does not expose proprietary internals
 const DIAGRAM = `flowchart TD
     subgraph Input["🔌 Input Sources"]
         Services[Agents / Services]
@@ -47,7 +47,7 @@ const DIAGRAM = `flowchart TD
     Services --> Signals[Observability Signals]
     Metrics --> Signals
     Signals --> Interpreter[ARF Reliability Interpreter]
-    subgraph Engine["⚙️ ARF Core Engine"]
+    subgraph Engine["⚙️ ARF Core Engine (Access‑Controlled)"]
         Interpreter --> Risk[Bayesian Risk Fusion]
         Risk --> Loss[Expected Loss Minimisation]
         Loss --> Decision{Approve / Deny / Escalate}
@@ -60,7 +60,8 @@ const DIAGRAM = `flowchart TD
     style Loss fill:#e8f5e8,stroke:#1b5e20
     style Decision fill:#fce4ec,stroke:#b71c1c`;
 
-const CURL_COMMAND = `curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate \\
+// Sandbox endpoint – not the real engine
+const SANDBOX_CURL = `curl -X POST https://sandbox.arf.dev/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
@@ -72,31 +73,28 @@ declare global {
 
 export default function LandingPage() {
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false);
+  const [copiedSandboxSnippet, setCopiedSandboxSnippet] = useState(false);
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText('petter2025us@outlook.com');
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
   };
-  const handleCopyCodeSnippet = async () => {
-    await navigator.clipboard.writeText('curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate');
-    setCopiedCodeSnippet(true);
-    setTimeout(() => setCopiedCodeSnippet(false), 2000);
+
+  const handleCopySandboxSnippet = async () => {
+    await navigator.clipboard.writeText(SANDBOX_CURL);
+    setCopiedSandboxSnippet(true);
+    setTimeout(() => setCopiedSandboxSnippet(false), 2000);
   };
-  const handleCopyFullSnippet = async () => {
-    await navigator.clipboard.writeText(CURL_COMMAND);
-    setCopiedFullSnippet(true);
-    setTimeout(() => setCopiedFullSnippet(false), 2000);
-  };
+
   const trackSlackClick = () => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'slack_invite_click', { event_category: 'engagement' });
     }
   };
+
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setNewsletterStatus('loading');
@@ -126,30 +124,30 @@ export default function LandingPage() {
           <GitHubStars />
         </div>
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-          ARF is the only governance layer that turns probabilistic AI into <strong>deterministic, auditable action</strong> – reducing MTTR by up to 85%<span className="text-xs align-super">*</span> and ensuring compliance in regulated environments.
+          ARF is a governance layer that turns probabilistic AI into <strong>deterministic, auditable action</strong> – reducing MTTR by up to 85%<span className="text-xs align-super">*</span> and ensuring compliance in regulated environments.
         </p>
 
-        {/* Scarcity banner */}
+        {/* Pilot scarcity banner */}
         <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-3 mb-8 max-w-md mx-auto">
-          <p className="text-yellow-300 text-sm">🔥 Enterprise early access: <strong>Only 50 spots left</strong> before price increase.</p>
+          <p className="text-yellow-300 text-sm">✈️ Pilot program – limited spots for 2026. Outcome‑based pricing.</p>
         </div>
 
         {/* Primary CTAs */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link href="/signup" className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2 text-lg">
-            Start Free → <span className="text-sm">(no credit card)</span>
+            Request Pilot Access →
           </Link>
           <a href="#demo" className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2">
             Watch Demo Video <ArrowRight size={18} />
           </a>
         </div>
-        <p className="text-gray-400 text-sm mt-4">⚡ Includes 1,000 free evaluations/month – no commitment.</p>
+        <p className="text-gray-400 text-sm mt-4">🔐 Core engine is access‑controlled. Free trials available for qualified pilots only.</p>
       </section>
 
-      {/* Social Proof – Trust & Authority (corrected claims) */}
+      {/* Social Proof – Trust & Authority */}
       <div className="container mx-auto px-4 mb-12">
         <div className="flex flex-wrap justify-center gap-8 items-center">
-          <div className="text-yellow-400 flex items-center gap-1">★★★★★ <span className="text-gray-400 ml-1">(Rated 5/5 by early users)</span></div>
+          <div className="text-yellow-400 flex items-center gap-1">★★★★★ <span className="text-gray-400 ml-1">(Rated 5/5 by early pilots)</span></div>
           <div className="flex items-center gap-2">
             <MessageSquare size={18} />
             <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition">
@@ -158,10 +156,10 @@ export default function LandingPage() {
           </div>
           <img src="/logos/placeholder.svg" alt="Trusted by" className="h-6 opacity-70" />
         </div>
-        <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents.</p>
+        <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents. Not a guarantee.</p>
       </div>
 
-      {/* Problem-Solution-Outcome Block (stronger language) */}
+      {/* Problem-Solution-Outcome Block */}
       <div className="container mx-auto px-4 mb-12">
         <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
           <div className="grid md:grid-cols-3 gap-6 text-center">
@@ -182,7 +180,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* How ARF Works (updated diagram) */}
+      {/* How ARF Works (conceptual diagram) */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
@@ -191,7 +189,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities (updated: DPT replaced with Expected Loss Minimisation) */}
+      {/* Key Capabilities (descriptions sanitised – no proprietary thresholds) */}
       <section ref={capabilitiesRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${capabilitiesInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -199,7 +197,7 @@ export default function LandingPage() {
             title="Bayesian Risk Scoring"
             description="Conjugate priors + hyperpriors + HMC for calibrated uncertainty."
             icon={<Brain className="w-8 h-8 text-blue-400" />}
-            details="Uses conjugate Beta priors per action category for fast online updates, optional hierarchical hyperpriors (Pyro) to share strength across categories, and an offline HMC logistic regression model that learns complex patterns (time of day, user role, environment). The final risk is a weighted average, with weights determined by the amount of historical data."
+            details="Uses conjugate Beta priors per action category for fast online updates, optional hierarchical hyperpriors to share strength across categories, and an offline HMC logistic regression model that learns complex patterns (time of day, user role, environment). The final risk is a weighted average."
           />
           <FeatureCard
             title="Semantic Memory"
@@ -211,7 +209,7 @@ export default function LandingPage() {
             title="Expected Loss Minimisation"
             description="Bayesian fusion + CVaR for approve/deny/escalate."
             icon={<Scale className="w-8 h-8 text-yellow-400" />}
-            details="Combines conjugate priors (online), hyperpriors (hierarchical), and HMC (offline) into a weighted risk score. Chooses the action that minimises expected loss, optionally using Conditional Value at Risk (CVaR) to account for tail risk. This replaces old fixed thresholds (0.2/0.8) with a data‑driven decision boundary."
+            details="Combines conjugate priors (online), hyperpriors (hierarchical), and HMC (offline) into a weighted risk score. Chooses the action that minimises expected loss, optionally using Conditional Value at Risk (CVaR) to account for tail risk."
           />
           <FeatureCard
             title="Multi‑Agent Orchestration"
@@ -222,9 +220,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Why Choose ARF Enterprise (benefit-driven) */}
+      {/* Why Pilots Choose ARF Enterprise */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Why SRE teams switch to ARF Enterprise</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Why Pilots Choose ARF Enterprise</h2>
         <div className="grid md:grid-cols-3 gap-8 text-center">
           <div className="bg-gray-800 p-6 rounded-lg">
             <Shield className="w-10 h-10 text-blue-400 mx-auto mb-3" />
@@ -244,67 +242,69 @@ export default function LandingPage() {
         </div>
         <div className="text-center mt-8">
           <Link href="/pricing" className="bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition inline-flex items-center gap-2">
-            View Pricing → <ArrowRight size={16} />
+            View Access Models → <ArrowRight size={16} />
           </Link>
         </div>
       </section>
 
-      {/* Pricing Anchor (Freemium) */}
+      {/* Access Models (replaces freemium table) */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 max-w-2xl mx-auto">
-          <h3 className="text-xl font-semibold mb-2 text-center">Start for free, scale with confidence</h3>
+          <h3 className="text-xl font-semibold mb-2 text-center">Access Models</h3>
           <div className="flex flex-col sm:flex-row justify-center gap-8 mt-4">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400">$0</div>
-              <div className="text-gray-400">OSS / Free tier</div>
+              <div className="text-3xl font-bold text-blue-400">Sandbox</div>
+              <div className="text-gray-400">Free demo</div>
               <ul className="text-sm text-gray-300 mt-2">
-                <li>✓ 1,000 evaluations/month</li>
-                <li>✓ Community support</li>
+                <li>✓ 100 evaluations/month</li>
+                <li>✓ Sanitized API endpoint</li>
+                <li>✓ No access to core engine</li>
               </ul>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-400">$99<span className="text-base">/mo</span></div>
-              <div className="text-gray-400">Pro</div>
+              <div className="text-3xl font-bold text-purple-400">Pilot</div>
+              <div className="text-gray-400">Time‑limited trial</div>
               <ul className="text-sm text-gray-300 mt-2">
-                <li>✓ 10,000 evaluations/month</li>
-                <li>✓ Email support, audit logs</li>
+                <li>✓ Full engine access</li>
+                <li>✓ Audit logs & support</li>
+                <li>✓ Subject to qualification</li>
               </ul>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-400 line-through">$999</div>
-              <div className="text-gray-400">Enterprise</div>
+              <div className="text-3xl font-bold text-gray-400">Enterprise</div>
+              <div className="text-gray-400">Outcome‑based pricing</div>
               <ul className="text-sm text-gray-300 mt-2">
-                <li>✓ Unlimited + SSO + SLA</li>
-                <li>✓ Custom pricing – contact sales</li>
+                <li>✓ Unlimited + SLA</li>
+                <li>✓ Pay per risk reduction</li>
+                <li>✓ Contact for quote</li>
               </ul>
             </div>
           </div>
+          <p className="text-xs text-gray-500 text-center mt-4">
+            The core ARF engine is not open source. Pilot access requires a mutual agreement.
+          </p>
         </div>
       </div>
 
-      {/* Try It Now (with referral prompt) */}
+      {/* Try the Sandbox API (no referral, no free evaluation bait) */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h2 className="text-2xl font-semibold mb-4">Try It Now</h2>
+          <h2 className="text-2xl font-semibold mb-4">Try the Sandbox API</h2>
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
-              <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{CURL_COMMAND}</pre>
-              <button onClick={handleCopyFullSnippet} className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition">
-                {copiedFullSnippet ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
+              <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{SANDBOX_CURL}</pre>
+              <button onClick={handleCopySandboxSnippet} className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition">
+                {copiedSandboxSnippet ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
               </button>
             </div>
-            <p className="text-sm text-gray-400">
-              Returns a full <span className="font-mono">HealingIntent</span> with Bayesian‑fused risk score, risk factors (conjugate / hyperprior / HMC), and a recommended action based on expected loss minimisation.
+            <p className="text-sm text-yellow-300">
+              ⚠️ This is a <strong>sanitized demo endpoint</strong>. It does <strong>not</strong> use the protected Bayesian engine. For pilot access, <Link href="/signup" className="underline">request here</Link>.
             </p>
-            <div className="mt-4 p-3 bg-blue-900/30 border border-blue-600 rounded-lg text-center">
-              <p className="text-sm">🎁 <strong>Refer a friend</strong> – both get 500 extra free evaluations!</p>
-              <button className="mt-2 text-blue-400 text-sm underline">Get your referral link</button>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Ecosystem Overview */}
+      {/* Ecosystem Overview – corrected descriptions, no “open source” claims */}
       <section ref={ecosystemRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${ecosystemInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -316,67 +316,56 @@ export default function LandingPage() {
           />
           <EcoCard
             icon={<Code className="w-6 h-6 text-green-400" />}
-            title="OSS Engine"
-            description="Core Bayesian models, memory, and governance loop"
-            details="The heart of ARF – implements conjugate priors, HMC sampling, and the semantic memory graph. Fully open‑source under Apache 2.0."
+            title="Protected Core Engine"
+            description="Bayesian models, memory, governance loop"
+            details="The heart of ARF – implements conjugate priors, HMC sampling, and semantic memory. **Access‑controlled** – available only to qualified pilots and enterprise customers."
           />
           <EcoCard
             icon={<Users className="w-6 h-6 text-yellow-400" />}
             title="API Control Plane"
             description="FastAPI service exposing the framework"
-            details="Production‑ready REST API with automatic docs, rate limiting, and CORS. Serves as the bridge between the core engine and frontend applications."
+            details="Production‑ready REST API with automatic docs, rate limiting, and CORS. Serves as the bridge between the core engine and frontend applications. Access gated."
           />
           <EcoCard
             icon={<BookOpen className="w-6 h-6 text-purple-400" />}
             title="Frontend UI"
             description="Next.js dashboard for visualizing risk"
-            details="Interactive dashboard built with Next.js and Tailwind CSS. Features real‑time risk charts, memory statistics, and the incident evaluation form you're using now."
+            details="Interactive dashboard built with Next.js and Tailwind CSS. Features real‑time risk charts, memory statistics, and the incident evaluation form you're using now. Publicly available as a demo."
           />
           <EcoCard
             icon={<Github className="w-6 h-6 text-orange-400" />}
             title="Enterprise"
             description="Advanced compliance, audit trails, and support"
-            details="For organizations requiring SLAs, SSO, and advanced audit capabilities. Includes priority support and custom integrations."
+            details="For organizations requiring SLAs, SSO, and advanced audit capabilities. Includes priority support and custom integrations. Access by contract only."
           />
         </div>
       </section>
 
-      {/* Live Demos */}
+      {/* Live Demos – all with disclaimers */}
       <section ref={demosRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${demosInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Live Demos</h2>
         <div className="grid md:grid-cols-4 gap-6">
           <DemoCard
-            title="OSS Demo"
-            description="Interactive risk dashboard"
+            title="UI Concept Demo"
+            description="Interactive risk dashboard (conceptual only)"
             link="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4"
             buttonText="Launch"
             icon={<Rocket size={16} />}
             external
+            disclaimer="Not connected to the actual engine"
           />
           <DemoCard
-            title="API Code Snippet"
-            description={
-              <div className="flex items-center gap-2">
-                <pre className="bg-gray-900 p-2 rounded text-sm font-mono text-green-300 whitespace-pre-wrap break-all flex-1">
-                  curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate
-                </pre>
-                <button
-                  onClick={handleCopyCodeSnippet}
-                  className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition group flex-shrink-0"
-                  aria-label="Copy code snippet"
-                >
-                  {copiedCodeSnippet ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300 group-hover:text-white" />}
-                </button>
-              </div>
-            }
-            link="https://a-r-f-agentic-reliability-framework-api.hf.space/docs"
+            title="Sandbox API"
+            description="Try a sanitized endpoint"
+            link="https://sandbox.arf.dev/docs"
             buttonText="Try API"
             icon={<Code size={16} />}
             external
+            disclaimer="Rate‑limited, no real Bayesian inference"
           />
           <DemoCard
             title="Frontend Dashboard"
-            description="Real‑time governance visuals"
+            description="Real‑time governance visuals (demo data)"
             link="/dashboard"
             buttonText="Go"
             icon={<Gauge size={16} />}
@@ -390,20 +379,21 @@ export default function LandingPage() {
             external
           />
         </div>
+        <p className="text-center text-xs text-gray-500 mt-4">All demos use simulated or sanitized data and do not expose the protected core engine.</p>
       </section>
 
-      {/* Repository Links */}
+      {/* Repository Links – removed private repos, added clarity */}
       <section ref={reposRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${reposInView ? 'opacity-100' : 'opacity-0'}`}>
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Repository Links</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <RepoCard name="agentic-reliability-framework" desc="OSS Engine" url="https://github.com/arf-foundation/agentic-reliability-framework" />
-          <RepoCard name="arf-api" desc="API Backend" url="https://github.com/arf-foundation/arf-api" />
-          <RepoCard name="arf-frontend" desc="Frontend UI" url="https://github.com/arf-foundation/arf-frontend" />
-          <RepoCard name="arf-spec" desc="ARF Spec" url="https://github.com/arf-foundation/arf-spec" />
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Public Repository Links</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          <RepoCard name="arf-frontend" desc="Public dashboard UI (this site)" url="https://github.com/arf-foundation/arf-frontend" />
+          <RepoCard name="arf-spec" desc="Canonical specification – data models, API contracts" url="https://github.com/arf-foundation/arf-spec" />
+          <RepoCard name="pitch-deck" desc="Public overview and vision" url="https://github.com/arf-foundation/pitch-deck" />
         </div>
+        <p className="text-center text-xs text-gray-500 mt-4">The core engine and API control plane are private and access‑controlled. They are not listed here.</p>
       </section>
 
-      {/* Footer */}
+      {/* Footer – corrected license and access statement */}
       <footer ref={footerRef} className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${footerInView ? 'opacity-100' : 'opacity-0'}`}>
         <div className="container mx-auto px-4">
           {/* Contact Section */}
@@ -480,10 +470,10 @@ export default function LandingPage() {
 
           {/* Social / Community Links */}
           <div className="flex flex-wrap justify-center gap-6 mb-4">
-            <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
-            <Link href="/signup" className="hover:text-white transition">Sign Up</Link>
+            <Link href="/pricing" className="hover:text-white transition">Access Models</Link>
+            <Link href="/signup" className="hover:text-white transition">Request Pilot Access</Link>
             <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">
-              <Github size={18} /> GitHub
+              <Github size={18} /> GitHub (Public)
             </a>
             <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">
               🤗 Hugging Face
@@ -498,7 +488,10 @@ export default function LandingPage() {
               <MessageSquare size={18} /> Slack
             </a>
           </div>
-          <p className="text-sm">© 2026 ARF Foundation – Open source (Apache 2.0)</p>
+          <p className="text-sm">
+            © 2026 ARF Foundation – Stewarded by the founder. The core engine is proprietary and access‑controlled. 
+            Public components (spec, frontend UI, pitch deck) are licensed under Apache 2.0.
+          </p>
         </div>
       </footer>
 
@@ -508,21 +501,16 @@ export default function LandingPage() {
           Email copied! ✉️
         </div>
       )}
-      {copiedCodeSnippet && (
+      {copiedSandboxSnippet && (
         <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
-          Code copied! 📋
-        </div>
-      )}
-      {copiedFullSnippet && (
-        <div className="fixed bottom-36 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
-          Command copied! 🚀
+          Sandbox command copied! 🧪
         </div>
       )}
     </div>
   );
 }
 
-// Helper components (unchanged from your original)
+// Helper components (unchanged except for optional disclaimer prop in DemoCard)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
@@ -573,18 +561,20 @@ function FeatureCard({ title, description, icon, details }: { title: string; des
   );
 }
 
-function DemoCard({ title, description, link, buttonText, icon = <ArrowRight size={16} />, external = false }: { 
+function DemoCard({ title, description, link, buttonText, icon = <ArrowRight size={16} />, external = false, disclaimer = '' }: { 
   title: string; 
   description: React.ReactNode; 
   link: string; 
   buttonText: string; 
   icon?: React.ReactNode; 
   external?: boolean;
+  disclaimer?: string;
 }) {
   const content = (
     <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-full flex flex-col">
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <div className="text-gray-400 mb-4 flex-1">{description}</div>
+      <div className="text-gray-400 mb-2 flex-1">{description}</div>
+      {disclaimer && <p className="text-xs text-yellow-500 mb-3">{disclaimer}</p>}
       <span className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 mt-auto">
         {buttonText} {icon}
       </span>
