@@ -62,3 +62,45 @@ body {
 .float-icon {
   animation: float 4s ease-in-out infinite;
 }
+
+/* ============================================
+   STABLE DIMENSIONS – PREVENT FLICKERING & JUMPS
+   ============================================ */
+
+/* Reserve exact aspect ratio for Mermaid diagram */
+.mermaid-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 300px;
+  background-color: #1f2937; /* matches skeleton background */
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Ensure the SVG fills the wrapper without shifting */
+.mermaid-wrapper svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Give feature cards a stable min-height – no collapse */
+.feature-card {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Prevent height changes when "Details" is expanded */
+.feature-card .details-expanded {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Optional: smooth expansion without layout shift */
+.feature-card .details-content {
+  transition: max-height 0.2s ease-out;
+}
