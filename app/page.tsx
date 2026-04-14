@@ -34,10 +34,10 @@ import GitHubStars from '../components/GitHubStars';
 import { useInView } from '../hooks/useInView';
 import LinkedInEmbed from '../components/LinkedInEmbed';
 
-// Lazy-load Mermaid with no SSR to reduce initial bundle size
+// Lazy-load Mermaid with no SSR – diagram is above the fold, but dynamic import reduces bundle size
 const Mermaid = dynamic(() => import('../components/Mermaid'), {
   ssr: false,
-  loading: () => <div className="h-64 animate-pulse bg-gray-700 rounded-lg" />
+  loading: () => <div className="absolute inset-0 bg-gray-700 animate-pulse rounded-lg" />
 });
 
 // --- Types ---
@@ -83,7 +83,7 @@ const SANDBOX_RESPONSE = {
   "policy_violations": []
 };
 
-// Feature data for lazy-loading
+// Feature data – now rendered eagerly, no lazy loading
 const FEATURES = [
   {
     title: "Bayesian Risk Scoring",
@@ -111,26 +111,6 @@ const FEATURES = [
   }
 ];
 
-// Component that lazy‑loads a single feature card
-function LazyFeatureCard({ feature }: { feature: typeof FEATURES[0] }) {
-  const { ref: rawRef, inView } = useInView({ threshold: 0.1 });
-  const ref = rawRef as React.RefObject<HTMLDivElement>;
-  return (
-    <div ref={ref}>
-      {inView ? (
-        <FeatureCard
-          title={feature.title}
-          description={feature.description}
-          icon={feature.icon}
-          details={feature.details}
-        />
-      ) : (
-        <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-64 animate-pulse" />
-      )}
-    </div>
-  );
-}
-
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
@@ -150,10 +130,6 @@ export default function LandingPage() {
   const [honeypot, setHoneypot] = useState('');
   // Security: time token (prevent rapid submissions)
   const lastSubmitTime = useRef<number>(0);
-
-  // Lazy-load diagram ref
-  const { ref: diagramRefRaw, inView: isDiagramVisible } = useInView({ threshold: 0.1 });
-  const diagramRef = diagramRefRaw as React.RefObject<HTMLDivElement>;
 
   // Handle FAB visibility on mobile
   useEffect(() => {
@@ -222,7 +198,7 @@ export default function LandingPage() {
     setTimeout(() => setNewsletterStatus('idle'), 3000);
   };
 
-  // Scroll animation hooks for other sections
+  // Scroll animation hooks for sections (only for opacity transitions, no lazy loading of content)
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2 });
   const { ref: ecosystemRef, inView: ecosystemInView } = useInView({ threshold: 0.2 });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2 });
@@ -276,7 +252,6 @@ export default function LandingPage() {
               Join our Slack
             </a>
           </div>
-          {/* Inline SVG – no more 404 */}
           <div className="flex items-center gap-1 text-gray-400">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
@@ -286,7 +261,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* New: Pilot Testimonial */}
+        {/* Pilot Testimonial */}
         <div className="max-w-2xl mx-auto mt-6 bg-gray-800/50 border border-gray-700 rounded-lg p-4 text-center">
           <p className="text-gray-300 italic">“ARF gave us confidence to let AI agents touch production. The audit trails alone saved us weeks of compliance work.”</p>
           <p className="text-sm text-blue-400 mt-2">— CTO, Fortune 500 Pilot (anonymous)</p>
@@ -295,7 +270,7 @@ export default function LandingPage() {
         <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents. Not a guarantee.</p>
       </div>
 
-      {/* LinkedIn Embed – Lazy‑loaded component with sandbox attribute */}
+      {/* LinkedIn Embed */}
       <LinkedInEmbed />
 
       {/* Problem-Solution-Outcome Block */}
@@ -319,22 +294,18 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* How ARF Works (conceptual diagram) - lazy load when visible */}
-      <div ref={diagramRef} className="container mx-auto px-4 mb-16">
+      {/* How ARF Works – diagram rendered eagerly with stable dimensions */}
+      <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <div className="relative w-full aspect-[16/9] min-h-[300px]">
-            {isDiagramVisible ? (
-              <Mermaid chart={DIAGRAM} className="absolute inset-0 w-full h-full" />
-            ) : (
-              <div className="absolute inset-0 bg-gray-700 animate-pulse rounded-lg" />
-            )}
+          <div className="mermaid-wrapper relative w-full aspect-[16/9] min-h-[300px]">
+            <Mermaid chart={DIAGRAM} className="absolute inset-0 w-full h-full" />
           </div>
           <p className="text-xs text-gray-500 mt-2 text-center">Bayesian risk fusion → Expected loss minimisation → Approve/Deny/Escalate</p>
         </div>
       </div>
 
-      {/* NEW: Mission, Vision, Values Section */}
+      {/* Mission, Vision, Values */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/30 rounded-2xl p-6 sm:p-8 border border-gray-700">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -369,7 +340,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities – Direct render, no lazy loading */}
+      {/* Key Capabilities – Direct render, no lazy loading, with stable card height */}
       <section ref={capabilitiesRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${capabilitiesInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -449,7 +420,6 @@ export default function LandingPage() {
             <p className="text-xs text-gray-500">
               The core ARF engine is not open source. Pilot access requires a mutual agreement.
             </p>
-            {/* Security badge */}
             <span className="inline-flex items-center gap-1 text-xs bg-green-900/30 text-green-400 px-2 py-1 rounded-full border border-green-700">
               <Shield size={12} /> SOC2 ready – in progress
             </span>
@@ -457,7 +427,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Try the Sandbox API – with expandable example response */}
+      {/* Try the Sandbox API */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4">Try the Sandbox API</h2>
@@ -477,7 +447,6 @@ export default function LandingPage() {
                 )}
               </button>
             </div>
-            {/* Expandable example response */}
             <div className="mt-2">
               <button
                 onClick={() => setShowSandboxResponse(!showSandboxResponse)}
@@ -647,7 +616,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Newsletter Signup – Security enhanced (honeypot + rate limiting) */}
+          {/* Newsletter Signup */}
           <div className="mb-8 max-w-md mx-auto">
             <h4 className="text-lg font-semibold text-white mb-2">Stay Updated</h4>
             <p className="text-sm text-gray-400 mb-4">
@@ -663,7 +632,6 @@ export default function LandingPage() {
                 className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white placeholder-gray-500"
                 aria-label="Email address for newsletter"
               />
-              {/* Honeypot field – hidden from real users */}
               <input
                 type="text"
                 name="website"
@@ -749,7 +717,8 @@ export default function LandingPage() {
   );
 }
 
-// Helper components (unchanged except for minor improvements)
+// Helper components
+
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
@@ -780,7 +749,7 @@ function EcoCard({ icon, title, description, details }: { icon: React.ReactNode;
 function FeatureCard({ title, description, icon, details }: { title: string; description: string; icon: React.ReactNode; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
+    <div className="feature-card bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
       <div className="mb-4 flex justify-center group-hover:scale-110 transition-transform">{icon}</div>
       <h3 className="text-xl font-semibold mb-2 text-center">{title}</h3>
       <p className="text-gray-400 text-center mb-2">{description}</p>
@@ -863,7 +832,7 @@ function RepoCard({ name, desc, url }: { name: string; desc: string; url: string
         {repoData && (
           <div className="flex items-center gap-2 text-xs">
             {repoData.language && <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-300">{repoData.language}</span>}
-            <span className="flex items-center gap-0.5 text-yellow-400">
+            <span className="flex items-center gap-0.5 text-yellow-400 min-w-[50px] justify-end">
               <Star size={12} className="fill-yellow-400" />
               {repoData.stargazers_count.toLocaleString()}
             </span>
