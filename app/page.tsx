@@ -27,7 +27,8 @@ import {
   Star,
   Zap,
   Shield,
-  BarChart
+  BarChart,
+  ChevronRight
 } from 'lucide-react';
 import GitHubStars from '../components/GitHubStars';
 import { useInView } from '../hooks/useInView';
@@ -72,6 +73,16 @@ const SANDBOX_CURL = `curl -X POST https://sandbox.arf.dev/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
+// Example response for the sandbox API (mock)
+const SANDBOX_RESPONSE = {
+  "status": "success",
+  "recommendation": "ESCALATE",
+  "risk_score": 0.68,
+  "confidence": 0.72,
+  "justification": "High latency (450ms) exceeds threshold; historical incidents show 35% failure probability. Escalating for human review.",
+  "policy_violations": []
+};
+
 // Feature data for lazy-loading
 const FEATURES = [
   {
@@ -100,7 +111,7 @@ const FEATURES = [
   }
 ];
 
-// Component that lazy‑loads a single feature card (fixed TypeScript ref type)
+// Component that lazy‑loads a single feature card
 function LazyFeatureCard({ feature }: { feature: typeof FEATURES[0] }) {
   const { ref: rawRef, inView } = useInView({ threshold: 0.1 });
   const ref = rawRef as React.RefObject<HTMLDivElement>;
@@ -134,6 +145,7 @@ export default function LandingPage() {
   const [showFAB, setShowFAB] = useState(false);
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [showSandboxResponse, setShowSandboxResponse] = useState(false);
   // Security: honeypot field (should be empty)
   const [honeypot, setHoneypot] = useState('');
   // Security: time token (prevent rapid submissions)
@@ -220,7 +232,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      {/* Hero Section – reduced vertical padding on mobile */}
+      {/* Hero Section */}
       <section id="hero" ref={heroRef} className={`container mx-auto px-4 py-12 sm:py-20 text-center transition-opacity duration-1000 ${heroInView ? 'opacity-100' : 'opacity-0'}`}>
         <div className="flex flex-col items-center gap-3 mb-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
@@ -254,7 +266,7 @@ export default function LandingPage() {
         <p className="text-gray-400 text-sm mt-4">🔐 Core engine is access‑controlled. Free trials available for qualified pilots only.</p>
       </section>
 
-      {/* Social Proof – Trust & Authority */}
+      {/* Social Proof – Trust & Authority with added testimonial */}
       <div className="container mx-auto px-4 mb-12">
         <div className="flex flex-wrap justify-center gap-8 items-center">
           <div className="text-yellow-400 flex items-center gap-1">★★★★★ <span className="text-gray-400 ml-1">(Rated 5/5 by early pilots)</span></div>
@@ -273,6 +285,13 @@ export default function LandingPage() {
             <span>Trusted by leading AI teams</span>
           </div>
         </div>
+
+        {/* New: Pilot Testimonial */}
+        <div className="max-w-2xl mx-auto mt-6 bg-gray-800/50 border border-gray-700 rounded-lg p-4 text-center">
+          <p className="text-gray-300 italic">“ARF gave us confidence to let AI agents touch production. The audit trails alone saved us weeks of compliance work.”</p>
+          <p className="text-sm text-blue-400 mt-2">— CTO, Fortune 500 Pilot (anonymous)</p>
+        </div>
+
         <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents. Not a guarantee.</p>
       </div>
 
@@ -310,7 +329,42 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities – Lazy‑loaded cards, now with grid-cols-1 */}
+      {/* NEW: Mission, Vision, Values Section */}
+      <div className="container mx-auto px-4 mb-16">
+        <div className="bg-gray-800/30 rounded-2xl p-6 sm:p-8 border border-gray-700">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Our North Star
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-blue-500 transition">
+              <div className="text-3xl mb-3">🚀</div>
+              <h3 className="text-xl font-semibold mb-2">Mission</h3>
+              <p className="text-gray-300 text-sm">
+                Make every AI action provably safe, auditable, and commercially viable – without slowing down innovation.
+              </p>
+            </div>
+            <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-purple-500 transition">
+              <div className="text-3xl mb-3">🔭</div>
+              <h3 className="text-xl font-semibold mb-2">Vision</h3>
+              <p className="text-gray-300 text-sm">
+                A world where autonomous systems are trusted partners in every enterprise – governed by code, not guesswork.
+              </p>
+            </div>
+            <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-green-500 transition">
+              <div className="text-3xl mb-3">⚖️</div>
+              <h3 className="text-xl font-semibold mb-2">Values</h3>
+              <ul className="text-gray-300 text-sm space-y-1 list-disc list-inside">
+                <li>Determinism over vibes</li>
+                <li>Transparency by default</li>
+                <li>Outcome‑aligned incentives</li>
+                <li>Pilot‑first, honest boundaries</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Key Capabilities – Lazy‑loaded cards */}
       <section ref={capabilitiesRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${capabilitiesInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -380,13 +434,19 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
-          <p className="text-xs text-gray-500 text-center mt-4">
-            The core ARF engine is not open source. Pilot access requires a mutual agreement.
-          </p>
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <p className="text-xs text-gray-500">
+              The core ARF engine is not open source. Pilot access requires a mutual agreement.
+            </p>
+            {/* Security badge */}
+            <span className="inline-flex items-center gap-1 text-xs bg-green-900/30 text-green-400 px-2 py-1 rounded-full border border-green-700">
+              <Shield size={12} /> SOC2 ready – in progress
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Try the Sandbox API */}
+      {/* Try the Sandbox API – with expandable example response */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4">Try the Sandbox API</h2>
@@ -405,6 +465,22 @@ export default function LandingPage() {
                   </span>
                 )}
               </button>
+            </div>
+            {/* Expandable example response */}
+            <div className="mt-2">
+              <button
+                onClick={() => setShowSandboxResponse(!showSandboxResponse)}
+                className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
+              >
+                {showSandboxResponse ? 'Hide' : 'Show'} example response <ChevronRight size={14} className={`transition-transform ${showSandboxResponse ? 'rotate-90' : ''}`} />
+              </button>
+              {showSandboxResponse && (
+                <div className="mt-2 bg-gray-900 p-3 rounded-lg border border-gray-700">
+                  <pre className="text-xs font-mono text-green-300 overflow-x-auto">
+                    {JSON.stringify(SANDBOX_RESPONSE, null, 2)}
+                  </pre>
+                </div>
+              )}
             </div>
             <p className="text-sm text-yellow-300">
               ⚠️ This is a <strong>sanitized demo endpoint</strong>. It does <strong>not</strong> use the protected Bayesian engine. For pilot access, <Link href="/signup" className="underline">request here</Link>.
@@ -450,11 +526,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Demos – added grid-cols-1 */}
+      {/* Live Demos */}
       <section ref={demosRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${demosInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Live Demos</h2>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          {/* Interactive Risk Demo (simulated) */}
           <DemoCard
             title="Interactive Risk Demo"
             description="Simulated Bayesian risk scoring – adjust priors, see MCMC, semantic memory"
@@ -644,7 +719,7 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Toast Notifications (kept for compatibility) */}
+      {/* Toast Notifications */}
       <div aria-live="polite" className="sr-only">
         {copiedEmail && 'Email address copied'}
         {copiedSandboxSnippet && 'Sandbox command copied'}
@@ -663,7 +738,7 @@ export default function LandingPage() {
   );
 }
 
-// Helper components (unchanged)
+// Helper components (unchanged except for minor improvements)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
