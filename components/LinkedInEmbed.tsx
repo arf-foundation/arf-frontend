@@ -12,29 +12,28 @@ export default function LinkedInEmbed() {
   useEffect(() => {
     if (inView && !hasLoadedRef.current) {
       hasLoadedRef.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShouldLoad(true);
     }
   }, [inView]);
 
   return (
     <div ref={ref} className="flex justify-center">
-      <div className="w-full max-w-md rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+      <div className="w-full max-w-md rounded-lg border border-gray-700 bg-gray-800/50 p-4" style={{ minHeight: '500px' }}>
         {shouldLoad ? (
           <iframe
             src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7436928497408880640?collapsed=1"
-            height="877"
-            width="504"
+            width="100%"
+            height="450"
             frameBorder="0"
             allowFullScreen
             title="LinkedIn post – ARF access control agent"
             loading="lazy"
-            className="mx-auto w-full"
-            style={{ maxWidth: '100%', height: 'auto', minHeight: '400px' }}
+            className="mx-auto"
+            style={{ display: 'block', height: '450px' }}
             sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
           />
         ) : (
-          <div className="h-[400px] flex items-center justify-center text-gray-400">
+          <div className="h-[450px] flex items-center justify-center text-gray-400">
             <div className="animate-pulse">Loading LinkedIn post …</div>
           </div>
         )}
