@@ -323,8 +323,13 @@ export default function LandingPage() {
       <div ref={diagramRef} className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          {isDiagramVisible && <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />}
-          {!isDiagramVisible && <div className="h-64 animate-pulse bg-gray-700 rounded-lg" />}
+          <div className="relative w-full aspect-[16/9] min-h-[300px]">
+            {isDiagramVisible ? (
+              <Mermaid chart={DIAGRAM} className="absolute inset-0 w-full h-full" />
+            ) : (
+              <div className="absolute inset-0 bg-gray-700 animate-pulse rounded-lg" />
+            )}
+          </div>
           <p className="text-xs text-gray-500 mt-2 text-center">Bayesian risk fusion → Expected loss minimisation → Approve/Deny/Escalate</p>
         </div>
       </div>
@@ -364,12 +369,18 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities – Lazy‑loaded cards */}
+      {/* Key Capabilities – Direct render, no lazy loading */}
       <section ref={capabilitiesRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${capabilitiesInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {FEATURES.map((feature, idx) => (
-            <LazyFeatureCard key={idx} feature={feature} />
+            <FeatureCard
+              key={idx}
+              title={feature.title}
+              description={feature.description}
+              icon={feature.icon}
+              details={feature.details}
+            />
           ))}
         </div>
       </section>
