@@ -15,7 +15,6 @@ export default function GitHubStars() {
     const now = Date.now();
 
     if (cached && cachedTime && now - parseInt(cachedTime) < 3600000) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStars(JSON.parse(cached));
       return;
     }
@@ -38,17 +37,19 @@ export default function GitHubStars() {
       });
   }, [repoName]);
 
-  if (stars === null) return null;
+  // Always render a container with fixed dimensions to prevent layout shift
   return (
     <a
       href="https://github.com/arf-foundation/arf-spec"
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 bg-gray-800 px-3 py-1 rounded-full text-sm"
+      className="inline-flex items-center gap-1 bg-gray-800 px-3 py-1 rounded-full text-sm min-w-[70px] justify-center"
       title="Stars for the public specification – the core engine is not open source"
     >
       <Star size={14} className="fill-yellow-400 text-yellow-400" />
-      <span>{stars.toLocaleString()}</span>
+      <span className="min-w-[40px] text-left">
+        {stars !== null ? stars.toLocaleString() : '…'}
+      </span>
     </a>
   );
 }
