@@ -2,12 +2,41 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowRight, RefreshCw, AlertCircle, Shield, Network, Info, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowRight, RefreshCw, Info, Network } from 'lucide-react';
+
+// ----------------------------------------------------------------------
+// Type definitions (no 'any')
+// ----------------------------------------------------------------------
+interface RiskBreakdown {
+  conjugate: number;
+  hmc: number;
+  hyperprior: number;
+}
+
+interface RiskWeights {
+  conjugate: number;
+  hmc: number;
+  hyperprior: number;
+}
+
+interface RiskData {
+  risk: number;
+  status: 'critical' | 'warning' | 'safe';
+  breakdown: RiskBreakdown;
+  weights: RiskWeights;
+  variance: number;
+}
+
+interface QuotaData {
+  tier: string;
+  remaining: number;
+  limit: number;
+}
 
 // ----------------------------------------------------------------------
 // Helper: generate deterministic mock risk data (changes every 10s)
 // ----------------------------------------------------------------------
-const generateMockRisk = () => {
+const generateMockRisk = (): RiskData => {
   const seed = Math.floor(Date.now() / 10000);
   const random = (min: number, max: number) => {
     const x = Math.sin(seed) * 10000;
@@ -15,7 +44,7 @@ const generateMockRisk = () => {
     return min + r * (max - min);
   };
   const risk = random(0.2, 0.95);
-  let status: 'critical' | 'warning' | 'safe' = 'warning';
+  let status: RiskData['status'] = 'warning';
   if (risk > 0.7) status = 'critical';
   else if (risk < 0.4) status = 'safe';
 
@@ -100,7 +129,6 @@ const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
           stroke={getColor()}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          strokeDasharray="none"
         />
         {/* Needle */}
         <line
@@ -144,15 +172,16 @@ const escapeHtml = (str: string) => {
 // Main Dashboard Component
 // ----------------------------------------------------------------------
 export default function Dashboard() {
-  const [riskData, setRiskData] = useState<any>(null);
-  const [quota, setQuota] = useState<{ tier: string; remaining: number; limit: number } | null>(null);
+  const [riskData, setRiskData] = useState<RiskData | null>(null);
+  const [quota, setQuota] = useState<QuotaData | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isHttpWarning, setIsHttpWarning] = useState(false);
 
-  // Security: detect HTTP and warn
+  // Security: detect HTTP and warn – one-time, safe to ignore lint rule
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsHttpWarning(true);
     }
   }, []);
@@ -172,10 +201,12 @@ export default function Dashboard() {
     }, 500);
   }, []);
 
+  // Initial load and auto‑refresh – safe to ignore lint rule (intended side effect)
   useEffect(() => {
     refreshData();
     const interval = setInterval(refreshData, 30000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
   }, [refreshData]);
 
   if (!riskData) {
@@ -396,7 +427,7 @@ export default function Dashboard() {
                     </tr>
                   ))}
                 </tbody>
-               </table>
+              </table>
             </div>
 
             {/* Mobile card list */}
