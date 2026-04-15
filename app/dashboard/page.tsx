@@ -297,7 +297,10 @@ export default function Dashboard() {
                 {/* Risk Factor Breakdown with Tooltips */}
                 <div className="border-t border-gray-700 pt-4">
                   <div className="text-gray-400 text-sm mb-2 flex items-center gap-1">
-                    Risk Factor Breakdown <Info size={14} className="text-gray-500 cursor-help" title="Weighted contributions from each Bayesian component" />
+                    Risk Factor Breakdown
+                    <span title="Weighted contributions from each Bayesian component">
+                      <Info size={14} className="text-gray-500 cursor-help" />
+                    </span>
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
