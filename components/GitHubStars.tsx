@@ -38,7 +38,6 @@ export default function GitHubStars() {
       });
   }, [repoName]);
 
-  // Always render a container with fixed dimensions to prevent layout shift
   return (
     <a
       href="https://github.com/arf-foundation/arf-spec"
@@ -49,7 +48,11 @@ export default function GitHubStars() {
     >
       <Star size={14} className="fill-yellow-400 text-yellow-400" />
       <span className="min-w-[40px] text-left">
-        {stars !== null ? stars.toLocaleString() : '…'}
+        {stars !== null ? (
+          stars.toLocaleString()
+        ) : (
+          <span className="inline-block w-10 h-4 bg-gray-700 animate-pulse rounded" />
+        )}
       </span>
     </a>
   );
