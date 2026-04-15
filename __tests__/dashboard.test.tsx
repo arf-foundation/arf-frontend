@@ -5,7 +5,6 @@ import Dashboard from '../app/dashboard/page';
 // Mock window.location.protocol to avoid HTTP warning banner
 const originalLocation = window.location;
 beforeAll(() => {
-  // Use Object.defineProperty to avoid `any` cast
   delete (window as { location: Location }).location;
   Object.defineProperty(window, 'location', {
     value: { ...originalLocation, protocol: 'https:' },
@@ -30,8 +29,13 @@ describe('Dashboard (Simulated Demo)', () => {
   it('displays a risk score percentage', async () => {
     render(<Dashboard />);
     await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
-    const percentages = await screen.findAllByText(/\d+\s*%/);
-    expect(percentages.length).toBeGreaterThan(0);
+    // Find the large percentage (unique by class)
+    const largePercentage = await screen.findByText((content, element) => {
+      return element?.tagName === 'DIV' && 
+             element.classList.contains('text-3xl') && 
+             /\d+\s*%/.test(content);
+    });
+    expect(largePercentage).toBeInTheDocument();
   });
 
   it('shows the simulated disclaimer banner', async () => {
@@ -87,8 +91,13 @@ describe('Dashboard (Simulated Demo)', () => {
     const refreshButton = await screen.findByLabelText('Refresh data');
     expect(refreshButton).toBeEnabled();
     await user.click(refreshButton);
+    // Use the same specific matcher for the large percentage
     await waitFor(() => {
-      expect(screen.getByText(/\d+\s*%/)).toBeInTheDocument();
+      expect(screen.getByText((content, element) => {
+        return element?.tagName === 'DIV' && 
+               element.classList.contains('text-3xl') && 
+               /\d+\s*%/.test(content);
+      })).toBeInTheDocument();
     }, { timeout: 2000 });
     expect(refreshButton).toBeEnabled();
   });
