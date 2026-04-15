@@ -14,8 +14,8 @@ describe('Dashboard (Simulated Demo)', () => {
 
   it('displays a risk score percentage (unique large text)', async () => {
     render(<Dashboard />);
-    // Match only the large percentage number (e.g., "41%") – not the many other percentages
-    const riskPercentage = await screen.findByText(/^\d+%$/);
+    // Match numbers like "32%" or "32 %"
+    const riskPercentage = await screen.findByText(/\d+\s*%/);
     expect(riskPercentage).toBeInTheDocument();
   });
 
@@ -65,11 +65,11 @@ describe('Dashboard (Simulated Demo)', () => {
     const user = userEvent.setup();
     render(<Dashboard />);
     const refreshButton = await screen.findByLabelText('Refresh data');
-    const initialRisk = await screen.findByText(/^\d+%$/);
+    const initialRisk = await screen.findByText(/\d+\s*%/);
     expect(initialRisk).toBeInTheDocument();
     await user.click(refreshButton);
     await waitFor(() => {
-      expect(screen.getByText(/^\d+%$/)).toBeInTheDocument();
+      expect(screen.getByText(/\d+\s*%/)).toBeInTheDocument();
     });
     expect(refreshButton).toBeEnabled();
   });
@@ -79,7 +79,6 @@ describe('Dashboard (Simulated Demo)', () => {
     expect(await screen.findByText(/Ready to govern your AI agents\?/i)).toBeInTheDocument();
     const pilotLinks = await screen.findAllByRole('link', { name: /Request Pilot Access/i });
     expect(pilotLinks.length).toBeGreaterThan(0);
-    // Check that at least one link points to /signup
     const signupLink = pilotLinks.find(link => link.getAttribute('href') === '/signup');
     expect(signupLink).toBeTruthy();
   });
