@@ -43,7 +43,7 @@ yarn install
 Create .env.local:
 
 ```text
-NEXT_PUBLIC_API_URL=https://sandbox.arf.dev   # Sanitised demo endpoint
+NEXT_PUBLIC_API_URL=https://a-r-f-arf-sandbox-api.hf.space   # Sanitised demo endpoint
 NEXT_PUBLIC_USE_MOCK_DATA=true                # Use local mocks (default)
 ```
 
