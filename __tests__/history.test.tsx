@@ -1,82 +1,87 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import History from '@/app/history/page';
+import Dashboard from '../app/dashboard/page';
 
-// Mock recharts to avoid SVG rendering issues
-jest.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => children,
-  LineChart: ({ children }: { children: React.ReactNode }) => <div data-testid="line-chart">{children}</div>,
-  Line: () => null,
-  XAxis: () => null,
-  YAxis: () => null,
-  CartesianGrid: () => null,
-  Tooltip: () => null,
+jest.mock('../hooks/useInView', () => ({
+  useInView: () => ({ ref: { current: null }, inView: true }),
 }));
 
-describe('History Page (Simulated Demo)', () => {
-  it('renders the page title and description', async () => {
-    render(<History />);
-    expect(await screen.findByText('Risk History')).toBeInTheDocument();
-    expect(await screen.findByText(/simulated risk score evolution/i)).toBeInTheDocument();
+describe('Dashboard (Simulated Demo)', () => {
+  it('renders the main risk card with title', async () => {
+    render(<Dashboard />);
+    expect(await screen.findByText('ARF System Risk')).toBeInTheDocument();
   });
 
-  it('displays the simulated disclaimer banner', async () => {
-    render(<History />);
+  it('displays a risk score percentage (e.g., 22%)', async () => {
+    render(<Dashboard />);
+    const percentageText = await screen.findByText(/\d+%/);
+    expect(percentageText).toBeInTheDocument();
+  });
+
+  it('shows the simulated disclaimer banner', async () => {
+    render(<Dashboard />);
     const disclaimer = await screen.findByText(/simulated demo/i);
     expect(disclaimer).toBeInTheDocument();
   });
 
-  it('renders the line chart', async () => {
-    render(<History />);
-    expect(await screen.findByTestId('line-chart')).toBeInTheDocument();
+  it('displays the risk status badge (safe / warning / critical)', async () => {
+    render(<Dashboard />);
+    const statusBadge = await screen.findByText(/SAFE|WARNING|CRITICAL/);
+    expect(statusBadge).toBeInTheDocument();
   });
 
-  it('shows the recent decisions table with expected columns', async () => {
-    render(<History />);
-    expect(await screen.findByText('Recent Decisions (Simulated)')).toBeInTheDocument();
-    expect(await screen.findByText('Time')).toBeInTheDocument();
-    expect(await screen.findByText('Service')).toBeInTheDocument();
-    expect(await screen.findByText('Risk Score')).toBeInTheDocument();
-    expect(await screen.findByText('Action')).toBeInTheDocument();
+  it('shows the risk factor breakdown section', async () => {
+    render(<Dashboard />);
+    expect(await screen.findByText(/Risk Factor Breakdown/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Conjugate prior/i)).toBeInTheDocument();
+    expect(await screen.findByText(/HMC prediction/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Hyperprior shrinkage/i)).toBeInTheDocument();
   });
 
-  it('displays sample decision entries', async () => {
-    render(<History />);
+  it('displays the semantic memory stats', async () => {
+    render(<Dashboard />);
+    expect(await screen.findByText(/Semantic Memory \(Simulated\)/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Similar Incidents/i)).toBeInTheDocument();
+    expect(await screen.findByText(/RAG Similarity/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Cache Hits/i)).toBeInTheDocument();
+  });
+
+  it('shows the recent incidents table (desktop) or card list (mobile)', async () => {
+    render(<Dashboard />);
     expect(await screen.findByText('payment-api')).toBeInTheDocument();
     expect(await screen.findByText('auth-service')).toBeInTheDocument();
     expect(await screen.findByText('database')).toBeInTheDocument();
   });
 
-  it('shows action badges (APPROVE, DENY, ESCALATE)', async () => {
-    render(<History />);
+  it('displays action badges (APPROVE, DENY, ESCALATE)', async () => {
+    render(<Dashboard />);
     expect(await screen.findByText('APPROVE')).toBeInTheDocument();
     expect(await screen.findByText('DENY')).toBeInTheDocument();
     expect(await screen.findByText('ESCALATE')).toBeInTheDocument();
   });
 
-  it('has a refresh button that updates the chart (simulated)', async () => {
+  it('has a refresh button that updates the risk score', async () => {
     const user = userEvent.setup();
-    render(<History />);
-    const refreshButton = await screen.findByRole('button', { name: /refresh/i });
-    expect(refreshButton).toBeEnabled();
-    // Click the refresh button – the chart should still be present (no error)
+    render(<Dashboard />);
+    const refreshButton = await screen.findByLabelText('Refresh data');
+    // Verify risk score exists
+    expect(await screen.findByText(/\d+%/)).toBeInTheDocument();
     await user.click(refreshButton);
-    // After clicking, the chart should still be there (maybe loading briefly)
     await waitFor(() => {
-      expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+      expect(screen.getByText(/\d+%/)).toBeInTheDocument();
     });
+    expect(refreshButton).toBeEnabled();
   });
 
-  it('displays last updated timestamp after initial load', async () => {
-    render(<History />);
-    const lastUpdated = await screen.findByText(/last updated/i);
-    expect(lastUpdated).toBeInTheDocument();
+  it('displays the call to action for pilot access', async () => {
+    render(<Dashboard />);
+    expect(await screen.findByText(/Ready to govern your AI agents\?/i)).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: /Request Pilot Access/i })).toHaveAttribute('href', '/signup');
   });
 
-  it('shows the call to action for pilot access', async () => {
-    render(<History />);
-    expect(await screen.findByText(/Get real‑time risk history/i)).toBeInTheDocument();
-    const ctaLink = screen.getByRole('link', { name: /Request Pilot Access/i });
-    expect(ctaLink).toHaveAttribute('href', '/signup');
+  it('shows the HTTP warning banner only when on HTTP', () => {
+    render(<Dashboard />);
+    const httpWarning = screen.queryByText(/Security warning: You are viewing this page over HTTP/i);
+    expect(httpWarning).not.toBeInTheDocument();
   });
 });
