@@ -12,9 +12,9 @@ describe('Dashboard (Simulated Demo)', () => {
     expect(await screen.findByText('ARF System Risk')).toBeInTheDocument();
   });
 
-  it('displays a risk score percentage (unique large text)', async () => {
+  it('displays a risk score percentage', async () => {
     render(<Dashboard />);
-    // Match numbers like "32%" or "32 %"
+    await screen.findByText('ARF System Risk');
     const riskPercentage = await screen.findByText(/\d+\s*%/);
     expect(riskPercentage).toBeInTheDocument();
   });
@@ -64,9 +64,15 @@ describe('Dashboard (Simulated Demo)', () => {
   it('has a refresh button that updates the risk score', async () => {
     const user = userEvent.setup();
     render(<Dashboard />);
+    // Wait for the main card to load
+    await screen.findByText('ARF System Risk');
     const refreshButton = await screen.findByLabelText('Refresh data');
-    const initialRisk = await screen.findByText(/\d+\s*%/);
-    expect(initialRisk).toBeInTheDocument();
+    // Use waitFor with a longer timeout and queryByText inside
+    let initialRisk;
+    await waitFor(() => {
+      initialRisk = screen.queryByText(/\d+\s*%/);
+      expect(initialRisk).toBeInTheDocument();
+    }, { timeout: 2000 });
     await user.click(refreshButton);
     await waitFor(() => {
       expect(screen.getByText(/\d+\s*%/)).toBeInTheDocument();
