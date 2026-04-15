@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Dashboard from '../app/dashboard/page';
 
-// Mock the useInView hook (if used in other components, but not in dashboard directly)
 jest.mock('../hooks/useInView', () => ({
   useInView: () => ({ ref: { current: null }, inView: true }),
 }));
@@ -13,23 +12,19 @@ describe('Dashboard (Simulated Demo)', () => {
     expect(await screen.findByText('ARF System Risk')).toBeInTheDocument();
   });
 
-  it('displays a risk score percentage (e.g., 22%)', async () => {
+  it('displays a risk score percentage', async () => {
     render(<Dashboard />);
-    // The gauge shows a percentage inside an SVG text element
-    const percentageText = await screen.findByText(/\d+%/);
-    expect(percentageText).toBeInTheDocument();
+    expect(await screen.findByText(/\d+%/)).toBeInTheDocument();
   });
 
   it('shows the simulated disclaimer banner', async () => {
     render(<Dashboard />);
-    const disclaimer = await screen.findByText(/simulated demo/i);
-    expect(disclaimer).toBeInTheDocument();
+    expect(await screen.findByText(/simulated demo/i)).toBeInTheDocument();
   });
 
-  it('displays the risk status badge (safe / warning / critical)', async () => {
+  it('displays the risk status badge', async () => {
     render(<Dashboard />);
-    const statusBadge = await screen.findByText(/SAFE|WARNING|CRITICAL/);
-    expect(statusBadge).toBeInTheDocument();
+    expect(await screen.findByText(/SAFE|WARNING|CRITICAL/)).toBeInTheDocument();
   });
 
   it('shows the risk factor breakdown section', async () => {
@@ -48,15 +43,14 @@ describe('Dashboard (Simulated Demo)', () => {
     expect(await screen.findByText(/Cache Hits/i)).toBeInTheDocument();
   });
 
-  it('shows the recent incidents table (desktop) or card list (mobile)', async () => {
+  it('shows recent incidents', async () => {
     render(<Dashboard />);
-    // Check for at least one incident service name
     expect(await screen.findByText('payment-api')).toBeInTheDocument();
     expect(await screen.findByText('auth-service')).toBeInTheDocument();
     expect(await screen.findByText('database')).toBeInTheDocument();
   });
 
-  it('displays action badges (APPROVE, DENY, ESCALATE)', async () => {
+  it('displays action badges', async () => {
     render(<Dashboard />);
     expect(await screen.findByText('APPROVE')).toBeInTheDocument();
     expect(await screen.findByText('DENY')).toBeInTheDocument();
@@ -67,15 +61,11 @@ describe('Dashboard (Simulated Demo)', () => {
     const user = userEvent.setup();
     render(<Dashboard />);
     const refreshButton = await screen.findByLabelText('Refresh data');
-    const initialRisk = (await screen.findByText(/\d+%/)).textContent;
+    expect(await screen.findByText(/\d+%/)).toBeInTheDocument();
     await user.click(refreshButton);
-    // Wait for the refresh animation and updated text
     await waitFor(() => {
-      const newRisk = screen.getByText(/\d+%/).textContent;
-      // The risk might stay the same sometimes, but we just verify it exists after click
-      expect(newRisk).toBeTruthy();
+      expect(screen.getByText(/\d+%/)).toBeInTheDocument();
     });
-    // Ensure the button was enabled and clicked
     expect(refreshButton).toBeEnabled();
   });
 
@@ -85,10 +75,7 @@ describe('Dashboard (Simulated Demo)', () => {
     expect(await screen.findByRole('link', { name: /Request Pilot Access/i })).toHaveAttribute('href', '/signup');
   });
 
-  it('shows the HTTP warning banner only when on HTTP (simulate by mocking window.location)', () => {
-    // This test is environment‑specific; we skip it in the CI (which runs on HTTPS usually)
-    // Instead, we test that the banner is not present when protocol is HTTPS.
-    // For simplicity, we check that the banner does NOT appear by default.
+  it('does not show HTTP warning by default', () => {
     render(<Dashboard />);
     const httpWarning = screen.queryByText(/Security warning: You are viewing this page over HTTP/i);
     expect(httpWarning).not.toBeInTheDocument();
