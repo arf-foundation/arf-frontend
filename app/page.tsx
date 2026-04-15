@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import {
   ArrowRight,
   Github,
@@ -32,12 +33,15 @@ import {
 } from 'lucide-react';
 import GitHubStars from '../components/GitHubStars';
 import { useInView } from '../hooks/useInView';
-import LinkedInEmbed from '../components/LinkedInEmbed';
 
-// Lazy-load Mermaid with no SSR – diagram is above the fold, but dynamic import reduces bundle size
-const Mermaid = dynamic(() => import('../components/Mermaid'), {
+// Lazy‑load LinkedIn embed – reduces initial bundle size
+const LinkedInEmbed = dynamic(() => import('../components/LinkedInEmbed'), {
   ssr: false,
-  loading: () => <div className="absolute inset-0 bg-gray-700 animate-pulse rounded-lg" />
+  loading: () => (
+    <div className="flex justify-center my-4">
+      <div className="w-full max-w-md h-[500px] bg-gray-800 animate-pulse rounded-lg" />
+    </div>
+  ),
 });
 
 // --- Types ---
@@ -45,28 +49,6 @@ interface RepoData {
   stargazers_count: number;
   language: string | null;
 }
-
-// Conceptual diagram – does not expose proprietary internals
-const DIAGRAM = `flowchart TD
-    subgraph Input["🔌 Input Sources"]
-        Services[Agents / Services]
-        Metrics[Metrics / Logs]
-    end
-    Services --> Signals[Observability Signals]
-    Metrics --> Signals
-    Signals --> Interpreter[ARF Reliability Interpreter]
-    subgraph Engine["⚙️ ARF Core Engine (Access‑Controlled)"]
-        Interpreter --> Risk[Bayesian Risk Fusion]
-        Risk --> Loss[Expected Loss Minimisation]
-        Loss --> Decision{Approve / Deny / Escalate}
-    end
-    Decision -->|Approve| Action[Recovery Actions]
-    Decision -->|Deny| Log[Log & Alert]
-    Decision -->|Escalate| Human[Human Review]
-    style Interpreter fill:#e1f5fe,stroke:#01579b
-    style Risk fill:#fff3e0,stroke:#e65100
-    style Loss fill:#e8f5e8,stroke:#1b5e20
-    style Decision fill:#fce4ec,stroke:#b71c1c`;
 
 // Sandbox endpoint – not the real engine
 const SANDBOX_CURL = `curl -X POST https://sandbox.arf.dev/v1/evaluate \\
@@ -83,7 +65,7 @@ const SANDBOX_RESPONSE = {
   "policy_violations": []
 };
 
-// Feature data – now rendered eagerly, no lazy loading
+// Feature data – unchanged
 const FEATURES = [
   {
     title: "Bayesian Risk Scoring",
@@ -270,7 +252,7 @@ export default function LandingPage() {
         <p className="text-xs text-gray-500 text-center mt-4">* MTTR reduction based on internal benchmarks with simulated incidents. Not a guarantee.</p>
       </div>
 
-      {/* LinkedIn Embed */}
+      {/* LinkedIn Embed – lazy‑loaded with skeleton */}
       <LinkedInEmbed />
 
       {/* Problem-Solution-Outcome Block */}
@@ -294,12 +276,19 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* How ARF Works – diagram rendered eagerly with stable dimensions and centered */}
+      {/* How ARF Works – STATIC IMAGE (no Mermaid) */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <div className="mermaid-wrapper">
-            <Mermaid chart={DIAGRAM} />
+          <div className="flex justify-center my-8">
+            <Image
+              src="/images/arf-enterprise-flow.png"
+              alt="ARF architecture: Input sources → Observability Signals → Core Engine (Bayesian Risk Fusion → Expected Loss Minimisation → HealingIntent) → Enterprise Enforcement (gates, execution ladder) → Recovery Actions / Log & Alert / Human Review. Optional Temporal Reliability layer."
+              width={1200}
+              height={800}
+              className="w-full h-auto max-w-4xl rounded-lg shadow-lg"
+              priority
+            />
           </div>
           <p className="text-xs text-gray-500 mt-2 text-center">Bayesian risk fusion → Expected loss minimisation → Approve/Deny/Escalate</p>
         </div>
@@ -717,7 +706,7 @@ export default function LandingPage() {
   );
 }
 
-// Helper components (unchanged except for adding feature-card class)
+// Helper components (unchanged except RepoCard skeleton)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
@@ -824,19 +813,27 @@ function RepoCard({ name, desc, url }: { name: string; desc: string; url: string
     };
     if (repoName) fetchRepoData();
   }, [repoName]);
+
   return (
     <a href={url} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition block group">
       <div className="flex items-start justify-between">
         <h3 className="font-mono text-sm text-gray-300 group-hover:text-white transition-colors">{name}</h3>
-        {repoData && (
-          <div className="flex items-center gap-2 text-xs">
-            {repoData.language && <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-300">{repoData.language}</span>}
-            <span className="flex items-center gap-0.5 text-yellow-400 min-w-[50px] justify-end">
-              <Star size={12} className="fill-yellow-400" />
-              {repoData.stargazers_count.toLocaleString()}
-            </span>
-          </div>
-        )}
+        <div className="flex items-center gap-2 text-xs">
+          {repoData ? (
+            <>
+              {repoData.language && <span className="px-2 py-0.5 bg-gray-700 rounded-full">{repoData.language}</span>}
+              <span className="flex items-center gap-0.5 text-yellow-400 min-w-[50px] justify-end">
+                <Star size={12} className="fill-yellow-400" />
+                {repoData.stargazers_count.toLocaleString()}
+              </span>
+            </>
+          ) : (
+            <>
+              <div className="w-12 h-5 bg-gray-700 rounded-full animate-pulse" />
+              <div className="w-14 h-5 bg-gray-700 rounded animate-pulse" />
+            </>
+          )}
+        </div>
       </div>
       <p className="text-gray-400 text-sm mt-1">{desc}</p>
     </a>
