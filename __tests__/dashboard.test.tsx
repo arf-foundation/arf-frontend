@@ -5,8 +5,13 @@ import Dashboard from '../app/dashboard/page';
 // Mock window.location.protocol to avoid HTTP warning banner
 const originalLocation = window.location;
 beforeAll(() => {
-  delete (window as any).location;
-  (window as any).location = { ...originalLocation, protocol: 'https:' };
+  // Use Object.defineProperty to avoid `any` cast
+  delete (window as { location: Location }).location;
+  Object.defineProperty(window, 'location', {
+    value: { ...originalLocation, protocol: 'https:' },
+    writable: true,
+    configurable: true,
+  });
 });
 afterAll(() => {
   window.location = originalLocation;
@@ -82,7 +87,6 @@ describe('Dashboard (Simulated Demo)', () => {
     const refreshButton = await screen.findByLabelText('Refresh data');
     expect(refreshButton).toBeEnabled();
     await user.click(refreshButton);
-    // After click, wait for the risk percentage to still be present (it may change)
     await waitFor(() => {
       expect(screen.getByText(/\d+\s*%/)).toBeInTheDocument();
     }, { timeout: 2000 });
