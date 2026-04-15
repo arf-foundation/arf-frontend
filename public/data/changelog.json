@@ -1,0 +1,21 @@
+{
+  "entries": [
+    {
+      "date": "2026-04-15",
+      "title": "Public specification v1.2.0 – Added Lyapunov stability and cryptographic integrity sections",
+      "type": "public",
+      "link": "https://github.com/arf-foundation/arf-spec/releases/tag/v1.2.0"
+    },
+    {
+      "date": "2026-04-10",
+      "title": "Pilot: Expected loss minimisation now supports CVaR (Conditional Value at Risk)",
+      "type": "pilot"
+    },
+    {
+      "date": "2026-04-05",
+      "title": "Demo UI: Added mobile‑friendly Mermaid diagram fallback",
+      "type": "public",
+      "link": "https://github.com/arf-foundation/arf-frontend/commits/main"
+    }
+  ]
+}
