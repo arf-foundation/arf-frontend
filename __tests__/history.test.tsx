@@ -1,9 +1,6 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
-import History from '@/app/history/page'
-
-// Mock fetch globally
-const mockFetch = jest.fn()
-global.fetch = mockFetch
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import History from '@/app/history/page';
 
 // Mock recharts to avoid SVG rendering issues
 jest.mock('recharts', () => ({
@@ -14,85 +11,72 @@ jest.mock('recharts', () => ({
   YAxis: () => null,
   CartesianGrid: () => null,
   Tooltip: () => null,
-}))
+}));
 
-describe('History Page', () => {
-  const mockHistoryData = [
-    {
-      decision_id: '1',
-      timestamp: '2026-04-02T23:10:40.440085+00:00',
-      risk_score: 0.09,
-      outcome: null,
-    },
-    {
-      decision_id: '2',
-      timestamp: '2026-04-02T22:10:40.440085+00:00',
-      risk_score: 0.45,
-      outcome: null,
-    },
-  ]
+describe('History Page (Simulated Demo)', () => {
+  it('renders the page title and description', async () => {
+    render(<History />);
+    expect(await screen.findByText('Risk History')).toBeInTheDocument();
+    expect(await screen.findByText(/simulated risk score evolution/i)).toBeInTheDocument();
+  });
 
-  beforeEach(() => {
-    mockFetch.mockClear()
-  })
+  it('displays the simulated disclaimer banner', async () => {
+    render(<History />);
+    const disclaimer = await screen.findByText(/simulated demo/i);
+    expect(disclaimer).toBeInTheDocument();
+  });
 
-  it('renders history data on successful fetch', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockHistoryData,
-    })
+  it('renders the line chart', async () => {
+    render(<History />);
+    expect(await screen.findByTestId('line-chart')).toBeInTheDocument();
+  });
 
-    render(<History />)
+  it('shows the recent decisions table with expected columns', async () => {
+    render(<History />);
+    expect(await screen.findByText('Recent Decisions (Simulated)')).toBeInTheDocument();
+    expect(await screen.findByText('Time')).toBeInTheDocument();
+    expect(await screen.findByText('Service')).toBeInTheDocument();
+    expect(await screen.findByText('Risk Score')).toBeInTheDocument();
+    expect(await screen.findByText('Action')).toBeInTheDocument();
+  });
 
+  it('displays sample decision entries', async () => {
+    render(<History />);
+    expect(await screen.findByText('payment-api')).toBeInTheDocument();
+    expect(await screen.findByText('auth-service')).toBeInTheDocument();
+    expect(await screen.findByText('database')).toBeInTheDocument();
+  });
+
+  it('shows action badges (APPROVE, DENY, ESCALATE)', async () => {
+    render(<History />);
+    expect(await screen.findByText('APPROVE')).toBeInTheDocument();
+    expect(await screen.findByText('DENY')).toBeInTheDocument();
+    expect(await screen.findByText('ESCALATE')).toBeInTheDocument();
+  });
+
+  it('has a refresh button that updates the chart (simulated)', async () => {
+    const user = userEvent.setup();
+    render(<History />);
+    const refreshButton = await screen.findByRole('button', { name: /refresh/i });
+    expect(refreshButton).toBeEnabled();
+    // Click the refresh button – the chart should still be present (no error)
+    await user.click(refreshButton);
+    // After clicking, the chart should still be there (maybe loading briefly)
     await waitFor(() => {
-      expect(screen.getByTestId('line-chart')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+    });
+  });
 
-  it('displays last updated timestamp', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockHistoryData,
-    })
+  it('displays last updated timestamp after initial load', async () => {
+    render(<History />);
+    const lastUpdated = await screen.findByText(/last updated/i);
+    expect(lastUpdated).toBeInTheDocument();
+  });
 
-    render(<History />)
-
-    await waitFor(() => {
-      expect(screen.getByText(/last updated/i)).toBeInTheDocument()
-    })
-  })
-
-  it('shows error message when fetch fails', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Network error'))
-
-    render(<History />)
-
-    await waitFor(() => {
-      expect(screen.getByText(/Network error/i)).toBeInTheDocument()
-    })
-  })
-
-  it('retries fetch when retry button is clicked', async () => {
-    // First fail, then succeed
-    mockFetch
-      .mockRejectedValueOnce(new Error('Network error'))
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockHistoryData,
-      })
-
-    render(<History />)
-
-    // Wait for error message
-    await waitFor(() => {
-      expect(screen.getByText(/Network error/i)).toBeInTheDocument()
-    })
-
-    const retryButton = screen.getByRole('button', { name: /retry/i })
-    fireEvent.click(retryButton)
-
-    await waitFor(() => {
-      expect(screen.getByTestId('line-chart')).toBeInTheDocument()
-    })
-  })
-})
+  it('shows the call to action for pilot access', async () => {
+    render(<History />);
+    expect(await screen.findByText(/Get real‑time risk history/i)).toBeInTheDocument();
+    const ctaLink = screen.getByRole('link', { name: /Request Pilot Access/i });
+    expect(ctaLink).toHaveAttribute('href', '/signup');
+  });
+});
