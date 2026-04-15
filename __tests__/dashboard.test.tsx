@@ -72,7 +72,9 @@ describe('Dashboard (Simulated Demo)', () => {
   it('displays the call to action for pilot access', async () => {
     render(<Dashboard />);
     expect(await screen.findByText(/Ready to govern your AI agents\?/i)).toBeInTheDocument();
-    expect(await screen.findByRole('link', { name: /Request Pilot Access/i })).toHaveAttribute('href', '/signup');
+    // Use findByText instead of findByRole to avoid accessible name issues
+    const pilotLink = await screen.findByText(/Request Pilot Access/i);
+    expect(pilotLink.closest('a')).toHaveAttribute('href', '/signup');
   });
 
   it('does not show HTTP warning by default', () => {
