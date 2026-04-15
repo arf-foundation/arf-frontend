@@ -10,18 +10,21 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Calendar, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
+import { Calendar, TrendingUp, RefreshCw } from 'lucide-react'; // removed TrendingDown
 
-// ----------------------------------------------------------------------
+// Types
+interface HistoryPoint {
+  timestamp: string;
+  risk_score: number;
+}
+
 // Mock data generator
-// ----------------------------------------------------------------------
-const generateMockHistory = () => {
+const generateMockHistory = (): HistoryPoint[] => {
   const now = new Date();
-  const data = [];
+  const data: HistoryPoint[] = [];
   for (let i = 30; i >= 0; i--) {
     const date = new Date(now);
     date.setDate(date.getDate() - i);
-    // Simulate a risk score that fluctuates but trends slightly upward
     const risk = 0.2 + 0.5 * Math.sin(i / 5) + 0.1 * Math.random();
     data.push({
       timestamp: date.toISOString(),
@@ -40,13 +43,12 @@ const mockDecisions = [
 ];
 
 export default function HistoryPage() {
-  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [historyData, setHistoryData] = useState<HistoryPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const refreshData = () => {
     setLoading(true);
-    // Simulate network delay
     setTimeout(() => {
       const newData = generateMockHistory();
       setHistoryData(newData);
@@ -56,6 +58,7 @@ export default function HistoryPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshData();
   }, []);
 
