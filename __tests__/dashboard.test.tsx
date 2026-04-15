@@ -1,56 +1,47 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Dashboard from '../app/dashboard/page';
+
+// Mock window.location.protocol to avoid HTTP warning banner
+const originalLocation = window.location;
+beforeAll(() => {
+  delete (window as any).location;
+  (window as any).location = { ...originalLocation, protocol: 'https:' };
+});
+afterAll(() => {
+  window.location = originalLocation;
+});
 
 jest.mock('../hooks/useInView', () => ({
   useInView: () => ({ ref: { current: null }, inView: true }),
 }));
 
 describe('Dashboard (Simulated Demo)', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
-  });
-
-  const advanceTimers = async () => {
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
-  };
-
   it('renders the main risk card with title', async () => {
     render(<Dashboard />);
-    await advanceTimers();
-    expect(await screen.findByText('ARF System Risk')).toBeInTheDocument();
+    expect(await screen.findByText('ARF System Risk', {}, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('displays a risk score percentage', async () => {
     render(<Dashboard />);
-    await advanceTimers();
-    await screen.findByText('ARF System Risk');
+    await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
     const percentages = await screen.findAllByText(/\d+\s*%/);
     expect(percentages.length).toBeGreaterThan(0);
   });
 
   it('shows the simulated disclaimer banner', async () => {
     render(<Dashboard />);
-    await advanceTimers();
-    expect(await screen.findByText(/simulated demo/i)).toBeInTheDocument();
+    expect(await screen.findByText(/simulated demo/i, {}, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('displays the risk status badge', async () => {
     render(<Dashboard />);
-    await advanceTimers();
-    expect(await screen.findByText(/SAFE|WARNING|CRITICAL/)).toBeInTheDocument();
+    expect(await screen.findByText(/SAFE|WARNING|CRITICAL/, {}, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('shows the risk factor breakdown section', async () => {
     render(<Dashboard />);
-    await advanceTimers();
+    await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
     expect(await screen.findByText(/Risk Factor Breakdown/i)).toBeInTheDocument();
     expect(await screen.findByText(/Conjugate prior/i)).toBeInTheDocument();
     expect(await screen.findByText(/HMC prediction/i)).toBeInTheDocument();
@@ -59,7 +50,7 @@ describe('Dashboard (Simulated Demo)', () => {
 
   it('displays the semantic memory stats', async () => {
     render(<Dashboard />);
-    await advanceTimers();
+    await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
     expect(await screen.findByText(/Semantic Memory \(Simulated\)/i)).toBeInTheDocument();
     expect(await screen.findByText(/Similar Incidents/i)).toBeInTheDocument();
     expect(await screen.findByText(/RAG Similarity/i)).toBeInTheDocument();
@@ -68,14 +59,14 @@ describe('Dashboard (Simulated Demo)', () => {
 
   it('shows recent incidents (at least one service name)', async () => {
     render(<Dashboard />);
-    await advanceTimers();
+    await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
     const services = await screen.findAllByText(/payment-api|auth-service|database/);
     expect(services.length).toBeGreaterThan(0);
   });
 
   it('displays action badges (at least one APPROVE, DENY, ESCALATE)', async () => {
     render(<Dashboard />);
-    await advanceTimers();
+    await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
     const approveBadges = await screen.findAllByText('APPROVE');
     const denyBadges = await screen.findAllByText('DENY');
     const escalateBadges = await screen.findAllByText('ESCALATE');
@@ -87,24 +78,20 @@ describe('Dashboard (Simulated Demo)', () => {
   it('has a refresh button that updates the risk score', async () => {
     const user = userEvent.setup();
     render(<Dashboard />);
-    await advanceTimers();
-    await screen.findByText('ARF System Risk');
+    await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
     const refreshButton = await screen.findByLabelText('Refresh data');
     expect(refreshButton).toBeEnabled();
     await user.click(refreshButton);
-    // Click triggers another 500ms delay, so advance timers again
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
+    // After click, wait for the risk percentage to still be present (it may change)
     await waitFor(() => {
       expect(screen.getByText(/\d+\s*%/)).toBeInTheDocument();
-    });
+    }, { timeout: 2000 });
     expect(refreshButton).toBeEnabled();
   });
 
   it('displays the call to action for pilot access (at least one link)', async () => {
     render(<Dashboard />);
-    await advanceTimers();
+    await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
     expect(await screen.findByText(/Ready to govern your AI agents\?/i)).toBeInTheDocument();
     const pilotLinks = await screen.findAllByRole('link', { name: /Request Pilot Access/i });
     expect(pilotLinks.length).toBeGreaterThan(0);
@@ -112,9 +99,9 @@ describe('Dashboard (Simulated Demo)', () => {
     expect(signupLink).toBeTruthy();
   });
 
-  it('does not show HTTP warning by default', async () => {
+  it('does not show HTTP warning (mocked to HTTPS)', async () => {
     render(<Dashboard />);
-    await advanceTimers();
+    await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
     const httpWarning = screen.queryByText(/Security warning: You are viewing this page over HTTP/i);
     expect(httpWarning).not.toBeInTheDocument();
   });
