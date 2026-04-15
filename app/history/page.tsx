@@ -1,151 +1,204 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { z } from 'zod';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useState, useEffect } from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import { Calendar, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
 
-// Schema for history response (matches actual API)
-const HistoryItemSchema = z.object({
-  decision_id: z.string(),
-  timestamp: z.string(),
-  risk_score: z.number().min(0).max(1),
-  outcome: z.string().nullable(),
-});
+// ----------------------------------------------------------------------
+// Mock data generator
+// ----------------------------------------------------------------------
+const generateMockHistory = () => {
+  const now = new Date();
+  const data = [];
+  for (let i = 30; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    // Simulate a risk score that fluctuates but trends slightly upward
+    const risk = 0.2 + 0.5 * Math.sin(i / 5) + 0.1 * Math.random();
+    data.push({
+      timestamp: date.toISOString(),
+      risk_score: Math.min(0.95, Math.max(0.05, risk)),
+    });
+  }
+  return data;
+};
 
-const HistoryResponseSchema = z.array(HistoryItemSchema);
+const mockDecisions = [
+  { id: 1, timestamp: '2026-04-15 10:23:45', service: 'payment-api', risk: 0.82, action: 'ESCALATE' },
+  { id: 2, timestamp: '2026-04-15 09:15:22', service: 'auth-service', risk: 0.45, action: 'APPROVE' },
+  { id: 3, timestamp: '2026-04-14 22:10:05', service: 'database', risk: 0.71, action: 'ESCALATE' },
+  { id: 4, timestamp: '2026-04-14 18:30:19', service: 'cache', risk: 0.38, action: 'APPROVE' },
+  { id: 5, timestamp: '2026-04-14 14:45:03', service: 'message-queue', risk: 0.63, action: 'DENY' },
+];
 
-type HistoryItem = z.infer<typeof HistoryItemSchema>;
-type ChartData = { time: string; risk: number };
-
-export default function History() {
-  const [data, setData] = useState<ChartData[]>([]);
+export default function HistoryPage() {
+  const [historyData, setHistoryData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
-  const isMounted = useRef(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const fetchHistory = useCallback(async () => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    try {
-      const response = await fetch('/api/v1/history', { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        if (response.status === 401) throw new Error('Unauthorized – check API credentials');
-        if (response.status === 404) throw new Error('History endpoint not found');
-        if (response.status >= 500) throw new Error('Server error – please try later');
-        throw new Error(`HTTP error ${response.status}`);
-      }
-
-      const rawData = await response.json();
-      const validatedData = HistoryResponseSchema.parse(rawData);
-      
-      // Transform to chart format: { time: formatted timestamp, risk: risk_score }
-      const chartData = validatedData.map(item => ({
-        time: new Date(item.timestamp).toLocaleTimeString(),
-        risk: item.risk_score,
-      }));
-
-      if (isMounted.current) {
-        setData(chartData);
-        setFetchedAt(new Date());
-        setError(null);
-      }
-    } catch (err: unknown) {
-      if (isMounted.current) {
-        if (err instanceof Error && err.name === 'AbortError') {
-          setError('Request timed out – please check your connection');
-        } else if (err instanceof z.ZodError) {
-          setError('Unable to parse history data – invalid format from server');
-        } else if (err instanceof Error) {
-          setError(err.message || 'Failed to load history');
-        } else {
-          setError('Failed to load history');
-        }
-      }
-    } finally {
-      if (isMounted.current) setLoading(false);
-    }
-  }, []);
+  const refreshData = () => {
+    setLoading(true);
+    // Simulate network delay
+    setTimeout(() => {
+      const newData = generateMockHistory();
+      setHistoryData(newData);
+      setLastUpdated(new Date());
+      setLoading(false);
+    }, 500);
+  };
 
   useEffect(() => {
-    isMounted.current = true;
-    fetchHistory();
-    return () => { isMounted.current = false; };
-  }, [fetchHistory]);
+    refreshData();
+  }, []);
 
-  if (loading) {
-    return (
-      <div className="p-4 sm:p-8 max-w-6xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Risk History (Last 24h)</h1>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="h-[400px] bg-gray-200 animate-pulse rounded" />
-        </div>
-      </div>
-    );
-  }
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
 
-  if (error) {
+  if (loading && historyData.length === 0) {
     return (
-      <div className="p-4 sm:p-8 max-w-6xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Risk History (Last 24h)</h1>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="flex flex-col items-center justify-center h-[400px]">
-            <div role="alert" className="text-red-600 mb-4 text-center text-sm sm:text-base">{error}</div>
-            <button
-              onClick={() => { setLoading(true); fetchHistory(); }}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (data.length === 0) {
-    return (
-      <div className="p-4 sm:p-8 max-w-6xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Risk History (Last 24h)</h1>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="flex items-center justify-center h-[400px] text-gray-500 text-sm sm:text-base">
-            No history data available
-          </div>
-        </div>
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex items-center justify-center p-4">
+        <div className="text-xl animate-pulse">Loading history simulation...</div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 sm:p-8 max-w-6xl mx-auto">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-6">Risk History (Last 24h)</h1>
-      {fetchedAt && (
-        <p className="text-xs text-gray-500 mb-4">
-          Last updated: {fetchedAt.toLocaleTimeString()}
-        </p>
-      )}
-      <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
-        <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 60 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="time" 
-              tick={{ fontSize: 10, angle: -45, textAnchor: 'end' }} 
-              height={70} 
-              interval={0}
-              tickMargin={10}
-            />
-            <YAxis domain={[0, 1]} tick={{ fontSize: 12 }} />
-            <Tooltip 
-              formatter={(value: unknown) => typeof value === 'number' ? value.toFixed(2) : String(value ?? '')}
-              contentStyle={{ fontSize: '12px' }}
-            />
-            <Line type="monotone" dataKey="risk" stroke="#3b82f6" strokeWidth={2} dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Disclaimer */}
+          <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 text-center">
+            <p className="text-blue-200 text-sm">
+              📊 This is a <strong>simulated demo</strong> using mock data. The real ARF engine requires pilot access.
+              <a href="/signup" className="ml-2 underline font-semibold hover:text-blue-100">Request pilot access →</a>
+            </p>
+          </div>
+
+          {/* Header with refresh button */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold">Risk History</h1>
+              <p className="text-gray-400 text-sm mt-1">
+                Simulated risk score evolution over the last 30 days
+              </p>
+            </div>
+            <button
+              onClick={refreshData}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"
+            >
+              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+              Refresh
+            </button>
+          </div>
+
+          {/* Line chart */}
+          <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-blue-400" /> Risk Trend (30 days)
+            </h2>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={historyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis
+                    dataKey="timestamp"
+                    tickFormatter={formatDate}
+                    stroke="#9ca3af"
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    domain={[0, 1]}
+                    tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
+                    stroke="#9ca3af"
+                    tick={{ fontSize: 12 }}
+                  />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '0.5rem' }}
+                    labelStyle={{ color: '#fff' }}
+                    formatter={(value: number) => `${(value * 100).toFixed(1)}%`}
+                    labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="risk_score"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    dot={{ r: 3, fill: '#3b82f6' }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            {lastUpdated && (
+              <p className="text-xs text-gray-400 text-center mt-4">
+                Last updated: {lastUpdated.toLocaleTimeString()}
+              </p>
+            )}
+          </div>
+
+          {/* Recent decisions table */}
+          <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-purple-400" /> Recent Decisions (Simulated)
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left py-2 px-2 text-gray-400">Time</th>
+                    <th className="text-left py-2 px-2 text-gray-400">Service</th>
+                    <th className="text-right py-2 px-2 text-gray-400">Risk Score</th>
+                    <th className="text-right py-2 px-2 text-gray-400">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mockDecisions.map((decision) => (
+                    <tr key={decision.id} className="border-b border-gray-700/50 hover:bg-gray-700/30 transition">
+                      <td className="py-2 px-2 text-gray-300 whitespace-nowrap">{decision.timestamp}</td>
+                      <td className="py-2 px-2 text-gray-300">{decision.service}</td>
+                      <td className="py-2 px-2 text-right font-mono text-yellow-400">{(decision.risk * 100).toFixed(0)}%</td>
+                      <td className="py-2 px-2 text-right">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          decision.action === 'ESCALATE' ? 'bg-red-900 text-red-200' :
+                          decision.action === 'DENY' ? 'bg-orange-900 text-orange-200' :
+                          'bg-green-900 text-green-200'
+                        }`}>
+                          {decision.action}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-gray-500 mt-4 text-center">
+              Data shown is simulated for demonstration purposes only.
+            </p>
+          </div>
+
+          {/* Call to action */}
+          <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-2xl p-6 border border-gray-700 text-center">
+            <h2 className="text-xl font-semibold mb-2">Get real‑time risk history</h2>
+            <p className="text-gray-300 mb-4">Access detailed historical risk trends and audit trails.</p>
+            <a
+              href="/signup"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium transition"
+            >
+              Request Pilot Access <TrendingUp size={16} />
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
