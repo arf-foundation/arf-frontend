@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import History from '../app/history/page';
 
-// Mock recharts to avoid SVG rendering issues
 jest.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => children,
   LineChart: ({ children }: { children: React.ReactNode }) => <div data-testid="line-chart">{children}</div>,
@@ -72,7 +71,7 @@ describe('History Page (Simulated Demo)', () => {
   it('shows the call to action for pilot access', async () => {
     render(<History />);
     expect(await screen.findByText(/Get real‑time risk history/i)).toBeInTheDocument();
-    const ctaLink = await screen.findByRole('link', { name: /Request Pilot Access/i });
-    expect(ctaLink).toHaveAttribute('href', '/signup');
+    const pilotLink = await screen.findByText(/Request Pilot Access/i);
+    expect(pilotLink.closest('a')).toHaveAttribute('href', '/signup');
   });
 });
