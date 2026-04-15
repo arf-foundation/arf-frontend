@@ -13,9 +13,14 @@ export default function SignupPage() {
     fullName: '',
     email: '',
     company: '',
+    industry: '',
+    jobRole: '',
     useCase: '',
     expectedVolume: '',
     cloudEnvironment: '',
+    aiMaturity: '',
+    budgetRange: '',
+    timeline: '',
     agreeToTerms: false,
   });
 
@@ -34,13 +39,48 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    // Simulate API call – replace with your actual pilot request endpoint
+    // Validate all required fields
+    const requiredFields = ['fullName', 'email', 'company', 'industry', 'jobRole', 'useCase', 'expectedVolume', 'cloudEnvironment', 'aiMaturity', 'budgetRange', 'timeline'];
+    for (const field of requiredFields) {
+      if (!formData[field as keyof typeof formData]) {
+        setError('Please fill all required fields.');
+        setLoading(false);
+        return;
+      }
+    }
+    if (!formData.agreeToTerms) {
+      setError('You must agree to the Terms of Service and Privacy Policy.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      // In production: POST to /api/pilot/request
-      console.log('Pilot request submitted:', formData);
+      const response = await fetch('/api/pilot-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          company: formData.company,
+          industry: formData.industry,
+          jobRole: formData.jobRole,
+          useCase: formData.useCase,
+          expectedVolume: formData.expectedVolume,
+          cloudEnvironment: formData.cloudEnvironment,
+          aiMaturity: formData.aiMaturity,
+          budgetRange: formData.budgetRange,
+          timeline: formData.timeline,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Submission failed');
+      }
+
       setSubmitted(true);
     } catch (err) {
+      console.error(err);
       setError('Failed to submit request. Please email petter2025us@outlook.com directly.');
     } finally {
       setLoading(false);
@@ -82,6 +122,7 @@ export default function SignupPage() {
 
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5 sm:p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+            {/* Full name */}
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">
                 Full name *
@@ -97,6 +138,7 @@ export default function SignupPage() {
               />
             </div>
 
+            {/* Work email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
                 Work email *
@@ -112,6 +154,7 @@ export default function SignupPage() {
               />
             </div>
 
+            {/* Company */}
             <div>
               <label htmlFor="company" className="block text-sm font-medium text-gray-300 mb-1">
                 Company / Organisation *
@@ -127,6 +170,57 @@ export default function SignupPage() {
               />
             </div>
 
+            {/* Industry (new) */}
+            <div>
+              <label htmlFor="industry" className="block text-sm font-medium text-gray-300 mb-1">
+                Industry *
+              </label>
+              <select
+                id="industry"
+                name="industry"
+                required
+                value={formData.industry}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+              >
+                <option value="">Select industry</option>
+                <option value="Fintech / Banking">Fintech / Banking</option>
+                <option value="Healthcare / Life Sciences">Healthcare / Life Sciences</option>
+                <option value="Cloud Infrastructure / DevOps">Cloud Infrastructure / DevOps</option>
+                <option value="E‑commerce / Retail">E‑commerce / Retail</option>
+                <option value="Manufacturing / IoT">Manufacturing / IoT</option>
+                <option value="Government / Defense">Government / Defense</option>
+                <option value="Consulting / Services">Consulting / Services</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {/* Job Role (new) */}
+            <div>
+              <label htmlFor="jobRole" className="block text-sm font-medium text-gray-300 mb-1">
+                Job role / title *
+              </label>
+              <select
+                id="jobRole"
+                name="jobRole"
+                required
+                value={formData.jobRole}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+              >
+                <option value="">Select role</option>
+                <option value="CTO / VP Engineering">CTO / VP Engineering</option>
+                <option value="Director of AI / ML">Director of AI / ML</option>
+                <option value="Platform / SRE Lead">Platform / SRE Lead</option>
+                <option value="Solutions Architect">Solutions Architect</option>
+                <option value="ML / AI Engineer">ML / AI Engineer</option>
+                <option value="Security / Compliance Lead">Security / Compliance Lead</option>
+                <option value="Consultant / Advisor">Consultant / Advisor</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {/* Use case description */}
             <div>
               <label htmlFor="useCase" className="block text-sm font-medium text-gray-300 mb-1">
                 Use case description *
@@ -143,6 +237,7 @@ export default function SignupPage() {
               />
             </div>
 
+            {/* Expected monthly volume */}
             <div>
               <label htmlFor="expectedVolume" className="block text-sm font-medium text-gray-300 mb-1">
                 Expected monthly incident evaluations *
@@ -155,14 +250,15 @@ export default function SignupPage() {
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
               >
-                <option value="">Select...</option>
-                <option value="<1,000">&lt; 1,000</option>
+                <option value="">Select volume</option>
+                <option value="< 1,000">&lt; 1,000</option>
                 <option value="1,000–10,000">1,000 – 10,000</option>
                 <option value="10,000–100,000">10,000 – 100,000</option>
-                <option value=">100,000">&gt; 100,000</option>
+                <option value="> 100,000">&gt; 100,000</option>
               </select>
             </div>
 
+            {/* Cloud environment */}
             <div>
               <label htmlFor="cloudEnvironment" className="block text-sm font-medium text-gray-300 mb-1">
                 Cloud environment *
@@ -175,7 +271,7 @@ export default function SignupPage() {
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
               >
-                <option value="">Select...</option>
+                <option value="">Select cloud</option>
                 <option value="AWS">AWS</option>
                 <option value="Azure">Azure</option>
                 <option value="GCP">GCP</option>
@@ -184,6 +280,70 @@ export default function SignupPage() {
               </select>
             </div>
 
+            {/* AI maturity (new) */}
+            <div>
+              <label htmlFor="aiMaturity" className="block text-sm font-medium text-gray-300 mb-1">
+                Current AI maturity *
+              </label>
+              <select
+                id="aiMaturity"
+                name="aiMaturity"
+                required
+                value={formData.aiMaturity}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+              >
+                <option value="">Select maturity level</option>
+                <option value="Exploring / Proof of concept">Exploring / Proof of concept</option>
+                <option value="Advisory AI in production">Advisory AI in production</option>
+                <option value="Limited autonomous actions">Limited autonomous actions</option>
+                <option value="Full autonomous operations">Full autonomous operations</option>
+              </select>
+            </div>
+
+            {/* Budget range (new) */}
+            <div>
+              <label htmlFor="budgetRange" className="block text-sm font-medium text-gray-300 mb-1">
+                Annual budget for AI governance *
+              </label>
+              <select
+                id="budgetRange"
+                name="budgetRange"
+                required
+                value={formData.budgetRange}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+              >
+                <option value="">Select budget range</option>
+                <option value="< $10k">&lt; $10k</option>
+                <option value="$10k – $50k">$10k – $50k</option>
+                <option value="$50k – $200k">$50k – $200k</option>
+                <option value="> $200k">&gt; $200k</option>
+              </select>
+            </div>
+
+            {/* Timeline (new) */}
+            <div>
+              <label htmlFor="timeline" className="block text-sm font-medium text-gray-300 mb-1">
+                Planned deployment timeline *
+              </label>
+              <select
+                id="timeline"
+                name="timeline"
+                required
+                value={formData.timeline}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+              >
+                <option value="">Select timeline</option>
+                <option value="Immediate (< 1 month)">Immediate (&lt; 1 month)</option>
+                <option value="1–3 months">1–3 months</option>
+                <option value="3–6 months">3–6 months</option>
+                <option value="> 6 months / exploratory">&gt; 6 months / exploratory</option>
+              </select>
+            </div>
+
+            {/* Terms agreement */}
             <div className="flex items-start gap-3">
               <input
                 type="checkbox"
