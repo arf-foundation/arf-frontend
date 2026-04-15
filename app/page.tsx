@@ -51,7 +51,8 @@ interface RepoData {
 }
 
 // Sandbox endpoint – not the real engine
-const SANDBOX_CURL = `curl -X POST https://sandbox.arf.dev/v1/evaluate \\
+// UPDATED: now points to the public Hugging Face Space
+const SANDBOX_CURL = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
@@ -520,7 +521,7 @@ export default function LandingPage() {
           <DemoCard
             title="Sandbox API"
             description="Try a sanitized endpoint"
-            link="https://sandbox.arf.dev/docs"
+            link="https://huggingface.co/spaces/A-R-F/ARF-Sandbox-API"   // UPDATED: new Hugging Face Space
             buttonText="Try API"
             icon={<Code size={16} />}
             external
