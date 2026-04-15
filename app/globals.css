@@ -69,22 +69,23 @@ body {
 
 /* Reserve exact aspect ratio for Mermaid diagram */
 .mermaid-wrapper {
-  position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
   min-height: 300px;
   background-color: #1f2937; /* matches skeleton background */
   border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
 
 /* Ensure the SVG fills the wrapper without shifting */
 .mermaid-wrapper svg {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: 100%;
+  display: block;
 }
 
 /* Give feature cards a stable min-height – no collapse */
