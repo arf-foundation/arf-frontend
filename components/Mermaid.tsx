@@ -5,7 +5,7 @@ import mermaid from 'mermaid';
 
 // Initialize Mermaid once with dark theme and secure settings
 mermaid.initialize({
-  startOnLoad: false,        // We control rendering manually
+  startOnLoad: false,
   theme: 'dark',
   securityLevel: 'loose',
   flowchart: { useMaxWidth: true },
@@ -35,5 +35,5 @@ export default function Mermaid({ chart, className = "" }: { chart: string; clas
     renderDiagram();
   }, [chart]);
 
-  return <div ref={ref} className={`mermaid ${className}`} />;
+  return <div ref={ref} className={className} />;
 }
