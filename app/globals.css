@@ -67,12 +67,12 @@ body {
    STABLE DIMENSIONS – PREVENT FLICKERING & JUMPS
    ============================================ */
 
-/* Reserve exact aspect ratio for Mermaid diagram */
+/* Reserve exact aspect ratio for Mermaid diagram – centered */
 .mermaid-wrapper {
   width: 100%;
   aspect-ratio: 16 / 9;
   min-height: 300px;
-  background-color: #1f2937; /* matches skeleton background */
+  background-color: #1f2937;
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
