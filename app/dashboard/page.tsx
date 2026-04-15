@@ -201,12 +201,12 @@ export default function Dashboard() {
     }, 500);
   }, []);
 
-  // Initial load and auto‑refresh – safe to ignore lint rule (intended side effect)
+  // Initial load and auto‑refresh – disable lint rule for this call
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshData();
     const interval = setInterval(refreshData, 30000);
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
   }, [refreshData]);
 
   if (!riskData) {
