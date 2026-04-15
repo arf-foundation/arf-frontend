@@ -294,12 +294,12 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* How ARF Works – diagram rendered eagerly with stable dimensions */}
+      {/* How ARF Works – diagram rendered eagerly with stable dimensions and centered */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <div className="mermaid-wrapper relative w-full aspect-[16/9] min-h-[300px]">
-            <Mermaid chart={DIAGRAM} className="absolute inset-0 w-full h-full" />
+          <div className="mermaid-wrapper">
+            <Mermaid chart={DIAGRAM} />
           </div>
           <p className="text-xs text-gray-500 mt-2 text-center">Bayesian risk fusion → Expected loss minimisation → Approve/Deny/Escalate</p>
         </div>
@@ -717,8 +717,7 @@ export default function LandingPage() {
   );
 }
 
-// Helper components
-
+// Helper components (unchanged except for adding feature-card class)
 function EcoCard({ icon, title, description, details }: { icon: React.ReactNode; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   return (
