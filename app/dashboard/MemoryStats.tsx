@@ -1,56 +1,36 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { MemoryStats as MemoryStatsType } from '../types';
 import { HelpCircle } from 'lucide-react';
+
+// Mock memory stats – sandbox has no /v1/memory/stats endpoint
+const MOCK_STATS: MemoryStatsType = {
+  incident_nodes: 24,
+  outcome_nodes: 18,
+  edges: 42,
+  cache_hit_rate: 0.76,
+  is_operational: true,
+};
 
 export default function MemoryStats() {
   const [stats, setStats] = useState<MemoryStatsType | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-
-  const fetchStats = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/memory/stats`);
-      if (!response.ok) throw new Error(`HTTP ${response.status} - ${response.statusText}`);
-      const data: MemoryStatsType = await response.json();
-      setStats(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
-    fetchStats();
-  }, [fetchStats, retryCount]);
-
-  const handleRetry = () => setRetryCount(c => c + 1);
+    // Simulate network delay (optional)
+    const timer = setTimeout(() => {
+      setStats(MOCK_STATS);
+      setLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (loading) {
     return (
       <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
         <h3 className="font-semibold mb-2 text-gray-200">Memory Stats</h3>
         <p className="text-sm text-gray-400">Loading...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
-        <h3 className="font-semibold mb-2 text-gray-200">Memory Stats</h3>
-        <p className="text-sm text-red-400 mb-2">Error: {error}</p>
-        <button
-          onClick={handleRetry}
-          className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
-        >
-          Retry
-        </button>
       </div>
     );
   }
