@@ -52,38 +52,53 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* Fix 1: Override getInstalledRelatedApps before any script runs */}
+        {/* Override both getInstalledRelatedApps and getInstalledApps */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                if (typeof navigator !== 'undefined' && navigator.getInstalledRelatedApps) {
-                  var original = navigator.getInstalledRelatedApps;
-                  navigator.getInstalledRelatedApps = function() {
+                // Helper to create a safe rejecting function
+                function makeSafe(original, methodName) {
+                  return function() {
                     if (window === window.parent) {
-                      return original.apply(this, arguments);
+                      return original ? original.apply(this, arguments) : Promise.reject(new Error(methodName + ' not available'));
                     } else {
                       return Promise.reject(new DOMException(
-                        'getInstalledRelatedApps is only allowed in top-level browsing contexts',
+                        methodName + ' is only allowed in top-level browsing contexts',
                         'InvalidStateError'
                       ));
                     }
                   };
                 }
-              })();
-            `,
-          }}
-        />
-        {/* Fix 2: Suppress unhandled rejections from getInstalledRelatedApps */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.addEventListener('unhandledrejection', function(event) {
-                if (event.reason && event.reason.message && event.reason.message.includes('getInstalledRelatedApps')) {
-                  event.preventDefault();
-                  console.debug('Ignored getInstalledRelatedApps error (non-top-level context)');
+
+                if (typeof navigator !== 'undefined') {
+                  // Override getInstalledRelatedApps
+                  if (navigator.getInstalledRelatedApps) {
+                    navigator.getInstalledRelatedApps = makeSafe(navigator.getInstalledRelatedApps, 'getInstalledRelatedApps');
+                  } else {
+                    // Define it to reject if not present
+                    navigator.getInstalledRelatedApps = makeSafe(null, 'getInstalledRelatedApps');
+                  }
+
+                  // Override getInstalledApps (non-standard, used by some PWA scripts)
+                  if (navigator.getInstalledApps) {
+                    navigator.getInstalledApps = makeSafe(navigator.getInstalledApps, 'getInstalledApps');
+                  } else {
+                    navigator.getInstalledApps = makeSafe(null, 'getInstalledApps');
+                  }
                 }
-              });
+
+                // Suppress unhandled rejections from these methods
+                window.addEventListener('unhandledrejection', function(event) {
+                  if (event.reason && event.reason.message && (
+                    event.reason.message.includes('getInstalledRelatedApps') ||
+                    event.reason.message.includes('getInstalledApps')
+                  )) {
+                    event.preventDefault();
+                    console.debug('Ignored ' + event.reason.message);
+                  }
+                });
+              })();
             `,
           }}
         />
