@@ -92,6 +92,27 @@ All changes are reviewed and merged at the founder’s discretion.
 
 For questions about pilot access or enterprise licensing, email **petter2025us@outlook.com**.
 
+## Known Limitations & Troubleshooting
+
+### Sandbox API Limitations
+- The public sandbox API is **rate‑limited** and returns **simulated responses only**. It does **not** perform real Bayesian inference or access the protected ARF engine.
+- The sandbox does **not** provide history (`/v1/history`) or memory (`/v1/memory/stats`) endpoints. Consequently, components like `RecentDecisions` and `MemoryStats` use local mock data.
+- Evaluation responses are transformed from the sandbox’s `recommendation` and `justification` fields into the `EvaluateResponse` shape expected by the frontend. The confidence interval and epistemic uncertainty are derived heuristically.
+
+### Build & Deployment Issues
+- **Private repository on Vercel Hobby plan:** Vercel’s free plan does **not** support private repositories owned by an organization. If you encounter deployment failures after making the repo private, either upgrade to Vercel Pro or make the repository public.
+- **Missing environment variables:** The frontend does **not** require `NEXT_PUBLIC_API_URL` or `NEXT_PUBLIC_USE_MOCK_DATA`. These variables are ignored. The API target is hardcoded in `next.config.ts` rewrites.
+- **Service worker errors:** If you see `getInstalledRelatedApps` errors in the console, they are suppressed by an inline script in `layout.tsx` and by disabling PWA in `next.config.ts`. This does not affect functionality.
+
+### Development Workflow
+- After cloning, run `yarn install` and `yarn dev`. No additional configuration is needed.
+- To test the sandbox API integration locally, ensure you have an internet connection – the frontend will call `https://A-R-F-ARF-Sandbox-API.hf.space/v1/evaluate`.
+- If you need to point to a different API backend, modify the `rewrites` section in `next.config.ts`.
+
+### Reporting Issues
+- For bugs in the public frontend, please open an issue on GitHub.
+- For questions about the protected core engine or pilot access, email **petter2025us@outlook.com**.
+
 ## License
 
 This repository (`arf-frontend`) is licensed under the **Apache 2.0 License** – see the [LICENSE](LICENSE) file for details.
