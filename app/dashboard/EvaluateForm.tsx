@@ -70,20 +70,47 @@ export default function EvaluateForm() {
     setError(null);
     try {
       const parsedMetrics = JSON.parse(metrics);
-      const payload: IncidentReport = {
+      const payload = {
         service_name: service,
         event_type: eventType,
         severity,
         metrics: parsedMetrics,
+        timestamp: Date.now() / 1000,
       };
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/incidents/evaluate`, {
+
+      // Use the rewrite – this goes to /api/v1/evaluate -> sandbox API
+      const response = await fetch('/api/v1/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+
       if (!response.ok) throw new Error('Evaluation failed');
-      const data: EvaluateResponse = await response.json();
-      setResult(data);
+      const sandboxData = await response.json();
+
+      // Transform sandbox response to frontend's EvaluateResponse
+      const transformed: EvaluateResponse = {
+        risk_score: sandboxData.risk_score,
+        epistemic_uncertainty: 1 - sandboxData.confidence,
+        confidence_interval: [
+          Math.max(0, sandboxData.risk_score - 0.1),
+          Math.min(1, sandboxData.risk_score + 0.1),
+        ],
+        risk_contributions: [],
+        similar_incidents: [],
+        recommended_actions: [
+          {
+            action_type: sandboxData.recommendation.toLowerCase(),
+            description: sandboxData.justification,
+            confidence: sandboxData.confidence,
+            prerequisites: [],
+          },
+        ],
+        explanation: sandboxData.justification,
+        policy_violations: sandboxData.policy_violations || [],
+        requires_escalation: sandboxData.recommendation === 'ESCALATE',
+      };
+      setResult(transformed);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
