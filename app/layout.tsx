@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/next';
-import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
+import ServiceWorkerRegister from '../components/ServiceWorkerRegister'; // fixed relative path
 import './globals.css';
 
 export const metadata: Metadata = {
