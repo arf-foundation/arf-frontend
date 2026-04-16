@@ -546,11 +546,10 @@ export default function LandingPage() {
         <p className="text-center text-xs text-gray-500 mt-4">All demos use simulated or sanitized data and do not expose the protected core engine.</p>
       </section>
 
-      {/* Repository Links */}
+      {/* Repository Links - UPDATED: removed arf-frontend, centered the remaining two */}
       <section ref={reposRef} className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${reposInView ? 'opacity-100' : 'opacity-0'}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Public Repository Links</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-          <RepoCard name="arf-frontend" desc="Public dashboard UI (this site)" url="https://github.com/arf-foundation/arf-frontend" />
+        <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
           <RepoCard name="arf-spec" desc="Canonical specification – data models, API contracts" url="https://github.com/arf-foundation/arf-spec" />
           <RepoCard name="pitch-deck" desc="Public overview and vision" url="https://github.com/arf-foundation/pitch-deck" />
         </div>
@@ -816,7 +815,7 @@ function RepoCard({ name, desc, url }: { name: string; desc: string; url: string
   }, [repoName]);
 
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition block group">
+    <a href={url} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition block group w-full sm:w-80">
       <div className="flex items-start justify-between">
         <h3 className="font-mono text-sm text-gray-300 group-hover:text-white transition-colors">{name}</h3>
         <div className="flex items-center gap-2 text-xs">
