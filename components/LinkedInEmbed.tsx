@@ -31,7 +31,7 @@ export default function LinkedInEmbed() {
             loading="lazy"
             className="mx-auto"
             style={{ display: 'block', height: '450px' }}
-            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-popups-to-escape-sandbox"
           />
         ) : (
           <div className="h-[450px] flex items-center justify-center text-gray-400">
