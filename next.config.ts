@@ -28,8 +28,13 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   turbopack: {},
   async rewrites() {
-    // No direct rewrites – we now use internal proxy routes under /api/proxy/
-    return [];
+    // Forward all /api/v1/* requests to the public Sandbox API
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: 'https://A-R-F-ARF-Sandbox-API.hf.space/v1/:path*',
+      },
+    ];
   },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
