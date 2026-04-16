@@ -8,6 +8,31 @@ interface ExtendedDecision extends Decision {
   action?: 'approve' | 'deny' | 'escalate';
 }
 
+// Optional: seed some mock decisions for demonstration
+const MOCK_DECISIONS: ExtendedDecision[] = [
+  {
+    decision_id: 'mock-001',
+    outcome: 'success',
+    timestamp: new Date().toISOString(),
+    risk_score: 0.25,
+    action: 'approve',
+  },
+  {
+    decision_id: 'mock-002',
+    outcome: 'pending',
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    risk_score: 0.67,
+    action: 'escalate',
+  },
+  {
+    decision_id: 'mock-003',
+    outcome: 'failure',
+    timestamp: new Date(Date.now() - 7200000).toISOString(),
+    risk_score: 0.89,
+    action: 'deny',
+  },
+];
+
 export default function RecentDecisions() {
   const [decisions, setDecisions] = useState<ExtendedDecision[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,18 +42,12 @@ export default function RecentDecisions() {
   const fetchDecisions = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/history`, {
-        headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
-      });
-      if (!res.ok) throw new Error('Failed to fetch history');
-      const data: Decision[] = await res.json();
-      const enriched = data.map(d => ({
-        ...d,
-        action: d.risk_score !== undefined
-          ? (d.risk_score < 0.2 ? 'approve' : d.risk_score > 0.8 ? 'deny' : 'escalate') as 'approve' | 'deny' | 'escalate'
-          : undefined
-      }));
-      setDecisions(enriched);
+      // Sandbox has no /history endpoint – use mock data instead
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // You can replace MOCK_DECISIONS with [] to show "No decisions yet"
+      setDecisions(MOCK_DECISIONS);
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -42,18 +61,11 @@ export default function RecentDecisions() {
 
   const handleFeedback = async (decisionId: string, success: boolean) => {
     setFeedbackLoading(decisionId);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/feedback?decision_id=${decisionId}&success=${success}`,
-        { method: 'POST', headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' } }
-      );
-      if (!res.ok) throw new Error('Feedback failed');
-      await fetchDecisions();
-    } catch (err) {
-      console.error('Feedback error:', err);
-    } finally {
-      setFeedbackLoading(null);
-    }
+    // Sandbox has no feedback endpoint – just log and pretend success
+    console.log(`[Mock] Feedback for ${decisionId}: ${success ? 'success' : 'failure'}`);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    // Optionally refresh decisions (mock stays same)
+    setFeedbackLoading(null);
   };
 
   if (loading) return <div className="animate-pulse h-24 bg-gray-800 rounded"></div>;
@@ -109,7 +121,7 @@ export default function RecentDecisions() {
                   className={`p-1 rounded hover:bg-gray-700 transition ${
                     dec.outcome === 'success' ? 'text-green-400' : 'text-gray-500'
                   }`}
-                  title="Mark as success"
+                  title="Mark as success (mock)"
                 >
                   <ThumbsUp size={16} />
                 </button>
@@ -119,7 +131,7 @@ export default function RecentDecisions() {
                   className={`p-1 rounded hover:bg-gray-700 transition ${
                     dec.outcome === 'failure' ? 'text-red-400' : 'text-gray-500'
                   }`}
-                  title="Mark as failure"
+                  title="Mark as failure (mock)"
                 >
                   <ThumbsDown size={16} />
                 </button>
