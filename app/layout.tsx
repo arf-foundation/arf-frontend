@@ -52,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* CRITICAL FIX: Override getInstalledRelatedApps before any script runs */}
+        {/* Fix 1: Override getInstalledRelatedApps before any script runs */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -71,6 +71,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   };
                 }
               })();
+            `,
+          }}
+        />
+        {/* Fix 2: Suppress unhandled rejections from getInstalledRelatedApps */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.addEventListener('unhandledrejection', function(event) {
+                if (event.reason && event.reason.message && event.reason.message.includes('getInstalledRelatedApps')) {
+                  event.preventDefault();
+                  console.debug('Ignored getInstalledRelatedApps error (non-top-level context)');
+                }
+              });
             `,
           }}
         />
