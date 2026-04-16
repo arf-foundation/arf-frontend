@@ -1,6 +1,9 @@
+'use client';
+
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/next';
+import { useEffect } from 'react';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -20,14 +23,7 @@ export const metadata: Metadata = {
     description: 'Stewarded, pilot‑first reliability framework for AI systems. Core engine is access‑controlled.',
     url: 'https://arf-frontend-sandy.vercel.app',
     siteName: 'ARF',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'ARF Dashboard Preview',
-      },
-    ],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'ARF Dashboard Preview' }],
     locale: 'en_US',
     type: 'website',
   },
@@ -44,9 +40,7 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'ARF',
   },
-  formatDetection: {
-    telephone: false,
-  },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
@@ -56,11 +50,16 @@ export const viewport: Viewport = {
   themeColor: '#3b82f6',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Register service worker for PWA offline support (fixes missing SW)
+  useEffect(() => {
+    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+      navigator.serviceWorker.register('/sw.js').catch((err) =>
+        console.error('Service worker registration failed:', err)
+      );
+    }
+  }, []);
+
   return (
     <html lang="en">
       <head>
@@ -73,10 +72,8 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className="min-h-screen bg-gray-100">
-        {/* Navigation – now responsive with flex-wrap */}
         <nav className="bg-gray-800 text-white shadow-md" aria-label="Main navigation">
           <div className="container mx-auto flex flex-wrap items-center justify-between gap-3 p-4">
-            {/* Left side menu */}
             <div className="flex flex-wrap items-center gap-4">
               <Link href="/" className="font-bold hover:underline">ARF</Link>
               <Link href="/dashboard" className="hover:underline">Dashboard</Link>
@@ -85,20 +82,11 @@ export default function RootLayout({
               <Link href="/faq" className="hover:underline">FAQ</Link>
               <Link href="/pricing" className="hover:underline font-medium text-blue-400">Access Models</Link>
             </div>
-            {/* Right side buttons */}
             <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/signup"
-                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition"
-              >
+              <Link href="/signup" className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition">
                 Request Pilot Access
               </Link>
-              <a
-                href="https://arf-foundation.github.io/arf-spec/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline text-sm"
-              >
+              <a href="https://arf-foundation.github.io/arf-spec/" target="_blank" rel="noopener noreferrer" className="hover:underline text-sm">
                 Spec
               </a>
             </div>
