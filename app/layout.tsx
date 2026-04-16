@@ -1,9 +1,7 @@
-'use client';
-
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/next';
-import { useEffect } from 'react';
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -51,24 +49,6 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // FIX: Register service worker ONLY in top‑level window and after load
-  // This prevents getInstalledRelatedApps from being called in non‑top‑level contexts
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      window === window.parent && // Ensures we are in the top‑level browsing context
-      'serviceWorker' in navigator &&
-      process.env.NODE_ENV === 'production'
-    ) {
-      // Delay registration to avoid race conditions with Workbox's getInstalledRelatedApps
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch((err) =>
-          console.error('Service worker registration failed:', err)
-        );
-      });
-    }
-  }, []);
-
   return (
     <html lang="en">
       <head>
@@ -103,6 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </nav>
         <main>{children}</main>
         <Analytics />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
