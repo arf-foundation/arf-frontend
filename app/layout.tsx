@@ -51,12 +51,21 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Register service worker for PWA offline support (fixes missing SW)
+  // FIX: Register service worker ONLY in top‑level window and after load
+  // This prevents getInstalledRelatedApps from being called in non‑top‑level contexts
   useEffect(() => {
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-      navigator.serviceWorker.register('/sw.js').catch((err) =>
-        console.error('Service worker registration failed:', err)
-      );
+    if (
+      typeof window !== 'undefined' &&
+      window === window.parent && // Ensures we are in the top‑level browsing context
+      'serviceWorker' in navigator &&
+      process.env.NODE_ENV === 'production'
+    ) {
+      // Delay registration to avoid race conditions with Workbox's getInstalledRelatedApps
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch((err) =>
+          console.error('Service worker registration failed:', err)
+        );
+      });
     }
   }, []);
 
