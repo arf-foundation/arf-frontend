@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/next';
-import ServiceWorkerRegister from '../components/ServiceWorkerRegister'; // fixed relative path
+import ServiceWorkerRegister from '../components/ServiceWorkerRegister';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -52,6 +52,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        {/* CRITICAL FIX: Override getInstalledRelatedApps before any script runs */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                if (typeof navigator !== 'undefined' && navigator.getInstalledRelatedApps) {
+                  var original = navigator.getInstalledRelatedApps;
+                  navigator.getInstalledRelatedApps = function() {
+                    if (window === window.parent) {
+                      return original.apply(this, arguments);
+                    } else {
+                      return Promise.reject(new DOMException(
+                        'getInstalledRelatedApps is only allowed in top-level browsing contexts',
+                        'InvalidStateError'
+                      ));
+                    }
+                  };
+                }
+              })();
+            `,
+          }}
+        />
         <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.ico" />
