@@ -1,32 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
-
-// Helper component for code blocks with copy buttons – touch‑friendly on mobile
-  const [copied, setCopied] = useState(false);
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="relative group">
-      <pre className="bg-gray-900 p-3 rounded-lg text-xs sm:text-sm text-green-300 overflow-x-auto whitespace-pre-wrap font-mono">
-        {code}
-      </pre>
-      <button
-        onClick={copyToClipboard}
-        className="absolute top-2 right-2 p-1.5 sm:p-1 bg-gray-700 rounded opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition focus:opacity-100"
-        aria-label="Copy code"
-      >
-        {copied ? <Check size={16} className="text-green-400" /> : <Copy size={16} className="text-gray-300" />}
-      </button>
-    </div>
-  );
-};
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function FAQPage() {
   return (
