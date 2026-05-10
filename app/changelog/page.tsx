@@ -14,7 +14,7 @@ interface ChangelogEntry {
 }
 
 // Sandbox API snippet (mock, not real engine)
-const CURL_COMMAND = `curl -X POST https://sandbox.arf.dev/v1/evaluate \\
+const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 

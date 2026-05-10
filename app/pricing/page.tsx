@@ -11,7 +11,7 @@ export default function PricingPage() {
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   const handleCopyEmail = async () => {
-    await navigator.clipboard.writeText('petter2025us@outlook.com');
+    await navigator.clipboard.writeText('juan@arf-ai.com');
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
   };
@@ -37,7 +37,7 @@ export default function PricingPage() {
             <ul className="space-y-2 sm:space-y-3 flex-1">
               <li className="flex items-center gap-2 text-xs sm:text-sm">
                 <Check size={16} className="text-green-400 flex-shrink-0" />
-                <span>100 evaluations/month</span>
+                <span>1,000 advisory evaluations/month</span>
               </li>
               <li className="flex items-center gap-2 text-xs sm:text-sm">
                 <Check size={16} className="text-green-400 flex-shrink-0" />
@@ -115,15 +115,15 @@ export default function PricingPage() {
               </li>
               <li className="flex items-center gap-2 text-xs sm:text-sm">
                 <Check size={16} className="text-green-400 flex-shrink-0" />
-                <span>99.9% uptime SLA</span>
+                <span>SLA and deployment options discussed during pilot</span>
               </li>
               <li className="flex items-center gap-2 text-xs sm:text-sm">
                 <Check size={16} className="text-green-400 flex-shrink-0" />
-                <span>SSO, on‑prem deployment</span>
+                <span>SSO and custom deployment available</span>
               </li>
               <li className="flex items-center gap-2 text-xs sm:text-sm">
                 <Check size={16} className="text-green-400 flex-shrink-0" />
-                <span>Pricing tied to MTTR reduction</span>
+                <span>Outcome‑based pricing tied to measured risk reduction</span>
               </li>
             </ul>
             <p className="text-xs text-gray-400 mt-4 border-t border-gray-700 pt-3">

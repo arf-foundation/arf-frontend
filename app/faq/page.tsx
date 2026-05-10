@@ -95,7 +95,12 @@ export default function FAQPage() {
             />
             <FAQItem
               question="Is there a community Slack?"
-              answer="Yes, we have a Slack workspace for pilot customers and community discussions. <a href='https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg' target='_blank' rel='noopener noreferrer' className='text-blue-400 hover:underline'>Join here</a>."
+              answer=<>
+              Yes, we have a Slack workspace for pilot customers and community discussions.{" "}
+              <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                Join here
+              </a>.
+            </>
             />
           </div>
         </section>
