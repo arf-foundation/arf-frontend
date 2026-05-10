@@ -84,6 +84,13 @@ export default function LandingPage() {
   const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
 
+  // Live sandbox "Try it" state
+  const [sandboxLoading, setSandboxLoading] = useState(false);
+  const [sandboxResponse, setSandboxResponse] = useState<Record<string, unknown> | null>(null);
+  const [sandboxError, setSandboxError] = useState<string | null>(null);
+  const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
+
+
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText('petter2025us@outlook.com');
     setCopiedEmail(true);
@@ -101,6 +108,40 @@ export default function LandingPage() {
     setCopiedFullSnippet(true);
     setTimeout(() => setCopiedFullSnippet(false), 2000);
   };
+
+  // Live sandbox fetch
+  const fetchSandboxResponse = async () => {
+    setSandboxLoading(true);
+    setSandboxError(null);
+    try {
+      const res = await fetch('https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_name: 'api',
+          event_type: 'latency',
+          severity: 'high',
+          metrics: { latency_ms: 450 },
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setSandboxResponse(data);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setSandboxError(message);
+    } finally {
+      setSandboxLoading(false);
+    }
+  };
+
+  const handleCopySandboxResponse = async () => {
+    if (!sandboxResponse) return;
+    await navigator.clipboard.writeText(JSON.stringify(sandboxResponse, null, 2));
+    setCopiedSandboxResponse(true);
+    setTimeout(() => setCopiedSandboxResponse(false), 2000);
+  };
+
   const trackSlackClick = () => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'slack_invite_click', { event_category: 'engagement' });
@@ -635,8 +676,9 @@ export default function LandingPage() {
           />
           <RepoCard
             name="arf-frontend"
-            desc="Public demo UI — Apache 2.0"
+            desc="Frontend dashboard — pilot access only"
             url="https://github.com/arf-foundation/arf-frontend"
+            isPrivate
           />
           <RepoCard
             name="arf-spec"
