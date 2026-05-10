@@ -65,7 +65,6 @@ const DIAGRAM = `flowchart TD
     style Loss fill:#e8f5e8,stroke:#1b5e20
     style Decision fill:#fce4ec,stroke:#b71c1c`;
 
-// Advisory API endpoint. Returns status: "oss_advisory_only".
 // The protected core engine is not exposed here.
 const CURL_COMMAND = `curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate \\
   -H "Content-Type: application/json" \\
@@ -92,7 +91,7 @@ export default function LandingPage() {
 
 
   const handleCopyEmail = async () => {
-    await navigator.clipboard.writeText('petter2025us@outlook.com');
+    await navigator.clipboard.writeText('juan@arf-ai.com');
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
   };
@@ -414,7 +413,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row justify-center gap-8">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-400">Sandbox</div>
-              <div className="text-gray-400 text-sm mt-1">Advisory / OSS</div>
+              <div className="text-gray-400 text-sm mt-1">Advisory only</div>
               <ul className="text-sm text-gray-300 mt-2 space-y-1 text-left">
                 <li>✓ 1,000 advisory evaluations/month</li>
                 <li>✓ Mock responses — not production engine</li>
@@ -712,9 +711,9 @@ export default function LandingPage() {
             <div className="flex flex-wrap justify-center gap-6">
               <div className="flex items-center gap-2">
                 <ContactLink
-                  href="mailto:petter2025us@outlook.com"
+                  href="mailto:juan@arf-ai.com"
                   icon={<Mail className="w-5 h-5" />}
-                  text="petter2025us@outlook.com"
+                  text="juan@arf-ai.com"
                   emoji="📬"
                 />
                 <button
@@ -760,7 +759,7 @@ export default function LandingPage() {
               evaluation volume.
             </p>
             <a
-              href="mailto:petter2025us@outlook.com?subject=ARF%20Pilot%20Access%20Request"
+              href="mailto:juan@arf-ai.com?subject=ARF%20Pilot%20Access%20Request"
               className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
             >
               <Mail className="w-4 h-4" /> Apply for Pilot Access

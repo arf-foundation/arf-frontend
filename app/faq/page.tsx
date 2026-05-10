@@ -32,7 +32,7 @@ export default function FAQPage() {
               question="How do I get access to the real engine?"
               answer={
                 <>
-                  Fill out the <a href="/signup" className="text-blue-400 hover:underline">pilot request form</a> or contact us at <a href="mailto:petter2025us@outlook.com" className="text-blue-400 hover:underline">petter2025us@outlook.com</a>.
+                  Fill out the <a href="/signup" className="text-blue-400 hover:underline">pilot request form</a> or contact us at <a href="mailto:juan@arf-ai.com" className="text-blue-400 hover:underline">juan@arf-ai.com</a>.
                 </>
               }
             />
