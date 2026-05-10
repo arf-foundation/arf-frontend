@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/next';
 import ServiceWorkerRegister from '../components/ServiceWorkerRegister';
+import NavBar from '../components/NavBar';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -111,26 +112,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className="min-h-screen bg-gray-100">
-        <nav className="bg-gray-800 text-white shadow-md" aria-label="Main navigation">
-          <div className="container mx-auto flex flex-wrap items-center justify-between gap-3 p-4">
-            <div className="flex flex-wrap items-center gap-4">
-              <Link href="/" className="font-bold hover:underline">ARF</Link>
-              <Link href="/dashboard" className="hover:underline">Dashboard</Link>
-              <Link href="/history" className="hover:underline">History</Link>
-              <Link href="/changelog" className="hover:underline">Changelog</Link>
-              <Link href="/faq" className="hover:underline">FAQ</Link>
-              <Link href="/pricing" className="hover:underline font-medium text-blue-400">Access Models</Link>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link href="/signup" className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition">
-                Request Pilot Access
-              </Link>
-              <a href="https://arf-foundation.github.io/arf-spec/" target="_blank" rel="noopener noreferrer" className="hover:underline text-sm">
-                Spec
-              </a>
-            </div>
-          </div>
-        </nav>
+        <NavBar />
         <main>{children}</main>
         <Analytics />
         <ServiceWorkerRegister />
