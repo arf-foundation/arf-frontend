@@ -581,28 +581,32 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Repository Links ────────────────────────────────────────────────── */}
+      {/* ── Open Specs & Protected Core ──────────────────────────────────────── */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
           reposInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Public Repositories</h2>
-        <p className="text-gray-400 text-center text-sm mb-10">
-          Private repositories (core engine, API control plane, enterprise) are not listed.
-          Access is restricted to pilots and enterprise customers.
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
+          Open Specs &amp; Protected Core
+        </h2>
+        <p className="text-gray-400 text-center text-sm max-w-2xl mx-auto mb-10">
+          The specification and demo UI are open source (Apache&#8209;2.0). The core
+          engine and API control plane are access&#8209;controlled — available only to
+          qualified pilots. This boundary preserves audit&#8209;grade integrity while
+          providing full transparency into APIs and decision rules.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <RepoCard
             name="agentic_reliability_framework"
-            desc="Protected core engine — pilot access only"
+            desc="Protected core engine — Bayesian risk scoring, semantic memory, governance loop."
             url="https://github.com/arf-foundation/agentic_reliability_framework"
             isPrivate
           />
           <RepoCard
             name="arf-api"
-            desc="API control plane — pilot access only"
+            desc="API control plane — governs access, enforces quotas, and logs every decision."
             url="https://github.com/arf-foundation/arf-api"
             isPrivate
           />
@@ -942,7 +946,7 @@ function RepoCard({
     <div
       className={`bg-gray-800 p-4 rounded-lg border transition ${
         isPrivate
-          ? 'border-gray-700 opacity-70 cursor-default'
+          ? 'border-gray-600 bg-gray-800/60'
           : 'border-gray-700 hover:border-blue-500 group'
       }`}
     >
@@ -952,8 +956,8 @@ function RepoCard({
         </h3>
         <div className="flex items-center gap-2 text-xs flex-shrink-0 ml-2">
           {isPrivate ? (
-            <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-400 flex items-center gap-1">
-              <Lock size={10} /> Pilot only
+            <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-400 flex items-center gap-1 border border-gray-600">
+              <Shield size={10} /> Access‑controlled
             </span>
           ) : repoData ? (
             <>
@@ -971,6 +975,14 @@ function RepoCard({
         </div>
       </div>
       <p className="text-gray-400 text-sm mt-1">{desc}</p>
+      {isPrivate && (
+        <Link
+          href="/signup"
+          className="inline-flex items-center gap-1 mt-3 text-xs text-blue-400 hover:text-blue-300 transition font-medium"
+        >
+          Apply for pilot access <ArrowRight size={12} />
+        </Link>
+      )}
     </div>
   );
 
