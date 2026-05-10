@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
 
 // Helper component for code blocks with copy buttons – touch‑friendly on mobile
-const CodeBlock = ({ code }: { code: string }) => {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
