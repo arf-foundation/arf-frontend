@@ -656,9 +656,9 @@ export default function LandingPage() {
           Open Specs &amp; Protected Core
         </h2>
         <p className="text-gray-400 text-center text-sm max-w-2xl mx-auto mb-10">
-          The specification and demo UI are open source (Apache&#8209;2.0). The core
-          engine and API control plane are access&#8209;controlled — available only to
-          qualified pilots. This boundary preserves audit&#8209;grade integrity while
+          The specification and demo UI are open source (Apache‑2.0). The core
+          engine and API control plane are access‑controlled — available only to
+          qualified pilots. This boundary preserves audit‑grade integrity while
           providing full transparency into APIs and decision rules.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -675,14 +675,14 @@ export default function LandingPage() {
             isPrivate
           />
           <RepoCard
-            name="arf-frontend"
-            desc="Frontend dashboard — pilot access only"
-            url="https://github.com/arf-foundation/arf-frontend"
+            name="enterprise"
+            desc="Enterprise layer — tamper‑proof audit trails, SSO, and commercial SLAs."
+            url="https://github.com/arf-foundation/enterprise"
             isPrivate
           />
           <RepoCard
             name="arf-spec"
-            desc="Canonical specification — Apache 2.0"
+            desc="Canonical specification — data models, API contracts, decision rules (Apache‑2.0)."
             url="https://github.com/arf-foundation/arf-spec"
           />
         </div>
