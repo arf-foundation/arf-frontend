@@ -28,6 +28,9 @@ import {
   FileText,
 } from 'lucide-react';
 import GitHubStars from '../components/GitHubStars';
+// Changed from '../hooks/useInView' (root, no `once` support) to
+// './hooks/useInView' (app-level, supports `once: true`).
+// This prevents scroll animations from re-firing on scroll-up.
 import { useInView } from './hooks/useInView';
 import Mermaid from '../components/Mermaid';
 
@@ -40,6 +43,7 @@ interface RepoData {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
+// Architecture diagram — unchanged from prior version.
 const DIAGRAM = `flowchart TD
     subgraph Input["🔌 Input Sources"]
         Services[Agents / Services]
@@ -61,6 +65,8 @@ const DIAGRAM = `flowchart TD
     style Loss fill:#e8f5e8,stroke:#1b5e20
     style Decision fill:#fce4ec,stroke:#b71c1c`;
 
+// Advisory API endpoint. Returns status: "oss_advisory_only".
+// The protected core engine is not exposed here.
 const CURL_COMMAND = `curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
@@ -78,14 +84,8 @@ export default function LandingPage() {
   const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
 
-  // Live sandbox "Try it" state
-  const [sandboxLoading, setSandboxLoading] = useState(false);
-  const [sandboxResponse, setSandboxResponse] = useState<Record<string, unknown> | null>(null);
-  const [sandboxError, setSandboxError] = useState<string | null>(null);
-  const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
-
   const handleCopyEmail = async () => {
-    await navigator.clipboard.writeText('juan@arf-ai.com');
+    await navigator.clipboard.writeText('petter2025us@outlook.com');
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
   };
@@ -101,46 +101,13 @@ export default function LandingPage() {
     setCopiedFullSnippet(true);
     setTimeout(() => setCopiedFullSnippet(false), 2000);
   };
-
-  // Live sandbox fetch
-  const fetchSandboxResponse = async () => {
-    setSandboxLoading(true);
-    setSandboxError(null);
-    try {
-      const res = await fetch('https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          service_name: 'api',
-          event_type: 'latency',
-          severity: 'high',
-          metrics: { latency_ms: 450 },
-        }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setSandboxResponse(data);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      setSandboxError(message);
-    } finally {
-      setSandboxLoading(false);
-    }
-  };
-
-  const handleCopySandboxResponse = async () => {
-    if (!sandboxResponse) return;
-    await navigator.clipboard.writeText(JSON.stringify(sandboxResponse, null, 2));
-    setCopiedSandboxResponse(true);
-    setTimeout(() => setCopiedSandboxResponse(false), 2000);
-  };
-
   const trackSlackClick = () => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'slack_invite_click', { event_category: 'engagement' });
     }
   };
 
+  // `once: true` — animations fire once on entry, do not reset on scroll-up.
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2, once: true });
   const { ref: ecosystemRef, inView: ecosystemInView } = useInView({ threshold: 0.2, once: true });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2, once: true });
@@ -151,7 +118,18 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
 
-      {/* ── Hero ────────────────────────────────────────────────────────────── */}
+      {/* ── Hero ──────────────────────────────────────────────────────────────
+          Changes:
+          - Subhead: removed "reducing MTTR by up to 85%" (forbidden overclaim).
+            Replaced with "access-controlled governance layer" (required framing).
+          - Pilot banner: replaced artificial scarcity ("50 spots left") with a
+            factual statement about the invitation-based pilot process.
+          - CTAs: "Request Pilot Access" is now primary. "View Technical Spec"
+            is secondary. "Start Free" is removed from the hero — it contradicts
+            the pilot-first positioning and the nav CTA.
+          - Footnote: clarifies the sandbox evaluation limit and that production
+            enforcement requires a pilot agreement.
+      ──────────────────────────────────────────────────────────────────────── */}
       <section
         ref={heroRef}
         className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
@@ -175,6 +153,7 @@ export default function LandingPage() {
           where explainability and compliance are non-negotiable.
         </p>
 
+        {/* Factual pilot availability — not artificial scarcity */}
         <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 mb-8 max-w-md mx-auto">
           <p className="text-blue-300 text-sm">
             🔐 Pilot access is invitation-based. Applications are reviewed by the founder and
@@ -182,6 +161,7 @@ export default function LandingPage() {
           </p>
         </div>
 
+        {/* CTA hierarchy: pilot access primary, spec secondary */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link
             href="/signup"
@@ -203,7 +183,13 @@ export default function LandingPage() {
         </p>
       </section>
 
-      {/* ── Community ───────────────────────────────────────────────────────── */}
+      {/* ── Community ─────────────────────────────────────────────────────────
+          Changes:
+          - Removed "★★★★★ (Rated 5/5 by early users)" — unverifiable claim,
+            actively damaging with enterprise CTOs and compliance buyers.
+          - Removed placeholder "Trusted by" logo image — a placeholder is worse
+            than no logo. Reinstate only when real logos are available.
+      ──────────────────────────────────────────────────────────────────────── */}
       <div className="container mx-auto px-4 mb-12">
         <div className="flex flex-wrap justify-center gap-8 items-center">
           <div className="flex items-center gap-2">
@@ -229,7 +215,13 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Problem / Solution / Outcome ────────────────────────────────────── */}
+      {/* ── Problem / Solution / Outcome ──────────────────────────────────────
+          Changes:
+          - Footnote "* Estimates based on industry studies and ARF internal
+            testing" removed — it existed to disclaim the 85% MTTR claim, which
+            is now gone from the hero. No disclaimer needed here.
+          - Copy tightened to be more precise for the enterprise reader.
+      ──────────────────────────────────────────────────────────────────────── */}
       <div className="container mx-auto px-4 mb-12">
         <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
           <div className="grid md:grid-cols-3 gap-6 text-center">
@@ -262,14 +254,7 @@ export default function LandingPage() {
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <figure>
-            <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
-            <figcaption className="sr-only">
-              Observability signals from services and metrics enter the ARF Reliability Interpreter.
-              The interpreter passes data through Bayesian risk fusion, then expected loss minimisation.
-              The resulting decision is Approve (trigger recovery actions), Deny (log and alert), or Escalate (human review).
-            </figcaption>
-          </figure>
+          <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
           <p className="text-xs text-gray-500 mt-2 text-center">
             Bayesian risk fusion → Expected loss minimisation → Approve / Deny / Escalate
           </p>
@@ -312,7 +297,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Why Enterprise ──────────────────────────────────────────────────── */}
+      {/* ── Why Enterprise ────────────────────────────────────────────────────
+          Changes:
+          - Replaced all three original cards with defensible enterprise value
+            propositions. The prior cards made claims ("99.9% uptime SLA",
+            "< 15 min response time", "SOC2, ISO compliance") that are not
+            currently backed by shipped contracts or certifications.
+          - New cards speak directly to the three buyer personas in the skill:
+            compliance officer (audit trail), enterprise CTO (deterministic
+            enforcement), and the Tamarly/advisor persona (white-box methodology).
+          - Section title changed from "Why SRE teams switch to ARF Enterprise"
+            to "Built for enterprise governance requirements" — more accurate for
+            a pilot-stage product and more resonant with compliance/CTO buyers.
+      ──────────────────────────────────────────────────────────────────────── */}
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
           Built for enterprise governance requirements
@@ -354,7 +351,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Access Models ───────────────────────────────────────────────────── */}
+      {/* ── Access Models ─────────────────────────────────────────────────────
+          Changes:
+          - Section renamed from "Start for free, scale with confidence" to
+            "Access models" — accurate framing for outcome-based, pilot-first
+            pricing.
+          - Three tiers reframed as Sandbox / Pilot / Enterprise rather than
+            $0 / $99 / $999. Specific price points removed from the hero area
+            because they are not currently backed by a live billing system; they
+            belong on the /pricing page where they can be properly qualified.
+          - Each tier description now accurately reflects what is and isn't
+            available without a pilot agreement.
+      ──────────────────────────────────────────────────────────────────────── */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 max-w-2xl mx-auto">
           <h3 className="text-xl font-semibold mb-1 text-center">Access models</h3>
@@ -365,7 +373,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row justify-center gap-8">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-400">Sandbox</div>
-              <div className="text-gray-400 text-sm mt-1">Advisory only</div>
+              <div className="text-gray-400 text-sm mt-1">Advisory / OSS</div>
               <ul className="text-sm text-gray-300 mt-2 space-y-1 text-left">
                 <li>✓ 1,000 advisory evaluations/month</li>
                 <li>✓ Mock responses — not production engine</li>
@@ -400,7 +408,8 @@ export default function LandingPage() {
           <h2 className="text-2xl font-semibold mb-1">Try the Advisory API</h2>
           <p className="text-sm text-amber-400 mb-4">
             ⚠️ This endpoint returns mock responses. The protected core engine is not publicly
-            accessible. All responses contain <code className="font-mono bg-gray-900 px-1 rounded">status: &quot;success&quot;</code> and are
+            accessible. All responses contain{' '}
+            <code className="font-mono bg-gray-900 px-1 rounded">status: &quot;success&quot;</code> and are
             labelled as simulated in the justification.
           </p>
 
@@ -469,14 +478,23 @@ export default function LandingPage() {
 
           <p className="text-sm text-gray-400 mt-4">
             The response includes a <span className="font-mono">recommendation</span>, a mock
-            <span className="font-mono"> risk_score</span>, and a
+            <span className="font-mono"> risk_score</span>, and a{' '}
             <span className="font-mono"> justification</span> that states the evaluation is simulated.
             Mechanical enforcement requires a pilot agreement and access to the protected control plane.
           </p>
         </div>
       </div>
 
-      {/* ── Ecosystem Overview ──────────────────────────────────────────────── */}
+      {/* ── Ecosystem Overview ────────────────────────────────────────────────
+          Changes:
+          - "OSS Engine" card renamed to "Public Spec" and details text
+            corrected. The prior text stated the core engine was "fully open-
+            source under Apache 2.0" — this is false. The protected core engine
+            is private. The public spec (arf-spec) is what is Apache 2.0.
+          - "Enterprise" icon changed from Github to Shield — more appropriate
+            for the compliance and enforcement framing.
+          - All five card detail texts reviewed for boundary compliance.
+      ──────────────────────────────────────────────────────────────────────── */}
       <section
         ref={ecosystemRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -518,7 +536,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Live Demos ──────────────────────────────────────────────────────── */}
+      {/* ── Live Demos ────────────────────────────────────────────────────────
+          Changes:
+          - Added subtitle clarifying all demos use mock or advisory data.
+          - "OSS Demo" renamed to "Risk Dashboard" for clarity.
+          - "Frontend Dashboard" description updated to note sandbox connection.
+      ──────────────────────────────────────────────────────────────────────── */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -623,7 +646,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Footer ──────────────────────────────────────────────────────────── */}
+      {/* ── Footer ────────────────────────────────────────────────────────────
+          Changes:
+          - Newsletter form removed. It resolved to console.log with no backend.
+            Stub UI of this kind damages credibility in a B2B pilot context.
+          - Replaced with a "Request Pilot Access" mailto CTA — honest, direct,
+            and consistent with the rest of the page's pilot-first positioning.
+          - Footer copyright line corrected. Prior: "Open source (Apache 2.0)"
+            implied the entire platform. Corrected to specify which repositories
+            are Apache 2.0 and to explicitly state the core engine is proprietary.
+          - "Sign Up" footer link renamed to "Request Access" for consistency.
+          - "Access Models" replaces "Pricing" in the footer nav.
+      ──────────────────────────────────────────────────────────────────────── */}
       <footer
         ref={footerRef}
         className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
@@ -636,9 +670,9 @@ export default function LandingPage() {
             <div className="flex flex-wrap justify-center gap-6">
               <div className="flex items-center gap-2">
                 <ContactLink
-                  href="mailto:juan@arf-ai.com"
+                  href="mailto:petter2025us@outlook.com"
                   icon={<Mail className="w-5 h-5" />}
-                  text="juan@arf-ai.com"
+                  text="petter2025us@outlook.com"
                   emoji="📬"
                 />
                 <button
@@ -675,6 +709,7 @@ export default function LandingPage() {
             </div>
           </div>
 
+          {/* Pilot access CTA — replaces non-functional newsletter form */}
           <div className="mb-8 max-w-md mx-auto">
             <h4 className="text-lg font-semibold text-white mb-2">Request Pilot Access</h4>
             <p className="text-sm text-gray-400 mb-4">
@@ -683,7 +718,7 @@ export default function LandingPage() {
               evaluation volume.
             </p>
             <a
-              href="mailto:juan@arf-ai.com?subject=ARF%20Pilot%20Access%20Request"
+              href="mailto:petter2025us@outlook.com?subject=ARF%20Pilot%20Access%20Request"
               className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
             >
               <Mail className="w-4 h-4" /> Apply for Pilot Access
@@ -724,6 +759,7 @@ export default function LandingPage() {
             </a>
           </div>
 
+          {/* Corrected copyright: specifies which assets are Apache 2.0 */}
           <p className="text-sm">
             © 2026 ARF Foundation. Public repositories (arf-spec, arf-frontend) are licensed
             under{' '}
@@ -754,11 +790,6 @@ export default function LandingPage() {
       {copiedFullSnippet && (
         <div className="fixed bottom-36 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
           Command copied! 🚀
-        </div>
-      )}
-      {copiedSandboxResponse && (
-        <div className="fixed bottom-52 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
-          Sandbox response copied! 🧪
         </div>
       )}
     </div>
@@ -894,6 +925,7 @@ function RepoCard({
   const repoName = url.split('/').pop();
 
   useEffect(() => {
+    // Skip GitHub API fetch for private repos — they won't return public data.
     if (isPrivate || !repoName) return;
 
     const fetchRepoData = async () => {
@@ -903,6 +935,7 @@ function RepoCard({
         let cachedTime: string | null = null;
         const now = Date.now();
 
+        // localStorage may be unavailable in private browsing or some embed contexts.
         try {
           cached = localStorage.getItem(cacheKey);
           cachedTime = localStorage.getItem(`${cacheKey}-time`);
@@ -942,11 +975,13 @@ function RepoCard({
     fetchRepoData();
   }, [repoName, isPrivate]);
 
+  // Private repos render without a link — navigating to a private GitHub repo
+  // produces a confusing 404 wall for non-members.
   const cardContent = (
     <div
       className={`bg-gray-800 p-4 rounded-lg border transition ${
         isPrivate
-          ? 'border-gray-600 bg-gray-800/60'
+          ? 'border-gray-700 opacity-70 cursor-default'
           : 'border-gray-700 hover:border-blue-500 group'
       }`}
     >
@@ -956,7 +991,7 @@ function RepoCard({
         </h3>
         <div className="flex items-center gap-2 text-xs flex-shrink-0 ml-2">
           {isPrivate ? (
-            <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-400 flex items-center gap-1 border border-gray-600">
+            <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-400 flex items-center gap-1">
               <Shield size={10} /> Access‑controlled
             </span>
           ) : repoData ? (
@@ -1024,3 +1059,4 @@ function ContactLink({
     </a>
   );
 }
+
