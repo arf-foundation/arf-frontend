@@ -78,6 +78,12 @@ export default function LandingPage() {
   const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
 
+  // Live sandbox "Try it" state
+  const [sandboxLoading, setSandboxLoading] = useState(false);
+  const [sandboxResponse, setSandboxResponse] = useState<Record<string, unknown> | null>(null);
+  const [sandboxError, setSandboxError] = useState<string | null>(null);
+  const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
+
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText('juan@arf-ai.com');
     setCopiedEmail(true);
@@ -95,6 +101,40 @@ export default function LandingPage() {
     setCopiedFullSnippet(true);
     setTimeout(() => setCopiedFullSnippet(false), 2000);
   };
+
+  // Live sandbox fetch
+  const fetchSandboxResponse = async () => {
+    setSandboxLoading(true);
+    setSandboxError(null);
+    try {
+      const res = await fetch('https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_name: 'api',
+          event_type: 'latency',
+          severity: 'high',
+          metrics: { latency_ms: 450 },
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setSandboxResponse(data);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setSandboxError(message);
+    } finally {
+      setSandboxLoading(false);
+    }
+  };
+
+  const handleCopySandboxResponse = async () => {
+    if (!sandboxResponse) return;
+    await navigator.clipboard.writeText(JSON.stringify(sandboxResponse, null, 2));
+    setCopiedSandboxResponse(true);
+    setTimeout(() => setCopiedSandboxResponse(false), 2000);
+  };
+
   const trackSlackClick = () => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'slack_invite_click', { event_category: 'engagement' });
@@ -159,8 +199,7 @@ export default function LandingPage() {
           </a>
         </div>
         <p className="text-gray-400 text-sm mt-4">
-          ⚡ Sandbox includes 1,000 advisory evaluations/month. Production enforcement requires a
-          pilot agreement.
+          ⚡ Sandbox returns mock advisory responses (status: &quot;success&quot;). Real enforcement and audit trails require a pilot agreement.
         </p>
       </section>
 
@@ -223,7 +262,14 @@ export default function LandingPage() {
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
+          <figure>
+            <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
+            <figcaption className="sr-only">
+              Observability signals from services and metrics enter the ARF Reliability Interpreter.
+              The interpreter passes data through Bayesian risk fusion, then expected loss minimisation.
+              The resulting decision is Approve (trigger recovery actions), Deny (log and alert), or Escalate (human review).
+            </figcaption>
+          </figure>
           <p className="text-xs text-gray-500 mt-2 text-center">
             Bayesian risk fusion → Expected loss minimisation → Approve / Deny / Escalate
           </p>
@@ -353,13 +399,13 @@ export default function LandingPage() {
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-1">Try the Advisory API</h2>
           <p className="text-sm text-amber-400 mb-4">
-            ⚠️ This endpoint returns advisory responses only. The protected core engine is not
-            publicly accessible. The{' '}
-            <code className="font-mono bg-gray-900 px-1 rounded">status</code> field in every
-            response reads{' '}
-            <code className="font-mono bg-gray-900 px-1 rounded">oss_advisory_only</code>.
+            ⚠️ This endpoint returns mock responses. The protected core engine is not publicly
+            accessible. All responses contain <code className="font-mono bg-gray-900 px-1 rounded">status: &quot;success&quot;</code> and are
+            labelled as simulated in the justification.
           </p>
-          <div className="flex flex-col gap-3">
+
+          <div className="flex flex-col gap-4">
+            {/* Curl command with copy */}
             <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
               <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">
                 {CURL_COMMAND}
@@ -376,13 +422,57 @@ export default function LandingPage() {
                 )}
               </button>
             </div>
-            <p className="text-sm text-gray-400">
-              Returns a <span className="font-mono">HealingIntent</span> with Bayesian-fused risk
-              factors (conjugate / hyperprior / HMC) and an action recommendation based on expected
-              loss minimisation. Mechanical enforcement of the recommended action requires pilot
-              access to the protected control plane.
-            </p>
+
+            {/* Live Try-It button */}
+            <button
+              onClick={fetchSandboxResponse}
+              disabled={sandboxLoading}
+              className="self-start px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2 disabled:opacity-50"
+            >
+              {sandboxLoading ? (
+                <>
+                  <span className="animate-spin">⏳</span> Evaluating...
+                </>
+              ) : (
+                <>
+                  <Rocket size={16} /> Try it live
+                </>
+              )}
+            </button>
+
+            {/* Response display */}
+            {sandboxResponse && (
+              <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs font-mono text-gray-400">
+                    Live sandbox response (mock)
+                  </span>
+                  <button
+                    onClick={handleCopySandboxResponse}
+                    className="text-xs text-blue-400 hover:underline"
+                  >
+                    {copiedSandboxResponse ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+                <pre className="text-xs font-mono text-green-300 overflow-x-auto whitespace-pre-wrap">
+                  {JSON.stringify(sandboxResponse, null, 2)}
+                </pre>
+              </div>
+            )}
+
+            {sandboxError && (
+              <p className="text-sm text-red-400">
+                Failed to reach sandbox: {sandboxError}
+              </p>
+            )}
           </div>
+
+          <p className="text-sm text-gray-400 mt-4">
+            The response includes a <span className="font-mono">recommendation</span>, a mock
+            <span className="font-mono"> risk_score</span>, and a
+            <span className="font-mono"> justification</span> that states the evaluation is simulated.
+            Mechanical enforcement requires a pilot agreement and access to the protected control plane.
+          </p>
         </div>
       </div>
 
@@ -660,6 +750,11 @@ export default function LandingPage() {
       {copiedFullSnippet && (
         <div className="fixed bottom-36 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
           Command copied! 🚀
+        </div>
+      )}
+      {copiedSandboxResponse && (
+        <div className="fixed bottom-52 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
+          Sandbox response copied! 🧪
         </div>
       )}
     </div>
