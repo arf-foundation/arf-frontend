@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Calendar, Tag, ArrowRight, Copy, Check, Github, Rocket, Mail } from 'lucide-react';
+import { Calendar, Tag,  Copy, Check,   Mail } from 'lucide-react';
 import Link from 'next/link';
 
 // Types for our manual changelog entries

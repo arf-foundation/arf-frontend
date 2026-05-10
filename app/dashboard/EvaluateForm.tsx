@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { EvaluateResponse, IncidentReport } from '../types';
+import { EvaluateResponse } from '../types';
 
 type SeverityLevel = 'low' | 'medium' | 'high' | 'critical';
 

@@ -72,10 +72,10 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Notion API error:', error);
     return NextResponse.json(
-      { error: `Notion error: ${error?.message || 'Unknown'}` },
+      { error: `Notion error: ${error instanceof Error ? error.message : String(error) || 'Unknown'}` },
       { status: 500 }
     );
   }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Send, Check, Loader2, Shield, Clock, Eye, FileText } from 'lucide-react';
+import { Send, Check, Loader2, Shield,  Eye, FileText } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SignupPage() {
@@ -44,7 +44,7 @@ export default function SignupPage() {
       try {
         const parsed = JSON.parse(saved);
         setFormData(prev => ({ ...prev, ...parsed }));
-      } catch (e) {
+      } catch {
         // ignore parse errors
       }
     }
