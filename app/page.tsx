@@ -28,9 +28,6 @@ import {
   FileText,
 } from 'lucide-react';
 import GitHubStars from '../components/GitHubStars';
-// Changed from '../hooks/useInView' (root, no `once` support) to
-// './hooks/useInView' (app-level, supports `once: true`).
-// This prevents scroll animations from re-firing on scroll-up.
 import { useInView } from './hooks/useInView';
 import Mermaid from '../components/Mermaid';
 
@@ -43,19 +40,19 @@ interface RepoData {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-// System flow — abstract, enterprise‑safe.
+// High‑level flow suitable for public view, yet conveys the core control logic.
 const DIAGRAM = `flowchart TD
-    subgraph Input["Input Sources"]
-        S1[Infrastructure Signals]
-        S2[Application Telemetry]
+    subgraph Input["Infrastructure Signals & Telemetry"]
+        S1[Provisioning Requests]
+        S2[Runtime Health Metrics]
     end
-    S1 --> Eval[Evaluation & Risk Assessment]
+    S1 --> Eval[Structured Risk Assessment]
     S2 --> Eval
-    Eval --> Policy[Policy Enforcement]
-    Policy --> Decision{Action Decision}
-    Decision -->|Approved| Execute[Controlled Execution]
-    Decision -->|Denied| Alert[Alert & Audit Log]
-    Decision -->|Escalated| Review[Human Review]`;
+    Eval --> Policy[Policy Evaluation & Enforcement]
+    Policy --> Action{Decision}
+    Action -->|Approved| Execute[Controlled Execution]
+    Action -->|Denied| Alert[Alert & Audit Log]
+    Action -->|Escalated| Review[Human‑in‑the‑Loop Review]`;
 
 // Advisory API endpoint — not the protected engine.
 const CURL_COMMAND = `curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate \\
@@ -75,12 +72,11 @@ export default function LandingPage() {
   const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
 
-  // Live sandbox "Try it" state
+  // Live sandbox state
   const [sandboxLoading, setSandboxLoading] = useState(false);
   const [sandboxResponse, setSandboxResponse] = useState<Record<string, unknown> | null>(null);
   const [sandboxError, setSandboxError] = useState<string | null>(null);
   const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
-
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText('juan@arf-ai.com');
@@ -100,7 +96,6 @@ export default function LandingPage() {
     setTimeout(() => setCopiedFullSnippet(false), 2000);
   };
 
-  // Live sandbox fetch
   const fetchSandboxResponse = async () => {
     setSandboxLoading(true);
     setSandboxError(null);
@@ -139,7 +134,6 @@ export default function LandingPage() {
     }
   };
 
-  // `once: true` — animations fire once on entry, do not reset on scroll-up.
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2, once: true });
   const { ref: ecosystemRef, inView: ecosystemInView } = useInView({ threshold: 0.2, once: true });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2, once: true });
@@ -170,11 +164,11 @@ export default function LandingPage() {
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
           ARF is an{' '}
           <strong>access‑controlled governance layer</strong> that makes AI decisions
-          deterministic, auditable, and mechanically enforced — built for production environments
-          where explainability and compliance are non‑negotiable.
+          deterministic, auditable, and mechanically enforced — built for production
+          environments where explainability and compliance are non‑negotiable.
         </p>
 
-        {/* Factual pilot availability — not artificial scarcity */}
+        {/* Factual pilot availability */}
         <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 mb-8 max-w-md mx-auto">
           <p className="text-blue-300 text-sm">
             🔐 Pilot access is invitation‑based. Applications are reviewed by the founder and
@@ -200,7 +194,7 @@ export default function LandingPage() {
           </a>
         </div>
         <p className="text-gray-400 text-sm mt-4">
-          ⚡ Sandbox returns mock advisory responses (status: &quot;success&quot;). Real enforcement and
+          ⚡ The public sandbox returns mock advisory responses only. Real enforcement and
           audit trails require a pilot agreement.
         </p>
       </section>
@@ -239,15 +233,15 @@ export default function LandingPage() {
               <div className="text-red-400 font-bold text-xl mb-2">⚠️ Problem</div>
               <p className="text-gray-300">
                 AI agents fail silently in production, creating untraceable, unauditable decisions
-                that expose the organisation to operational risk and compliance gaps.
+                that expose organisations to operational risk and compliance gaps.
               </p>
             </div>
             <div>
               <div className="text-green-400 font-bold text-xl mb-2">🔧 Solution</div>
               <p className="text-gray-300">
                 ARF wraps AI outputs in a deterministic governance layer that evaluates,
-                constrains, and logs every decision using structured risk assessment and
-                flexible rule configuration.
+                constrains, and logs every decision using structured risk modeling and
+                configurable policy rules.
               </p>
             </div>
             <div>
@@ -269,13 +263,13 @@ export default function LandingPage() {
           <figure>
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
             <figcaption className="sr-only">
-              Infrastructure signals and telemetry enter an evaluation layer that assesses risk.
-              A policy layer determines the appropriate action, resulting in a controlled
-              execution, an alert with audit log, or human review.
+              Infrastructure signals flow into a structured risk assessment, which is checked
+              against configurable policies. The result is either a controlled execution, an
+              alert with audit log, or escalation to a human reviewer.
             </figcaption>
           </figure>
           <p className="text-xs text-gray-500 mt-2 text-center">
-            Signals → Structured Evaluation → Policy‑Enforced Decision
+            Incoming Signals → Risk Assessment → Policy‑Enforced Decision
           </p>
         </div>
       </div>
@@ -290,28 +284,28 @@ export default function LandingPage() {
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
-            title="Calibrated Risk Assessment"
-            description="Continuously adapts to observed outcomes, blending immediate feedback with long‑term patterns."
+            title="Online Risk Calibration"
+            description="Updates its confidence model continuously from observed outcomes, blending immediate feedback with deeper pattern analysis."
             icon={<Brain className="w-8 h-8 text-blue-400" />}
-            details="The system maintains a dynamic view of operational risk, combining real‑time learning with deeper historical analysis. The result is a single, calibrated confidence indicator that evolves with your environment."
+            details="The system maintains a per‑category confidence model that learns from every action. The final risk indicator is a weighted composite of real‑time and historical signals, always backed by a full audit trail."
           />
           <FeatureCard
-            title="Operational Context Recall"
-            description="Instantly surfaces relevant past incidents to inform current decisions."
+            title="Operational Context Retrieval"
+            description="Instantly surfaces similar past incidents so every decision is informed by prior experience."
             icon={<Network className="w-8 h-8 text-green-400" />}
-            details="A living record of previous events and their resolutions allows the system to identify comparable situations and recommend actions based on what worked in similar contexts."
+            details="A living graph of historical events and their resolutions lets the system find comparable situations and recommend actions that proved effective in similar contexts."
           />
           <FeatureCard
-            title="Optimized Decision Logic"
-            description="Selects the safest effective action by weighing trade‑offs, not by fixed thresholds."
+            title="Cost‑Optimized Decision Logic"
+            description="Selects the safest, most valuable action by balancing expected costs—not by a single threshold."
             icon={<Scale className="w-8 h-8 text-yellow-400" />}
-            details="Every possible action—approve, deny, or escalate—is evaluated through a structured cost‑benefit model that considers operational impact, recovery speed, and current confidence. The chosen action comes with a full, auditable justification."
+            details="Approve, deny, or escalate? Every option is evaluated against a configurable cost model that accounts for operational impact, restoration speed, and current confidence. The chosen action comes with a human‑readable, auditable justification."
           />
           <FeatureCard
-            title="Coordinated System Analysis"
-            description="Detects anomalies, traces root causes, and forecasts future reliability — all within a unified governance loop."
+            title="Coordinated System Inspection"
+            description="Anomaly detection, root‑cause tracing, and reliability forecasting run inside a unified governance loop."
             icon={<Cpu className="w-8 h-8 text-purple-400" />}
-            details="Multiple analysis modules work in concert to scan for early warnings, diagnose underlying issues, and project future health. Their outputs are consolidated to produce consistent, policy‑aligned recommendations."
+            details="Multiple analysis modules work together to detect early warnings, diagnose underlying issues, and forecast future health. Their outputs are consolidated into policy‑aligned recommendations."
           />
         </div>
       </section>
@@ -327,24 +321,24 @@ export default function LandingPage() {
             <h3 className="text-xl font-semibold mb-2">Tamper‑proof audit trail</h3>
             <p className="text-gray-400">
               Every decision is recorded, timestamped, and attributed. The resulting logs are
-              designed for regulatory review, post‑incident forensics, and compliance preparation.
+              designed for regulatory review, forensic analysis, and compliance preparation.
             </p>
           </div>
           <div className="bg-gray-800 p-6 rounded-lg">
             <Lock className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
             <h3 className="text-xl font-semibold mb-2">Deterministic enforcement</h3>
             <p className="text-gray-400">
-              Policy gates cannot be bypassed or silently degraded. Any override is logged,
-              ensuring that enforcement is mechanical, not advisory.
+              Policy gates that cannot be bypassed or silently degraded. Any override is
+              logged, making enforcement mechanical rather than advisory.
             </p>
           </div>
           <div className="bg-gray-800 p-6 rounded-lg">
             <Brain className="w-10 h-10 text-purple-400 mx-auto mb-3" />
             <h3 className="text-xl font-semibold mb-2">Transparent reasoning</h3>
             <p className="text-gray-400">
-              Every risk score is explainable through auditable, transparent reasoning — not a
-              black‑box prediction. Suitable for executive reporting, advisor repackaging, and
-              regulator briefings.
+              Every risk score is explainable through auditable, transparent logic — never a
+              black‑box. Suitable for executive reporting, regulator briefings, and third‑party
+              review.
             </p>
           </div>
         </div>
@@ -372,7 +366,7 @@ export default function LandingPage() {
               <div className="text-gray-400 text-sm mt-1">Advisory only</div>
               <ul className="text-sm text-gray-300 mt-2 space-y-1 text-left">
                 <li>✓ 1,000 advisory evaluations/month</li>
-                <li>✓ Mock responses — not the production engine</li>
+                <li>✓ Mock responses — not production</li>
                 <li>✓ Community support</li>
               </ul>
             </div>
@@ -380,8 +374,8 @@ export default function LandingPage() {
               <div className="text-2xl font-bold text-green-400">Pilot</div>
               <div className="text-gray-400 text-sm mt-1">Time‑limited · Free</div>
               <ul className="text-sm text-gray-300 mt-2 space-y-1 text-left">
-                <li>✓ Protected core engine access</li>
-                <li>✓ Outcome‑based pricing post‑pilot</li>
+                <li>✓ Protected core access</li>
+                <li>✓ Outcome‑based pricing after pilot</li>
                 <li>✓ Founder‑led onboarding</li>
               </ul>
             </div>
@@ -492,32 +486,32 @@ export default function LandingPage() {
           <EcoCard
             icon={<Rocket className="w-6 h-6 text-blue-400" />}
             title="Research"
-            description="Foundational work in reliability engineering"
-            details="Ongoing investigation into methods for validating AI‑generated outputs and quantifying uncertainty. This research anchors the framework’s approach to calibration and risk estimation."
+            description="Foundations in reliability engineering"
+            details="Ongoing investigation into validation methods for AI‑generated outputs, uncertainty quantification, and calibration. This work anchors the framework’s approach to risk estimation."
           />
           <EcoCard
             icon={<Code className="w-6 h-6 text-green-400" />}
             title="Public Specification"
-            description="Open standards for transparency"
-            details="The arf‑spec repository defines the canonical data models, API contracts, and decision rules. Licensed under Apache 2.0, it provides full transparency without exposing proprietary implementation details."
+            description="Open data models, API contracts, and decision rules"
+            details="The arf‑spec repository defines the canonical specification, licensed under Apache 2.0. It provides full transparency into the system’s contracts without exposing proprietary implementation details."
           />
           <EcoCard
             icon={<Users className="w-6 h-6 text-yellow-400" />}
-            title="Control Layer"
-            description="Access‑controlled governance API"
-            details="The protected control layer exposes governed endpoints for evaluation, audit queries, and quota management. The public sandbox returns only advisory mock responses."
+            title="API Control Plane"
+            description="Access‑controlled governance endpoints"
+            details="The protected control layer exposes governed operations for evaluation, audit queries, and quota management. The public sandbox returns only advisory mock responses."
           />
           <EcoCard
             icon={<BookOpen className="w-6 h-6 text-purple-400" />}
             title="Management Interface"
-            description="Visual dashboards for governance insights"
-            details="An interactive interface built with modern web technologies. Public demos show only mock data; connected instances provide real‑time visibility into decisions and system health."
+            description="Dashboards for governance insights"
+            details="An interactive interface built with modern web technologies. Public demos use mock data; connected instances provide real‑time visibility into decisions and system health."
           />
           <EcoCard
             icon={<Shield className="w-6 h-6 text-orange-400" />}
             title="Enterprise Extension"
             description="Enforcement, audit, and commercial support"
-            details="Adds mechanical enforcement with real‑world integrations, tamper‑proof logs, multi‑tenancy, and outcome‑based commercial terms. Available under a commercial license to qualified organizations."
+            details="Adds mechanical enforcement with real‑world integrations, tamper‑proof audit logs, multi‑tenancy, and outcome‑based commercial terms. Available under a commercial license to qualified organizations."
           />
         </div>
       </section>
@@ -604,7 +598,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <RepoCard
             name="agentic_reliability_framework"
-            desc="Protected core engine — calibrated risk assessment, operational context, governance loop."
+            desc="Protected core engine — online risk calibration, operational context, governance loop."
             url="https://github.com/arf-foundation/agentic_reliability_framework"
             isPrivate
           />
@@ -680,7 +674,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Pilot access CTA — replaces non-functional newsletter form */}
+          {/* Pilot access CTA */}
           <div className="mb-8 max-w-md mx-auto">
             <h4 className="text-lg font-semibold text-white mb-2">Request Pilot Access</h4>
             <p className="text-sm text-gray-400 mb-4">
@@ -730,7 +724,6 @@ export default function LandingPage() {
             </a>
           </div>
 
-          {/* Corrected copyright: specifies which assets are Apache 2.0 */}
           <p className="text-sm">
             © 2026 ARF Foundation. Public repositories (arf‑spec, arf‑frontend) are licensed
             under{' '}
@@ -896,7 +889,6 @@ function RepoCard({
   const repoName = url.split('/').pop();
 
   useEffect(() => {
-    // Skip GitHub API fetch for private repos — they won't return public data.
     if (isPrivate || !repoName) return;
 
     const fetchRepoData = async () => {
@@ -906,22 +898,17 @@ function RepoCard({
         let cachedTime: string | null = null;
         const now = Date.now();
 
-        // localStorage may be unavailable in private browsing or some embed contexts.
         try {
           cached = localStorage.getItem(cacheKey);
           cachedTime = localStorage.getItem(`${cacheKey}-time`);
-        } catch {
-          // localStorage unavailable — proceed without cache.
-        }
+        } catch {}
 
         if (cached && cachedTime && now - parseInt(cachedTime) < 3_600_000) {
           setRepoData(JSON.parse(cached));
           return;
         }
 
-        const response = await fetch(
-          `https://api.github.com/repos/arf-foundation/${repoName}`
-        );
+        const response = await fetch(`https://api.github.com/repos/arf-foundation/${repoName}`);
         if (!response.ok) throw new Error(`GitHub API ${response.status}`);
         const data = await response.json();
 
@@ -931,12 +918,7 @@ function RepoCard({
             language: data.language ?? null,
           };
           setRepoData(newData);
-          try {
-            localStorage.setItem(cacheKey, JSON.stringify(newData));
-            localStorage.setItem(`${cacheKey}-time`, String(now));
-          } catch {
-            // localStorage write failed — safe to ignore.
-          }
+          try { localStorage.setItem(cacheKey, JSON.stringify(newData)); localStorage.setItem(`${cacheKey}-time`, String(now)); } catch {}
         }
       } catch (err) {
         console.error(`Failed to fetch GitHub data for ${repoName}:`, err);
@@ -946,8 +928,6 @@ function RepoCard({
     fetchRepoData();
   }, [repoName, isPrivate]);
 
-  // Private repos render without a link — navigating to a private GitHub repo
-  // produces a confusing 404 wall for non-members.
   const cardContent = (
     <div
       className={`bg-gray-800 p-4 rounded-lg border transition ${
