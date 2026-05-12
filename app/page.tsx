@@ -153,7 +153,7 @@ export default function LandingPage() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
             Stop guessing.{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Govern every AI decision.
+              Govern every AI decision
             </span>
           </h1>
           <GitHubStars />
