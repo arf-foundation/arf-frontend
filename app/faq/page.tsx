@@ -18,21 +18,21 @@ export default function FAQPage() {
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
               question="What is ARF?"
-              answer="Agentic Reliability Framework (ARF) is a governance layer that uses Bayesian inference to evaluate infrastructure requests. It returns a recommendation – approve, deny, or escalate – with a calibrated risk score and a full explanation. The core engine is access‑controlled and available only to qualified pilots."
+              answer="ARF is a governance layer that evaluates infrastructure decisions through a calibrated risk model. It recommends one of three actions — approve, deny, or escalate — together with a confidence indicator and a full audit trail. The core engine is access‑controlled and available only to qualified pilots."
             />
             <FAQItem
               question="Is ARF open source?"
-              answer="Only the public specification, demo UI, and pitch deck are open source (Apache 2.0). The core Bayesian engine, API control plane, and enterprise features are proprietary and access‑controlled."
+              answer="No. ARF is proprietary and access‑controlled. All repositories are private, and access to code, specifications, and supporting materials is granted only through approved pilot or enterprise arrangements."
             />
             <FAQItem
-              question="What’s the difference between the public demo and the real engine?"
-              answer="The public demo UI and sandbox API use mock data only. They illustrate concepts but do not invoke the real Bayesian engine. The real engine requires pilot access and is offered under outcome‑based pricing."
+              question="What’s the difference between the demo and the real engine?"
+              answer="The demo is illustrative and uses mock or advisory data. It is designed to explain the workflow, not expose the protected engine. The real system is private and available only through pilot or enterprise access."
             />
             <FAQItem
               question="How do I get access to the real engine?"
               answer={
                 <>
-                  Fill out the <a href="/signup" className="text-blue-400 hover:underline">pilot request form</a> or contact us at <a href="mailto:juan@arf-ai.com" className="text-blue-400 hover:underline">juan@arf-ai.com</a>.
+                  Submit a <a href="/signup" className="text-blue-400 hover:underline">pilot request</a> or contact us at <a href="mailto:juan@arf-ai.com" className="text-blue-400 hover:underline">juan@arf-ai.com</a>. Access is reviewed case by case for qualified use cases.
                 </>
               }
             />
@@ -45,7 +45,7 @@ export default function FAQPage() {
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
               question="How do I interpret the risk score?"
-              answer="The risk score is a probability between 0 and 1. Higher values indicate higher estimated risk. The decision (approve/deny/escalate) is based on expected loss minimisation, not a fixed threshold."
+              answer="The risk indicator is a value between 0 and 1. Higher values indicate higher estimated risk. The recommended action — approve, deny, or escalate — comes from a structured trade‑off model, not a fixed threshold, and includes a full, auditable justification."
             />
             <FAQItem
               question="Can I use the sandbox API for production?"
@@ -53,7 +53,7 @@ export default function FAQPage() {
             />
             <FAQItem
               question="What is expected loss minimisation?"
-              answer="Expected loss minimisation calculates the cost of each possible action (approve, deny, escalate) based on configurable cost constants and the current risk distribution, then selects the action with the lowest expected loss."
+              answer="The system evaluates the potential cost of each possible action based on configurable parameters and the current risk assessment. It then selects the action with the lowest expected impact, producing a human‑readable, auditable justification."
             />
           </div>
         </section>
@@ -73,34 +73,29 @@ export default function FAQPage() {
           </div>
         </section>
 
-        {/* Contributing & Support */}
+        {/* Engagement & Support */}
         <section className="mb-10 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Contributing & Support</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Engagement & Support</h2>
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
-              question="How can I contribute to public repositories?"
-              answer={
-                <>
-                  See the <a href="https://github.com/arf-foundation/arf-frontend" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">README</a> for guidelines. We accept limited contributions to public repos (arf-spec, arf-frontend, pitch-deck) – bug fixes, documentation, demo improvements.
-                </>
-              }
+              question="How can I engage with ARF?"
+              answer="ARF is not accepting public contributions. Collaboration is handled through private pilot, partner, or enterprise channels. Reach out to discuss possible involvement."
             />
             <FAQItem
-              question="Where do I report a bug in the public demo?"
-              answer={
-                <>
-                  Open an issue on <a href="https://github.com/arf-foundation/arf-frontend/issues" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">GitHub</a>.
-                </>
-              }
+              question="Where do I report a bug in the demo?"
+              answer="Contact us directly through the support or pilot request channel. We review issues from approved users and pilot participants."
             />
             <FAQItem
               question="Is there a community Slack?"
-              answer=<>
-              Yes, we have a Slack workspace for pilot customers and community discussions.{" "}
-              <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-                Join here
-              </a>.
-            </>
+              answer={
+                <>
+                  There is an invite‑only Slack workspace for pilot customers and approved collaborators.{" "}
+                  <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                    Join here
+                  </a>
+                  .
+                </>
+              }
             />
           </div>
         </section>
@@ -110,8 +105,8 @@ export default function FAQPage() {
           <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Licensing</h2>
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
-              question="What license does the public specification use?"
-              answer="Apache 2.0. See the <a href='https://github.com/arf-foundation/arf-spec/blob/main/LICENSE' target='_blank' rel='noopener noreferrer' className='text-blue-400 hover:underline'>LICENSE</a> file."
+              question="What license governs ARF materials?"
+              answer="ARF materials are proprietary and access‑controlled. Any access to code, specifications, or supporting materials is governed by written agreement and approved use terms."
             />
             <FAQItem
               question="Can I use the real engine in a commercial product?"
@@ -121,7 +116,7 @@ export default function FAQPage() {
         </section>
 
         <p className="text-gray-400 text-xs sm:text-sm border-t border-gray-700 pt-4 mt-8">
-          For more help, see the <a href="https://github.com/arf-foundation/arf-spec" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">public specification</a> or <a href="/signup" className="text-blue-400 hover:underline">request pilot access</a>.
+          For more help, <a href="/signup" className="text-blue-400 hover:underline">request pilot access</a> or contact us directly.
         </p>
       </div>
     </div>
