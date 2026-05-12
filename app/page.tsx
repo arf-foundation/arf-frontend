@@ -40,7 +40,6 @@ interface RepoData {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-// High‑level flow suitable for public view, yet conveys the core control logic.
 const DIAGRAM = `flowchart TD
     subgraph Input["Infrastructure Signals & Telemetry"]
         S1[Provisioning Requests]
@@ -54,7 +53,6 @@ const DIAGRAM = `flowchart TD
     Action -->|Denied| Alert[Alert & Audit Log]
     Action -->|Escalated| Review[Human‑in‑the‑Loop Review]`;
 
-// Advisory API endpoint — not the protected engine.
 const CURL_COMMAND = `curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
@@ -72,7 +70,7 @@ export default function LandingPage() {
   const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
 
-  // Live sandbox state
+  // Live sandbox states
   const [sandboxLoading, setSandboxLoading] = useState(false);
   const [sandboxResponse, setSandboxResponse] = useState<Record<string, unknown> | null>(null);
   const [sandboxError, setSandboxError] = useState<string | null>(null);
@@ -155,7 +153,7 @@ export default function LandingPage() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
             Stop guessing.{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Govern every AI decision.
+              Govern every AI decision.
             </span>
           </h1>
           <GitHubStars />
@@ -163,20 +161,18 @@ export default function LandingPage() {
 
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
           ARF is an{' '}
-          <strong>access‑controlled governance layer</strong> that makes AI decisions
-          deterministic, auditable, and mechanically enforced — built for production
-          environments where explainability and compliance are non‑negotiable.
+          <strong>access‑controlled governance layer</strong> that transforms
+          probabilistic AI into deterministic, auditable, and mechanically enforced
+          outcomes — built for environments where trust is non‑negotiable.
         </p>
 
-        {/* Factual pilot availability */}
         <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 mb-8 max-w-md mx-auto">
           <p className="text-blue-300 text-sm">
-            🔐 Pilot access is invitation‑based. Applications are reviewed by the founder and
-            matched to qualified use cases.
+            🔐 Pilot access is by invitation only. Every application is personally
+            reviewed by the founder and matched to qualified use cases.
           </p>
         </div>
 
-        {/* CTA hierarchy: pilot access primary, spec secondary */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link
             href="/signup"
@@ -194,8 +190,8 @@ export default function LandingPage() {
           </a>
         </div>
         <p className="text-gray-400 text-sm mt-4">
-          ⚡ The public sandbox returns mock advisory responses only. Real enforcement and
-          audit trails require a pilot agreement.
+          ⚡ The public sandbox returns only mock advisory responses. Real enforcement,
+          audit trails, and confidence guarantees require a pilot agreement.
         </p>
       </section>
 
@@ -232,24 +228,25 @@ export default function LandingPage() {
             <div>
               <div className="text-red-400 font-bold text-xl mb-2">⚠️ Problem</div>
               <p className="text-gray-300">
-                AI agents fail silently in production, creating untraceable, unauditable decisions
-                that expose organisations to operational risk and compliance gaps.
+                AI agents fail silently in production, generating untraceable,
+                unauditable decisions that expose your organization to operational
+                risk and compliance gaps.
               </p>
             </div>
             <div>
               <div className="text-green-400 font-bold text-xl mb-2">🔧 Solution</div>
               <p className="text-gray-300">
-                ARF wraps AI outputs in a deterministic governance layer that evaluates,
-                constrains, and logs every decision using structured risk modeling and
-                configurable policy rules.
+                ARF wraps AI outputs in a deterministic governance layer that
+                evaluates, constrains, and logs every decision — keeping you in
+                control, always.
               </p>
             </div>
             <div>
               <div className="text-blue-400 font-bold text-xl mb-2">📈 Outcome</div>
               <p className="text-gray-300">
-                Auditable AI operations with mechanical enforcement, calibrated confidence
-                levels, and decision trails that hold up under regulatory and post‑incident
-                scrutiny.
+                Auditable operations with mechanical enforcement, calibrated
+                confidence, and decision trails that withstand regulatory scrutiny
+                and internal review.
               </p>
             </div>
           </div>
@@ -263,13 +260,12 @@ export default function LandingPage() {
           <figure>
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
             <figcaption className="sr-only">
-              Infrastructure signals flow into a structured risk assessment, which is checked
-              against configurable policies. The result is either a controlled execution, an
-              alert with audit log, or escalation to a human reviewer.
+              Incoming signals are assessed. A policy layer decides to approve, deny, or
+              escalate. The result is a controlled, auditable outcome — every time.
             </figcaption>
           </figure>
           <p className="text-xs text-gray-500 mt-2 text-center">
-            Incoming Signals → Risk Assessment → Policy‑Enforced Decision
+            Signals → Structured Assessment → Policy‑Enforced Decision
           </p>
         </div>
       </div>
@@ -284,28 +280,28 @@ export default function LandingPage() {
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
-            title="Online Risk Calibration"
-            description="Updates its confidence model continuously from observed outcomes, blending immediate feedback with deeper pattern analysis."
+            title="Continuous Risk Calibration"
+            description="Confidence that evolves with every observed outcome — immediate feedback meets long‑term pattern analysis."
             icon={<Brain className="w-8 h-8 text-blue-400" />}
-            details="The system maintains a per‑category confidence model that learns from every action. The final risk indicator is a weighted composite of real‑time and historical signals, always backed by a full audit trail."
+            details="A per‑category confidence model learns from each action, blending real‑time and historical signals. The resulting risk indicator is always backed by a full audit trail."
           />
           <FeatureCard
-            title="Operational Context Retrieval"
-            description="Instantly surfaces similar past incidents so every decision is informed by prior experience."
+            title="Operational Memory"
+            description="Instantly retrieve similar past incidents so decisions are never made in a vacuum."
             icon={<Network className="w-8 h-8 text-green-400" />}
-            details="A living graph of historical events and their resolutions lets the system find comparable situations and recommend actions that proved effective in similar contexts."
+            details="A living graph of historical events lets the system surface comparable situations and their resolutions, grounding each recommendation in proven experience."
           />
           <FeatureCard
-            title="Cost‑Optimized Decision Logic"
-            description="Selects the safest, most valuable action by balancing expected costs—not by a single threshold."
+            title="Cost‑Optimized Decisioning"
+            description="Chooses the safest, highest‑value action by balancing trade‑offs — no fixed thresholds, no blind spots."
             icon={<Scale className="w-8 h-8 text-yellow-400" />}
-            details="Approve, deny, or escalate? Every option is evaluated against a configurable cost model that accounts for operational impact, restoration speed, and current confidence. The chosen action comes with a human‑readable, auditable justification."
+            details="Approve, deny, or escalate? Each path is evaluated against a configurable cost model that accounts for impact, restoration speed, and current uncertainty. The chosen action arrives with a human‑readable, auditable justification."
           />
           <FeatureCard
-            title="Coordinated System Inspection"
-            description="Anomaly detection, root‑cause tracing, and reliability forecasting run inside a unified governance loop."
+            title="Unified System Oversight"
+            description="Anomaly detection, root‑cause tracing, and forecasting operate inside a single governance loop."
             icon={<Cpu className="w-8 h-8 text-purple-400" />}
-            details="Multiple analysis modules work together to detect early warnings, diagnose underlying issues, and forecast future health. Their outputs are consolidated into policy‑aligned recommendations."
+            details="Multiple analysis modules work in concert to catch early warnings, diagnose underlying issues, and forecast health — producing consolidated, policy‑aligned recommendations."
           />
         </div>
       </section>
@@ -313,32 +309,33 @@ export default function LandingPage() {
       {/* ── Why Enterprise ──────────────────────────────────────────────────── */}
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
-          Built for enterprise governance requirements
+          Built for the Demands of Enterprise Governance
         </h2>
         <div className="grid md:grid-cols-3 gap-8 text-center">
           <div className="bg-gray-800 p-6 rounded-lg">
             <FileText className="w-10 h-10 text-blue-400 mx-auto mb-3" />
-            <h3 className="text-xl font-semibold mb-2">Tamper‑proof audit trail</h3>
+            <h3 className="text-xl font-semibold mb-2">Immutable Audit Trail</h3>
             <p className="text-gray-400">
-              Every decision is recorded, timestamped, and attributed. The resulting logs are
-              designed for regulatory review, forensic analysis, and compliance preparation.
+              Every decision is recorded, timestamped, and attributed. Logs are
+              designed for regulatory review, forensic analysis, and compliance
+              preparation — no exceptions, no gaps.
             </p>
           </div>
           <div className="bg-gray-800 p-6 rounded-lg">
             <Lock className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
-            <h3 className="text-xl font-semibold mb-2">Deterministic enforcement</h3>
+            <h3 className="text-xl font-semibold mb-2">Mechanical Enforcement</h3>
             <p className="text-gray-400">
-              Policy gates that cannot be bypassed or silently degraded. Any override is
-              logged, making enforcement mechanical rather than advisory.
+              Policy gates that cannot be bypassed or silently overridden. Every
+              override is logged. Enforcement is deterministic — not advisory.
             </p>
           </div>
           <div className="bg-gray-800 p-6 rounded-lg">
             <Brain className="w-10 h-10 text-purple-400 mx-auto mb-3" />
-            <h3 className="text-xl font-semibold mb-2">Transparent reasoning</h3>
+            <h3 className="text-xl font-semibold mb-2">Explainable Reasoning</h3>
             <p className="text-gray-400">
-              Every risk score is explainable through auditable, transparent logic — never a
-              black‑box. Suitable for executive reporting, regulator briefings, and third‑party
-              review.
+              Every risk score is backed by transparent logic — never a black‑box.
+              Suitable for executive briefings, regulator inquiries, and third‑party
+              audits.
             </p>
           </div>
         </div>
@@ -355,15 +352,15 @@ export default function LandingPage() {
       {/* ── Access Models ───────────────────────────────────────────────────── */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 max-w-2xl mx-auto">
-          <h3 className="text-xl font-semibold mb-1 text-center">Access models</h3>
+          <h3 className="text-xl font-semibold mb-1 text-center">Access Models</h3>
           <p className="text-sm text-gray-400 text-center mb-6">
-            All pricing is outcome‑based. Pilot access is time‑limited and free for qualified
-            organisations.
+            All pricing is outcome‑based. Pilot access is time‑limited and free for
+            qualified organizations — no commitment required.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-8">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-400">Sandbox</div>
-              <div className="text-gray-400 text-sm mt-1">Advisory only</div>
+              <div className="text-gray-400 text-sm mt-1">Advisory Only</div>
               <ul className="text-sm text-gray-300 mt-2 space-y-1 text-left">
                 <li>✓ 1,000 advisory evaluations/month</li>
                 <li>✓ Mock responses — not production</li>
@@ -372,7 +369,7 @@ export default function LandingPage() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-400">Pilot</div>
-              <div className="text-gray-400 text-sm mt-1">Time‑limited · Free</div>
+              <div className="text-gray-400 text-sm mt-1">Time‑Limited · Free</div>
               <ul className="text-sm text-gray-300 mt-2 space-y-1 text-left">
                 <li>✓ Protected core access</li>
                 <li>✓ Outcome‑based pricing after pilot</li>
@@ -397,14 +394,13 @@ export default function LandingPage() {
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-1">Try the Advisory API</h2>
           <p className="text-sm text-amber-400 mb-4">
-            ⚠️ This endpoint returns mock responses. The protected core engine is not publicly
-            accessible. All responses contain{' '}
+            ⚠️ This endpoint returns mock responses. The protected core engine is not
+            publicly accessible. All responses contain{' '}
             <code className="font-mono bg-gray-900 px-1 rounded">status: &quot;success&quot;</code> and are
             labelled as simulated in the justification.
           </p>
 
           <div className="flex flex-col gap-4">
-            {/* Curl command with copy */}
             <div className="flex items-center gap-2 bg-gray-900 p-3 rounded-lg">
               <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">
                 {CURL_COMMAND}
@@ -422,7 +418,6 @@ export default function LandingPage() {
               </button>
             </div>
 
-            {/* Live Try-It button */}
             <button
               onClick={fetchSandboxResponse}
               disabled={sandboxLoading}
@@ -439,7 +434,6 @@ export default function LandingPage() {
               )}
             </button>
 
-            {/* Response display */}
             {sandboxResponse && (
               <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
                 <div className="flex justify-between items-center mb-2">
@@ -467,9 +461,10 @@ export default function LandingPage() {
           </div>
 
           <p className="text-sm text-gray-400 mt-4">
-            The response includes a recommendation, a mock risk indicator, and a justification that
-            clearly states the evaluation is simulated. Mechanical enforcement requires a pilot
-            agreement and access to the protected control plane.
+            The response includes a recommendation, a mock risk indicator, and a
+            justification that clearly states the evaluation is simulated. Mechanical
+            enforcement requires a pilot agreement and access to the protected control
+            plane.
           </p>
         </div>
       </div>
@@ -598,7 +593,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <RepoCard
             name="agentic_reliability_framework"
-            desc="Protected core engine — online risk calibration, operational context, governance loop."
+            desc="Protected core engine — continuous risk calibration, operational memory, governance loop."
             url="https://github.com/arf-foundation/agentic_reliability_framework"
             isPrivate
           />
@@ -674,13 +669,12 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Pilot access CTA */}
           <div className="mb-8 max-w-md mx-auto">
             <h4 className="text-lg font-semibold text-white mb-2">Request Pilot Access</h4>
             <p className="text-sm text-gray-400 mb-4">
-              The core ARF engine is available to qualified pilots under a time‑limited,
-              outcome‑based evaluation. Email us with your organisation, use case, and expected
-              evaluation volume.
+              The core ARF engine is available to qualified pilots under a
+              time‑limited, outcome‑based evaluation. Email us with your
+              organization, use case, and expected evaluation volume.
             </p>
             <a
               href="mailto:juan@arf-ai.com?subject=ARF%20Pilot%20Access%20Request"
@@ -725,8 +719,8 @@ export default function LandingPage() {
           </div>
 
           <p className="text-sm">
-            © 2026 ARF Foundation. Public repositories (arf‑spec, arf‑frontend) are licensed
-            under{' '}
+            © 2026 ARF Foundation. Public repositories (arf‑spec, arf‑frontend) are
+            licensed under{' '}
             <a
               href="https://github.com/arf-foundation/arf-spec/blob/main/LICENSE"
               target="_blank"
