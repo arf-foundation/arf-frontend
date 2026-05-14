@@ -181,7 +181,7 @@ export default function LandingPage() {
             Request Pilot Access <ArrowRight size={18} />
           </Link>
           <a
-            href="https://arf-foundation.github.io/arf-spec/"
+            href="https://github.com/arf-foundation"
             target="_blank"
             rel="noopener noreferrer"
             className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"

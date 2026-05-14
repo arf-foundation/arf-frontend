@@ -36,7 +36,7 @@ export default function NavBar() {
             Access Models
           </Link>
           <a
-            href="https://arf-foundation.github.io/arf-spec/"
+            href="https://github.com/arf-foundation"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:underline text-sm"
@@ -116,7 +116,7 @@ export default function NavBar() {
             Access Models
           </Link>
           <a
-            href="https://arf-foundation.github.io/arf-spec/"
+            href="https://github.com/arf-foundation"
             target="_blank"
             rel="noopener noreferrer"
             className="block px-4 py-3 rounded-md hover:bg-gray-700 transition text-sm"
