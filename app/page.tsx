@@ -488,7 +488,7 @@ export default function LandingPage() {
             icon={<Code className="w-6 h-6 text-green-400" />}
             title="Public Specification"
             description="Open data models, API contracts, and decision rules"
-            details="The arf‑spec repository defines the canonical specification, licensed under Apache 2.0. It provides full transparency into the system’s contracts without exposing proprietary implementation details."
+            details="The arf‑spec repository defines the canonical specification, shared under written terms with qualified pilots. It provides full transparency into the system’s contracts without exposing proprietary implementation details."
           />
           <EcoCard
             icon={<Users className="w-6 h-6 text-yellow-400" />}
@@ -585,10 +585,11 @@ export default function LandingPage() {
           Open Specs &amp; Protected Core
         </h2>
         <p className="text-gray-400 text-center text-sm max-w-2xl mx-auto mb-10">
-          The specification and demo UI are open source (Apache‑2.0). The core
-          engine and API control plane are access‑controlled — available only to
-          qualified pilots. This boundary preserves audit‑grade integrity while
-          providing full transparency into APIs and decision rules.
+          Selected specifications and supporting materials are shared under written
+          terms with qualified pilots. The core engine and API control plane are
+          access‑controlled — available only to qualified pilots. This boundary
+          preserves audit‑grade integrity while providing full transparency into
+          APIs and decision rules.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <RepoCard
@@ -719,17 +720,9 @@ export default function LandingPage() {
           </div>
 
           <p className="text-sm">
-            © 2026 ARF Foundation. Public repositories (arf‑spec, arf‑frontend) are
-            licensed under{' '}
-            <a
-              href="https://github.com/arf-foundation/arf-spec/blob/main/LICENSE"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-white transition"
-            >
-              Apache 2.0
-            </a>
-            . The core engine is proprietary and access‑controlled.
+            © 2026 ARF Foundation. All repositories are private and access‑controlled.
+            The core engine is proprietary. Selected materials are shared under written
+            terms with qualified pilots and enterprise customers.
           </p>
         </div>
       </footer>
