@@ -201,7 +201,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-2">
             <MessageSquare size={18} />
             <a
-              href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
+              href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-300 hover:text-white transition"
@@ -661,7 +661,7 @@ export default function LandingPage() {
                 emoji="📅"
               />
               <ContactLink
-                href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
+                href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg"
                 icon={<MessageSquare className="w-5 h-5" />}
                 text="Join Slack"
                 emoji="💬"
@@ -709,7 +709,7 @@ export default function LandingPage() {
               🤗 Hugging Face
             </a>
             <a
-              href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
+              href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg"
               target="_blank"
               rel="noopener noreferrer"
               onClick={trackSlackClick}

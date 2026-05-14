@@ -1594,10 +1594,10 @@
   resolved "https://registry.yarnpkg.com/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@notionhq/client@^5.20.0":
-  version "5.20.0"
-  resolved "https://registry.yarnpkg.com/@notionhq/client/-/client-5.20.0.tgz#a02afd4782e8974af8a2b14255af183cbec545df"
-  integrity sha512-MS0DFSfHPLZ0wi+e9mOP16gCCYbWAkaiMuu/rVK9KxDlKac4oAgHReOfTglcd77g/nlg78snp+KB7fNWP75bEw==
+"@notionhq/client@^5.21.0":
+  version "5.21.0"
+  resolved "https://registry.yarnpkg.com/@notionhq/client/-/client-5.21.0.tgz#ad7383751a57cff2d5d8b6ba0e2003904c417b26"
+  integrity sha512-X+T+hzaQFleOUGm4xUOUm51pOpdZ1+6T4BsRjGlcdEOTJLNkUEv8nZATq9O3ZY4NQEgICc0qwQ0I25OdYprX0w==
 
 "@reduxjs/toolkit@^1.9.0 || 2.x.x":
   version "2.11.2"
