@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowRight, RefreshCw, Info, Network } from 'lucide-react';
-import DashboardBottomNav from '../components/DashboardBottomNav';
+import DashboardBottomNav from '../../components/DashboardBottomNav';
 
 // ----------------------------------------------------------------------
 // Type definitions (no 'any')
