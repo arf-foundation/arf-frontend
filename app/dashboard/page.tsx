@@ -239,7 +239,7 @@ export default function Dashboard() {
               <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                   <h1 className="text-2xl font-bold">ARF System Risk</h1>
-                  <button onClick={refreshData} disabled={isRefreshing} className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"><RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} /></button>
+                  <button onClick={refreshData} disabled={isRefreshing} aria-label="Refresh data" className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"><RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} /></button>
                 </div>
                 <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
                   <div className="flex-shrink-0"><RiskGauge risk={riskData.risk} size={180} /></div>
