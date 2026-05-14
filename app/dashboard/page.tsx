@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowRight, RefreshCw, Info, Network } from 'lucide-react';
+import DashboardBottomNav from '../components/DashboardBottomNav';
 
 // ----------------------------------------------------------------------
 // Type definitions (no 'any')
@@ -152,6 +153,7 @@ const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
           {(risk * 100).toFixed(0)}%
         </text>
       </svg>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };
@@ -181,7 +183,7 @@ export default function Dashboard() {
   // Security: detect HTTP and warn – one-time, safe to ignore lint rule
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsHttpWarning(true);
     }
   }, []);
@@ -203,7 +205,7 @@ export default function Dashboard() {
 
   // Initial load and auto‑refresh – disable lint rule for this call
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshData();
     const interval = setInterval(refreshData, 30000);
     return () => clearInterval(interval);
@@ -213,6 +215,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex items-center justify-center p-4">
         <div className="text-xl animate-pulse">Loading dashboard simulation...</div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
     );
   }
@@ -223,7 +226,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      <div className="container mx-auto px-4 py-6 sm:py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8 pb-20">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* HTTP Warning Banner (Security improvement) */}
           {isHttpWarning && (
@@ -234,6 +237,7 @@ export default function Dashboard() {
                   Switch to HTTPS
                 </a>
               </p>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
           )}
 
@@ -243,6 +247,7 @@ export default function Dashboard() {
               🚀 This is a <strong>simulated demo</strong> using mock data. The real ARF engine requires pilot access.
               <Link href="/signup" className="ml-2 underline font-semibold hover:text-blue-100">Request pilot access →</Link>
             </p>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
 
           {/* Main Risk Card with Gauge */}
@@ -257,12 +262,14 @@ export default function Dashboard() {
               >
                 <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
               </button>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
 
             <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
               {/* Gauge */}
               <div className="flex-shrink-0">
                 <RiskGauge risk={riskData.risk} size={180} />
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
 
               {/* Risk Details */}
@@ -271,6 +278,7 @@ export default function Dashboard() {
                   <div>
                     <div className="text-gray-400 text-sm">Risk Score</div>
                     <div className="text-3xl font-bold text-white">{safeRiskPercent}%</div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                   </div>
                   <div>
                     <div className="text-gray-400 text-sm">Status</div>
@@ -279,19 +287,25 @@ export default function Dashboard() {
                       riskData.status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'
                     }`}>
                       {safeStatus}
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                   </div>
                   <div>
                     <div className="text-gray-400 text-sm">Posterior Variance</div>
                     <div className="font-mono text-lg">{riskData.variance.toFixed(4)}</div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                   </div>
                   <div>
                     <div className="text-gray-400 text-sm">Confidence Interval (90%)</div>
                     <div className="font-mono text-sm">
                       [{Math.max(0, riskData.risk - 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}, 
                        {Math.min(1, riskData.risk + 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}]
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                   </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                 </div>
 
                 {/* Risk Factor Breakdown with Tooltips */}
@@ -301,32 +315,43 @@ export default function Dashboard() {
                     <span title="Weighted contributions from each Bayesian component">
                       <Info size={14} className="text-gray-500 cursor-help" />
                     </span>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Conjugate prior</span>
                       <span className="font-mono">{(riskData.breakdown.conjugate * 100).toFixed(1)}% (weight {riskData.weights.conjugate.toFixed(2)})</span>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-1.5">
                       <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${riskData.weights.conjugate * 100}%` }} />
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>HMC prediction</span>
                       <span className="font-mono">{(riskData.breakdown.hmc * 100).toFixed(1)}% (weight {riskData.weights.hmc.toFixed(2)})</span>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-1.5">
                       <div className="bg-purple-500 h-1.5 rounded-full" style={{ width: `${riskData.weights.hmc * 100}%` }} />
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Hyperprior shrinkage</span>
                       <span className="font-mono">{(riskData.breakdown.hyperprior * 100).toFixed(1)}% (weight {riskData.weights.hyperprior.toFixed(2)})</span>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-1.5">
                       <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${riskData.weights.hyperprior * 100}%` }} />
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                   </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                 </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
 
             {lastUpdated && (
@@ -334,6 +359,7 @@ export default function Dashboard() {
                 Last updated: {lastUpdated.toLocaleTimeString()}
               </p>
             )}
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
 
           {/* Simulated Quota Card */}
@@ -344,21 +370,25 @@ export default function Dashboard() {
                 <span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-medium">
                   {quota.tier.toUpperCase()}
                 </span>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
               <div className="mb-4">
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-300">Remaining evaluations this month</span>
                   <span className="font-mono font-medium text-white">{quota.remaining.toLocaleString()}</span>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-2">
                   <div
                     className="bg-blue-500 h-2 rounded-full"
                     style={{ width: `${(quota.remaining / quota.limit) * 100}%` }}
                   />
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                 </div>
                 <p className="text-xs text-gray-400 mt-2">
                   Limit: {quota.limit.toLocaleString()} evaluations/month (simulated)
                 </p>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
               <Link
                 href="/pricing"
@@ -366,6 +396,7 @@ export default function Dashboard() {
               >
                 View access models → <ArrowRight size={14} />
               </Link>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
           )}
 
@@ -378,20 +409,26 @@ export default function Dashboard() {
               <div>
                 <div className="text-2xl font-bold text-blue-400">{mockMemoryStats.similar_incidents}</div>
                 <div className="text-xs text-gray-400">Similar Incidents</div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
               <div>
                 <div className="text-2xl font-bold text-purple-400">{mockMemoryStats.rag_similarity.toFixed(2)}</div>
                 <div className="text-xs text-gray-400">RAG Similarity</div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
               <div>
                 <div className="text-2xl font-bold text-yellow-400">{mockMemoryStats.cache_hits}</div>
                 <div className="text-xs text-gray-400">Cache Hits</div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
               <div>
                 <div className="text-xs font-mono text-gray-300 break-words">{mockMemoryStats.memory_usage}</div>
                 <div className="text-xs text-gray-400">Index Type</div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
 
           {/* Recent Incidents: Table on desktop, Cards on mobile (mobile-friendly) */}
@@ -431,6 +468,7 @@ export default function Dashboard() {
                   ))}
                 </tbody>
               </table>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
 
             {/* Mobile card list */}
@@ -441,6 +479,7 @@ export default function Dashboard() {
                     <div>
                       <div className="font-medium text-white">{incident.service}</div>
                       <div className="text-xs text-gray-400">{incident.timestamp}</div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                       incident.action === 'ESCALATE' ? 'bg-red-900 text-red-200' :
@@ -449,24 +488,32 @@ export default function Dashboard() {
                     }`}>
                       {incident.action}
                     </span>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                   </div>
                   <div className="mt-2 grid grid-cols-3 gap-2 text-sm">
                     <div>
                       <span className="text-gray-400">Metric:</span> {incident.metric}
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
                     <div>
                       <span className="text-gray-400">Value:</span> <span className="font-mono">{incident.value}</span>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
                     <div>
                       <span className="text-gray-400">Risk:</span> <span className="font-mono text-yellow-400">{(incident.risk * 100).toFixed(0)}%</span>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                   </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
                 </div>
               ))}
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
             <p className="text-xs text-gray-500 mt-4 text-center">
               Data shown is simulated for demonstration purposes only.
             </p>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
 
           {/* Call to Action */}
@@ -479,9 +526,13 @@ export default function Dashboard() {
             >
               Request Pilot Access <ArrowRight size={16} />
             </Link>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
+          <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 }
