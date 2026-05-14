@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowRight, RefreshCw, Info, Network, Activity, Shield, Award } from 'lucide-react';
+import { ArrowRight, RefreshCw, Info, Network } from 'lucide-react';
 import DashboardBottomNav from '../../components/DashboardBottomNav';
 
 // ----------------------------------------------------------------------
@@ -44,6 +44,9 @@ interface Incident {
   action: 'APPROVE' | 'DENY' | 'ESCALATE';
 }
 
+// ----------------------------------------------------------------------
+// Helper: generate deterministic mock risk data
+// ----------------------------------------------------------------------
 const generateMockRisk = (): RiskData => {
   const seed = Math.floor(Date.now() / 10000);
   const random = (min: number, max: number) => {
@@ -88,7 +91,7 @@ const mockMemoryStats = {
 };
 
 // ----------------------------------------------------------------------
-// Components
+// Reusable Components (outside Dashboard)
 // ----------------------------------------------------------------------
 const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
   const radius = size * 0.4;
@@ -158,6 +161,11 @@ const RiskFactorBreakdown = ({ breakdown, weights }: { breakdown: RiskBreakdown;
   </div>
 );
 
+const StatusBadge = ({ status }: { status: string }) => {
+  const color = status === 'critical' ? 'bg-red-600' : status === 'warning' ? 'bg-yellow-500' : 'bg-green-500';
+  return <span className={`inline-block px-3 py-1 rounded-full text-white font-medium text-sm ${color}`}>{status.toUpperCase()}</span>;
+};
+
 // ----------------------------------------------------------------------
 // Main Dashboard Component
 // ----------------------------------------------------------------------
@@ -173,6 +181,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsHttpWarning(true);
     }
   }, []);
@@ -193,6 +202,7 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshData();
     const interval = setInterval(refreshData, 30000);
     return () => clearInterval(interval);
@@ -205,11 +215,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  const StatusBadge = ({ status }: { status: string }) => {
-    const color = status === 'critical' ? 'bg-red-600' : status === 'warning' ? 'bg-yellow-500' : 'bg-green-500';
-    return <span className={`inline-block px-3 py-1 rounded-full text-white font-medium text-sm ${color}`}>{status.toUpperCase()}</span>;
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
@@ -227,9 +232,10 @@ export default function Dashboard() {
             <p className="text-blue-200 text-sm">🚀 This is a <strong>simulated demo</strong> using mock data. The real ARF engine requires pilot access. <Link href="/signup" className="ml-2 underline font-semibold hover:text-blue-100">Request pilot access →</Link></p>
           </div>
 
-          {/* Risk View */}
+          {/* Risk Tab Content */}
           {activeTab === 'risk' && (
             <div className="space-y-6">
+              {/* Main Risk Card */}
               <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                   <h1 className="text-2xl font-bold">ARF System Risk</h1>
@@ -250,6 +256,7 @@ export default function Dashboard() {
                 {lastUpdated && <p className="text-xs text-gray-400 text-center mt-4">Last updated: {lastUpdated.toLocaleTimeString()}</p>}
               </div>
 
+              {/* Quota Card */}
               {quota && (
                 <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
                   <div className="flex justify-between items-start mb-4"><h2 className="text-xl font-semibold">Your Plan (Demo)</h2><span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-medium">{quota.tier.toUpperCase()}</span></div>
@@ -258,6 +265,7 @@ export default function Dashboard() {
                 </div>
               )}
 
+              {/* Semantic Memory */}
               <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Network className="w-5 h-5 text-green-400" /> Semantic Memory (Simulated)</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -268,6 +276,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* Recent Incidents */}
               <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold mb-4">Recent Incidents (Simulated)</h2>
                 <div className="hidden sm:block overflow-x-auto">
@@ -292,7 +301,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Governance View (placeholder) */}
+          {/* Governance Tab Content (placeholder) */}
           {activeTab === 'governance' && (
             <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
               <h2 className="text-xl font-semibold mb-4">Governance Operations (Simulated)</h2>
@@ -300,7 +309,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Compliance View (placeholder) */}
+          {/* Compliance Tab Content (placeholder) */}
           {activeTab === 'compliance' && (
             <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
               <h2 className="text-xl font-semibold mb-4">Compliance & Certifications (Simulated)</h2>
