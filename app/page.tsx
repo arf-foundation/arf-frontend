@@ -612,7 +612,7 @@ export default function LandingPage() {
           />
           <RepoCard
             name="arf-spec"
-            desc="Canonical specification — data models, API contracts, decision rules (Apache‑2.0)."
+            desc="Canonical specification — data models, API contracts, decision rules (shared under written terms)."
             url="https://github.com/arf-foundation/arf-spec"
           />
         </div>
