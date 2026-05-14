@@ -21,7 +21,7 @@ export default function FAQPage() {
               answer="ARF is a governance layer that evaluates infrastructure decisions through a calibrated risk model. It recommends one of three actions — approve, deny, or escalate — together with a confidence indicator and a full audit trail. The core engine is access‑controlled and available only to qualified pilots."
             />
             <FAQItem
-              question="Is ARF open source?"
+              question="Is ARF publicly available?"
               answer="No. ARF is proprietary and access‑controlled. All repositories are private, and access to code, specifications, and supporting materials is granted only through approved pilot or enterprise arrangements."
             />
             <FAQItem
