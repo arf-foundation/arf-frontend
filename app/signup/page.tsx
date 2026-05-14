@@ -513,7 +513,7 @@ export default function SignupPage() {
                     className="mt-1 w-4 h-4 bg-gray-900 border-gray-700 rounded focus:ring-blue-500"
                   />
                   <label htmlFor="agreeToTerms" className="text-sm text-gray-300">
-                    I understand that the ARF core engine is not open source and that access is granted at the founder’s discretion.  
+                    I understand that the ARF core engine is proprietary and access‑controlled and that access is granted at the founder’s discretion.  
                     I agree to the{' '}
                     <Link href="/terms" className="text-blue-400 hover:underline">Terms of Service</Link>
                     {' '}and{' '}
