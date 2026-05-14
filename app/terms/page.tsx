@@ -29,7 +29,7 @@ export default function TermsPage() {
                 By accessing or using the Agentic Reliability Framework (“ARF”) hosted API service (the “Service”), you agree to be bound by these Terms of Service (“Terms”). If you do not agree, you may not use the Service.
               </p>
               <p>
-                These Terms apply only to the hosted SaaS offering. The open-source ARF library is governed separately under the Apache 2.0 License.
+                These Terms apply only to the hosted SaaS offering. The ARF public specification is governed separately under the proprietary access-controlled license.
               </p>
 
               <h2>2. Description of the Service</h2>
@@ -90,7 +90,7 @@ export default function TermsPage() {
                 <li>You retain ownership of any data you submit.</li>
                 <li>You grant us a limited license to process your data solely to provide the Service.</li>
               </ul>
-              <p>The open-source ARF library remains governed by the Apache 2.0 License.</p>
+              <p>The ARF public specification remains governed by the proprietary access-controlled license.</p>
 
               <h2>8. Disclaimer of Warranties</h2>
               <p>The Service is provided “as is” and “as available”. We disclaim all warranties, including:</p>

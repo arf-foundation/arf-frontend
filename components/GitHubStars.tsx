@@ -44,7 +44,7 @@ export default function GitHubStars() {
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex items-center gap-1 bg-gray-800 px-3 py-1 rounded-full text-sm min-w-[70px] justify-center"
-      title="Stars for the public specification – the core engine is not open source"
+      title="Stars for the public specification – the core engine is access-controlled and proprietary"
     >
       <Star size={14} className="fill-yellow-400 text-yellow-400" />
       <span className="min-w-[40px] text-left">
