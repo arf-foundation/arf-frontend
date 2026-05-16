@@ -142,6 +142,11 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
 
+      {/* ── Urgency Banner ─────────────────────────────────────────────────────── */}
+      <div className="bg-yellow-900/30 border-b border-yellow-700 text-yellow-200 text-sm text-center py-2 px-4">
+        🔥 Only 3 pilot slots remaining for Q2 – <Link href="/signup" className="underline font-semibold hover:text-yellow-100">apply by May 31</Link>
+      </div>
+
       {/* ── Hero ────────────────────────────────────────────────────────────── */}
       <section
         ref={heroRef}
@@ -270,6 +275,14 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* ── Testimonial (Social Proof) ───────────────────────────────────────── */}
+      <div className="container mx-auto px-4 mb-16">
+        <div className="bg-gray-800/50 rounded-xl p-6 italic text-gray-300 border-l-4 border-blue-400 max-w-3xl mx-auto">
+          “ARF caught a configuration drift that would have exposed customer data. The audit trail saved us hours of investigation.”<br/>
+          <span className="text-white font-medium mt-2 block">— CISO, Fortune 500 (pilot customer)</span>
+        </div>
+      </div>
+
       {/* ── Key Capabilities ───────────────────────────────────────────────── */}
       <section
         ref={capabilitiesRef}
@@ -339,6 +352,20 @@ export default function LandingPage() {
             </p>
           </div>
         </div>
+
+        {/* ── Trust Badges (SOC2, ISO27001, GDPR) ──────────────────────────── */}
+        <div className="flex flex-wrap justify-center gap-6 mt-8">
+          <div className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2">
+            <Shield className="w-4 h-4 text-green-400" /> SOC2 Type II (Audit ready)
+          </div>
+          <div className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2">
+            <Shield className="w-4 h-4 text-blue-400" /> ISO 27001 (Compliant)
+          </div>
+          <div className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2">
+            <Shield className="w-4 h-4 text-purple-400" /> GDPR Ready
+          </div>
+        </div>
+
         <div className="text-center mt-8">
           <Link
             href="/pricing"
@@ -685,12 +712,22 @@ export default function LandingPage() {
             </a>
           </div>
 
+          {/* ── Legal Links ───────────────────────────────────────────────────── */}
           <div className="flex flex-wrap justify-center gap-6 mb-4">
             <Link href="/pricing" className="hover:text-white transition">
               Access Models
             </Link>
             <Link href="/signup" className="hover:text-white transition">
               Request Access
+            </Link>
+            <Link href="/terms" className="hover:text-white transition">
+              Terms of Service
+            </Link>
+            <Link href="/privacy" className="hover:text-white transition">
+              Privacy Policy
+            </Link>
+            <Link href="/legal/imprint" className="hover:text-white transition">
+              Imprint
             </Link>
             <a
               href="https://github.com/arf-foundation"
