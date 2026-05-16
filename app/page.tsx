@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import {
   ArrowRight,
-  GitHub,
+  Github,
   Rocket,
   BookOpen,
   Users,
@@ -14,7 +14,7 @@ import {
   Scale,
   Network,
   Mail,
-  LinkedIn,
+  Linkedin,
   Calendar,
   MessageSquare,
   Copy,
@@ -221,7 +221,7 @@ export default function LandingPage() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-gray-300 hover:text-white transition"
           >
-            <GitHub size={18} /> GitHub
+            <Github size={18} /> Github
           </a>
         </div>
       </div>
@@ -677,7 +677,7 @@ export default function LandingPage() {
               </div>
               <ContactLink
                 href="https://www.linkedin.com/in/petterjuan/"
-                icon={<LinkedIn className="w-5 h-5" />}
+                icon={<Linkedin className="w-5 h-5" />}
                 text="Juan Petter"
                 emoji="🔗"
               />
@@ -735,7 +735,7 @@ export default function LandingPage() {
               rel="noopener noreferrer"
               className="hover:text-white transition flex items-center gap-1"
             >
-              <GitHub size={18} /> GitHub
+              <Github size={18} /> Github
             </a>
             <a
               href="https://huggingface.co/A-R-F"
@@ -933,7 +933,7 @@ function RepoCard({
         }
 
         const response = await fetch(`https://api.github.com/repos/arf-foundation/${repoName}`);
-        if (!response.ok) throw new Error(`GitHub API ${response.status}`);
+        if (!response.ok) throw new Error(`Github API ${response.status}`);
         const data = await response.json();
 
         if (data.stargazers_count !== undefined) {
@@ -945,7 +945,7 @@ function RepoCard({
           try { localStorage.setItem(cacheKey, JSON.stringify(newData)); localStorage.setItem(`${cacheKey}-time`, String(now)); } catch {}
         }
       } catch (err) {
-        console.error(`Failed to fetch GitHub data for ${repoName}:`, err);
+        console.error(`Failed to fetch Github data for ${repoName}:`, err);
       }
     };
 
