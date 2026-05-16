@@ -4,6 +4,16 @@ import Dashboard from '../app/dashboard/page';
 
 // Mock window.location.protocol to avoid HTTP warning banner
 const originalLocation = window.location;
+beforeAll(() => {
+  delete (window as { location: Location }).location;
+  Object.defineProperty(window, 'location', {
+    value: { ...originalLocation, protocol: 'https:' },
+    writable: true,
+    configurable: true,
+  });
+});
+afterAll(() => {
+  window.location = originalLocation;
 });
 
 jest.mock('../hooks/useInView', () => ({
