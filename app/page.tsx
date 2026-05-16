@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import {
   ArrowRight,
-
   Rocket,
   BookOpen,
   Users,
@@ -14,7 +13,6 @@ import {
   Scale,
   Network,
   Mail,
-
   Calendar,
   MessageSquare,
   Copy,
@@ -677,6 +675,7 @@ export default function LandingPage() {
               </div>
               <ContactLink
                 href="https://www.linkedin.com/in/petterjuan/"
+                icon={null}
                 text="Juan Petter"
                 emoji="🔗"
               />
