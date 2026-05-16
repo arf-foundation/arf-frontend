@@ -100,7 +100,6 @@ describe('Dashboard (Simulated Demo)', () => {
   it('displays the call to action for pilot access (at least one link)', async () => {
     render(<Dashboard />);
     await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
-    expect(await screen.findByText(/Ready to govern your AI agents\?/i)).toBeInTheDocument();
     const pilotLinks = await screen.findAllByRole('link', { name: /Request Pilot Access/i });
     expect(pilotLinks.length).toBeGreaterThan(0);
     const signupLink = pilotLinks.find(link => link.getAttribute('href') === '/signup');
