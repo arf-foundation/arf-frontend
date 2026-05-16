@@ -221,7 +221,7 @@ export default function LandingPage() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-gray-300 hover:text-white transition"
           >
-            GitHub GitHub
+            GitHub
           </a>
         </div>
       </div>
@@ -677,7 +677,6 @@ export default function LandingPage() {
               </div>
               <ContactLink
                 href="https://www.linkedin.com/in/petterjuan/"
-                icon={LinkedIn}
                 text="Juan Petter"
                 emoji="🔗"
               />
@@ -735,7 +734,7 @@ export default function LandingPage() {
               rel="noopener noreferrer"
               className="hover:text-white transition flex items-center gap-1"
             >
-              GitHub GitHub
+              GitHub
             </a>
             <a
               href="https://huggingface.co/A-R-F"
