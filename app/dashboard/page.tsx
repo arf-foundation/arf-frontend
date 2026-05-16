@@ -126,21 +126,10 @@ const mockMemoryStats = {
 // Reusable Components (outside Dashboard)
 // ----------------------------------------------------------------------
 const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
-  const radius = size * 0.4;
-  const strokeWidth = size * 0.08;
-  const normalizedAngle = risk * 270;
-  const startAngle = -135;
-  const endAngle = startAngle + normalizedAngle;
-  const startRad = startAngle * (Math.PI / 180);
-  const endRad = endAngle * (Math.PI / 180);
-  const largeArcFlag = normalizedAngle > 180 ? 1 : 0;
-  const center = size / 2;
-  const x1 = center + radius * Math.cos(startRad);
-  const y1 = center + radius * Math.sin(startRad);
-  const x2 = center + radius * Math.cos(endRad);
-  const y2 = center + radius * Math.sin(endRad);
-  const arcPath = `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`;
-
+  const radius = size * 0.35; // inner radius
+  const strokeWidth = size * 0.1;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - risk);
   const getColor = () => {
     if (risk < 0.4) return '#22c55e';
     if (risk < 0.7) return '#eab308';
@@ -150,25 +139,38 @@ const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
   return (
     <div className="relative inline-flex items-center justify-center">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <path
-          d={`M ${center + radius * Math.cos(startRad)} ${center + radius * Math.sin(startRad)} A ${radius} ${radius} 0 0 1 ${center + radius * Math.cos((startAngle + 270) * (Math.PI / 180))} ${center + radius * Math.sin((startAngle + 270) * (Math.PI / 180))}`}
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
           fill="none"
           stroke="#374151"
           strokeWidth={strokeWidth}
-          strokeLinecap="round"
         />
-        <path d={arcPath} fill="none" stroke={getColor()} strokeWidth={strokeWidth} strokeLinecap="round" />
-        <circle cx={center} cy={center} r={size * 0.05} fill="#fff" />
-        <line
-          x1={center}
-          y1={center}
-          x2={center + radius * Math.cos((normalizedAngle - 135) * (Math.PI / 180))}
-          y2={center + radius * Math.sin((normalizedAngle - 135) * (Math.PI / 180))}
-          stroke="#fff"
-          strokeWidth={size * 0.02}
+        {/* Progress arc */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={getColor()}
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
           strokeLinecap="round"
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          style={{ transition: 'stroke-dashoffset 0.5s ease' }}
         />
-        <text x={center} y={center + size * 0.1} textAnchor="middle" fill="#fff" fontSize={size * 0.12} fontWeight="bold">
+        {/* Center text */}
+        <text
+          x={size / 2}
+          y={size / 2 + size * 0.08}
+          textAnchor="middle"
+          fill="#fff"
+          fontSize={size * 0.12}
+          fontWeight="bold"
+        >
           {(risk * 100).toFixed(0)}%
         </text>
       </svg>
