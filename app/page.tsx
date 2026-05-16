@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import {
   ArrowRight,
-  Github,
+  GitHub,
   Rocket,
   BookOpen,
   Users,
@@ -14,7 +14,7 @@ import {
   Scale,
   Network,
   Mail,
-  Linkedin,
+  LinkedIn,
   Calendar,
   MessageSquare,
   Copy,
@@ -221,7 +221,7 @@ export default function LandingPage() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-gray-300 hover:text-white transition"
           >
-            <Github size={18} /> GitHub
+            <GitHub size={18} /> GitHub
           </a>
         </div>
       </div>
@@ -677,7 +677,7 @@ export default function LandingPage() {
               </div>
               <ContactLink
                 href="https://www.linkedin.com/in/petterjuan/"
-                icon={<Linkedin className="w-5 h-5" />}
+                icon={<LinkedIn className="w-5 h-5" />}
                 text="Juan Petter"
                 emoji="🔗"
               />
@@ -735,7 +735,7 @@ export default function LandingPage() {
               rel="noopener noreferrer"
               className="hover:text-white transition flex items-center gap-1"
             >
-              <Github size={18} /> GitHub
+              <GitHub size={18} /> GitHub
             </a>
             <a
               href="https://huggingface.co/A-R-F"
