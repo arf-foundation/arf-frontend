@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowRight, RefreshCw, Info, Network, Shield, Lock, FileText, AlertTriangle, CheckCircle, Clock, Eye, Printer, Mail, ExternalLink } from 'lucide-react';
+import {ArrowRight, RefreshCw, Info, Network, Shield, Lock, FileText, AlertTriangle, Clock, Printer} from 'lucide-react';
 import DashboardBottomNav from '../../components/DashboardBottomNav';
 
 // ----------------------------------------------------------------------

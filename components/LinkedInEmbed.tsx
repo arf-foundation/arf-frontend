@@ -12,7 +12,6 @@ export default function LinkedInEmbed() {
   useEffect(() => {
     if (inView && !hasLoadedRef.current) {
       hasLoadedRef.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShouldLoad(true);
     }
   }, [inView]);
