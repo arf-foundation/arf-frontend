@@ -1,13 +1,12 @@
 import { Shield, Calendar, Mail } from 'lucide-react';
 
 export default function TermsPage() {
-  const effectiveDate = "April 9, 2026";
+  const effectiveDate = "May 16, 2026";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       <div className="container mx-auto px-4 py-8 sm:py-16">
         <div className="max-w-4xl mx-auto">
-          {/* Header Card */}
           <div className="text-center mb-8 sm:mb-12">
             <div className="inline-flex items-center justify-center p-3 bg-blue-600/20 rounded-full mb-4">
               <Shield className="w-8 h-8 text-blue-400" />
@@ -21,128 +20,77 @@ export default function TermsPage() {
             </div>
           </div>
 
-          {/* Content Card */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 p-5 sm:p-6 md:p-8 shadow-xl">
-            <div className="prose prose-invert max-w-none prose-headings:text-white prose-headings:font-semibold prose-p:text-gray-300 prose-strong:text-white prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-li:text-gray-300 prose-p:text-sm sm:prose-p:text-base prose-li:text-sm sm:prose-li:text-base prose-headings:text-xl sm:prose-headings:text-2xl">
+            <div className="prose prose-invert max-w-none">
               <h2>1. Acceptance of Terms</h2>
               <p>
-                By accessing or using the Agentic Reliability Framework (“ARF”) hosted API service (the “Service”), you agree to be bound by these Terms of Service (“Terms”). If you do not agree, you may not use the Service.
-              </p>
-              <p>
-                These Terms apply only to the hosted SaaS offering. The ARF public specification is governed separately under the proprietary access-controlled license.
+                By accessing or using the ARF website or the public sandbox API, you agree to these Terms. The <strong>core ARF engine is proprietary and access‑controlled</strong> – it is not publicly available. Access to the real engine requires a separate written Pilot or Enterprise Agreement.
               </p>
 
               <h2>2. Description of the Service</h2>
               <p>
-                ARF provides a hosted API for evaluating infrastructure actions using Bayesian risk scoring, expected loss minimisation, and audit logging.
+                The public Service consists of:
               </p>
-              <p>Service tiers are:</p>
               <ul>
-                <li><strong>Free</strong>: Up to 1,000 evaluations/month</li>
-                <li><strong>Pro</strong>: Up to 10,000 evaluations/month</li>
-                <li><strong>Premium</strong>: Up to 50,000 evaluations/month</li>
-                <li><strong>Enterprise</strong>: Custom limits and features (contact us)</li>
+                <li><strong>Sandbox API</strong> – returns <strong>mock data only</strong>, rate‑limited, for demonstration purposes.</li>
+                <li><strong>Demo dashboard</strong> – visualises mock data.</li>
+                <li><strong>Public specification</strong> – shared under written terms, not open source.</li>
               </ul>
               <p>
-                We may modify features, limits, or pricing with reasonable notice (e.g., 30 days). The free tier is intended for evaluation and non‑production use only.
+                Production‑grade inference, deterministic enforcement, and audit trails are available only under a written Pilot or Enterprise Agreement with outcome‑based pricing.
               </p>
 
               <h2>3. User Accounts and API Keys</h2>
-              <p>To use the Service, you must:</p>
-              <ul>
-                <li>Register with a valid email address</li>
-                <li>Maintain the security of your account credentials</li>
-                <li>Keep your API keys confidential</li>
-              </ul>
               <p>
-                You are solely responsible for all activity conducted using your API keys. You must notify us immediately of any unauthorised use. We may revoke API keys at any time if we suspect abuse.
+                You may sign up for a sandbox API key. You are responsible for keeping it confidential. We may revoke keys at any time if we suspect abuse.
               </p>
 
               <h2>4. Payment Terms</h2>
-              <p>Paid tiers are billed via Stripe:</p>
-              <ul>
-                <li>Subscriptions are billed monthly unless otherwise stated.</li>
-                <li>You authorise us and Stripe to charge your payment method.</li>
-                <li>Fees are non‑refundable except where required by law.</li>
-                <li>You may cancel at any time; access continues until the end of the billing period.</li>
-              </ul>
-              <p>We do not store full payment card details.</p>
+              <p>
+                The public sandbox is free. Paid pilot or enterprise tiers are governed by separate written agreements and are not available through this website.
+              </p>
 
               <h2>5. Acceptable Use</h2>
               <p>You agree not to:</p>
               <ul>
                 <li>Abuse, overload, or disrupt the Service.</li>
-                <li>Reverse engineer, decompile, or attempt to extract source code from the Service.</li>
-                <li>Circumvent usage limits or security measures.</li>
-                <li>Use the Service for unlawful or harmful purposes.</li>
-                <li>Use the Service to process sensitive personal data (e.g., health, financial) without appropriate safeguards.</li>
+                <li>Reverse engineer or attempt to extract source code.</li>
+                <li>Use the Service for unlawful purposes.</li>
               </ul>
-              <p>We reserve the right to suspend or terminate accounts violating this policy.</p>
 
               <h2>6. Data Processing</h2>
               <p>
-                We process data as described in our <a href="/privacy">Privacy Policy</a>. By using the Service, you consent to such processing.
+                We process data as described in our <a href="/privacy" className="text-blue-400 hover:underline">Privacy Policy</a>.
               </p>
 
               <h2>7. Intellectual Property</h2>
-              <ul>
-                <li>ARF retains all rights, title, and interest in the Service.</li>
-                <li>You retain ownership of any data you submit.</li>
-                <li>You grant us a limited license to process your data solely to provide the Service.</li>
-              </ul>
-              <p>The ARF public specification remains governed by the proprietary access-controlled license.</p>
+              <p>
+                All rights in the ARF website and sandbox API belong to ARF. The core engine is proprietary – no public license is granted.
+              </p>
 
               <h2>8. Disclaimer of Warranties</h2>
-              <p>The Service is provided “as is” and “as available”. We disclaim all warranties, including:</p>
-              <ul>
-                <li>Merchantability</li>
-                <li>Fitness for a particular purpose</li>
-                <li>Non‑infringement</li>
-              </ul>
-              <p>We do not guarantee uninterrupted or error‑free operation.</p>
+              <p>
+                The sandbox API is provided “as is” with mock data. We disclaim all warranties. It is not suitable for production.
+              </p>
 
               <h2>9. Limitation of Liability</h2>
-              <p>To the maximum extent permitted by law:</p>
-              <ul>
-                <li>ARF shall not be liable for indirect, incidental, or consequential damages.</li>
-                <li>Total liability shall not exceed the amount paid by you in the 12 months preceding the claim.</li>
-              </ul>
-
-              <h2>10. Indemnification</h2>
-              <p>You agree to indemnify and hold harmless ARF from any claims, damages, or expenses arising from:</p>
-              <ul>
-                <li>Your use of the Service</li>
-                <li>Your violation of these Terms</li>
-              </ul>
-
-              <h2>11. Termination</h2>
-              <p>We may suspend or terminate your access:</p>
-              <ul>
-                <li>For violation of these Terms</li>
-                <li>For non‑payment</li>
-                <li>At our discretion with reasonable notice (e.g., 30 days)</li>
-              </ul>
-              <p>You may terminate your account at any time by contacting us.</p>
-
-              <h2>12. Governing Law</h2>
               <p>
-                These Terms are governed by the laws of the State of Delaware, United States, without regard to conflict‑of‑law principles. Disputes shall be resolved in the courts located in Delaware.
+                To the maximum extent permitted by law, ARF shall not be liable for any damages arising from use of the public sandbox.
               </p>
 
-              <h2>13. Changes to Terms</h2>
+              <h2>10. Governing Law</h2>
               <p>
-                We may update these Terms from time to time. Continued use of the Service after the effective date constitutes acceptance of the updated Terms.
+                These Terms are governed by the laws of the State of Delaware, USA.
               </p>
 
-              <h2>14. Contact</h2>
+              <h2>11. Contact</h2>
               <p className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                <a href="mailto:petter2025us@outlook.com">petter2025us@outlook.com</a>
+                <a href="mailto:juan@arf-ai.com">juan@arf-ai.com</a>
               </p>
             </div>
           </div>
 
-          {/* Footer note */}
           <p className="text-center text-gray-500 text-xs mt-8">
             Last updated: {effectiveDate}
           </p>
