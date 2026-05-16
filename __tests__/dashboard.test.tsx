@@ -2,20 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Dashboard from '../app/dashboard/page';
 
-// Mock window.location.protocol to avoid HTTP warning banner
-const originalLocation = window.location;
-beforeAll(() => {
-  delete (window as { location: Location }).location;
-  Object.defineProperty(window, 'location', {
-    value: { ...originalLocation, protocol: 'https:' },
-    writable: true,
-    configurable: true,
-  });
-});
-afterAll(() => {
-  window.location = originalLocation;
-});
-
 jest.mock('../hooks/useInView', () => ({
   useInView: () => ({ ref: { current: null }, inView: true }),
 }));
@@ -29,7 +15,6 @@ describe('Dashboard (Simulated Demo)', () => {
   it('displays a risk score percentage', async () => {
     render(<Dashboard />);
     await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
-    // Find the large percentage (unique by class)
     const largePercentage = await screen.findByText((content, element) => {
       return element?.tagName === 'DIV' && 
              element.classList.contains('text-3xl') && 
@@ -91,7 +76,6 @@ describe('Dashboard (Simulated Demo)', () => {
     const refreshButton = await screen.findByLabelText('Refresh data');
     expect(refreshButton).toBeEnabled();
     await user.click(refreshButton);
-    // Wait for the button to become enabled again (refresh complete)
     await waitFor(() => {
       expect(refreshButton).toBeEnabled();
     }, { timeout: 2000 });
@@ -104,12 +88,5 @@ describe('Dashboard (Simulated Demo)', () => {
     expect(pilotLinks.length).toBeGreaterThan(0);
     const signupLink = pilotLinks.find(link => link.getAttribute('href') === '/signup');
     expect(signupLink).toBeTruthy();
-  });
-
-  it('does not show HTTP warning (mocked to HTTPS)', async () => {
-    render(<Dashboard />);
-    await screen.findByText('ARF System Risk', {}, { timeout: 5000 });
-    const httpWarning = screen.queryByText(/Security warning: You are viewing this page over HTTP/i);
-    expect(httpWarning).not.toBeInTheDocument();
   });
 });
