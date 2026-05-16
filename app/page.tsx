@@ -682,7 +682,7 @@ export default function LandingPage() {
               />
               <ContactLink
                 href="https://calendly.com/petter2025us/30min"
-                icon={<Calendar className="w-5 h-5" />}
+                icon={null}
                 text="Book a Call"
                 emoji="📅"
               />
