@@ -45,13 +45,17 @@ const DIAGRAM = `flowchart TD
     end
     S1 --> Eval[Structured Risk Assessment]
     S2 --> Eval
-    Eval --> Policy[Policy Evaluation & Enforcement]
+    Eval --> Memory[Semantic Memory Retrieval]
+    Memory --> Fusion[Memory‑Based Risk Correction]
+    Fusion --> Policy[Policy Evaluation & Enforcement]
     Policy --> Action{Decision}
     Action -->|Approved| Execute[Controlled Execution]
     Action -->|Denied| Alert[Alert & Audit Log]
-    Action -->|Escalated| Review[Human‑in‑the‑Loop Review]`;
+    Action -->|Escalated| Review[Human‑in‑the‑Loop Review]
+    Execute --> Feedback[Outcome Feedback Loop]
+    Feedback --> Eval`;
 
-const CURL_COMMAND = `curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate \\
+const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
@@ -81,7 +85,7 @@ export default function LandingPage() {
   };
   const handleCopyCodeSnippet = async () => {
     await navigator.clipboard.writeText(
-      'curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate'
+      'curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate'
     );
     setCopiedCodeSnippet(true);
     setTimeout(() => setCopiedCodeSnippet(false), 2000);
@@ -263,12 +267,14 @@ export default function LandingPage() {
           <figure>
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
             <figcaption className="sr-only">
-              Incoming signals are assessed. A policy layer decides to approve, deny, or
-              escalate. The result is a controlled, auditable outcome — every time.
+              Incoming signals are assessed and enriched with memory. A closed‑loop
+              feedback mechanism updates the Bayesian risk model after every outcome.
+              A policy layer decides to approve, deny, or escalate. The result is a
+              controlled, auditable outcome — every time.
             </figcaption>
           </figure>
           <p className="text-xs text-gray-500 mt-2 text-center">
-            Signals → Structured Assessment → Policy‑Enforced Decision
+            Signals → Structured Assessment → Memory‑Informed Risk → Policy‑Enforced Decision
           </p>
         </div>
       </div>
@@ -292,15 +298,15 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
             title="Continuous Risk Calibration"
-            description="Confidence that evolves with every observed outcome — immediate feedback meets long‑term pattern analysis."
+            description="Confidence that evolves with every observed outcome — closed‑loop feedback meets long‑term pattern analysis."
             icon={<Brain className="w-8 h-8 text-blue-400" />}
-            details="A per‑category confidence model learns from each action, blending real‑time and historical signals. The resulting risk indicator is always backed by a full audit trail."
+            details="A per‑category Bayesian model learns from each action, updating its failure probability in real time. A closed feedback loop recalibrates priors when prediction errors exceed threshold, ensuring risk scores stay trustworthy over time."
           />
           <FeatureCard
             title="Operational Memory"
             description="Instantly retrieve similar past incidents so decisions are never made in a vacuum."
             icon={<Network className="w-8 h-8 text-green-400" />}
-            details="A living graph of historical events lets the system surface comparable situations and their resolutions, grounding each recommendation in proven experience."
+            details="A living graph of historical events lets the system surface comparable situations and their outcomes. Memory‑based risk correction blends evidence from past successes and failures into the current assessment, within a bounded, auditable weight."
           />
           <FeatureCard
             title="Cost‑Optimized Decisioning"
