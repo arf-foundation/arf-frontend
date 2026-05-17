@@ -25,7 +25,6 @@ import {
   Lock,
   FileText,
 } from 'lucide-react';
-import GitHubStars from '../components/GitHubStars';
 import { useInView } from './hooks/useInView';
 import Mermaid from '../components/Mermaid';
 
@@ -163,7 +162,6 @@ export default function LandingPage() {
               Govern every AI decision
             </span>
           </h1>
-          <GitHubStars />
         </div>
 
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
@@ -645,6 +643,7 @@ export default function LandingPage() {
             name="arf-spec"
             desc="Canonical specification — data models, API contracts, decision rules (shared under written terms)."
             url="https://github.com/arf-foundation/arf-spec"
+            isPrivate
           />
         </div>
       </section>
