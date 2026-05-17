@@ -1,6 +1,20 @@
 {
   "entries": [
     {
+      "date": "2026-05-17",
+      "title": "🧠 The Engine Now Learns from Every Decision",
+      "description": "Closed‑loop feedback is live: after a decision is executed, its outcome updates the Bayesian risk model. Semantic memory also now influences risk scores—past successes make similar requests safer, past failures make them riskier—all within an auditable, bounded weight. Risk scores are now true failure probabilities, giving you a decision‑grade number every time.",
+      "type": "pilot",
+      "link": "https://github.com/arf-foundation/agentic_reliability_framework/commit/87f079e"
+    },
+    {
+      "date": "2026-05-17",
+      "title": "📘 Public Specification Updated",
+      "description": "The governance specification now describes the closed‑loop feedback mechanism and memory‑based risk correction. New constants (memory weight cap, recalibration threshold) are publicly documented.",
+      "type": "public",
+      "link": "https://github.com/arf-foundation/arf-spec/blob/main/docs/governance.md"
+    },
+    {
       "date": "2026-04-15",
       "title": "Public specification v1.2.0 – Added Lyapunov stability and cryptographic integrity sections",
       "type": "public",
@@ -16,6 +30,34 @@
       "title": "Demo UI: Added mobile‑friendly Mermaid diagram fallback",
       "type": "public",
       "link": "https://github.com/arf-foundation/arf-frontend/commits/main"
+    },
+    {
+      "date": "2026-03-25",
+      "title": "🔬 Mathematical Foundation Hardened",
+      "description": "The entire test suite was transformed into an executable specification. Bayesian risk scoring, policy algebra, and predictive analytics are now continuously verified for correctness, determinism, and auditability. Trust is proven, not assumed.",
+      "type": "pilot",
+      "link": "https://github.com/arf-foundation/agentic_reliability_framework/commit/497e49f"
+    },
+    {
+      "date": "2026-03-16",
+      "title": "📦 Canonical Governance Loop Released",
+      "description": "Complete decision pipeline: Intent → Risk Evaluation → Policy Analysis → Expected Loss Minimisation → HealingIntent. HealingIntent now carries 30+ fields for full explainability and audit readiness.",
+      "type": "pilot",
+      "link": "https://github.com/arf-foundation/agentic_reliability_framework/releases/tag/v4.2.0%2Boss"
+    },
+    {
+      "date": "2026-03-05",
+      "title": "🧠 Semantic Memory Foundation",
+      "description": "Added incident storage, similarity search, and outcome tracking. The engine can now retrieve relevant past incidents to inform future decisions—the first step toward a memory‑aware governance system.",
+      "type": "pilot",
+      "link": "https://github.com/arf-foundation/agentic_reliability_framework/commit/19ca2d2"
+    },
+    {
+      "date": "2026-02-28",
+      "title": "🚀 Initial Core Engine Release",
+      "description": "First release of the hybrid Bayesian risk engine, policy enforcement, and multi‑agent architecture. The foundation of deterministic, auditable AI governance.",
+      "type": "pilot",
+      "link": "https://github.com/arf-foundation/agentic_reliability_framework/releases/tag/v4.0.0"
     }
   ]
 }
