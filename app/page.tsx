@@ -729,9 +729,6 @@ export default function LandingPage() {
             <Link href="/privacy" className="hover:text-white transition">
               Privacy Policy
             </Link>
-            <Link href="/legal/imprint" className="hover:text-white transition">
-              Imprint
-            </Link>
             <a
               href="https://github.com/arf-foundation"
               target="_blank"
