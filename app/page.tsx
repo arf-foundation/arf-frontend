@@ -155,6 +155,7 @@ export default function LandingPage() {
           heroInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
+          <img src="/arf-logo.png" alt="ARF – Agentic Reliability Framework" className="h-20 w-auto mx-auto mb-4" />
         <div className="flex flex-col items-center gap-3 mb-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
             {' '}
