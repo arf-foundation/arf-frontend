@@ -1,4 +1,4 @@
-# ARF Frontend – Public Demo Dashboard
+# ARF Frontend
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)](https://arf-frontend-sandy.vercel.app)
