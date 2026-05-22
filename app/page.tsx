@@ -754,6 +754,14 @@ export default function LandingPage() {
             >
               <MessageSquare size={18} /> Slack
             </a>
+            <a
+              href="https://www.linkedin.com/company/agentic-reliability"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition flex items-center gap-1"
+            >
+              LinkedIn
+            </a>
           </div>
 
           <p className="text-sm">
