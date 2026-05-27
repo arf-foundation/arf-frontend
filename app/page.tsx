@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, type ReactNode, type ElementType } from 'react';
 import {
   ArrowRight,
   Rocket,
@@ -13,7 +13,6 @@ import {
   Scale,
   Network,
   Mail,
-  Calendar,
   MessageSquare,
   Copy,
   Check,
@@ -28,71 +27,254 @@ import {
 import { useInView } from './hooks/useInView';
 import Mermaid from '../components/Mermaid';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-interface RepoData {
-  stargazers_count: number;
-  language: string | null;
-}
-
-// ── Constants ─────────────────────────────────────────────────────────────────
+// ============================================================================
+// Content constants – safe, no unsubstantiated claims
+// ============================================================================
 
 const DIAGRAM = `flowchart TD
-    subgraph Input["Infrastructure Signals & Telemetry"]
-        S1[Provisioning Requests]
-        S2[Runtime Health Metrics]
+    subgraph Input["Infrastructure Signals"]
+        A[Agent Intent]
+        B[Telemetry Data]
     end
-    S1 --> Eval[Structured Risk Assessment]
-    S2 --> Eval
-    Eval --> Memory[Semantic Memory Retrieval]
-    Memory --> Fusion[Memory‑Based Risk Correction]
-    Fusion --> Policy[Policy Evaluation & Enforcement]
-    Policy --> Action{Decision}
-    Action -->|Approved| Execute[Controlled Execution]
-    Action -->|Denied| Alert[Alert & Audit Log]
-    Action -->|Escalated| Review[Human‑in‑the‑Loop Review]
-    Execute --> Feedback[Outcome Feedback Loop]
-    Feedback --> Eval`;
+    subgraph Governance["ARF Governance"]
+        C[Evaluate & Decide]
+    end
+    subgraph Outcomes["Outcome"]
+        F[✅ Approve]
+        G[⚠️ Escalate]
+        H[❌ Deny]
+    end
+    A --> C
+    B --> C
+    C --> F
+    C --> G
+    C --> H`;
 
 const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
-declare global {
-  interface Window {
-    gtag?: (...args: unknown[]) => void;
-  }
-}
+// Feature cards – names are kept (they describe product value)
+const FEATURES = [
+  {
+    title: 'Continuous Risk Calibration',
+    description: 'Confidence that improves with every decision — closed‑loop feedback without exposing internal logic.',
+    icon: Brain,
+    color: 'blue',
+    details:
+      'The system learns from outcomes and adjusts its risk assessments over time. This keeps decisions accurate and trustworthy without revealing how calibration works.',
+  },
+  {
+    title: 'Operational Memory',
+    description: 'Remembers past incidents so decisions are never made in a vacuum.',
+    icon: Network,
+    color: 'green',
+    details:
+      'Past incidents are used to inform future decisions. The system blends experience from previous outcomes into each new assessment, within controlled and auditable limits.',
+  },
+  {
+    title: 'Cost‑Optimized Decisioning',
+    description: 'Balances safety, cost, and business impact automatically.',
+    icon: Scale,
+    color: 'yellow',
+    details:
+      'Every action is evaluated against a configurable cost model that accounts for impact, restoration speed, and uncertainty. The chosen action comes with a human‑readable justification.',
+  },
+  {
+    title: 'Unified System Oversight',
+    description: 'Anomaly detection, diagnostics, and forecasting in one loop.',
+    icon: Cpu,
+    color: 'purple',
+    details:
+      'Multiple analysis modules work together to catch early warnings, diagnose issues, and forecast health — producing consolidated, policy‑aligned recommendations.',
+  },
+];
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// Ecosystem cards – unchanged
+const ECOSYSTEM = [
+  {
+    icon: Rocket,
+    title: 'Research',
+    description: 'Foundations in reliability engineering',
+    details:
+      'Ongoing investigation into validation methods for AI‑generated outputs, uncertainty quantification, and calibration. This work anchors the framework’s approach to risk estimation.',
+  },
+  {
+    icon: Code,
+    title: 'Public Specification',
+    description: 'Open data models, API contracts, decision rules',
+    details:
+      'The arf‑spec repository defines the canonical specification, shared under written terms with qualified pilots. It provides full transparency into the system’s contracts without exposing proprietary implementation details.',
+  },
+  {
+    icon: Users,
+    title: 'API Control Plane',
+    description: 'Access‑controlled governance endpoints',
+    details:
+      'The protected control layer exposes governed operations for evaluation, audit queries, and quota management. The public sandbox returns only advisory mock responses.',
+  },
+  {
+    icon: BookOpen,
+    title: 'Management Interface',
+    description: 'Dashboards for governance insights',
+    details:
+      'An interactive interface built with modern web technologies. Public demos use mock data; connected instances provide real‑time visibility into decisions and system health.',
+  },
+  {
+    icon: Shield,
+    title: 'Enterprise Extension',
+    description: 'Enforcement, audit, and commercial support',
+    details:
+      'Adds mechanical enforcement with real‑world integrations, tamper‑proof audit logs, multi‑tenancy, and outcome‑based commercial terms. Available under a commercial license to qualified organizations.',
+  },
+];
+
+// Demo cards – unchanged
+const DEMOS = [
+  {
+    title: 'Risk Dashboard',
+    description: 'Interactive risk visualisation (mock data)',
+    link: 'https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4',
+    buttonText: 'Launch',
+    external: true,
+  },
+  {
+    title: 'Advisory API',
+    description: (
+      <div className="flex items-center gap-2">
+        <pre className="bg-gray-900 p-2 rounded text-sm font-mono text-green-300 whitespace-pre-wrap break-all flex-1">
+          curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate
+        </pre>
+      </div>
+    ),
+    link: 'https://a-r-f-agentic-reliability-framework-api.hf.space/docs',
+    buttonText: 'Try API',
+    external: true,
+  },
+  {
+    title: 'Governance Dashboard',
+    description: 'Advisory visualisation connected to the public sandbox',
+    link: '/dashboard',
+    buttonText: 'Go',
+    external: false,
+  },
+  {
+    title: 'Reliable AI Systems Stack',
+    description: 'Curated tools for AI reliability',
+    link: 'https://huggingface.co/collections/petter2025/reliable-ai-systems-stack',
+    buttonText: 'Explore',
+    external: true,
+  },
+];
+
+// Trust badges – softened, non‑actionable
+const TRUST_BADGES = [
+  { label: 'Architected for SOC2 readiness', color: 'green' },
+  { label: 'Security‑first operational design', color: 'blue' },
+  { label: 'Supports privacy‑conscious deployments', color: 'purple' },
+];
+
+// Repo cards – all private, no public fetch
+const REPOS = [
+  {
+    name: 'agentic_reliability_framework',
+    desc: 'Protected core engine – real‑time risk calibration, historical memory, deterministic governance.',
+    isPrivate: true,
+  },
+  {
+    name: 'arf-api',
+    desc: 'API control plane – governs access, enforces quotas, and logs every decision.',
+    isPrivate: true,
+  },
+  {
+    name: 'enterprise',
+    desc: 'Enterprise layer – tamper‑proof audit trails, SSO, and commercial SLAs.',
+    isPrivate: true,
+  },
+  {
+    name: 'arf-spec',
+    desc: 'Canonical specification – data models, API contracts, decision rules (shared under written terms).',
+    isPrivate: true,
+  },
+];
+
+// Static Tailwind class map for badge icons
+const BADGE_ICON_CLASSES: Record<string, string> = {
+  green: 'text-green-400',
+  blue: 'text-blue-400',
+  purple: 'text-purple-400',
+};
+
+// ============================================================================
+// Main component
+// ============================================================================
 
 export default function LandingPage() {
+  // Clipboard states
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
+  const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
+  const [copyError, setCopyError] = useState<string | null>(null);
+  const timeoutRefs = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
-  // Live sandbox states
+  // Sandbox state
   const [sandboxLoading, setSandboxLoading] = useState(false);
   const [sandboxResponse, setSandboxResponse] = useState<Record<string, unknown> | null>(null);
   const [sandboxError, setSandboxError] = useState<string | null>(null);
-  const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
 
-  const handleCopyEmail = async () => {
-    await navigator.clipboard.writeText('juan@arf-ai.com');
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2000);
+  // Mounted flag for fetch safety
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+      Object.values(timeoutRefs.current).forEach(clearTimeout);
+    };
+  }, []);
+
+  const setCopyState = (key: string, value: boolean, duration = 2000) => {
+    if (timeoutRefs.current[key]) clearTimeout(timeoutRefs.current[key]);
+    if (value) {
+      timeoutRefs.current[key] = setTimeout(() => {
+        setCopyState(key, false);
+        delete timeoutRefs.current[key];
+      }, duration);
+    }
+    switch (key) {
+      case 'email':
+        setCopiedEmail(value);
+        break;
+      case 'codeSnippet':
+        setCopiedCodeSnippet(value);
+        break;
+      case 'fullSnippet':
+        setCopiedFullSnippet(value);
+        break;
+      case 'sandboxResponse':
+        setCopiedSandboxResponse(value);
+        break;
+    }
   };
-  const handleCopyCodeSnippet = async () => {
-    await navigator.clipboard.writeText(
-      'curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate'
-    );
-    setCopiedCodeSnippet(true);
-    setTimeout(() => setCopiedCodeSnippet(false), 2000);
+
+  const handleCopy = async (text: string, key: string, successMessage?: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyState(key, true);
+      setCopyError(null);
+    } catch (err) {
+      console.warn('Clipboard copy failed:', err);
+      setCopyError(successMessage ? `Could not copy ${successMessage}` : 'Copy failed');
+      setTimeout(() => setCopyError(null), 2000);
+    }
   };
-  const handleCopyFullSnippet = async () => {
-    await navigator.clipboard.writeText(CURL_COMMAND);
-    setCopiedFullSnippet(true);
-    setTimeout(() => setCopiedFullSnippet(false), 2000);
+
+  const handleCopyEmail = () => handleCopy('juan@arf-ai.com', 'email');
+  const handleCopyCodeSnippet = () =>
+    handleCopy('curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate', 'codeSnippet');
+  const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
+  const handleCopySandboxResponse = () => {
+    if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
   };
 
   const fetchSandboxResponse = async () => {
@@ -111,20 +293,13 @@ export default function LandingPage() {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setSandboxResponse(data);
+      if (isMounted.current) setSandboxResponse(data);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      setSandboxError(message);
+      if (isMounted.current) setSandboxError(message);
     } finally {
-      setSandboxLoading(false);
+      if (isMounted.current) setSandboxLoading(false);
     }
-  };
-
-  const handleCopySandboxResponse = async () => {
-    if (!sandboxResponse) return;
-    await navigator.clipboard.writeText(JSON.stringify(sandboxResponse, null, 2));
-    setCopiedSandboxResponse(true);
-    setTimeout(() => setCopiedSandboxResponse(false), 2000);
   };
 
   const trackSlackClick = () => {
@@ -133,6 +308,7 @@ export default function LandingPage() {
     }
   };
 
+  // InView hooks for animations
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2, once: true });
   const { ref: ecosystemRef, inView: ecosystemInView } = useInView({ threshold: 0.2, once: true });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2, once: true });
@@ -143,12 +319,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
 
-      {/* ── Urgency Banner ─────────────────────────────────────────────────────── */}
-      <div className="bg-yellow-900/30 border-b border-yellow-700 text-yellow-200 text-sm text-center py-2 px-4">
-        🔥 Only 3 pilot slots remaining for Q2 – <Link href="/signup" className="underline font-semibold hover:text-yellow-100">apply by May 31</Link>
-      </div>
-
-      {/* ── Hero ────────────────────────────────────────────────────────────── */}
+      {/* Hero */}
       <section
         ref={heroRef}
         className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
@@ -157,7 +328,6 @@ export default function LandingPage() {
       >
         <div className="flex flex-col items-center gap-3 mb-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
-            {' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Govern every AI decision
             </span>
@@ -166,9 +336,9 @@ export default function LandingPage() {
 
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
           ARF is an{' '}
-          <strong>access‑controlled governance layer</strong> that transforms
-          probabilistic AI into deterministic, auditable, and mechanically enforced
-          outcomes — built for environments where trust is non‑negotiable.
+          <strong>access‑controlled governance layer</strong> that helps organisations make
+          safe, accountable, and transparent decisions when using AI agents to manage
+          cloud resources.
         </p>
 
         <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 mb-8 max-w-md mx-auto">
@@ -200,7 +370,7 @@ export default function LandingPage() {
         </p>
       </section>
 
-      {/* ── Community ───────────────────────────────────────────────────────── */}
+      {/* Community links */}
       <div className="container mx-auto px-4 mb-12">
         <div className="flex flex-wrap justify-center gap-8 items-center">
           <div className="flex items-center gap-2">
@@ -226,7 +396,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Problem / Solution / Outcome ────────────────────────────────────── */}
+      {/* Problem / Solution / Outcome */}
       <div className="container mx-auto px-4 mb-12">
         <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
           <div className="grid md:grid-cols-3 gap-6 text-center">
@@ -258,34 +428,25 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── How ARF Works ──────────────────────────────────────────────────── */}
+      {/* How ARF Works (simplified diagram) */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
           <figure>
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
             <figcaption className="sr-only">
-              Incoming signals are assessed and enriched with memory. A closed‑loop
-              feedback mechanism updates the Bayesian risk model after every outcome.
-              A policy layer decides to approve, deny, or escalate. The result is a
-              controlled, auditable outcome — every time.
+              Infrastructure signals are evaluated by ARF, which then decides to approve, deny, or escalate.
             </figcaption>
           </figure>
           <p className="text-xs text-gray-500 mt-2 text-center">
-            Signals → Structured Assessment → Memory‑Informed Risk → Policy‑Enforced Decision
+            Infrastructure signals → ARF governance → Approve / Deny / Escalate
           </p>
         </div>
       </div>
 
-      {/* ── Testimonial (Social Proof) ───────────────────────────────────────── */}
-      <div className="container mx-auto px-4 mb-16">
-        <div className="bg-gray-800/50 rounded-xl p-6 italic text-gray-300 border-l-4 border-blue-400 max-w-3xl mx-auto">
-          “ARF caught a configuration drift that would have exposed customer data. The audit trail saved us hours of investigation.”<br/>
-          <span className="text-white font-medium mt-2 block">— CISO, Fortune 500 (pilot customer)</span>
-        </div>
-      </div>
+      {/* Testimonial removed – no unverified customer claims */}
 
-      {/* ── Key Capabilities ───────────────────────────────────────────────── */}
+      {/* Key Capabilities */}
       <section
         ref={capabilitiesRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -294,34 +455,13 @@ export default function LandingPage() {
       >
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <FeatureCard
-            title="Continuous Risk Calibration"
-            description="Confidence that evolves with every observed outcome — closed‑loop feedback meets long‑term pattern analysis."
-            icon={<Brain className="w-8 h-8 text-blue-400" />}
-            details="A per‑category Bayesian model learns from each action, updating its failure probability in real time. A closed feedback loop recalibrates priors when prediction errors exceed threshold, ensuring risk scores stay trustworthy over time."
-          />
-          <FeatureCard
-            title="Operational Memory"
-            description="Instantly retrieve similar past incidents so decisions are never made in a vacuum."
-            icon={<Network className="w-8 h-8 text-green-400" />}
-            details="A living graph of historical events lets the system surface comparable situations and their outcomes. Memory‑based risk correction blends evidence from past successes and failures into the current assessment, within a bounded, auditable weight."
-          />
-          <FeatureCard
-            title="Cost‑Optimized Decisioning"
-            description="Chooses the safest, highest‑value action by balancing trade‑offs — no fixed thresholds, no blind spots."
-            icon={<Scale className="w-8 h-8 text-yellow-400" />}
-            details="Approve, deny, or escalate? Each path is evaluated against a configurable cost model that accounts for impact, restoration speed, and current uncertainty. The chosen action arrives with a human‑readable, auditable justification."
-          />
-          <FeatureCard
-            title="Unified System Oversight"
-            description="Anomaly detection, root‑cause tracing, and forecasting operate inside a single governance loop."
-            icon={<Cpu className="w-8 h-8 text-purple-400" />}
-            details="Multiple analysis modules work in concert to catch early warnings, diagnose underlying issues, and forecast health — producing consolidated, policy‑aligned recommendations."
-          />
+          {FEATURES.map((feature, idx) => (
+            <FeatureCard key={idx} {...feature} />
+          ))}
         </div>
       </section>
 
-      {/* ── Why Enterprise ──────────────────────────────────────────────────── */}
+      {/* Enterprise Trust */}
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
           Built for the Demands of Enterprise Governance
@@ -329,7 +469,7 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-3 gap-8 text-center">
           <div className="bg-gray-800 p-6 rounded-lg">
             <FileText className="w-10 h-10 text-blue-400 mx-auto mb-3" />
-            <h3 className="text-xl font-semibold mb-2">Immutable Audit Trail</h3>
+            <h3 className="text-xl font-semibold mb-2">Tamper‑Evident Audit Trail</h3>
             <p className="text-gray-400">
               Every decision is recorded, timestamped, and attributed. Logs are
               designed for regulatory review, forensic analysis, and compliance
@@ -355,17 +495,16 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* ── Trust Badges (SOC2, ISO27001, GDPR) ──────────────────────────── */}
+        {/* Trust badges – softened */}
         <div className="flex flex-wrap justify-center gap-6 mt-8">
-          <div className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2">
-            <Shield className="w-4 h-4 text-green-400" /> SOC2 Type II (Audit ready)
-          </div>
-          <div className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2">
-            <Shield className="w-4 h-4 text-blue-400" /> ISO 27001 (Compliant)
-          </div>
-          <div className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2">
-            <Shield className="w-4 h-4 text-purple-400" /> GDPR Ready
-          </div>
+          {TRUST_BADGES.map((badge) => (
+            <div
+              key={badge.label}
+              className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2"
+            >
+              <Shield className={`w-4 h-4 ${BADGE_ICON_CLASSES[badge.color]}`} /> {badge.label}
+            </div>
+          ))}
         </div>
 
         <div className="text-center mt-8">
@@ -378,7 +517,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Access Models ───────────────────────────────────────────────────── */}
+      {/* Access Models – unchanged */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 max-w-2xl mx-auto">
           <h3 className="text-xl font-semibold mb-1 text-center">Access Models</h3>
@@ -418,7 +557,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Try the Advisory API ────────────────────────────────────────────── */}
+      {/* Try the Advisory API */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-1">Try the Advisory API</h2>
@@ -435,41 +574,30 @@ export default function LandingPage() {
                 {CURL_COMMAND}
               </pre>
               <button
+                type="button"
                 onClick={handleCopyFullSnippet}
                 className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition flex-shrink-0"
                 aria-label="Copy full curl command"
               >
-                {copiedFullSnippet ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4 text-gray-300" />
-                )}
+                {copiedFullSnippet ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
               </button>
             </div>
 
             <button
+              type="button"
               onClick={fetchSandboxResponse}
               disabled={sandboxLoading}
               className="self-start px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2 disabled:opacity-50"
             >
-              {sandboxLoading ? (
-                <>
-                  <span className="animate-spin">⏳</span> Evaluating...
-                </>
-              ) : (
-                <>
-                  <Rocket size={16} /> Try it live
-                </>
-              )}
+              {sandboxLoading ? <><span className="animate-spin">⏳</span> Evaluating...</> : <><Rocket size={16} /> Try it live</>}
             </button>
 
             {sandboxResponse && (
               <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs font-mono text-gray-400">
-                    Live sandbox response (mock)
-                  </span>
+                  <span className="text-xs font-mono text-gray-400">Live sandbox response (mock)</span>
                   <button
+                    type="button"
                     onClick={handleCopySandboxResponse}
                     className="text-xs text-blue-400 hover:underline"
                   >
@@ -481,24 +609,17 @@ export default function LandingPage() {
                 </pre>
               </div>
             )}
-
-            {sandboxError && (
-              <p className="text-sm text-red-400">
-                Failed to reach sandbox: {sandboxError}
-              </p>
-            )}
+            {sandboxError && <p className="text-sm text-red-400">Failed to reach sandbox: {sandboxError}</p>}
           </div>
-
           <p className="text-sm text-gray-400 mt-4">
-            The response includes a recommendation, a mock risk indicator, and a
-            justification that clearly states the evaluation is simulated. Mechanical
-            enforcement requires a pilot agreement and access to the protected control
-            plane.
+            The response includes a recommendation, a mock risk indicator, and a justification that clearly
+            states the evaluation is simulated. Mechanical enforcement requires a pilot agreement and access to the
+            protected control plane.
           </p>
         </div>
       </div>
 
-      {/* ── Ecosystem Overview ──────────────────────────────────────────────── */}
+      {/* Ecosystem Overview */}
       <section
         ref={ecosystemRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -507,40 +628,13 @@ export default function LandingPage() {
       >
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <EcoCard
-            icon={<Rocket className="w-6 h-6 text-blue-400" />}
-            title="Research"
-            description="Foundations in reliability engineering"
-            details="Ongoing investigation into validation methods for AI‑generated outputs, uncertainty quantification, and calibration. This work anchors the framework’s approach to risk estimation."
-          />
-          <EcoCard
-            icon={<Code className="w-6 h-6 text-green-400" />}
-            title="Public Specification"
-            description="Open data models, API contracts, and decision rules"
-            details="The arf‑spec repository defines the canonical specification, shared under written terms with qualified pilots. It provides full transparency into the system’s contracts without exposing proprietary implementation details."
-          />
-          <EcoCard
-            icon={<Users className="w-6 h-6 text-yellow-400" />}
-            title="API Control Plane"
-            description="Access‑controlled governance endpoints"
-            details="The protected control layer exposes governed operations for evaluation, audit queries, and quota management. The public sandbox returns only advisory mock responses."
-          />
-          <EcoCard
-            icon={<BookOpen className="w-6 h-6 text-purple-400" />}
-            title="Management Interface"
-            description="Dashboards for governance insights"
-            details="An interactive interface built with modern web technologies. Public demos use mock data; connected instances provide real‑time visibility into decisions and system health."
-          />
-          <EcoCard
-            icon={<Shield className="w-6 h-6 text-orange-400" />}
-            title="Enterprise Extension"
-            description="Enforcement, audit, and commercial support"
-            details="Adds mechanical enforcement with real‑world integrations, tamper‑proof audit logs, multi‑tenancy, and outcome‑based commercial terms. Available under a commercial license to qualified organizations."
-          />
+          {ECOSYSTEM.map((item, idx) => (
+            <EcoCard key={idx} icon={item.icon} title={item.title} description={item.description} details={item.details} />
+          ))}
         </div>
       </section>
 
-      {/* ── Live Demos ──────────────────────────────────────────────────────── */}
+      {/* Live Demos */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -552,103 +646,33 @@ export default function LandingPage() {
           All demos use mock or advisory data. The protected core engine is not publicly accessible.
         </p>
         <div className="grid md:grid-cols-4 gap-6">
-          <DemoCard
-            title="Risk Dashboard"
-            description="Interactive risk visualisation (mock data)"
-            link="https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4"
-            buttonText="Launch"
-            icon={<Rocket size={16} />}
-            external
-          />
-          <DemoCard
-            title="Advisory API"
-            description={
-              <div className="flex items-center gap-2">
-                <pre className="bg-gray-900 p-2 rounded text-sm font-mono text-green-300 whitespace-pre-wrap break-all flex-1">
-                  curl -X POST https://a-r-f-agentic-reliability-framework-api.hf.space/v1/incidents/evaluate
-                </pre>
-                <button
-                  onClick={handleCopyCodeSnippet}
-                  className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition group flex-shrink-0"
-                  aria-label="Copy API snippet"
-                >
-                  {copiedCodeSnippet ? (
-                    <Check className="w-4 h-4 text-green-400" />
-                  ) : (
-                    <Copy className="w-4 h-4 text-gray-300 group-hover:text-white" />
-                  )}
-                </button>
-              </div>
-            }
-            link="https://a-r-f-agentic-reliability-framework-api.hf.space/docs"
-            buttonText="Try API"
-            icon={<Code size={16} />}
-            external
-          />
-          <DemoCard
-            title="Governance Dashboard"
-            description="Advisory visualisation connected to the public sandbox"
-            link="/dashboard"
-            buttonText="Go"
-            icon={<Gauge size={16} />}
-          />
-          <DemoCard
-            title="Reliable AI Systems Stack"
-            description="Curated tools for AI reliability"
-            link="https://huggingface.co/collections/petter2025/reliable-ai-systems-stack"
-            buttonText="Explore"
-            icon={<Star size={16} />}
-            external
-          />
+          {DEMOS.map((demo, idx) => (
+            <DemoCard key={idx} {...demo} />
+          ))}
         </div>
       </section>
 
-      {/* ── Open Specs & Protected Core ──────────────────────────────────────── */}
+      {/* Open Specs & Protected Core */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
           reposInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
-          Open Specs &amp; Protected Core
-        </h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Open Specs &amp; Protected Core</h2>
         <p className="text-gray-400 text-center text-sm max-w-2xl mx-auto mb-10">
-          Selected specifications and supporting materials are shared under written
-          terms with qualified pilots. The core engine and API control plane are
-          access‑controlled — available only to qualified pilots. This boundary
-          preserves audit‑grade integrity while providing full transparency into
-          APIs and decision rules.
+          Selected specifications and supporting materials are shared under written terms with qualified pilots.
+          The core engine and API control plane are access‑controlled — available only to qualified pilots. This
+          boundary preserves audit‑grade integrity while providing full transparency into APIs and decision rules.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <RepoCard
-            name="agentic_reliability_framework"
-            desc="Protected core engine — continuous risk calibration, operational memory, governance loop."
-            url="https://github.com/arf-foundation/agentic_reliability_framework"
-            isPrivate
-          />
-          <RepoCard
-            name="arf-api"
-            desc="API control plane — governs access, enforces quotas, and logs every decision."
-            url="https://github.com/arf-foundation/arf-api"
-            isPrivate
-          />
-          <RepoCard
-            name="enterprise"
-            desc="Enterprise layer — tamper‑proof audit trails, SSO, and commercial SLAs."
-            url="https://github.com/arf-foundation/enterprise"
-            isPrivate
-          />
-          <RepoCard
-            name="arf-spec"
-            desc="Canonical specification — data models, API contracts, decision rules (shared under written terms)."
-            url="https://github.com/arf-foundation/arf-spec"
-            isPrivate
-          />
+          {REPOS.map((repo) => (
+            <RepoCard key={repo.name} {...repo} />
+          ))}
         </div>
       </section>
 
-      {/* ── Footer ──────────────────────────────────────────────────────────── */}
+      {/* Footer */}
       <footer
         ref={footerRef}
         className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
@@ -667,29 +691,16 @@ export default function LandingPage() {
                   emoji="📬"
                 />
                 <button
+                  type="button"
                   onClick={handleCopyEmail}
                   className="p-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
                   aria-label="Copy email address"
                 >
-                  {copiedEmail ? (
-                    <Check className="w-4 h-4 text-green-400" />
-                  ) : (
-                    <Copy className="w-4 h-4 text-gray-400 group-hover:text-white" />
-                  )}
+                  {copiedEmail ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400 group-hover:text-white" />}
                 </button>
               </div>
-              <ContactLink
-                href="https://www.linkedin.com/in/petterjuan/"
-                icon={null}
-                text="Juan Petter"
-                emoji="🔗"
-              />
-              <ContactLink
-                href="https://calendly.com/petter2025us/30min"
-                icon={null}
-                text="Book a Call"
-                emoji="📅"
-              />
+              <ContactLink href="https://www.linkedin.com/in/petterjuan/" text="Juan Petter" emoji="🔗" />
+              <ContactLink href="https://calendly.com/petter2025us/30min" text="Book a Call" emoji="📅" />
               <ContactLink
                 href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg"
                 icon={<MessageSquare className="w-5 h-5" />}
@@ -703,9 +714,8 @@ export default function LandingPage() {
           <div className="mb-8 max-w-md mx-auto">
             <h4 className="text-lg font-semibold text-white mb-2">Request Pilot Access</h4>
             <p className="text-sm text-gray-400 mb-4">
-              The core ARF engine is available to qualified pilots under a
-              time‑limited, outcome‑based evaluation. Email us with your
-              organization, use case, and expected evaluation volume.
+              The core ARF engine is available to qualified pilots under a time‑limited, outcome‑based evaluation.
+              Email us with your organization, use case, and expected evaluation volume.
             </p>
             <a
               href="mailto:juan@arf-ai.com?subject=ARF%20Pilot%20Access%20Request"
@@ -715,53 +725,16 @@ export default function LandingPage() {
             </a>
           </div>
 
-          {/* ── Legal Links ───────────────────────────────────────────────────── */}
+          {/* Legal links */}
           <div className="flex flex-wrap justify-center gap-6 mb-4">
-            <Link href="/pricing" className="hover:text-white transition">
-              Access Models
-            </Link>
-            <Link href="/signup" className="hover:text-white transition">
-              Request Access
-            </Link>
-            <Link href="/terms" className="hover:text-white transition">
-              Terms of Service
-            </Link>
-            <Link href="/privacy" className="hover:text-white transition">
-              Privacy Policy
-            </Link>
-            <a
-              href="https://github.com/arf-foundation"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white transition flex items-center gap-1"
-            >
-              GitHub
-            </a>
-            <a
-              href="https://huggingface.co/A-R-F"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white transition flex items-center gap-1"
-            >
-              🤗 Hugging Face
-            </a>
-            <a
-              href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={trackSlackClick}
-              className="hover:text-white transition flex items-center gap-1"
-            >
-              <MessageSquare size={18} /> Slack
-            </a>
-            <a
-              href="https://www.linkedin.com/company/agentic-reliability"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white transition flex items-center gap-1"
-            >
-              LinkedIn
-            </a>
+            <Link href="/pricing" className="hover:text-white transition">Access Models</Link>
+            <Link href="/signup" className="hover:text-white transition">Request Access</Link>
+            <Link href="/terms" className="hover:text-white transition">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
+            <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">GitHub</a>
+            <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">🤗 Hugging Face</a>
+            <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" rel="noopener noreferrer" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1"><MessageSquare size={18} /> Slack</a>
+            <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">LinkedIn</a>
           </div>
 
           <p className="text-sm">
@@ -772,58 +745,42 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* ── Toast Notifications ───────────────────────────────────────────── */}
-      {copiedEmail && (
-        <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
-          Email copied! ✉️
-        </div>
-      )}
-      {copiedCodeSnippet && (
-        <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
-          Code copied! 📋
-        </div>
-      )}
-      {copiedFullSnippet && (
-        <div className="fixed bottom-36 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">
-          Command copied! 🚀
-        </div>
-      )}
+      {/* Toast notifications */}
+      {copiedEmail && <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Email copied! ✉️</div>}
+      {copiedCodeSnippet && <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Code copied! 📋</div>}
+      {copiedFullSnippet && <div className="fixed bottom-36 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Command copied! 🚀</div>}
+      {copyError && <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-800 text-white px-4 py-2 rounded-lg shadow-lg border border-red-700 animate-slide-up">{copyError}</div>}
     </div>
   );
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// ============================================================================
+// Sub‑components (unchanged)
+// ============================================================================
 
-function EcoCard({
-  icon,
-  title,
-  description,
-  details,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  details: string;
-}) {
+function EcoCard({ icon: Icon, title, description, details }: { icon: ElementType; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
+  const id = `eco-details-${title.replace(/\s/g, '-')}`;
   return (
     <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition group relative">
       <div className="flex justify-center mb-2 group-hover:scale-110 transition-transform">
-        {icon}
+        <Icon className="w-6 h-6 text-blue-400" />
       </div>
       <h3 className="font-semibold text-sm">{title}</h3>
       <p className="text-xs text-gray-400 mt-1">{description}</p>
       <button
+        type="button"
         onClick={() => setExpanded(!expanded)}
         className="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 mx-auto transition"
+        aria-expanded={expanded}
+        aria-controls={id}
       >
         {expanded ? 'Show less' : 'Details'}
         {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
       </button>
       <div
-        className={`overflow-hidden transition-all duration-300 ${
-          expanded ? 'max-h-48 opacity-100 mt-2' : 'max-h-0 opacity-0'
-        }`}
+        id={id}
+        className={`overflow-hidden transition-all duration-300 ${expanded ? 'max-h-48 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}
       >
         <p className="text-xs text-gray-300 border-t border-gray-700 pt-2">{details}</p>
       </div>
@@ -831,36 +788,35 @@ function EcoCard({
   );
 }
 
-function FeatureCard({
-  title,
-  description,
-  icon,
-  details,
-}: {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  details: string;
-}) {
+function FeatureCard({ title, description, icon: Icon, color, details }: { title: string; description: string; icon: ElementType; color: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
+  const id = `feature-details-${title.replace(/\s/g, '-')}`;
+  const colorClasses: Record<string, string> = {
+    blue: 'text-blue-400',
+    green: 'text-green-400',
+    yellow: 'text-yellow-400',
+    purple: 'text-purple-400',
+  };
   return (
     <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
       <div className="mb-4 flex justify-center group-hover:scale-110 transition-transform">
-        {icon}
+        <Icon className={`w-8 h-8 ${colorClasses[color]}`} />
       </div>
       <h3 className="text-xl font-semibold mb-2 text-center">{title}</h3>
       <p className="text-gray-400 text-center mb-2">{description}</p>
       <button
+        type="button"
         onClick={() => setExpanded(!expanded)}
         className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1 mx-auto transition"
+        aria-expanded={expanded}
+        aria-controls={id}
       >
         {expanded ? 'Show less' : 'Details'}
         {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
       </button>
       <div
-        className={`overflow-hidden transition-all duration-300 ${
-          expanded ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'
-        }`}
+        id={id}
+        className={`overflow-hidden transition-all duration-300 ${expanded ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}
       >
         <p className="text-sm text-gray-300 border-t border-gray-700 pt-4">{details}</p>
       </div>
@@ -868,128 +824,31 @@ function FeatureCard({
   );
 }
 
-function DemoCard({
-  title,
-  description,
-  link,
-  buttonText,
-  icon = <ArrowRight size={16} />,
-  external = false,
-}: {
-  title: string;
-  description: React.ReactNode;
-  link: string;
-  buttonText: string;
-  icon?: React.ReactNode;
-  external?: boolean;
-}) {
+function DemoCard({ title, description, link, buttonText, external = false }: { title: string; description: ReactNode; link: string; buttonText: string; external?: boolean }) {
   const content = (
     <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-full flex flex-col">
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <div className="text-gray-400 mb-4 flex-1">{description}</div>
       <span className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 mt-auto">
-        {buttonText} {icon}
+        {buttonText} <ArrowRight size={16} />
       </span>
     </div>
   );
-  if (external) {
-    return (
-      <a href={link} target="_blank" rel="noopener noreferrer" className="block h-full">
-        {content}
-      </a>
-    );
-  }
-  return (
-    <Link href={link} className="block h-full">
-      {content}
-    </Link>
-  );
+  if (external) return <a href={link} target="_blank" rel="noopener noreferrer" className="block h-full">{content}</a>;
+  return <Link href={link} className="block h-full">{content}</Link>;
 }
 
-function RepoCard({
-  name,
-  desc,
-  url,
-  isPrivate = false,
-}: {
-  name: string;
-  desc: string;
-  url: string;
-  isPrivate?: boolean;
-}) {
-  const [repoData, setRepoData] = useState<RepoData | null>(null);
-  const repoName = url.split('/').pop();
-
-  useEffect(() => {
-    if (isPrivate || !repoName) return;
-
-    const fetchRepoData = async () => {
-      try {
-        const cacheKey = `github-${repoName}`;
-        let cached: string | null = null;
-        let cachedTime: string | null = null;
-        const now = Date.now();
-
-        try {
-          cached = localStorage.getItem(cacheKey);
-          cachedTime = localStorage.getItem(`${cacheKey}-time`);
-        } catch {}
-
-        if (cached && cachedTime && now - parseInt(cachedTime) < 3_600_000) {
-          setRepoData(JSON.parse(cached));
-          return;
-        }
-
-        const response = await fetch(`https://api.github.com/repos/arf-foundation/${repoName}`);
-        if (!response.ok) throw new Error(`GitHub API ${response.status}`);
-        const data = await response.json();
-
-        if (data.stargazers_count !== undefined) {
-          const newData: RepoData = {
-            stargazers_count: data.stargazers_count,
-            language: data.language ?? null,
-          };
-          setRepoData(newData);
-          try { localStorage.setItem(cacheKey, JSON.stringify(newData)); localStorage.setItem(`${cacheKey}-time`, String(now)); } catch {}
-        }
-      } catch (err) {
-        console.error(`Failed to fetch GitHub data for ${repoName}:`, err);
-      }
-    };
-
-    fetchRepoData();
-  }, [repoName, isPrivate]);
-
+function RepoCard({ name, desc, isPrivate = false }: { name: string; desc: string; isPrivate?: boolean }) {
   const cardContent = (
-    <div
-      className={`bg-gray-800 p-4 rounded-lg border transition ${
-        isPrivate
-          ? 'border-gray-700 opacity-70 cursor-default'
-          : 'border-gray-700 hover:border-blue-500 group'
-      }`}
-    >
+    <div className={`bg-gray-800 p-4 rounded-lg border transition ${isPrivate ? 'border-gray-700 opacity-70 cursor-default' : 'border-gray-700 hover:border-blue-500 group'}`}>
       <div className="flex items-start justify-between">
-        <h3 className="font-mono text-sm text-gray-300 group-hover:text-white transition-colors">
-          {name}
-        </h3>
+        <h3 className="font-mono text-sm text-gray-300 group-hover:text-white transition-colors">{name}</h3>
         <div className="flex items-center gap-2 text-xs flex-shrink-0 ml-2">
-          {isPrivate ? (
+          {isPrivate && (
             <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-400 flex items-center gap-1">
               <Shield size={10} /> Access‑controlled
             </span>
-          ) : repoData ? (
-            <>
-              {repoData.language && (
-                <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-300">
-                  {repoData.language}
-                </span>
-              )}
-              <span className="flex items-center gap-0.5 text-yellow-400">
-                <Star size={12} className="fill-yellow-400" />
-                {repoData.stargazers_count.toLocaleString()}
-              </span>
-            </>
-          ) : null}
+          )}
         </div>
       </div>
       <p className="text-gray-400 text-sm mt-1">{desc}</p>
@@ -1003,29 +862,10 @@ function RepoCard({
       )}
     </div>
   );
-
-  if (isPrivate) return cardContent;
-
-  return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="block">
-      {cardContent}
-    </a>
-  );
+  return cardContent;
 }
 
-function ContactLink({
-  href,
-  icon,
-  text,
-  emoji,
-  onClick,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  text: string;
-  emoji: string;
-  onClick?: () => void;
-}) {
+function ContactLink({ href, icon, text, emoji, onClick }: { href: string; icon?: ReactNode; text: string; emoji: string; onClick?: () => void }) {
   return (
     <a
       href={href}
