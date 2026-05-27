@@ -26,6 +26,12 @@ import {
 } from 'lucide-react';
 import { useInView } from './hooks/useInView';
 import Mermaid from '../components/Mermaid';
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
 
 // ============================================================================
 // Content constants – safe, no unsubstantiated claims
