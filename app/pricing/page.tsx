@@ -48,7 +48,7 @@ export default function PricingPage() {
                 <span>UI dashboard with demo data</span>
               </li>
               <li className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
-                <span className="w-4" />✗ No Bayesian core
+                <span className="w-4" />✗ No statistical engine
               </li>
               <li className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
                 <span className="w-4" />✗ No audit logs
@@ -127,7 +127,7 @@ export default function PricingPage() {
               </li>
             </ul>
             <p className="text-xs text-gray-400 mt-4 border-t border-gray-700 pt-3">
-              We measure risk reduction via auditable pre/post Bayesian scores – you pay only for verified improvement.
+              We measure risk reduction via auditable pre/post risk scores – you pay only for verified improvement.
             </p>
             <div className="mt-6 sm:mt-8">
               <button
