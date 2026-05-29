@@ -2,9 +2,32 @@
 
 import { useState } from 'react';
 
+interface HealingIntent {
+  intent_type: string;
+  parameters: Record<string, unknown>;
+  rollback_required: boolean;
+  execution_mode_recommended: 'Advisory' | 'Approval' | 'Autonomous';
+}
+
+interface ARFAgentOutput {
+  incident_summary: string;
+  normalized_category: string;
+  detected_patterns: string[];
+  pattern_signal_count: number;
+  probable_root_cause: string;
+  similarity_confidence: number;
+  risk_score: number;
+  gating_rule_triggered: string;
+  gating_rule_stack: string[];
+  policy_flag_frequency_hint: string[];
+  healing_intent: HealingIntent;
+  policy_flags: string[];
+  uncertainty_notes: string;
+}
+
 export default function AgentPage() {
   const [input, setInput] = useState('');
-  const [output, setOutput] = useState<any>(null);
+  const [output, setOutput] = useState<ARFAgentOutput | { error: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
   const analyze = async () => {
@@ -38,11 +61,13 @@ export default function AgentPage() {
         <p className="text-gray-600 dark:text-gray-400 mb-4">
           Paste an incident description → get structured governance output (risk score, execution mode, etc.)
         </p>
+
         <div className="flex gap-2 mb-4 flex-wrap">
           <button onClick={() => setInput(presets.aircanada)} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-md">✈️ Air Canada</button>
           <button onClick={() => setInput(presets.pocketos)} className="px-3 py-1 bg-red-100 text-red-800 rounded-md">💀 PocketOS</button>
           <button onClick={() => setInput(presets.amazon)} className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-md">📦 Amazon</button>
         </div>
+
         <textarea
           className="w-full p-3 border rounded-md font-mono"
           rows={6}
@@ -50,6 +75,7 @@ export default function AgentPage() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Describe an incident..."
         />
+
         <button
           onClick={analyze}
           disabled={loading || !input.trim()}
@@ -57,10 +83,11 @@ export default function AgentPage() {
         >
           {loading ? 'Analyzing...' : 'Analyze Incident'}
         </button>
+
         {output && (
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-2">Governance Output</h2>
-            {output.error ? (
+            {'error' in output ? (
               <div className="bg-red-50 p-4 rounded-md text-red-700">{output.error}</div>
             ) : (
               <>
