@@ -216,7 +216,6 @@ const BADGE_ICON_CLASSES: Record<string, string> = {
 export default function LandingPage() {
   // Clipboard states
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
   const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
@@ -233,7 +232,8 @@ export default function LandingPage() {
     isMounted.current = true;
     return () => {
       isMounted.current = false;
-      Object.values(timeoutRefs.current).forEach(clearTimeout);
+      const refs = timeoutRefs.current;
+      Object.values(refs).forEach(clearTimeout);
     };
   }, []);
 
@@ -248,9 +248,6 @@ export default function LandingPage() {
     switch (key) {
       case 'email':
         setCopiedEmail(value);
-        break;
-      case 'codeSnippet':
-        setCopiedCodeSnippet(value);
         break;
       case 'fullSnippet':
         setCopiedFullSnippet(value);
@@ -274,8 +271,6 @@ export default function LandingPage() {
   };
 
   const handleCopyEmail = () => handleCopy('juan@arf-ai.com', 'email');
-  const handleCopyCodeSnippet = () =>
-    handleCopy('curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate', 'codeSnippet');
   const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
   const handleCopySandboxResponse = () => {
     if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
@@ -499,7 +494,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Trust badges – softened */}
           <div className="flex flex-wrap justify-center gap-6 mt-8">
             {TRUST_BADGES.map((badge) => (
               <div
@@ -740,7 +734,6 @@ export default function LandingPage() {
             </a>
           </div>
 
-          {/* Legal links */}
           <div className="flex flex-wrap justify-center gap-6 mb-4">
             <Link href="/pricing" className="hover:text-white transition">Access Models</Link>
             <Link href="/signup" className="hover:text-white transition">Request Access</Link>
@@ -762,8 +755,7 @@ export default function LandingPage() {
 
       {/* Toast notifications */}
       {copiedEmail && <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Email copied! ✉️</div>}
-      {copiedCodeSnippet && <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Code copied! 📋</div>}
-      {copiedFullSnippet && <div className="fixed bottom-36 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Command copied! 🚀</div>}
+      {copiedFullSnippet && <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Command copied! 🚀</div>}
       {copyError && <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-800 text-white px-4 py-2 rounded-lg shadow-lg border border-red-700 animate-slide-up">{copyError}</div>}
     </div>
   );
