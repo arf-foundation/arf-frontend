@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import fs from 'fs';
 import path from 'path';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Lazy‑load OpenAI client only when the API is called (avoids build‑time key requirement)
+let openai: any = null;
+async function getOpenAI() {
+  if (!openai) {
+    const { default: OpenAI } = await import('openai');
+    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openai;
+}
 
-// Read system prompt from a separate file
+// Read system prompt from file (this is fine – it’s static content)
 const SYSTEM_PROMPT = fs.readFileSync(
   path.join(process.cwd(), 'app/api/chat/prompt.txt'),
   'utf-8'
@@ -18,6 +25,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'message required' }, { status: 400 });
     }
 
+    const openai = await getOpenAI();
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       temperature: 0,
