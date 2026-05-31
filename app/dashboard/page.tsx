@@ -317,7 +317,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Recent Incidents - fixed JSX closing tags */}
+              {/* Recent Incidents - fixed JSX */}
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold mb-4">Recent Incidents (Simulated)</h2>
                 <div className="hidden sm:block overflow-x-auto">
@@ -380,7 +380,7 @@ export default function Dashboard() {
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-blue-400" /> Audit Trail (Recent decisions)</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-gray-700"><th className="text-left py-2 px-2">Timestamp</th><th className="text-left py-2 px-2">Component</th><th className="text-left py-2 px-2">Action</th><th className="text-right py-2 px-2">Risk</th><th className="text-right py-2 px-2">Decision</th><th className="text-left py-2 px-2">User</th></td></thead>
+                    <thead><tr className="border-b border-gray-700"><th className="text-left py-2 px-2">Timestamp</th><th className="text-left py-2 px-2">Component</th><th className="text-left py-2 px-2">Action</th><th className="text-right py-2 px-2">Risk</th><th className="text-right py-2 px-2">Decision</th><th className="text-left py-2 px-2">User</th></tr></thead>
                     <tbody>
                       {MOCK_AUDIT_LOGS.map((log) => (
                         <tr key={log.id} className="border-b border-gray-700/50">
