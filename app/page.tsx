@@ -18,20 +18,18 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  Gauge,
-  Star,
   Shield,
   Lock,
   FileText,
 } from 'lucide-react';
 import { useInView } from './hooks/useInView';
 import Mermaid from '../components/Mermaid';
+
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
   }
 }
-
 
 // ============================================================================
 // Content constants – safe, no unsubstantiated claims
@@ -180,7 +178,7 @@ const TRUST_BADGES = [
   { label: 'Supports privacy‑conscious deployments', color: 'purple' },
 ];
 
-// Repo cards – all private, no public fetch
+// Repo cards – updated descriptions for trust building
 const REPOS = [
   {
     name: 'agentic_reliability_framework',
@@ -323,8 +321,7 @@ export default function LandingPage() {
   const { ref: footerRef, inView: footerInView } = useInView({ threshold: 0.1, once: true });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-
+    <div className="min-h-screen text-white">
       {/* Hero */}
       <section
         ref={heroRef}
@@ -404,7 +401,7 @@ export default function LandingPage() {
 
       {/* Problem / Solution / Outcome */}
       <div className="container mx-auto px-4 mb-12">
-        <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <div className="grid md:grid-cols-3 gap-6 text-center">
             <div>
               <div className="text-red-400 font-bold text-xl mb-2">⚠️ Problem</div>
@@ -436,7 +433,7 @@ export default function LandingPage() {
 
       {/* How ARF Works (simplified diagram) */}
       <div className="container mx-auto px-4 mb-16">
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
           <figure>
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
@@ -450,8 +447,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Testimonial removed – no unverified customer claims */}
-
       {/* Key Capabilities */}
       <section
         ref={capabilitiesRef}
@@ -459,73 +454,77 @@ export default function LandingPage() {
           capabilitiesInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {FEATURES.map((feature, idx) => (
-            <FeatureCard key={idx} {...feature} />
-          ))}
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Key Capabilities</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {FEATURES.map((feature, idx) => (
+              <FeatureCard key={idx} {...feature} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Enterprise Trust */}
+      {/* Enterprise Trust (Built for the Demands of Enterprise Governance) */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
-          Built for the Demands of Enterprise Governance
-        </h2>
-        <div className="grid md:grid-cols-3 gap-8 text-center">
-          <div className="bg-gray-800 p-6 rounded-lg">
-            <FileText className="w-10 h-10 text-blue-400 mx-auto mb-3" />
-            <h3 className="text-xl font-semibold mb-2">Tamper‑Evident Audit Trail</h3>
-            <p className="text-gray-400">
-              Every decision is recorded, timestamped, and attributed. Logs are
-              designed for regulatory review, forensic analysis, and compliance
-              preparation — no exceptions, no gaps.
-            </p>
-          </div>
-          <div className="bg-gray-800 p-6 rounded-lg">
-            <Lock className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
-            <h3 className="text-xl font-semibold mb-2">Mechanical Enforcement</h3>
-            <p className="text-gray-400">
-              Policy gates that cannot be bypassed or silently overridden. Every
-              override is logged. Enforcement is deterministic — not advisory.
-            </p>
-          </div>
-          <div className="bg-gray-800 p-6 rounded-lg">
-            <Brain className="w-10 h-10 text-purple-400 mx-auto mb-3" />
-            <h3 className="text-xl font-semibold mb-2">Explainable Reasoning</h3>
-            <p className="text-gray-400">
-              Every risk score is backed by transparent logic — never a black‑box.
-              Suitable for executive briefings, regulator inquiries, and third‑party
-              audits.
-            </p>
-          </div>
-        </div>
-
-        {/* Trust badges – softened */}
-        <div className="flex flex-wrap justify-center gap-6 mt-8">
-          {TRUST_BADGES.map((badge) => (
-            <div
-              key={badge.label}
-              className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2"
-            >
-              <Shield className={`w-4 h-4 ${BADGE_ICON_CLASSES[badge.color]}`} /> {badge.label}
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
+            Built for the Demands of Enterprise Governance
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <FileText className="w-10 h-10 text-blue-400 mx-auto mb-3" />
+              <h3 className="text-xl font-semibold mb-2">Tamper‑Evident Audit Trail</h3>
+              <p className="text-gray-400">
+                Every decision is recorded, timestamped, and attributed. Logs are
+                designed for regulatory review, forensic analysis, and compliance
+                preparation — no exceptions, no gaps.
+              </p>
             </div>
-          ))}
-        </div>
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <Lock className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
+              <h3 className="text-xl font-semibold mb-2">Mechanical Enforcement</h3>
+              <p className="text-gray-400">
+                Policy gates that cannot be bypassed or silently overridden. Every
+                override is logged. Enforcement is deterministic — not advisory.
+              </p>
+            </div>
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <Brain className="w-10 h-10 text-purple-400 mx-auto mb-3" />
+              <h3 className="text-xl font-semibold mb-2">Explainable Reasoning</h3>
+              <p className="text-gray-400">
+                Every risk score is backed by transparent logic — never a black‑box.
+                Suitable for executive briefings, regulator inquiries, and third‑party
+                audits.
+              </p>
+            </div>
+          </div>
 
-        <div className="text-center mt-8">
-          <Link
-            href="/pricing"
-            className="bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition inline-flex items-center gap-2"
-          >
-            View Access Models <ArrowRight size={16} />
-          </Link>
+          {/* Trust badges – softened */}
+          <div className="flex flex-wrap justify-center gap-6 mt-8">
+            {TRUST_BADGES.map((badge) => (
+              <div
+                key={badge.label}
+                className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700"
+              >
+                <Shield className={`w-4 h-4 ${BADGE_ICON_CLASSES[badge.color]}`} /> {badge.label}
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              href="/pricing"
+              className="bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition inline-flex items-center gap-2"
+            >
+              View Access Models <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Access Models – unchanged */}
+      {/* Access Models */}
       <div className="container mx-auto px-4 mb-16">
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 max-w-2xl mx-auto">
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 max-w-4xl mx-auto">
           <h3 className="text-xl font-semibold mb-1 text-center">Access Models</h3>
           <p className="text-sm text-gray-400 text-center mb-6">
             All pricing is outcome‑based. Pilot access is time‑limited and free for
@@ -565,7 +564,7 @@ export default function LandingPage() {
 
       {/* Try the Advisory API */}
       <div className="container mx-auto px-4 mb-16">
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-1">Try the Advisory API</h2>
           <p className="text-sm text-amber-400 mb-4">
             ⚠️ This endpoint returns mock responses. The protected core engine is not
@@ -632,11 +631,13 @@ export default function LandingPage() {
           ecosystemInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {ECOSYSTEM.map((item, idx) => (
-            <EcoCard key={idx} icon={item.icon} title={item.title} description={item.description} details={item.details} />
-          ))}
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {ECOSYSTEM.map((item, idx) => (
+              <EcoCard key={idx} icon={item.icon} title={item.title} description={item.description} details={item.details} />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -647,34 +648,42 @@ export default function LandingPage() {
           demosInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Live Demos</h2>
-        <p className="text-gray-400 text-center text-sm mb-10">
-          All demos use mock or advisory data. The protected core engine is not publicly accessible.
-        </p>
-        <div className="grid md:grid-cols-4 gap-6">
-          {DEMOS.map((demo, idx) => (
-            <DemoCard key={idx} {...demo} />
-          ))}
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Live Demos</h2>
+          <p className="text-gray-400 text-center text-sm mb-10">
+            All demos use mock or advisory data. The protected core engine is not publicly accessible.
+          </p>
+          <div className="grid md:grid-cols-4 gap-6">
+            {DEMOS.map((demo, idx) => (
+              <DemoCard key={idx} {...demo} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Open Specs & Protected Core */}
+      {/* Open Specs & Protected Core (rewritten for trust) */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
           reposInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Open Specs &amp; Protected Core</h2>
-        <p className="text-gray-400 text-center text-sm max-w-2xl mx-auto mb-10">
-          Selected specifications and supporting materials are shared under written terms with qualified pilots.
-          The core engine and API control plane are access‑controlled — available only to qualified pilots. This
-          boundary preserves audit‑grade integrity while providing full transparency into APIs and decision rules.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {REPOS.map((repo) => (
-            <RepoCard key={repo.name} {...repo} />
-          ))}
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Open Specifications &amp; Protected Core</h2>
+          <p className="text-gray-400 text-center text-sm max-w-3xl mx-auto mb-6">
+            ARF’s core engine is access‑controlled and not publicly available. However, we provide open specifications
+            (data models, API contracts, decision rules) under written terms to qualified pilots. This approach gives you
+            full transparency into how decisions are made, while preserving the integrity and security of the production
+            engine. All code, specifications, and materials are proprietary and protected as trade secrets.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {REPOS.map((repo) => (
+              <RepoCard key={repo.name} {...repo} />
+            ))}
+          </div>
+          <p className="text-gray-400 text-center text-xs mt-6">
+            The specification and API contracts are shared under written terms. <Link href="/signup" className="text-blue-400 hover:underline">Request pilot access</Link> to receive them.
+          </p>
         </div>
       </section>
 
@@ -761,14 +770,14 @@ export default function LandingPage() {
 }
 
 // ============================================================================
-// Sub‑components (unchanged)
+// Sub‑components
 // ============================================================================
 
 function EcoCard({ icon: Icon, title, description, details }: { icon: ElementType; title: string; description: string; details: string }) {
   const [expanded, setExpanded] = useState(false);
   const id = `eco-details-${title.replace(/\s/g, '-')}`;
   return (
-    <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition group relative">
+    <div className="bg-gray-800/80 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition group relative">
       <div className="flex justify-center mb-2 group-hover:scale-110 transition-transform">
         <Icon className="w-6 h-6 text-blue-400" />
       </div>
@@ -804,7 +813,7 @@ function FeatureCard({ title, description, icon: Icon, color, details }: { title
     purple: 'text-purple-400',
   };
   return (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
+    <div className="bg-gray-800/80 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
       <div className="mb-4 flex justify-center group-hover:scale-110 transition-transform">
         <Icon className={`w-8 h-8 ${colorClasses[color]}`} />
       </div>
@@ -832,7 +841,7 @@ function FeatureCard({ title, description, icon: Icon, color, details }: { title
 
 function DemoCard({ title, description, link, buttonText, external = false }: { title: string; description: ReactNode; link: string; buttonText: string; external?: boolean }) {
   const content = (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-full flex flex-col">
+    <div className="bg-gray-800/80 p-6 rounded-lg border border-gray-700 h-full flex flex-col hover:border-blue-500 transition">
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <div className="text-gray-400 mb-4 flex-1">{description}</div>
       <span className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 mt-auto">
@@ -846,7 +855,7 @@ function DemoCard({ title, description, link, buttonText, external = false }: { 
 
 function RepoCard({ name, desc, isPrivate = false }: { name: string; desc: string; isPrivate?: boolean }) {
   const cardContent = (
-    <div className={`bg-gray-800 p-4 rounded-lg border transition ${isPrivate ? 'border-gray-700 opacity-70 cursor-default' : 'border-gray-700 hover:border-blue-500 group'}`}>
+    <div className={`bg-gray-800/80 p-4 rounded-lg border transition ${isPrivate ? 'border-gray-700 opacity-80 cursor-default' : 'border-gray-700 hover:border-blue-500 group'}`}>
       <div className="flex items-start justify-between">
         <h3 className="font-mono text-sm text-gray-300 group-hover:text-white transition-colors">{name}</h3>
         <div className="flex items-center gap-2 text-xs flex-shrink-0 ml-2">
