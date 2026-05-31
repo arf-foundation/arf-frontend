@@ -185,15 +185,9 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const TrustBadges = () => (
   <div className="flex flex-wrap justify-center gap-4 my-6">
-    <div className="bg-gray-800 px-3 py-1 rounded-full text-xs flex items-center gap-1">
-      <Shield className="w-3 h-3 text-green-400" /> SOC2 Type II (Audit ready)
-    </div>
-    <div className="bg-gray-800 px-3 py-1 rounded-full text-xs flex items-center gap-1">
-      <Shield className="w-3 h-3 text-blue-400" /> ISO 27001 (Compliant)
-    </div>
-    <div className="bg-gray-800 px-3 py-1 rounded-full text-xs flex items-center gap-1">
-      <Shield className="w-3 h-3 text-purple-400" /> GDPR Ready
-    </div>
+    <div className="bg-gray-800 px-3 py-1 rounded-full text-xs flex items-center gap-1"><Shield className="w-3 h-3 text-green-400" /> SOC2 Type II (Audit ready)</div>
+    <div className="bg-gray-800 px-3 py-1 rounded-full text-xs flex items-center gap-1"><Shield className="w-3 h-3 text-blue-400" /> ISO 27001 (Compliant)</div>
+    <div className="bg-gray-800 px-3 py-1 rounded-full text-xs flex items-center gap-1"><Shield className="w-3 h-3 text-purple-400" /> GDPR Ready</div>
   </div>
 );
 
@@ -249,10 +243,10 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshData();
     const interval = setInterval(refreshData, 30000);
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
   }, [refreshData]);
 
   if (!riskData) {
@@ -270,21 +264,14 @@ export default function Dashboard() {
           {/* HTTP Warning */}
           {isHttpWarning && (
             <div className="bg-red-900/50 border border-red-700 rounded-lg p-3 text-center backdrop-blur-sm">
-              <p className="text-red-200 text-sm">
-                ⚠️ Security warning: You are viewing this page over HTTP. Sensitive data (simulated) could be intercepted.
-                <a href={window.location.href.replace('http:', 'https:')} className="ml-2 underline font-semibold hover:text-red-100">Switch to HTTPS</a>
-              </p>
+              <p className="text-red-200 text-sm">⚠️ Security warning: You are viewing this page over HTTP. Sensitive data (simulated) could be intercepted. <a href={window.location.href.replace('http:', 'https:')} className="ml-2 underline font-semibold hover:text-red-100">Switch to HTTPS</a></p>
             </div>
           )}
 
           {/* Demo Disclaimer */}
           <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 text-center flex flex-wrap justify-between items-center gap-2 backdrop-blur-sm">
-            <p className="text-blue-200 text-sm flex-1">
-              🚀 This is a <strong>simulated demo</strong> using mock data. The real ARF engine requires pilot access.
-            </p>
-            <Link href="/signup" className="text-blue-400 hover:text-blue-300 text-sm font-medium underline whitespace-nowrap">
-              Request pilot access →
-            </Link>
+            <p className="text-blue-200 text-sm flex-1">🚀 This is a <strong>simulated demo</strong> using mock data. The real ARF engine requires pilot access.</p>
+            <Link href="/signup" className="text-blue-400 hover:text-blue-300 text-sm font-medium underline whitespace-nowrap">Request pilot access →</Link>
           </div>
 
           {/* Risk Tab Content */}
@@ -293,9 +280,7 @@ export default function Dashboard() {
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                   <h1 className="text-2xl font-bold">ARF System Risk</h1>
-                  <button onClick={refreshData} disabled={isRefreshing} aria-label="Refresh data" className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition disabled:opacity-50">
-                    <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
-                  </button>
+                  <button onClick={refreshData} disabled={isRefreshing} aria-label="Refresh data" className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"><RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} /></button>
                 </div>
                 <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
                   <div className="flex-shrink-0"><RiskGauge risk={riskData.risk} size={180} /></div>
@@ -332,7 +317,6 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Recent Incidents - clean table */}
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold mb-4">Recent Incidents (Simulated)</h2>
                 <div className="hidden sm:block overflow-x-auto">
@@ -395,16 +379,7 @@ export default function Dashboard() {
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-blue-400" /> Audit Trail (Recent decisions)</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-700">
-                        <th className="text-left py-2 px-2">Timestamp</th>
-                        <th className="text-left py-2 px-2">Component</th>
-                        <th className="text-left py-2 px-2">Action</th>
-                        <th className="text-right py-2 px-2">Risk</th>
-                        <th className="text-right py-2 px-2">Decision</th>
-                        <th className="text-left py-2 px-2">User</th>
-                      </tr>
-                    </thead>
+                    <thead><tr className="border-b border-gray-700"><th className="text-left py-2 px-2">Timestamp</th><th className="text-left py-2 px-2">Component</th><th className="text-left py-2 px-2">Action</th><th className="text-right py-2 px-2">Risk</th><th className="text-right py-2 px-2">Decision</th><th className="text-left py-2 px-2">User</th></tr></thead>
                     <tbody>
                       {MOCK_AUDIT_LOGS.map((log) => (
                         <tr key={log.id} className="border-b border-gray-700/50">
