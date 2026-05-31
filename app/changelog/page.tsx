@@ -139,7 +139,7 @@ export default function ChangelogPage() {
                     {entry.link && (
                       <a
                         href={entry.link}
-                        target="_blank"
+                        target="_blank" rel="noopener noreferrer"
                         rel="noopener noreferrer"
                         className="text-blue-400 text-sm hover:underline flex items-center gap-1"
                       >

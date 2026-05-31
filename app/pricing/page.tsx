@@ -156,7 +156,7 @@ export default function PricingPage() {
             or{' '}
             <a
               href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               rel="noopener noreferrer"
               className="text-blue-400 hover:underline"
             >
