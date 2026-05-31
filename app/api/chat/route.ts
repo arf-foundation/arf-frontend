@@ -6,13 +6,16 @@ let openai: OpenAI | null = null;
 async function getOpenAI(): Promise<OpenAI> {
   if (!openai) {
     const { default: OpenAIConstructor } = await import('openai');
-    openai = new OpenAIConstructor({ apiKey: process.env.OPENAI_API_KEY });
+    openai = new OpenAIConstructor({
+      baseURL: 'https://gateway.ai.vercel.com/v1/arf-foundation/deepseek/v1',
+      apiKey: process.env.VERCEL_AI_GATEWAY_API_KEY || 'dummy', // dummy works – Vercel uses project auth
+    });
   }
   return openai;
 }
 
 // ============================================================
-// PASTE YOUR FULL SYSTEM PROMPT (v1.3) BELOW
+// SYSTEM PROMPT (ARF Institutional Memory Agent v1.3)
 // ============================================================
 const SYSTEM_PROMPT = `## ARF Institutional Memory Agent — System Prompt (v1.3 — Deterministic Advisory Mode)
 
@@ -281,7 +284,7 @@ export async function POST(req: Request) {
 
     const openai = await getOpenAI();
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'deepseek/deepseek-v4-pro',   // DeepSeek model via Vercel AI Gateway
       temperature: 0,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
