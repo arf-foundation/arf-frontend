@@ -317,11 +317,21 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* Recent Incidents - fixed JSX closing tags */}
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold mb-4">Recent Incidents (Simulated)</h2>
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-gray-700"><th className="text-left py-2 px-2">Time</th><th className="text-left py-2 px-2">Service</th><th className="text-left py-2 px-2">Metric</th><th className="text-right py-2 px-2">Value</th><th className="text-right py-2 px-2">Risk</th><th className="text-right py-2 px-2">Action</th></tr></thead>
+                    <thead>
+                      <tr className="border-b border-gray-700">
+                        <th className="text-left py-2 px-2">Time</th>
+                        <th className="text-left py-2 px-2">Service</th>
+                        <th className="text-left py-2 px-2">Metric</th>
+                        <th className="text-right py-2 px-2">Value</th>
+                        <th className="text-right py-2 px-2">Risk</th>
+                        <th className="text-right py-2 px-2">Action</th>
+                      </tr>
+                    </thead>
                     <tbody>
                       {MOCK_INCIDENTS.map((inc) => (
                         <tr key={inc.id} className="border-b border-gray-700/50">
@@ -330,7 +340,11 @@ export default function Dashboard() {
                           <td className="py-2 px-2 text-gray-300">{inc.metric}</td>
                           <td className="py-2 px-2 text-right font-mono text-gray-300">{inc.value}</td>
                           <td className="py-2 px-2 text-right font-mono text-yellow-400">{inc.risk.toFixed(2)}</td>
-                          <td className="py-2 px-2 text-right"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${inc.action === 'ESCALATE' ? 'bg-red-900 text-red-200' : inc.action === 'DENY' ? 'bg-orange-900 text-orange-200' : 'bg-green-900 text-green-200'}`}>{inc.action}</span></td>
+                          <td className="py-2 px-2 text-right">
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${inc.action === 'ESCALATE' ? 'bg-red-900 text-red-200' : inc.action === 'DENY' ? 'bg-orange-900 text-orange-200' : 'bg-green-900 text-green-200'}`}>
+                              {inc.action}
+                            </span>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -366,7 +380,7 @@ export default function Dashboard() {
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-blue-400" /> Audit Trail (Recent decisions)</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-gray-700"><th className="text-left py-2 px-2">Timestamp</th><th className="text-left py-2 px-2">Component</th><th className="text-left py-2 px-2">Action</th><th className="text-right py-2 px-2">Risk</th><th className="text-right py-2 px-2">Decision</th><th className="text-left py-2 px-2">User</th></table></thead>
+                    <thead><tr className="border-b border-gray-700"><th className="text-left py-2 px-2">Timestamp</th><th className="text-left py-2 px-2">Component</th><th className="text-left py-2 px-2">Action</th><th className="text-right py-2 px-2">Risk</th><th className="text-right py-2 px-2">Decision</th><th className="text-left py-2 px-2">User</th></td></thead>
                     <tbody>
                       {MOCK_AUDIT_LOGS.map((log) => (
                         <tr key={log.id} className="border-b border-gray-700/50">
