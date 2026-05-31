@@ -1,18 +1,18 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import type OpenAI from 'openai';
 
-// Lazy‑load OpenAI client only when the API is called (avoids build‑time key requirement)
-let openai: any = null;
-async function getOpenAI() {
+let openai: OpenAI | null = null;
+
+async function getOpenAI(): Promise<OpenAI> {
   if (!openai) {
-    const { default: OpenAI } = await import('openai');
-    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const { default: OpenAIConstructor } = await import('openai');
+    openai = new OpenAIConstructor({ apiKey: process.env.OPENAI_API_KEY });
   }
   return openai;
 }
 
-// Read system prompt from file (this is fine – it’s static content)
 const SYSTEM_PROMPT = fs.readFileSync(
   path.join(process.cwd(), 'app/api/chat/prompt.txt'),
   'utf-8'
