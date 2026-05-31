@@ -7,8 +7,8 @@ async function getOpenAI(): Promise<OpenAI> {
   if (!openai) {
     const { default: OpenAIConstructor } = await import('openai');
     openai = new OpenAIConstructor({
-      baseURL: 'https://gateway.ai.vercel.com/v1/arf-foundation/deepseek/v1',
-      apiKey: process.env.VERCEL_AI_GATEWAY_API_KEY || 'dummy', // dummy works – Vercel uses project auth
+      baseURL: 'https://api.deepseek.com/v1',
+      apiKey: process.env.DEEPSEEK_API_KEY,
     });
   }
   return openai;
@@ -284,7 +284,7 @@ export async function POST(req: Request) {
 
     const openai = await getOpenAI();
     const completion = await openai.chat.completions.create({
-      model: 'deepseek/deepseek-v4-pro',   // DeepSeek model via Vercel AI Gateway
+      model: 'deepseek-chat',   // DeepSeek direct API
       temperature: 0,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
