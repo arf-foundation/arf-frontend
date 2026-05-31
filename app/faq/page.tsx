@@ -90,7 +90,7 @@ export default function FAQPage() {
               answer={
                 <>
                   There is an invite‑only Slack workspace for pilot customers and approved collaborators.{" "}
-                  <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                  <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
                     Join here
                   </a>
                   .
