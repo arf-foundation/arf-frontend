@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import type OpenAI from 'openai';
 
+export const dynamic = 'force-dynamic';
+
 let openai: OpenAI | null = null;
 
 async function getOpenAI(): Promise<OpenAI> {
