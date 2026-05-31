@@ -14,7 +14,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0c10;   /* changed from #0a0a0a to match pitch deck */
+    --background: #0a0c10;
     --foreground: #ededed;
   }
 }
@@ -44,7 +44,6 @@ body {
   animation: slide-up 0.8s ease-out;
 }
 
-/* New animations for deep‑tech vibes */
 @keyframes glow {
   0%, 100% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
   50% { text-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
@@ -66,8 +65,6 @@ body {
 /* ============================================
    STABLE DIMENSIONS – PREVENT FLICKERING & JUMPS
    ============================================ */
-
-/* Reserve exact aspect ratio for Mermaid diagram – centered */
 .mermaid-wrapper {
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -80,7 +77,6 @@ body {
   overflow: hidden;
 }
 
-/* Ensure the SVG fills the wrapper without shifting */
 .mermaid-wrapper svg {
   width: 100%;
   height: auto;
@@ -88,26 +84,23 @@ body {
   display: block;
 }
 
-/* Give feature cards a stable min-height – no collapse */
 .feature-card {
   min-height: 320px;
   display: flex;
   flex-direction: column;
 }
 
-/* Prevent height changes when "Details" is expanded */
 .feature-card .details-expanded {
   max-height: 200px;
   overflow-y: auto;
 }
 
-/* Optional: smooth expansion without layout shift */
 .feature-card .details-content {
   transition: max-height 0.2s ease-out;
 }
 
 /* ============================================
-   UNIFIED ANIMATED TECH GRID (from pitch deck)
+   UNIFIED ANIMATED TECH GRID
    ============================================ */
 :root {
   --grid-color: rgba(56, 189, 248, 0.18);
@@ -118,7 +111,6 @@ body {
   --animation-speed-glow: 6s;
 }
 
-/* Animated grid layer */
 body::before {
   content: "";
   position: fixed;
@@ -140,7 +132,6 @@ body::before {
   100% { background-position: var(--grid-size) var(--grid-size); }
 }
 
-/* Pulsing radial glow layer */
 body::after {
   content: "";
   position: fixed;
@@ -158,4 +149,30 @@ body::after {
   0% { opacity: 0.4; }
   50% { opacity: 0.8; }
   100% { opacity: 0.4; }
+}
+
+/* ============================================
+   FIX READABILITY: FORCE SOLID CARD BACKGROUNDS
+   ============================================ */
+/* Make all semi‑transparent card backgrounds fully opaque */
+.bg-gray-800\/90,
+.bg-gray-800\/80,
+.bg-gray-800\/70,
+.bg-gray-800\/60,
+.bg-gray-800\/50,
+.bg-gray-800\/40,
+.bg-gray-700\/30,
+.bg-gray-700\/50 {
+  background-color: rgb(31 41 55) !important; /* solid gray-800 */
+}
+
+/* Ensure backdrop blur does not accumulate on the wrapper – it already has its own */
+.relative.z-10.bg-gray-900\/80 {
+  background-color: rgba(17, 24, 39, 0.8) !important;
+}
+
+/* Optional: make the main content area slightly darker for extra contrast */
+main > div:first-child {
+  background-color: rgba(17, 24, 39, 0.3);
+  border-radius: 0.5rem;
 }
