@@ -133,12 +133,12 @@ const ECOSYSTEM = [
   },
 ];
 
-// Demo cards – unchanged
+// Demo cards – updated URLs
 const DEMOS = [
   {
     title: 'Risk Dashboard',
     description: 'Interactive risk visualisation (mock data)',
-    link: 'https://huggingface.co/spaces/A-R-F/Agentic-Reliability-Framework-v4',
+    link: 'https://arf-foundation.github.io/arf-risk-demo/',   // ✅ correct URL
     buttonText: 'Launch',
     external: true,
   },
@@ -151,7 +151,7 @@ const DEMOS = [
         </pre>
       </div>
     ),
-    link: 'https://a-r-f-agentic-reliability-framework-api.hf.space/docs',
+    link: 'https://huggingface.co/spaces/A-R-F/ARF-Sandbox-API',   // ✅ correct URL
     buttonText: 'Try API',
     external: true,
   },
