@@ -52,12 +52,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* Override both getInstalledRelatedApps and getInstalledApps */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                // Helper to create a safe rejecting function
                 function makeSafe(original, methodName) {
                   return function() {
                     if (window === window.parent) {
@@ -72,15 +70,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 }
 
                 if (typeof navigator !== 'undefined') {
-                  // Override getInstalledRelatedApps
                   if (navigator.getInstalledRelatedApps) {
                     navigator.getInstalledRelatedApps = makeSafe(navigator.getInstalledRelatedApps, 'getInstalledRelatedApps');
                   } else {
-                    // Define it to reject if not present
                     navigator.getInstalledRelatedApps = makeSafe(null, 'getInstalledRelatedApps');
                   }
 
-                  // Override getInstalledApps (non-standard, used by some PWA scripts)
                   if (navigator.getInstalledApps) {
                     navigator.getInstalledApps = makeSafe(navigator.getInstalledApps, 'getInstalledApps');
                   } else {
@@ -88,7 +83,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   }
                 }
 
-                // Suppress unhandled rejections from these methods
                 window.addEventListener('unhandledrejection', function(event) {
                   if (event.reason && event.reason.message && (
                     event.reason.message.includes('getInstalledRelatedApps') ||
@@ -112,7 +106,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-gray-100">
         <NavBar />
-        {/* Add a glass overlay wrapper to improve text readability over the animated grid */}
+        {/* Glass overlay wrapper – keeps grid visible but darkens background */}
         <div className="relative z-10 bg-gray-900/80 backdrop-blur-sm">
           <main>{children}</main>
         </div>
