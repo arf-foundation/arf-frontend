@@ -220,9 +220,9 @@ export default function Dashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isHttpWarning, setIsHttpWarning] = useState(false);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsHttpWarning(true);
     }
   }, []);
@@ -242,11 +242,11 @@ export default function Dashboard() {
     }, 500);
   }, []);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     refreshData();
     const interval = setInterval(refreshData, 30000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
   }, [refreshData]);
 
   if (!riskData) {
@@ -317,7 +317,6 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Recent Incidents - fixed JSX */}
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold mb-4">Recent Incidents (Simulated)</h2>
                 <div className="hidden sm:block overflow-x-auto">
@@ -330,7 +329,7 @@ export default function Dashboard() {
                         <th className="text-right py-2 px-2">Value</th>
                         <th className="text-right py-2 px-2">Risk</th>
                         <th className="text-right py-2 px-2">Action</th>
-                      </tr>
+                      </table>
                     </thead>
                     <tbody>
                       {MOCK_INCIDENTS.map((inc) => (
