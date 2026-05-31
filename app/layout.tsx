@@ -112,7 +112,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-gray-100">
         <NavBar />
-        <main>{children}</main>
+        {/* Add a glass overlay wrapper to improve text readability over the animated grid */}
+        <div className="relative z-10 bg-gray-900/80 backdrop-blur-sm">
+          <main>{children}</main>
+        </div>
         <Analytics />
         <ServiceWorkerRegister />
       </body>
