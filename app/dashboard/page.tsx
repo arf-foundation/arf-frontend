@@ -123,7 +123,7 @@ const mockMemoryStats = {
 };
 
 // ----------------------------------------------------------------------
-// Reusable Components (inside Dashboard)
+// Reusable Components
 // ----------------------------------------------------------------------
 const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
   const radius = size * 0.35;
@@ -220,6 +220,7 @@ export default function Dashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isHttpWarning, setIsHttpWarning] = useState(false);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
       setIsHttpWarning(true);
@@ -241,6 +242,7 @@ export default function Dashboard() {
     }, 500);
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     refreshData();
     const interval = setInterval(refreshData, 30000);
@@ -275,7 +277,6 @@ export default function Dashboard() {
           {/* Risk Tab Content */}
           {activeTab === 'risk' && (
             <div className="space-y-6">
-              {/* Main Risk Card */}
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                   <h1 className="text-2xl font-bold">ARF System Risk</h1>
@@ -296,10 +297,8 @@ export default function Dashboard() {
                 {lastUpdated && <p className="text-xs text-gray-400 text-center mt-4">Last updated: {lastUpdated.toLocaleTimeString()}</p>}
               </div>
 
-              {/* Trust Badges */}
               <TrustBadges />
 
-              {/* Quota Card */}
               {quota && (
                 <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                   <div className="flex justify-between items-start mb-4"><h2 className="text-xl font-semibold">Your Plan (Demo)</h2><span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-medium">{quota.tier.toUpperCase()}</span></div>
@@ -308,7 +307,6 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* Semantic Memory */}
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Network className="w-5 h-5 text-green-400" /> Semantic Memory (Simulated)</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -319,7 +317,6 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Recent Incidents */}
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold mb-4">Recent Incidents (Simulated)</h2>
                 <div className="hidden sm:block overflow-x-auto">
@@ -342,7 +339,6 @@ export default function Dashboard() {
                 <p className="text-xs text-gray-500 mt-4 text-center">Data shown is simulated for demonstration purposes only.</p>
               </div>
 
-              {/* Testimonial */}
               <Testimonial />
             </div>
           )}
@@ -370,7 +366,7 @@ export default function Dashboard() {
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-blue-400" /> Audit Trail (Recent decisions)</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-gray-700"><th className="text-left py-2 px-2">Timestamp</th><th className="text-left py-2 px-2">Component</th><th className="text-left py-2 px-2">Action</th><th className="text-right py-2 px-2">Risk</th><th className="text-right py-2 px-2">Decision</th><th className="text-left py-2 px-2">User</th></tr></thead>
+                    <thead><tr className="border-b border-gray-700"><th className="text-left py-2 px-2">Timestamp</th><th className="text-left py-2 px-2">Component</th><th className="text-left py-2 px-2">Action</th><th className="text-right py-2 px-2">Risk</th><th className="text-right py-2 px-2">Decision</th><th className="text-left py-2 px-2">User</th></table></thead>
                     <tbody>
                       {MOCK_AUDIT_LOGS.map((log) => (
                         <tr key={log.id} className="border-b border-gray-700/50">
@@ -443,7 +439,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Legal Footer (on all tabs) */}
           <LegalFooter />
         </div>
       </div>
