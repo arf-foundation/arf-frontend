@@ -36,31 +36,20 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
-
-.animate-slide-up {
-  animation: slide-up 0.8s ease-out;
-}
+.animate-fade-in { animation: fade-in 1s ease-out; }
+.animate-slide-up { animation: slide-up 0.8s ease-out; }
 
 @keyframes glow {
   0%, 100% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
   50% { text-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
 }
-
-.glow-text {
-  animation: glow 3s ease-in-out infinite;
-}
+.glow-text { animation: glow 3s ease-in-out infinite; }
 
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-5px); }
 }
-
-.float-icon {
-  animation: float 4s ease-in-out infinite;
-}
+.float-icon { animation: float 4s ease-in-out infinite; }
 
 /* ============================================
    STABLE DIMENSIONS – PREVENT FLICKERING & JUMPS
@@ -100,11 +89,11 @@ body {
 }
 
 /* ============================================
-   UNIFIED ANIMATED TECH GRID
+   ANIMATED TECH GRID – restored with lower opacity
    ============================================ */
 :root {
-  --grid-color: rgba(56, 189, 248, 0.18);
-  --glow-color-start: rgba(56, 189, 248, 0.12);
+  --grid-color: rgba(56, 189, 248, 0.12);     /* was 0.18 – now softer */
+  --glow-color-start: rgba(56, 189, 248, 0.08);
   --glow-color-end: transparent;
   --grid-size: 40px;
   --animation-speed-grid: 20s;
@@ -147,32 +136,30 @@ body::after {
 
 @keyframes pulseGlow {
   0% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+  50% { opacity: 0.7; }
   100% { opacity: 0.4; }
 }
 
 /* ============================================
-   FIX READABILITY: FORCE SOLID CARD BACKGROUNDS
+   FORCE SOLID CARD BACKGROUNDS – NO GRID BLEED‑THROUGH
    ============================================ */
-/* Make all semi‑transparent card backgrounds fully opaque */
+/* All cards that were semi‑transparent become fully opaque */
 .bg-gray-800\/90,
 .bg-gray-800\/80,
 .bg-gray-800\/70,
 .bg-gray-800\/60,
 .bg-gray-800\/50,
-.bg-gray-800\/40,
 .bg-gray-700\/30,
 .bg-gray-700\/50 {
   background-color: rgb(31 41 55) !important; /* solid gray-800 */
 }
 
-/* Ensure backdrop blur does not accumulate on the wrapper – it already has its own */
+/* The dark overlay wrapper (already in layout.tsx) will also have a solid dark background */
 .relative.z-10.bg-gray-900\/80 {
-  background-color: rgba(17, 24, 39, 0.8) !important;
+  background-color: rgba(17, 24, 39, 0.9) !important;
 }
 
-/* Optional: make the main content area slightly darker for extra contrast */
+/* Optional: make all text containers even more readable */
 main > div:first-child {
-  background-color: rgba(17, 24, 39, 0.3);
-  border-radius: 0.5rem;
+  background-color: transparent;
 }
