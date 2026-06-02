@@ -10,15 +10,26 @@ export const metadata: Metadata = {
     default: 'Agentic Reliability Framework (ARF) – Governance for AI Systems',
     template: '%s | ARF',
   },
-  description: 'ARF is a governance layer for AI systems. The core engine is access‑controlled and offered to qualified pilots under outcome‑based pricing.',
-  keywords: ['AI reliability', 'self-healing systems', 'AI governance', 'pilot program', 'access control', 'Bayesian inference', 'cloud governance', 'enterprise AI'],
+  description:
+    'ARF is a governance layer for AI systems. The core engine is access‑controlled and offered to qualified pilots under outcome‑based pricing.',
+  keywords: [
+    'AI reliability',
+    'self-healing systems',
+    'AI governance',
+    'pilot program',
+    'access control',
+    'Bayesian inference',
+    'cloud governance',
+    'enterprise AI',
+  ],
   authors: [{ name: 'Juan Petter', url: 'https://www.linkedin.com/in/juan-petter' }],
   creator: 'ARF Foundation',
   publisher: 'ARF Foundation',
   robots: 'index, follow',
   openGraph: {
     title: 'ARF – Agentic Reliability Framework',
-    description: 'Stewarded, pilot‑first reliability framework for AI systems. Core engine is access‑controlled.',
+    description:
+      'Stewarded, pilot‑first reliability framework for AI systems. Core engine is access‑controlled.',
     url: 'https://arf-frontend-sandy.vercel.app',
     siteName: 'ARF',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'ARF Dashboard Preview' }],
@@ -106,8 +117,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-gray-100">
         <NavBar />
-        {/* Glass overlay wrapper – keeps grid visible but darkens background */}
-        <div className="relative z-10 bg-gray-900/80 backdrop-blur-sm">
+        {/* Lighter overlay – grid visible, text still legible */}
+        <div className="relative z-10 bg-gray-900/30 backdrop-blur-sm">
           <main>{children}</main>
         </div>
         <Analytics />
