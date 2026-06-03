@@ -4,9 +4,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Check, Mail } from 'lucide-react';
 
-// This page describes access models, not per‑seat pricing.
-// Outcome‑based pricing is explained, and the free “tier” is replaced by a sandbox demo.
-
 export default function PricingPage() {
   const [copiedEmail, setCopiedEmail] = useState(false);
 
@@ -93,7 +90,7 @@ export default function PricingPage() {
                 </li>
               </ul>
               <p className="text-xs text-gray-400 mt-4 border-t border-gray-700 pt-3">
-                Subject to mutual qualification agreement. No credit card required.
+                Outcome‑based or retainer after pilot. No credit card required.
               </p>
               <div className="mt-6 sm:mt-8">
                 <Link
@@ -105,27 +102,27 @@ export default function PricingPage() {
               </div>
             </div>
 
-            {/* Enterprise – outcome‑based pricing */}
+            {/* Enterprise – hybrid pricing */}
             <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5 sm:p-6 flex flex-col">
               <h2 className="text-xl sm:text-2xl font-bold mb-2">Enterprise</h2>
-              <div className="text-3xl sm:text-4xl font-bold text-gray-400 mb-2">Outcome‑based</div>
-              <p className="text-gray-400 text-xs sm:text-sm mb-4">Pay for verified risk reduction</p>
+              <div className="text-3xl sm:text-4xl font-bold text-gray-400 mb-2">Hybrid</div>
+              <p className="text-gray-400 text-xs sm:text-sm mb-4">Fixed deployment + outcome or retainer</p>
               <ul className="space-y-2 sm:space-y-3 flex-1">
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Unlimited evaluations</span>
+                  <span>Fixed deployment fee (starts $50k)</span>
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>SLA and deployment options discussed during pilot</span>
+                  <span>Outcome‑based or retainer maintenance</span>
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>SSO and custom deployment available</span>
+                  <span>SSO, multi‑tenancy, SLA</span>
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Outcome‑based pricing tied to measured risk reduction</span>
+                  <span>Full enforcement + audit trails</span>
                 </li>
               </ul>
               <p className="text-xs text-gray-400 mt-4 border-t border-gray-700 pt-3">
@@ -147,8 +144,9 @@ export default function PricingPage() {
 
           <div className="text-center mt-10 sm:mt-12 text-gray-400 text-xs sm:text-sm max-w-2xl mx-auto px-2">
             <p className="mb-2">
-              <strong>Why outcome‑based pricing?</strong> We believe you should pay for value, not infrastructure.
-              ARF’s pricing is directly tied to the amount of operational risk the system removes from your AI workflows.
+              <strong>Hybrid pricing that aligns with value.</strong> ARF charges a fixed deployment fee starting at $50k,
+              plus either an outcome‑based fee tied to verified risk reduction or a monthly retainer. 
+              You only pay more when ARF demonstrably saves you money.
             </p>
             <p>
               Questions?{' '}
