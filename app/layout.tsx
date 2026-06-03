@@ -117,8 +117,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-gray-100">
         <NavBar />
-        {/* Lighter overlay – grid visible, text still legible */}
-        <div className="relative z-10 bg-gray-900/70 backdrop-blur-sm">
+        {/* Semi‑transparent overlay — grid visible, text still crisp */}
+        <div className="relative z-10 bg-gray-900/50 backdrop-blur-sm">
           <main>{children}</main>
         </div>
         <Analytics />
