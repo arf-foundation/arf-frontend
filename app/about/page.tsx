@@ -82,7 +82,7 @@ export default function AboutPage() {
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition"
                   >
-                    <Linkedin size={16} /> LinkedIn
+                    <Globe size={16} /> LinkedIn
                   </a>
                   <a
                     href="https://calendly.com/petter2025us/30min"
