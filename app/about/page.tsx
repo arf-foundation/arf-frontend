@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Shield, ArrowRight, Mail, Linkedin, Calendar } from 'lucide-react';
+import { Shield, ArrowRight, Mail, Globe, Calendar } from 'lucide-react';
 
 export default function AboutPage() {
   return (
