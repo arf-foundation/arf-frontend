@@ -1,61 +1,69 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Tag, Copy, Check } from 'lucide-react';
+import { Calendar, Copy, Check } from 'lucide-react';
 import Link from 'next/link';
 
 // --------------------------------------------------------------------------
 // Core‑engine changelog entries – terse, IP‑protective
 // --------------------------------------------------------------------------
-const CORE_ENGINE_CHANGELOG = [
+interface ChangelogEntry {
+  date: string;
+  title: string;
+  description: string;
+  type: 'pilot';
+  link?: string; // optional external URL for more context
+}
+
+const CORE_ENGINE_CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-05-30',
     title: 'Heterogeneous Treatment Effects',
     description:
       'The governance loop can now estimate individual‑level causal effects from outcome data, producing counterfactuals with confidence intervals.',
-    type: 'pilot' as const,
+    type: 'pilot',
   },
   {
     date: '2026-05-30',
     title: 'Bayesian Memory Weight Uncertainty',
     description:
       'Memory fusion now samples from a Beta‑Binomial posterior, propagating uncertainty into the final risk score.',
-    type: 'pilot' as const,
+    type: 'pilot',
   },
   {
     date: '2026-05-30',
     title: 'Ordinal Risk Model (Dirichlet‑Multinomial)',
     description:
       'An optional ordinal outcome model with self‑calibration and tail‑risk estimation is now available to pilots.',
-    type: 'pilot' as const,
+    type: 'pilot',
   },
   {
     date: '2026-05-29',
     title: 'Core Hardening (Memory, Determinism, Thread Safety)',
     description:
       'Multiple improvements to memory accuracy, deterministic seeding, thread‑safe recalibration, and performance.',
-    type: 'pilot' as const,
+    type: 'pilot',
   },
   {
     date: '2026-05-26',
     title: 'Audit Trail Completeness & CVaR',
     description:
       'Risk‑score audit trail now includes pre‑ and post‑memory values. Tail‑risk estimation (CVaR) enabled in expected loss minimisation.',
-    type: 'pilot' as const,
+    type: 'pilot',
   },
   {
     date: '2026-05-20',
     title: 'Learned Memory Weights & Causal Effect Estimation',
     description:
       'Memory weight is now optimised per category. Initial causal effect estimation and enriched outcome logging added.',
-    type: 'pilot' as const,
+    type: 'pilot',
   },
   {
     date: '2026-05-17',
     title: 'Closed‑Loop Feedback & Memory Fusion',
     description:
       'Outcomes are fed back into the risk engine, triggering continuous recalibration and memory‑based risk blending.',
-    type: 'pilot' as const,
+    type: 'pilot',
   },
 ];
 
@@ -125,16 +133,6 @@ export default function ChangelogPage() {
                     <Calendar size={14} />
                     {formatDate(entry.date)}
                   </span>
-                  {entry.link && (
-                    <a
-                      href={entry.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 text-sm hover:underline flex items-center gap-1"
-                    >
-                      <Tag size={14} /> Details
-                    </a>
-                  )}
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-1">{entry.title}</h3>
                 <p className="text-gray-300 text-sm">{entry.description}</p>
