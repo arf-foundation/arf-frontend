@@ -10,7 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Calendar, TrendingUp, RefreshCw } from 'lucide-react'; // removed TrendingDown
+import { Calendar, TrendingUp, RefreshCw } from 'lucide-react';
 
 // Types
 interface HistoryPoint {
@@ -58,7 +58,6 @@ export default function HistoryPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshData();
   }, []);
 
@@ -69,14 +68,14 @@ export default function HistoryPage() {
 
   if (loading && historyData.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex items-center justify-center p-4">
+      <div className="min-h-screen text-white flex items-center justify-center p-4">
         <div className="text-xl animate-pulse">Loading history simulation...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen text-white">
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Disclaimer */}
