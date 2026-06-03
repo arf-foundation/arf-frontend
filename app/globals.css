@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0c10;
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -12,17 +12,11 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0c10;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
+  background: linear-gradient(135deg, #0a1628 0%, #0a0c10 100%);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
 }
 
 /* Existing animations */
@@ -89,61 +83,8 @@ body {
 }
 
 /* ============================================
-   ANIMATED TECH GRID – restored with lower opacity
-   ============================================ */
-:root {
-  --grid-color: rgba(56, 189, 248, 0.12);     /* was 0.18 – now softer */
-  --glow-color-start: rgba(56, 189, 248, 0.08);
-  --glow-color-end: transparent;
-  --grid-size: 40px;
-  --animation-speed-grid: 20s;
-  --animation-speed-glow: 6s;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    linear-gradient(var(--grid-color) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-  background-size: var(--grid-size) var(--grid-size);
-  pointer-events: none;
-  z-index: 0;
-  animation: gridMove var(--animation-speed-grid) linear infinite;
-}
-
-@keyframes gridMove {
-  0% { background-position: 0 0; }
-  100% { background-position: var(--grid-size) var(--grid-size); }
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 30% 40%, var(--glow-color-start), var(--glow-color-end) 80%);
-  pointer-events: none;
-  z-index: 0;
-  animation: pulseGlow var(--animation-speed-glow) ease infinite;
-}
-
-@keyframes pulseGlow {
-  0% { opacity: 0.4; }
-  50% { opacity: 0.7; }
-  100% { opacity: 0.4; }
-}
-
-/* ============================================
    FORCE SOLID CARD BACKGROUNDS – NO GRID BLEED‑THROUGH
    ============================================ */
-/* All cards that were semi‑transparent become fully opaque */
 .bg-gray-800\/90,
 .bg-gray-800\/80,
 .bg-gray-800\/70,
@@ -154,9 +95,9 @@ body::after {
   background-color: rgb(31 41 55) !important; /* solid gray-800 */
 }
 
-/* The dark overlay wrapper (already in layout.tsx) will also have a solid dark background */
+/* Remove old overlay rule – now redundant */
 .relative.z-10.bg-gray-900\/80 {
-  background-color: rgba(17, 24, 39, 0.9) !important;
+  background-color: transparent !important;
 }
 
 /* Optional: make all text containers even more readable */
