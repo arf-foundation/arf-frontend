@@ -191,13 +191,6 @@ const TrustBadges = () => (
   </div>
 );
 
-const Testimonial = () => (
-  <div className="bg-gray-800/50 rounded-xl p-5 italic text-gray-300 border-l-4 border-blue-400 my-6">
-    “ARF caught a misconfiguration that would have exposed customer data. The audit trail saved us hours of investigation.”<br/>
-    <span className="text-white font-medium mt-2 block">— CISO, Fortune 500 (pilot customer)</span>
-  </div>
-);
-
 const LegalFooter = () => (
   <div className="border-t border-gray-800 mt-8 pt-6 text-center text-xs text-gray-500 flex flex-wrap justify-center gap-4">
     <Link href="/terms" className="hover:text-gray-300">Terms of Service</Link>
@@ -303,7 +296,7 @@ export default function Dashboard() {
                 <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                   <div className="flex justify-between items-start mb-4"><h2 className="text-xl font-semibold">Your Plan (Demo)</h2><span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-medium">{quota.tier.toUpperCase()}</span></div>
                   <div className="mb-4"><div className="flex justify-between text-sm mb-1"><span className="text-gray-300">Remaining evaluations this month</span><span className="font-mono font-medium text-white">{quota.remaining.toLocaleString()}</span></div><div className="w-full bg-gray-700 rounded-full h-2"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${(quota.remaining / quota.limit) * 100}%` }} /></div><p className="text-xs text-gray-400 mt-2">Limit: {quota.limit.toLocaleString()} evaluations/month (simulated)</p></div>
-                  <Link href="/pricing" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium">View access models → <ArrowRight size={14} /></Link>
+                  <Link href="/pricing" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium">View Access Models → <ArrowRight size={14} /></Link>
                 </div>
               )}
 
@@ -351,8 +344,6 @@ export default function Dashboard() {
                 </div>
                 <p className="text-xs text-gray-500 mt-4 text-center">Data shown is simulated for demonstration purposes only.</p>
               </div>
-
-              <Testimonial />
             </div>
           )}
 
