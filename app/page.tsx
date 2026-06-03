@@ -406,18 +406,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Pilot testimonial – between How ARF Works and Key Capabilities */}
-      <div className="container mx-auto px-4 mb-16">
-        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 border-l-4 border-l-blue-400 italic text-gray-300">
-          “ARF caught a misconfiguration that would have exposed customer data.
-          The audit trail saved us hours of investigation.”
-          <br />
-          <span className="text-white font-medium mt-2 block not-italic">
-            — CISO, Fortune 500 (pilot customer)
-          </span>
-        </div>
-      </div>
-
       {/* Key Capabilities */}
       <section
         ref={capabilitiesRef}
@@ -497,8 +485,9 @@ export default function LandingPage() {
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 max-w-4xl mx-auto">
           <h3 className="text-xl font-semibold mb-1 text-center">Access Models</h3>
           <p className="text-sm text-gray-400 text-center mb-6">
-            All pricing is outcome‑based. Pilot access is time‑limited and free for
-            qualified organizations — no commitment required.
+            ARF uses a hybrid pricing model: a fixed deployment fee starting at $50k,
+            plus either outcome‑based pricing or a monthly retainer. Pilot access is
+            time‑limited and free for qualified organizations — no commitment required.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-8">
             <div className="text-center">
@@ -515,17 +504,18 @@ export default function LandingPage() {
               <div className="text-gray-400 text-sm mt-1">Time‑Limited · Free</div>
               <ul className="text-sm text-gray-300 mt-2 space-y-1 text-left">
                 <li>✓ Protected core access</li>
-                <li>✓ Outcome‑based pricing after pilot</li>
+                <li>✓ Outcome‑based or retainer after pilot</li>
                 <li>✓ Founder‑led onboarding</li>
               </ul>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-400">Enterprise</div>
-              <div className="text-gray-400 text-sm mt-1">Commercial · Custom</div>
+              <div className="text-gray-400 text-sm mt-1">Commercial · Hybrid</div>
               <ul className="text-sm text-gray-300 mt-2 space-y-1 text-left">
-                <li>✓ Full enforcement + audit trails</li>
+                <li>✓ Fixed deployment fee (starts $50k)</li>
+                <li>✓ Outcome‑based or retainer maintenance</li>
                 <li>✓ SSO, multi‑tenancy, SLA</li>
-                <li>✓ Contact sales for pricing</li>
+                <li>✓ Full enforcement + audit trails</li>
               </ul>
             </div>
           </div>
@@ -682,7 +672,7 @@ export default function LandingPage() {
           <div className="mb-8 max-w-md mx-auto">
             <h4 className="text-lg font-semibold text-white mb-2">Request Pilot Access</h4>
             <p className="text-sm text-gray-400 mb-4">
-              The core ARF engine is available to qualified pilots under a time‑limited, outcome‑based evaluation.
+              The core ARF engine is available to qualified pilots under a time‑limited, hybrid evaluation.
               Email us with your organization, use case, and expected evaluation volume.
             </p>
             <a
@@ -720,7 +710,7 @@ export default function LandingPage() {
 }
 
 // ============================================================================
-// Sub‑components (unchanged except removed Ecosystem section)
+// Sub‑components
 // ============================================================================
 
 function FeatureCard({ title, description, icon: Icon, color, details }: { title: string; description: string; icon: ElementType; color: string; details: string }) {
