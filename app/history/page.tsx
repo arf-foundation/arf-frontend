@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   LineChart,
   Line,
@@ -46,19 +46,32 @@ export default function HistoryPage() {
   const [historyData, setHistoryData] = useState<HistoryPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const isMounted = useRef(true);
 
   const refreshData = () => {
     setLoading(true);
     setTimeout(() => {
-      const newData = generateMockHistory();
-      setHistoryData(newData);
+      if (!isMounted.current) return;
+      setHistoryData(generateMockHistory());
       setLastUpdated(new Date());
       setLoading(false);
     }, 500);
   };
 
   useEffect(() => {
-    refreshData();
+    isMounted.current = true;
+    // Initial load – wrapped in setTimeout to keep state update async
+    const timer = setTimeout(() => {
+      if (isMounted.current) {
+        setHistoryData(generateMockHistory());
+        setLastUpdated(new Date());
+        setLoading(false);
+      }
+    }, 300);
+    return () => {
+      isMounted.current = false;
+      clearTimeout(timer);
+    };
   }, []);
 
   const formatDate = (isoString: string) => {
