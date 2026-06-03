@@ -5,7 +5,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function FAQPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen text-white">
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
         <h1 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
           Frequently Asked Questions
@@ -58,6 +58,37 @@ export default function FAQPage() {
           </div>
         </section>
 
+        {/* Pricing */}
+        <section className="mb-10 sm:mb-12">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Pricing</h2>
+          <div className="space-y-5 sm:space-y-6">
+            <FAQItem
+              question="How does ARF pricing work?"
+              answer={
+                <>
+                  ARF uses a <strong>hybrid pricing model</strong>. Enterprises pay a fixed deployment fee starting at $50k, plus either an outcome‑based fee (a percentage of verified risk reduction) or a monthly retainer. Pilot access is time‑limited and free for qualified teams. See the{' '}
+                  <a href="/pricing" className="text-blue-400 hover:underline">Access Models</a> page for details.
+                </>
+              }
+            />
+          </div>
+        </section>
+
+        {/* Competitors */}
+        <section className="mb-10 sm:mb-12">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">How ARF Compares</h2>
+          <div className="space-y-5 sm:space-y-6">
+            <FAQItem
+              question="How does ARF compare to hyperscaler governance tools?"
+              answer={
+                <>
+                  Hyperscalers build governance into their own platforms — ARF is <strong>infrastructure‑agnostic</strong>. It works across AWS, Azure, GCP, and on‑premises. New entrants focus on model‑level guardrails; ARF operates at the <strong>decision layer</strong>, evaluating the action, not just the prompt. The difference: most tools advise; ARF enforces — and when it can’t, it escalates to a human with a complete audit trail.
+                </>
+              }
+            />
+          </div>
+        </section>
+
         {/* Performance & Limitations */}
         <section className="mb-10 sm:mb-12">
           <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Performance & Limitations</h2>
@@ -89,7 +120,7 @@ export default function FAQPage() {
               question="Is there a community Slack?"
               answer={
                 <>
-                  There is an invite‑only Slack workspace for pilot customers and approved collaborators.{" "}
+                  There is an invite‑only Slack workspace for pilot customers and approved collaborators.{' '}
                   <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
                     Join here
                   </a>
@@ -110,7 +141,7 @@ export default function FAQPage() {
             />
             <FAQItem
               question="Can I use the real engine in a commercial product?"
-              answer="Yes, under a pilot or enterprise agreement. Outcome‑based pricing applies. Contact us for details."
+              answer="Yes, under a pilot or enterprise agreement. Hybrid pricing (fixed deployment fee plus outcome‑based or retainer) applies. Contact us for details."
             />
           </div>
         </section>
