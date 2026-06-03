@@ -117,8 +117,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-gray-100">
         <NavBar />
-        {/* Semi‑transparent overlay — grid visible, text still crisp */}
-        <div className="relative z-10 bg-gray-900/50 backdrop-blur-sm">
+        {/* No background – grid fully visible, cards remain solid via globals.css */}
+        <div className="relative z-10 backdrop-blur-sm">
           <main>{children}</main>
         </div>
         <Analytics />
