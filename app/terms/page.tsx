@@ -4,7 +4,7 @@ export default function TermsPage() {
   const effectiveDate = "May 16, 2026";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen text-white">
       <div className="container mx-auto px-4 py-8 sm:py-16">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8 sm:mb-12">
@@ -37,7 +37,7 @@ export default function TermsPage() {
                 <li><strong>Public specification</strong> – shared under written terms, not open source.</li>
               </ul>
               <p>
-                Production‑grade inference, deterministic enforcement, and audit trails are available only under a written Pilot or Enterprise Agreement with outcome‑based pricing.
+                Production‑grade inference, deterministic enforcement, and audit trails are available only under a written Pilot or Enterprise Agreement with hybrid pricing (fixed deployment fee plus outcome‑based or retainer).
               </p>
 
               <h2>3. User Accounts and API Keys</h2>
@@ -47,7 +47,7 @@ export default function TermsPage() {
 
               <h2>4. Payment Terms</h2>
               <p>
-                The public sandbox is free. Paid pilot or enterprise tiers are governed by separate written agreements and are not available through this website.
+                The public sandbox is free. Paid pilot or enterprise tiers are governed by separate written agreements, with a hybrid pricing model (fixed deployment fee plus outcome‑based or retainer), and are not available through this website.
               </p>
 
               <h2>5. Acceptable Use</h2>
