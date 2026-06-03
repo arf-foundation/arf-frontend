@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Send, Check, Loader2, Shield,  Eye, FileText } from 'lucide-react';
+import { Send, Check, Loader2, Shield, Eye, FileText } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SignupPage() {
@@ -163,17 +163,19 @@ export default function SignupPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex items-center justify-center p-4">
+      <div className="min-h-screen text-white flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-6 sm:p-8 text-center">
           <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-green-400" />
           </div>
           <h1 className="text-2xl font-bold mb-2">Application received</h1>
           <p className="text-gray-300 mb-4">
-            You’ve taken the first step to equip your team with audit‑ready AI governance. Our founder will personally review your application.
+            You’ve taken the first step to equip your team with audit‑ready AI governance.
+            Our founder will personally review your application.
           </p>
           <p className="text-gray-400 text-sm mb-6">
-            If your use case is a fit, you’ll receive a <strong>30‑minute onboarding call</strong> within 3–5 business days. No commitment — outcome‑based pricing only applies after the pilot.
+            If your use case is a fit, you’ll receive a <strong>30‑minute onboarding call</strong> within 3–5 business days.
+            No commitment — hybrid pricing (fixed deployment fee + outcome‑based or retainer) applies only after the pilot.
           </p>
           <Link
             href="/"
@@ -187,15 +189,15 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white py-8 sm:py-16 px-4">
+    <div className="min-h-screen text-white py-8 sm:py-16 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Request Pilot Access</h1>
           <p className="text-gray-400 text-sm sm:text-base mb-4">
-            The core ARF engine is access‑controlled and offered under outcome‑based pricing.
+            The core ARF engine is access‑controlled and offered under hybrid pricing (fixed deployment fee + outcome‑based or retainer).
             Fill out this form to start a conversation with our founder.
           </p>
-          {/* Trust bar – addresses certainty preference & compliance sensitivity */}
+          {/* Trust bar */}
           <div className="inline-flex items-center gap-4 text-xs text-gray-400 bg-gray-800/50 rounded-full px-4 py-1 border border-gray-700">
             <span className="flex items-center gap-1"><Shield size={12} /> Deterministic enforcement</span>
             <span className="flex items-center gap-1"><Eye size={12} /> Full audit trail</span>
@@ -204,7 +206,7 @@ export default function SignupPage() {
         </div>
 
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5 sm:p-6 md:p-8">
-          {/* Progress bar – reduces perceived friction */}
+          {/* Progress bar */}
           <div className="mb-6">
             <div className="flex justify-between text-xs text-gray-400 mb-1">
               <span>Step {step} of {totalSteps}</span>
@@ -218,7 +220,7 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Step indicator (visual only – progress bar above does the job, kept for clarity) */}
+          {/* Step indicator */}
           <div className="flex justify-between mb-6">
             {[1, 2, 3].map(i => (
               <div key={i} className="flex-1 text-center">
@@ -456,7 +458,7 @@ export default function SignupPage() {
                       <p className="text-blue-300">
                         Once submitted, your application will be personally reviewed by the founder.
                         If qualified, you’ll receive an email to schedule a 30‑minute onboarding call.
-                        Pilot access is time‑limited and free; pricing is outcome‑based after the evaluation period.
+                        Pilot access is time‑limited and free; hybrid pricing (fixed deployment fee + outcome‑based or retainer) applies after the pilot.
                       </p>
                     </div>
                   </div>
@@ -524,7 +526,6 @@ export default function SignupPage() {
                 {fieldErrors.agreeToTerms && (
                   <p className="text-red-400 text-xs mt-1">{fieldErrors.agreeToTerms}</p>
                 )}
-                {/* Loss-aversion + urgency nudge */}
                 <p className="text-xs text-gray-500 italic">
                   Every ungoverned AI decision is a liability. Turn your AI operations into an auditable asset.
                 </p>
