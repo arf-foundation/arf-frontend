@@ -1,13 +1,32 @@
 'use client';
 
+/**
+ * Landing page for the Agentic Reliability Framework (ARF).
+ *
+ * This page serves as the primary marketing surface for the ARF governance layer.
+ * It explains the problem of ungoverned AI agents, presents ARF as the solution,
+ * and provides multiple pathways for enterprise customers to engage (pilot sign‑up,
+ * sandbox API, live demos, specification access).
+ *
+ * Key design decisions:
+ * - Hybrid pricing (fixed deployment fee + outcome‑based or retainer) is explained
+ *   in the Access Models section.
+ * - Trust badges (SOC2 readiness, security‑first design, privacy‑conscious
+ *   deployments) appear immediately after the hero call‑to‑action to reduce
+ *   perceived risk.
+ * - The pilot testimonial was intentionally removed to avoid any appearance of
+ *   unsubstantiated marketing claims.
+ * - All live‑demo and sandbox‑API sections clearly state that responses are mock
+ *   data and that the real engine is access‑controlled.
+ *
+ * @module LandingPage
+ */
+
 import Link from 'next/link';
 import { useState, useEffect, useRef, type ReactNode, type ElementType } from 'react';
 import {
   ArrowRight,
   Rocket,
-  BookOpen,
-  Users,
-  Code,
   Cpu,
   Brain,
   Scale,
@@ -35,6 +54,7 @@ declare global {
 // Content constants
 // ============================================================================
 
+/** Mermaid diagram showing the ARF governance flow (Agent Intent + Telemetry → Evaluate & Decide → Approve/Deny/Escalate). */
 const DIAGRAM = `flowchart TD
     subgraph Input["Infrastructure Signals"]
         A[Agent Intent]
@@ -54,10 +74,12 @@ const DIAGRAM = `flowchart TD
     C --> G
     C --> H`;
 
+/** cURL command demonstrating the public sandbox API (mock responses only). */
 const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
+/** Feature cards displayed in the "Key Capabilities" section. */
 const FEATURES = [
   {
     title: 'Continuous Risk Calibration',
@@ -93,6 +115,7 @@ const FEATURES = [
   },
 ];
 
+/** Demo cards for the "Live Demos" section. */
 const DEMOS = [
   {
     title: 'Risk Dashboard',
@@ -130,12 +153,14 @@ const DEMOS = [
   },
 ];
 
+/** Trust badges displayed beneath the hero CTA. */
 const TRUST_BADGES = [
   { label: 'Architected for SOC2 readiness', color: 'green' },
   { label: 'Security‑first operational design', color: 'blue' },
   { label: 'Supports privacy‑conscious deployments', color: 'purple' },
 ];
 
+/** Repository cards for the "Open Specs & Protected Core" section. */
 const REPOS = [
   {
     name: 'agentic_reliability_framework',
@@ -159,6 +184,7 @@ const REPOS = [
   },
 ];
 
+/** Map badge color names to Tailwind text classes for the shield icons. */
 const BADGE_ICON_CLASSES: Record<string, string> = {
   green: 'text-green-400',
   blue: 'text-blue-400',
@@ -169,7 +195,21 @@ const BADGE_ICON_CLASSES: Record<string, string> = {
 // Main component
 // ============================================================================
 
+/**
+ * LandingPage component.
+ *
+ * Renders the full marketing landing page for ARF, including hero, trust badges,
+ * problem/solution/outcome summary, "How ARF Works" diagram, key capabilities,
+ * enterprise trust section, access models, sandbox API demo, live demos, open specs,
+ * and a footer with contact links and legal navigation.
+ *
+ * All interactive elements (copy buttons, sandbox fetch) are self‑contained.
+ * The component uses the `useInView` hook for scroll‑triggered fade‑in animations.
+ */
 export default function LandingPage() {
+  /* ------------------------------------------------------------------
+   * Local state for clipboard operations and sandbox API demo
+   * ------------------------------------------------------------------ */
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
   const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
@@ -180,6 +220,7 @@ export default function LandingPage() {
   const [sandboxResponse, setSandboxResponse] = useState<Record<string, unknown> | null>(null);
   const [sandboxError, setSandboxError] = useState<string | null>(null);
 
+  // Mounted guard to prevent state updates after unmount
   const isMounted = useRef(true);
   useEffect(() => {
     isMounted.current = true;
@@ -190,6 +231,10 @@ export default function LandingPage() {
     };
   }, []);
 
+  /**
+   * Update a copy‑state flag and clear it after a timeout.
+   * Prevents stale timeouts by clearing any existing timer for the key.
+   */
   const setCopyState = (key: string, value: boolean, duration = 2000) => {
     if (timeoutRefs.current[key]) clearTimeout(timeoutRefs.current[key]);
     if (value) {
@@ -211,6 +256,7 @@ export default function LandingPage() {
     }
   };
 
+  /** Generic clipboard writer with error handling. */
   const handleCopy = async (text: string, key: string, successMessage?: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -229,6 +275,7 @@ export default function LandingPage() {
     if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
   };
 
+  /** Fetch a mock evaluation from the public sandbox API. */
   const fetchSandboxResponse = async () => {
     setSandboxLoading(true);
     setSandboxError(null);
@@ -260,6 +307,7 @@ export default function LandingPage() {
     }
   };
 
+  // Intersection observers for scroll‑triggered fade‑in
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2, once: true });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2, once: true });
   const { ref: demosRef, inView: demosInView } = useInView({ threshold: 0.2, once: true });
@@ -268,7 +316,9 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen text-white">
-      {/* Hero */}
+      {/* ==================================================================
+           Hero section – headline, subhead, trust badges, primary CTAs
+           ================================================================== */}
       <section
         ref={heroRef}
         className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
@@ -312,7 +362,7 @@ export default function LandingPage() {
           </a>
         </div>
 
-        {/* Trust badges – placed immediately after hero CTA */}
+        {/* Trust badges – immediately after hero CTA */}
         <div className="mt-8">
           <div className="flex flex-wrap justify-center gap-4">
             <div className="bg-gray-800/80 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700">
@@ -702,6 +752,7 @@ export default function LandingPage() {
         </div>
       </footer>
 
+      {/* Toast notifications */}
       {copiedEmail && <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Email copied! ✉️</div>}
       {copiedFullSnippet && <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Command copied! 🚀</div>}
       {copyError && <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-800 text-white px-4 py-2 rounded-lg shadow-lg border border-red-700 animate-slide-up">{copyError}</div>}
@@ -713,7 +764,24 @@ export default function LandingPage() {
 // Sub‑components
 // ============================================================================
 
-function FeatureCard({ title, description, icon: Icon, color, details }: { title: string; description: string; icon: ElementType; color: string; details: string }) {
+/**
+ * Collapsible feature card.
+ *
+ * Displays an icon, title, short description, and an expandable details section.
+ */
+function FeatureCard({
+  title,
+  description,
+  icon: Icon,
+  color,
+  details,
+}: {
+  title: string;
+  description: string;
+  icon: ElementType;
+  color: string;
+  details: string;
+}) {
   const [expanded, setExpanded] = useState(false);
   const id = `feature-details-${title.replace(/\s/g, '-')}`;
   const colorClasses: Record<string, string> = {
@@ -749,7 +817,22 @@ function FeatureCard({ title, description, icon: Icon, color, details }: { title
   );
 }
 
-function DemoCard({ title, description, link, buttonText, external = false }: { title: string; description: ReactNode; link: string; buttonText: string; external?: boolean }) {
+/**
+ * Demo card linking to an external demo or an internal page.
+ */
+function DemoCard({
+  title,
+  description,
+  link,
+  buttonText,
+  external = false,
+}: {
+  title: string;
+  description: ReactNode;
+  link: string;
+  buttonText: string;
+  external?: boolean;
+}) {
   const content = (
     <div className="bg-gray-800/80 p-6 rounded-lg border border-gray-700 h-full flex flex-col hover:border-blue-500 transition">
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
@@ -763,6 +846,12 @@ function DemoCard({ title, description, link, buttonText, external = false }: { 
   return <Link href={link} className="block h-full">{content}</Link>;
 }
 
+/**
+ * Repository card for the "Open Specs & Protected Core" section.
+ *
+ * Shows the repository name, a short description, and an access‑controlled badge
+ * when the repository is private.
+ */
 function RepoCard({ name, desc, isPrivate = false }: { name: string; desc: string; isPrivate?: boolean }) {
   return (
     <div className={`bg-gray-800/80 p-4 rounded-lg border transition ${isPrivate ? 'border-gray-700 opacity-80 cursor-default' : 'border-gray-700 hover:border-blue-500 group'}`}>
@@ -789,7 +878,22 @@ function RepoCard({ name, desc, isPrivate = false }: { name: string; desc: strin
   );
 }
 
-function ContactLink({ href, icon, text, emoji, onClick }: { href: string; icon?: ReactNode; text: string; emoji: string; onClick?: () => void }) {
+/**
+ * Contact link with emoji, optional icon, and hover effects.
+ */
+function ContactLink({
+  href,
+  icon,
+  text,
+  emoji,
+  onClick,
+}: {
+  href: string;
+  icon?: ReactNode;
+  text: string;
+  emoji: string;
+  onClick?: () => void;
+}) {
   return (
     <a
       href={href}
