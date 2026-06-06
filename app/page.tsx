@@ -253,6 +253,11 @@ export default function LandingPage() {
     }
   };
 
+  const handleCopyEmail = () => handleCopy('contact', 'email');
+  const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
+  const handleCopySandboxResponse = () => {
+    if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
+  };
 
   /** Fetch a mock evaluation from the public sandbox API. */
   const fetchSandboxResponse = async () => {
@@ -334,7 +339,7 @@ export default function LandingPage() {
           <a
             href="https://github.com/arf-foundation"
             target="_blank"
-
+            rel="noopener noreferrer"
             className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
           >
             View Technical Spec <ArrowRight size={18} />
@@ -374,7 +379,7 @@ export default function LandingPage() {
             <a
               href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg"
               target="_blank"
-
+              rel="noopener noreferrer"
               className="text-gray-300 hover:text-white transition"
               onClick={trackSlackClick}
             >
@@ -384,7 +389,7 @@ export default function LandingPage() {
           <a
             href="https://github.com/arf-foundation"
             target="_blank"
-
+            rel="noopener noreferrer"
             className="flex items-center gap-2 text-gray-300 hover:text-white transition"
           >
             GitHub
@@ -697,10 +702,10 @@ export default function LandingPage() {
             <Link href="/signup" className="hover:text-white transition">Request Access</Link>
             <Link href="/terms" className="hover:text-white transition">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
-            <a href="https://github.com/arf-foundation" target="_blank" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">GitHub</a>
-            <a href="https://huggingface.co/A-R-F" target="_blank" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">🤗 Hugging Face</a>
-            <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer"><MessageSquare size={18} /> Slack</a>
-            <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">LinkedIn</a>
+            <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">GitHub</a>
+            <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">🤗 Hugging Face</a>
+            <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" rel="noopener noreferrer" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer"><MessageSquare size={18} /> Slack</a>
+            <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">LinkedIn</a>
           </div>
 
           <p className="text-sm">
@@ -801,7 +806,7 @@ function DemoCard({
       </span>
     </div>
   );
-  if (external) return <a href={link} target="_blank" className="block h-full" rel="noopener noreferrer">{content}</a>;
+  if (external) return <a href={link} target="_blank" rel="noopener noreferrer" className="block h-full" rel="noopener noreferrer">{content}</a>;
   return <Link href={link} className="block h-full">{content}</Link>;
 }
 
@@ -857,7 +862,7 @@ function ContactLink({
     <a
       href={href}
       target="_blank"
-
+      rel="noopener noreferrer"
       onClick={onClick}
       className="group flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300"
     >
