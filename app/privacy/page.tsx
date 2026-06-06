@@ -64,7 +64,7 @@ export default function PrivacyPage() {
               </ul>
 
               <h2>8. Your Rights</h2>
-              <p>Access, correction, deletion, portability, objection. Contact <a href="mailto:juan@arf-ai.com">juan@arf-ai.com</a>.</p>
+              <p>Access, correction, deletion, portability, objection. Contact <a href="/contact">contact</a>.</p>
 
               <h2>9. Security Measures</h2>
               <p>HTTPS encryption, access controls, logging.</p>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
               <h2>14. Contact</h2>
               <p className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                <a href="mailto:juan@arf-ai.com">juan@arf-ai.com</a>
+                <a href="/contact">contact</a>
               </p>
             </div>
           </div>

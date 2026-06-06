@@ -196,7 +196,7 @@ const LegalFooter = () => (
     <Link href="/terms" className="hover:text-gray-300">Terms of Service</Link>
     <Link href="/privacy" className="hover:text-gray-300">Privacy Policy</Link>
     <Link href="/legal/imprint" className="hover:text-gray-300">Imprint</Link>
-    <a href="mailto:juan@arf-ai.com" className="hover:text-gray-300">Contact</a>
+    <a href="/contact" className="hover:text-gray-300">Contact</a>
   </div>
 );
 

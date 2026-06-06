@@ -155,7 +155,7 @@ export default function SignupPage() {
       localStorage.removeItem('arf-pilot-form');
     } catch (err) {
       console.error(err);
-      setError('Failed to submit request. Please email juan@arf-ai.com directly.');
+      setError('Failed to submit request. Please email contact directly.');
     } finally {
       setLoading(false);
     }
@@ -588,7 +588,7 @@ export default function SignupPage() {
 
           <p className="text-xs text-gray-500 text-center mt-6">
             Prefer to email? Contact us directly at{' '}
-            <a href="mailto:juan@arf-ai.com" className="text-blue-400 hover:underline">juan@arf-ai.com</a>
+            <a href="/contact" className="text-blue-400 hover:underline">contact</a>
           </p>
         </div>
       </div>

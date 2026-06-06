@@ -86,7 +86,7 @@ export default function TermsPage() {
               <h2>11. Contact</h2>
               <p className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                <a href="mailto:juan@arf-ai.com">juan@arf-ai.com</a>
+                <a href="/contact">contact</a>
               </p>
             </div>
           </div>

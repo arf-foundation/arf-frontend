@@ -8,7 +8,7 @@ export default function PricingPage() {
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   const handleCopyEmail = async () => {
-    await navigator.clipboard.writeText('juan@arf-ai.com');
+    await navigator.clipboard.writeText('contact');
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
   };

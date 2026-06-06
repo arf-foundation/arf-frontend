@@ -71,10 +71,10 @@ export default function AboutPage() {
                 </p>
                 <div className="flex gap-4 mt-4">
                   <a
-                    href="mailto:juan@arf-ai.com"
+                    href="/contact"
                     className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition"
                   >
-                    <Mail size={16} /> juan@arf-ai.com
+                    <Mail size={16} /> contact
                   </a>
                   <a
                     href="https://www.linkedin.com/in/petterjuan/"
