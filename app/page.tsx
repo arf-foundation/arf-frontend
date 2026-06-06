@@ -162,10 +162,26 @@ const TRUST_BADGES = [
 
 /** Repository cards for the "Open Specs & Protected Core" section. */
 const REPOS = [
-  { name: "Core Governance Engine", desc: "Protected core engine – Bayesian risk scoring, semantic memory, governance loop.", isPrivate: true },
-  { name: "API Control Plane", desc: "Access‑controlled API gateway – governs access, enforces quotas, logs every decision.", isPrivate: true },
-  { name: "Management UI", desc: "Frontend dashboard – pilot access only", isPrivate: true },
-  { name: "Open Specification", desc: "Canonical specification – Apache 2.0", isPrivate: false },
+  {
+    name: 'agentic_reliability_framework',
+    desc: 'Protected core engine – real‑time risk calibration, historical memory, deterministic governance.',
+    isPrivate: true,
+  },
+  {
+    name: 'arf-api',
+    desc: 'API control plane – governs access, enforces quotas, and logs every decision.',
+    isPrivate: true,
+  },
+  {
+    name: 'enterprise',
+    desc: 'Enterprise layer – tamper‑proof audit trails, SSO, and commercial SLAs.',
+    isPrivate: true,
+  },
+  {
+    name: 'arf-spec',
+    desc: 'Canonical specification – data models, API contracts, decision rules (shared under written terms).',
+    isPrivate: true,
+  },
 ];
 
 /** Map badge color names to Tailwind text classes for the shield icons. */
@@ -253,7 +269,7 @@ export default function LandingPage() {
     }
   };
 
-  const handleCopyEmail = () => handleCopy('contact', 'email');
+  const handleCopyEmail = () => handleCopy('juan@arf-ai.com', 'email');
   const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
   const handleCopySandboxResponse = () => {
     if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
@@ -677,12 +693,19 @@ export default function LandingPage() {
             <div className="flex flex-wrap justify-center gap-6">
               <div className="flex items-center gap-2">
                 <ContactLink
-                  href="/contact"
+                  href="mailto:juan@arf-ai.com"
                   icon={<Mail className="w-5 h-5" />}
-                  text="contact"
+                  text="juan@arf-ai.com"
                   emoji="📬"
                 />
-                
+                <button
+                  type="button"
+                  onClick={handleCopyEmail}
+                  className="p-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  aria-label="Copy email address"
+                >
+                  {copiedEmail ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400 group-hover:text-white" />}
+                </button>
               </div>
               <ContactLink href="https://www.linkedin.com/in/petterjuan/" text="Juan Petter" emoji="🔗" />
               <ContactLink href="https://calendly.com/petter2025us/30min" text="Book a Call" emoji="📅" />
@@ -703,7 +726,7 @@ export default function LandingPage() {
               Email us with your organization, use case, and expected evaluation volume.
             </p>
             <a
-              href="/contact?subject=ARF%20Pilot%20Access%20Request"
+              href="mailto:juan@arf-ai.com?subject=ARF%20Pilot%20Access%20Request"
               className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
             >
               <Mail className="w-4 h-4" /> Apply for Pilot Access
