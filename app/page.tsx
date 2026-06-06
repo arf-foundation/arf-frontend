@@ -253,11 +253,6 @@ export default function LandingPage() {
     }
   };
 
-  const handleCopyEmail = () => handleCopy('contact', 'email');
-  const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
-  const handleCopySandboxResponse = () => {
-    if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
-  };
 
   /** Fetch a mock evaluation from the public sandbox API. */
   const fetchSandboxResponse = async () => {
