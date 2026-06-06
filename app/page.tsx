@@ -583,13 +583,7 @@ export default function LandingPage() {
               <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs font-mono text-gray-400">Live sandbox response (mock)</span>
-                  <button
-                    type="button"
-                    onClick={handleCopySandboxResponse}
-                    className="text-xs text-blue-400 hover:underline"
-                  >
-                    {copiedSandboxResponse ? 'Copied!' : 'Copy'}
-                  </button>
+                  
                 </div>
                 <pre className="text-xs font-mono text-green-300 overflow-x-auto whitespace-pre-wrap">
                   {JSON.stringify(sandboxResponse, null, 2)}
