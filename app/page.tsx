@@ -567,14 +567,7 @@ export default function LandingPage() {
               <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">
                 {CURL_COMMAND}
               </pre>
-              <button
-                type="button"
-                onClick={handleCopyFullSnippet}
-                className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition flex-shrink-0"
-                aria-label="Copy full curl command"
-              >
-                {copiedFullSnippet ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
-              </button>
+              
             </div>
 
             <button
