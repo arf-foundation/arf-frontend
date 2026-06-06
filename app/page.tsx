@@ -253,7 +253,7 @@ export default function LandingPage() {
     }
   };
 
-  const handleCopyEmail = () => handleCopy('contact', 'email');
+  const handleCopyEmail = () => handleCopy('contact-ai.com', 'email');
   const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
   const handleCopySandboxResponse = () => {
     if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
@@ -339,7 +339,7 @@ export default function LandingPage() {
           <a
             href="https://github.com/arf-foundation"
             target="_blank"
-
+            rel="noopener noreferrer"
             className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
           >
             View Technical Spec <ArrowRight size={18} />
@@ -379,7 +379,7 @@ export default function LandingPage() {
             <a
               href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg"
               target="_blank"
-
+              rel="noopener noreferrer"
               className="text-gray-300 hover:text-white transition"
               onClick={trackSlackClick}
             >
@@ -389,7 +389,7 @@ export default function LandingPage() {
           <a
             href="https://github.com/arf-foundation"
             target="_blank"
-
+            rel="noopener noreferrer"
             className="flex items-center gap-2 text-gray-300 hover:text-white transition"
           >
             GitHub
@@ -572,7 +572,14 @@ export default function LandingPage() {
               <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">
                 {CURL_COMMAND}
               </pre>
-              
+              <button
+                type="button"
+                onClick={handleCopyFullSnippet}
+                className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition flex-shrink-0"
+                aria-label="Copy full curl command"
+              >
+                {copiedFullSnippet ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
+              </button>
             </div>
 
             <button
@@ -588,7 +595,13 @@ export default function LandingPage() {
               <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs font-mono text-gray-400">Live sandbox response (mock)</span>
-                  
+                  <button
+                    type="button"
+                    onClick={handleCopySandboxResponse}
+                    className="text-xs text-blue-400 hover:underline"
+                  >
+                    {copiedSandboxResponse ? 'Copied!' : 'Copy'}
+                  </button>
                 </div>
                 <pre className="text-xs font-mono text-green-300 overflow-x-auto whitespace-pre-wrap">
                   {JSON.stringify(sandboxResponse, null, 2)}
@@ -664,12 +677,19 @@ export default function LandingPage() {
             <div className="flex flex-wrap justify-center gap-6">
               <div className="flex items-center gap-2">
                 <ContactLink
-                  href="/contact"
+                  href="mailto:contact-ai.com"
                   icon={<Mail className="w-5 h-5" />}
-                  text="contact"
+                  text="contact-ai.com"
                   emoji="📬"
                 />
-                
+                <button
+                  type="button"
+                  onClick={handleCopyEmail}
+                  className="p-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  aria-label="Copy email address"
+                >
+                  {copiedEmail ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400 group-hover:text-white" />}
+                </button>
               </div>
               <ContactLink href="https://www.linkedin.com/in/petterjuan/" text="Juan Petter" emoji="🔗" />
               <ContactLink href="https://calendly.com/petter2025us/30min" text="Book a Call" emoji="📅" />
@@ -690,7 +710,7 @@ export default function LandingPage() {
               Email us with your organization, use case, and expected evaluation volume.
             </p>
             <a
-              href="/contact"
+              href="mailto:contact-ai.com?subject=ARF%20Pilot%20Access%20Request"
               className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
             >
               <Mail className="w-4 h-4" /> Apply for Pilot Access
@@ -702,10 +722,10 @@ export default function LandingPage() {
             <Link href="/signup" className="hover:text-white transition">Request Access</Link>
             <Link href="/terms" className="hover:text-white transition">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
-            <a href="https://github.com/arf-foundation" target="_blank" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">GitHub</a>
-            <a href="https://huggingface.co/A-R-F" target="_blank" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">🤗 Hugging Face</a>
-            <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer"><MessageSquare size={18} /> Slack</a>
-            <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">LinkedIn</a>
+            <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">GitHub</a>
+            <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">🤗 Hugging Face</a>
+            <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" rel="noopener noreferrer" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1"><MessageSquare size={18} /> Slack</a>
+            <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">LinkedIn</a>
           </div>
 
           <p className="text-sm">
@@ -806,7 +826,7 @@ function DemoCard({
       </span>
     </div>
   );
-  if (external) return <a href={link} target="_blank" className="block h-full" rel="noopener noreferrer">{content}</a>;
+  if (external) return <a href={link} target="_blank" rel="noopener noreferrer" className="block h-full">{content}</a>;
   return <Link href={link} className="block h-full">{content}</Link>;
 }
 
@@ -862,7 +882,7 @@ function ContactLink({
     <a
       href={href}
       target="_blank"
-
+      rel="noopener noreferrer"
       onClick={onClick}
       className="group flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300"
     >
