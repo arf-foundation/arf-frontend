@@ -3,6 +3,8 @@ import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false,
+  compiler: { removeConsole: true, },
+  productionBrowserSourceMaps: false,
   compiler: {
     removeConsole: true,
   },
