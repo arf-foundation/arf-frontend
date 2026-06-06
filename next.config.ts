@@ -2,22 +2,6 @@ import type { NextConfig } from "next";
 import withPWA from "next-pwa";
 
 const securityHeaders = [
-  {
-    key: "Content-Security-Policy",
-    value: `
-      default-src 'self';
-      script-src 'self' https://cdn.plot.ly https://platform.linkedin.com https://www.youtube.com https://api.github.com https://challenges.cloudflare.com 'unsafe-inline';
-      style-src 'self' 'unsafe-inline';
-      img-src 'self' data: https://api.qrserver.com https://*.licdn.com https://*.ytimg.com https://*.githubusercontent.com https://*.vercel.app;
-      font-src 'self' data:;
-      connect-src 'self' https://api.github.com https://sandbox.arf.dev https://*.vercel.app;
-      frame-src 'self' https://www.linkedin.com https://www.youtube.com https://www.youtube-nocookie.com;
-      frame-ancestors 'none';
-      form-action 'self';
-      base-uri 'self';
-      upgrade-insecure-requests;
-    `.replace(/\s{2,}/g, " ").trim(),
-  },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-XSS-Protection", value: "1; mode=block" },
@@ -26,9 +10,12 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  turbopack: {},
+  productionBrowserSourceMaps: false,
+  compiler: {
+    removeConsole: true,
+  },
+  turbopack: {}, // Required to avoid webpack/turbopack conflict
   async rewrites() {
-    // Forward all /api/v1/* requests to the public Sandbox API
     return [
       {
         source: '/api/v1/:path*',
@@ -52,7 +39,7 @@ export default withPWA({
   swMinify: true,
   workboxOptions: {
     exclude: [/\.map$/, /^manifest.*\.js$/],
-    runtimeCaching: [], // Prevents Workbox from calling getInstalledRelatedApps
+    runtimeCaching: [],
   },
   fallbacks: { document: '/offline' },
 })(nextConfig);
