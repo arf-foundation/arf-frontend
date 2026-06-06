@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const nonce = uuidv4();
   const csp = [
     `default-src 'self'`,
