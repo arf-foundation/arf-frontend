@@ -49,7 +49,6 @@ import {
   Shield,
   Lock,
   FileText,
-  
   Calendar,
 } from 'lucide-react';
 import { useInView } from './hooks/useInView';
@@ -383,11 +382,10 @@ export default function LandingPage() {
           </h1>
         </div>
 
+        {/* ORIGINAL HERO SUBHEAD – restored from backup */}
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-          ARF is an{' '}
-          <strong>access‑controlled governance layer</strong> that helps organisations make
-          safe, accountable, and transparent decisions when using AI agents to manage
-          cloud resources.
+          Every AI‑assisted infrastructure decision is evaluated, logged, and kept under your
+          control — without slowing your team down.
         </p>
 
         <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 mb-8 max-w-md mx-auto">
@@ -413,6 +411,8 @@ export default function LandingPage() {
             View Technical Spec <ArrowRight size={18} />
           </a>
         </div>
+
+        {/* Trust badges – immediately after hero CTA */}
         <div className="mt-8">
           <div className="flex flex-wrap justify-center gap-4">
             {TRUST_BADGES.map((badge) => (
@@ -426,6 +426,7 @@ export default function LandingPage() {
             enforcement available in pilot.
           </p>
         </div>
+
         <p className="text-gray-400 text-sm mt-4">
           ⚡ The public sandbox returns only mock advisory responses. Real enforcement,
           audit trails, and confidence guarantees require a pilot agreement.
@@ -458,7 +459,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Problem / Solution / Outcome & How ARF Works */}
+      {/* Problem / Solution / Outcome & How ARF Works – includes diagram */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <div className="grid md:grid-cols-3 gap-6 text-center mb-8">
@@ -487,6 +488,7 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
+
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
           <figure>
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
@@ -551,15 +553,23 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
+
           <div className="flex flex-wrap justify-center gap-6 mt-8">
             {TRUST_BADGES.map((badge) => (
-              <div key={badge.label} className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700">
+              <div
+                key={badge.label}
+                className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700"
+              >
                 <Shield className={`w-4 h-4 ${BADGE_ICON_CLASSES[badge.color]}`} /> {badge.label}
               </div>
             ))}
           </div>
+
           <div className="text-center mt-8">
-            <Link href="/pricing" className="bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition inline-flex items-center gap-2">
+            <Link
+              href="/pricing"
+              className="bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition inline-flex items-center gap-2"
+            >
               View Access Models <ArrowRight size={16} />
             </Link>
           </div>
