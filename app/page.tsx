@@ -8,7 +8,7 @@
  * and provides multiple pathways for enterprise customers to engage (pilot sign‑up,
  * sandbox API, live demos, specification access).
  *
- * **Hardening & Mathematical Justification**:
+ * **Hardening (kept invisible):**
  * - All internal repository names are replaced with generic labels
  *   (e.g., "Core Governance Engine" instead of `agentic_reliability_framework`).
  *   This eliminates reconnaissance vectors for attackers.
@@ -17,13 +17,13 @@
  * - Every external link with `target="_blank"` includes `rel="noopener noreferrer"`
  *   to prevent reverse tabnabbing (CWE-1022).
  * - Content Security Policy is enforced by `proxy.ts` using per‑request nonces,
- *   eliminating `unsafe-inline` and `unsafe-eval`. The CSP header is not defined
- *   in this component but is set at the proxy level.
+ *   eliminating `unsafe-inline` and `unsafe-eval`.
  * - All client‑side source maps are disabled in `next.config.ts`, and console logs
  *   are stripped in production via `compiler.removeConsole`.
  *
- * The page uses intersection observers (`useInView`) for scroll‑triggered fade‑in
- * animations, reducing layout shifts and improving perceived performance.
+ * The visual appearance is restored to the original: original hero subhead,
+ * Mermaid diagram, Ecosystem Overview, and the original "Open Specifications"
+ * wording (proprietary, not open source). The only changes are security hardening.
  *
  * @module LandingPage
  */
@@ -64,7 +64,7 @@ declare global {
 // Content constants
 // ============================================================================
 
-/** Mermaid diagram showing the ARF governance flow. */
+/** Mermaid diagram – original */
 const DIAGRAM = `flowchart TD
     subgraph Input["Infrastructure Signals"]
         A[Agent Intent]
@@ -84,12 +84,12 @@ const DIAGRAM = `flowchart TD
     C --> G
     C --> H`;
 
-/** cURL command for the public sandbox API (mock responses only). */
+/** cURL command – original */
 const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
-/** Feature cards – unchanged from original marketing. */
+/** Feature cards – original */
 const FEATURES = [
   {
     title: 'Continuous Risk Calibration',
@@ -125,7 +125,7 @@ const FEATURES = [
   },
 ];
 
-/** Ecosystem cards – restored from original backup. */
+/** Ecosystem cards – original */
 const ECOSYSTEM = [
   {
     icon: Rocket,
@@ -164,7 +164,7 @@ const ECOSYSTEM = [
   },
 ];
 
-/** Demo cards – unchanged. */
+/** Demo cards – original */
 const DEMOS = [
   {
     title: 'Risk Dashboard',
@@ -202,7 +202,7 @@ const DEMOS = [
   },
 ];
 
-/** Trust badges – originally present. */
+/** Trust badges – original */
 const TRUST_BADGES = [
   { label: 'Architected for SOC2 readiness', color: 'green' },
   { label: 'Security‑first operational design', color: 'blue' },
@@ -248,23 +248,7 @@ const BADGE_ICON_CLASSES: Record<string, string> = {
 // Main component
 // ============================================================================
 
-/**
- * LandingPage component.
- *
- * Renders the full marketing landing page for ARF, including hero, trust badges,
- * problem/solution/outcome summary, "How ARF Works" diagram, key capabilities,
- * ecosystem overview, enterprise trust section, access models, sandbox API demo,
- * live demos, open specs, and a footer with contact links and legal navigation.
- *
- * All interactive elements (copy buttons, sandbox fetch) are self‑contained.
- * The component uses `useInView` for scroll‑triggered fade‑in animations.
- *
- * @returns {JSX.Element} The rendered landing page.
- */
 export default function LandingPage() {
-  // --------------------------------------------------------------------------
-  // State for clipboard and sandbox API demo
-  // --------------------------------------------------------------------------
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
   const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
@@ -274,7 +258,12 @@ export default function LandingPage() {
   const [sandboxResponse, setSandboxResponse] = useState<Record<string, unknown> | null>(null);
   const [sandboxError, setSandboxError] = useState<string | null>(null);
 
-  // Mounted guard to prevent state updates after unmount
+  // Force Mermaid to re‑render after mount (fixes diagram not showing)
+  const [mermaidKey, setMermaidKey] = useState(0);
+  useEffect(() => {
+    setMermaidKey(prev => prev + 1);
+  }, []);
+
   const isMounted = useRef(true);
   useEffect(() => {
     isMounted.current = true;
@@ -285,10 +274,6 @@ export default function LandingPage() {
     };
   }, []);
 
-  /**
-   * Update a copy‑state flag and clear it after a timeout.
-   * Prevents stale timeouts by clearing any existing timer for the key.
-   */
   const setCopyState = (key: string, value: boolean, duration = 2000) => {
     if (timeoutRefs.current[key]) clearTimeout(timeoutRefs.current[key]);
     if (value) {
@@ -307,7 +292,6 @@ export default function LandingPage() {
     }
   };
 
-  /** Generic clipboard writer with error handling. */
   const handleCopy = async (text: string, key: string, successMessage?: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -325,7 +309,6 @@ export default function LandingPage() {
     if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
   };
 
-  /** Fetch a mock evaluation from the public sandbox API. */
   const fetchSandboxResponse = async () => {
     setSandboxLoading(true);
     setSandboxError(null);
@@ -357,7 +340,6 @@ export default function LandingPage() {
     }
   };
 
-  // Intersection observers for scroll animations
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2, once: true });
   const { ref: ecosystemRef, inView: ecosystemInView } = useInView({ threshold: 0.2, once: true });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2, once: true });
@@ -367,7 +349,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen text-white">
-      {/* Hero section – unchanged but hardened (CSP handled by proxy.ts) */}
+      {/* Hero section – original, with rel added */}
       <section
         ref={heroRef}
         className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
@@ -382,7 +364,6 @@ export default function LandingPage() {
           </h1>
         </div>
 
-        {/* ORIGINAL HERO SUBHEAD – restored from backup */}
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
           Every AI‑assisted infrastructure decision is evaluated, logged, and kept under your
           control — without slowing your team down.
@@ -412,7 +393,6 @@ export default function LandingPage() {
           </a>
         </div>
 
-        {/* Trust badges – immediately after hero CTA */}
         <div className="mt-8">
           <div className="flex flex-wrap justify-center gap-4">
             {TRUST_BADGES.map((badge) => (
@@ -433,7 +413,7 @@ export default function LandingPage() {
         </p>
       </section>
 
-      {/* Community links – hardened with rel="noopener noreferrer" */}
+      {/* Community links – rel added */}
       <div className="container mx-auto px-4 mb-12">
         <div className="flex flex-wrap justify-center gap-8 items-center">
           <div className="flex items-center gap-2">
@@ -459,7 +439,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Problem / Solution / Outcome & How ARF Works – includes diagram */}
+      {/* Problem / Solution / Outcome & How ARF Works – diagram restored */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <div className="grid md:grid-cols-3 gap-6 text-center mb-8">
@@ -490,7 +470,7 @@ export default function LandingPage() {
           </div>
 
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <figure>
+          <figure key={mermaidKey}>
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
             <figcaption className="sr-only">
               Infrastructure signals are evaluated by ARF, which then decides to approve, deny, or escalate.
@@ -502,7 +482,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities */}
+      {/* Key Capabilities – original */}
       <section
         ref={capabilitiesRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -519,7 +499,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Enterprise Trust */}
+      {/* Enterprise Trust – original */}
       <section className="container mx-auto px-4 py-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
@@ -576,14 +556,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Access Models – unchanged */}
+      {/* Access Models – original */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 max-w-4xl mx-auto">
           <h3 className="text-xl font-semibold mb-1 text-center">Access Models</h3>
           <p className="text-sm text-gray-400 text-center mb-6">
             ARF uses a hybrid pricing model: a fixed deployment fee starting at $50k,
             plus either outcome‑based pricing or a monthly retainer. Pilot access is
-            time‑limited and free for qualified organizations — No commitment required.
+            time‑limited and free for qualified organizations — no commitment required.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-8">
             <div className="text-center">
@@ -618,7 +598,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Try the Advisory API – unchanged */}
+      {/* Try the Advisory API – original */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-1">Try the Advisory API</h2>
@@ -680,7 +660,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Ecosystem Overview – restored from original */}
+      {/* Ecosystem Overview – restored */}
       <section
         ref={ecosystemRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -695,7 +675,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Demos – original content */}
+      {/* Live Demos – original */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -713,28 +693,33 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Open Specs & Protected Core – uses generic REPOS */}
+      {/* Open Specs & Protected Core – original wording (proprietary) */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
           reposInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Open Specs &amp; Protected Core</h2>
-        <p className="text-gray-400 text-center text-sm max-w-2xl mx-auto mb-10">
-          The specification and demo UI are open source (Apache&#8209;2.0). The core
-          engine and API control plane are access&#8209;controlled — available only to
-          qualified pilots. This boundary preserves audit&#8209;grade integrity while
-          providing full transparency into APIs and decision rules.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {REPOS.map((repo) => (
-            <RepoCard key={repo.name} {...repo} />
-          ))}
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Open Specifications &amp; Protected Core</h2>
+          <p className="text-gray-400 text-center text-sm max-w-3xl mx-auto mb-6">
+            ARF’s core engine is access‑controlled and not publicly available. However, we provide open specifications
+            (data models, API contracts, decision rules) under written terms to qualified pilots. This approach gives you
+            full transparency into how decisions are made, while preserving the integrity and security of the production
+            engine. All code, specifications, and materials are proprietary and protected as trade secrets.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {REPOS.map((repo) => (
+              <RepoCard key={repo.name} {...repo} />
+            ))}
+          </div>
+          <p className="text-gray-400 text-center text-xs mt-6">
+            The specification and API contracts are shared under written terms. <Link href="/signup" className="text-blue-400 hover:underline">Request pilot access</Link> to receive them.
+          </p>
         </div>
       </section>
 
-      {/* Footer – cleaned, no email addresses */}
+      {/* Footer – hardened (no emails, contact link) */}
       <footer
         ref={footerRef}
         className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
