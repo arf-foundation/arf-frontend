@@ -27,7 +27,7 @@ export default function ContactPage() {
       });
       if (!res.ok) throw new Error('Failed to send');
       setSubmitted(true);
-    } catch (err) {
+    } catch (_err) {
       setError('Something went wrong. Please try again later.');
     } finally {
       setLoading(false);

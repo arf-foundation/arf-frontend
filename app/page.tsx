@@ -223,10 +223,10 @@ export default function LandingPage() {
   const isMounted = useRef(true);
   useEffect(() => {
     isMounted.current = true;
+    const currentRefs = timeoutRefs.current;
     return () => {
       isMounted.current = false;
-      const refs = timeoutRefs.current;
-      Object.values(refs).forEach(clearTimeout);
+      Object.values(currentRefs).forEach(clearTimeout);
     };
   }, []);
 
