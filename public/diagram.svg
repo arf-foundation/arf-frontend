@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+    <style>
+      .node rect { fill: #1f2937; stroke: #4b5563; stroke-width: 2; rx: 8; }
+      .node text { fill: #f3f4f6; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; text-anchor: middle; dominant-baseline: middle; }
+      .edge { stroke: #9ca3af; stroke-width: 2; marker-end: url(#arrowhead); }
+      .subgraph rect { fill: #111827; stroke: #374151; stroke-width: 2; rx: 10; ry: 10; }
+      .subgraph text { fill: #e5e7eb; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; }
+    </style>
+  </defs>
+
+  <!-- Subgraph: Input -->
+  <rect x="50" y="50" width="200" height="150" class="subgraph" rx="10"/>
+  <text x="150" y="80" class="subgraph" text-anchor="middle">Infrastructure Signals</text>
+  <rect x="80" y="100" width="140" height="40" class="node"/>
+  <text x="150" y="125" class="node">Agent Intent</text>
+  <rect x="80" y="150" width="140" height="40" class="node"/>
+  <text x="150" y="175" class="node">Telemetry Data</text>
+
+  <!-- Subgraph: Governance -->
+  <rect x="300" y="50" width="200" height="100" class="subgraph" rx="10"/>
+  <text x="400" y="80" class="subgraph" text-anchor="middle">ARF Governance</text>
+  <rect x="330" y="100" width="140" height="40" class="node"/>
+  <text x="400" y="125" class="node">Evaluate & Decide</text>
+
+  <!-- Subgraph: Outcomes -->
+  <rect x="550" y="50" width="200" height="150" class="subgraph" rx="10"/>
+  <text x="650" y="80" class="subgraph" text-anchor="middle">Outcome</text>
+  <rect x="580" y="100" width="140" height="30" class="node"/>
+  <text x="650" y="120" class="node">✅ Approve</text>
+  <rect x="580" y="140" width="140" height="30" class="node"/>
+  <text x="650" y="160" class="node">⚠️ Escalate</text>
+  <rect x="580" y="180" width="140" height="30" class="node"/>
+  <text x="650" y="200" class="node">❌ Deny</text>
+
+  <!-- Edges -->
+  <line x1="220" y1="120" x2="330" y2="120" class="edge"/>
+  <line x1="220" y1="170" x2="330" y2="140" class="edge"/>
+  <line x1="470" y1="120" x2="580" y2="115" class="edge"/>
+  <line x1="470" y1="120" x2="580" y2="155" class="edge"/>
+  <line x1="470" y1="120" x2="580" y2="195" class="edge"/>
+</svg>
