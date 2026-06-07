@@ -46,11 +46,11 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  Gauge,
-  Star,
   Shield,
   Lock,
   FileText,
+  Linkedin,
+  Calendar,
 } from 'lucide-react';
 import { useInView } from './hooks/useInView';
 import Mermaid from '../components/Mermaid';
