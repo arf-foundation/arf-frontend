@@ -722,10 +722,10 @@ export default function LandingPage() {
             <Link href="/signup" className="hover:text-white transition">Request Access</Link>
             <Link href="/terms" className="hover:text-white transition">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
-            <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">GitHub</a>
-            <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">🤗 Hugging Face</a>
-            <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" rel="noopener noreferrer" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1"><MessageSquare size={18} /> Slack</a>
-            <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">LinkedIn</a>
+            <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">GitHub</a>
+            <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">🤗 Hugging Face</a>
+            <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" rel="noopener noreferrer" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer"><MessageSquare size={18} /> Slack</a>
+            <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer">LinkedIn</a>
           </div>
 
           <p className="text-sm">
@@ -826,7 +826,7 @@ function DemoCard({
       </span>
     </div>
   );
-  if (external) return <a href={link} target="_blank" rel="noopener noreferrer" className="block h-full">{content}</a>;
+  if (external) return <a href={link} target="_blank" rel="noopener noreferrer" className="block h-full" rel="noopener noreferrer">{content}</a>;
   return <Link href={link} className="block h-full">{content}</Link>;
 }
 
