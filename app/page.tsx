@@ -11,19 +11,13 @@
  * **Hardening (kept invisible):**
  * - All internal repository names are replaced with generic labels
  *   (e.g., "Core Governance Engine" instead of `agentic_reliability_framework`).
- *   This eliminates reconnaissance vectors for attackers.
- * - Email addresses are removed; contact is handled via `/contact` page and
- *   `/api/contact` endpoint, preventing email harvesting.
- * - Every external link with `target="_blank"` includes `rel="noopener noreferrer"`
- *   to prevent reverse tabnabbing (CWE-1022).
- * - Content Security Policy is enforced by `proxy.ts` using per‑request nonces,
- *   eliminating `unsafe-inline` and `unsafe-eval`.
- * - All client‑side source maps are disabled in `next.config.ts`, and console logs
- *   are stripped in production via `compiler.removeConsole`.
+ * - Email addresses are removed; contact is handled via `/contact` page.
+ * - Every external link with `target="_blank"` includes `rel="noopener noreferrer"`.
+ * - Content Security Policy is enforced by `proxy.ts` with per‑request nonces.
+ * - Source maps disabled, console logs stripped.
  *
- * The visual appearance is restored to the original: original hero subhead,
- * Mermaid diagram, Ecosystem Overview, and the original "Open Specifications"
- * wording (proprietary, not open source). The only changes are security hardening.
+ * Visual appearance is restored to the original: original hero subhead,
+ * Mermaid diagram, Ecosystem Overview, and the original "Open Specifications" wording.
  *
  * @module LandingPage
  */
@@ -64,7 +58,6 @@ declare global {
 // Content constants
 // ============================================================================
 
-/** Mermaid diagram – original */
 const DIAGRAM = `flowchart TD
     subgraph Input["Infrastructure Signals"]
         A[Agent Intent]
@@ -84,12 +77,10 @@ const DIAGRAM = `flowchart TD
     C --> G
     C --> H`;
 
-/** cURL command – original */
 const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
-/** Feature cards – original */
 const FEATURES = [
   {
     title: 'Continuous Risk Calibration',
@@ -125,7 +116,6 @@ const FEATURES = [
   },
 ];
 
-/** Ecosystem cards – original */
 const ECOSYSTEM = [
   {
     icon: Rocket,
@@ -164,7 +154,6 @@ const ECOSYSTEM = [
   },
 ];
 
-/** Demo cards – original */
 const DEMOS = [
   {
     title: 'Risk Dashboard',
@@ -202,18 +191,13 @@ const DEMOS = [
   },
 ];
 
-/** Trust badges – original */
 const TRUST_BADGES = [
   { label: 'Architected for SOC2 readiness', color: 'green' },
   { label: 'Security‑first operational design', color: 'blue' },
   { label: 'Supports privacy‑conscious deployments', color: 'purple' },
 ];
 
-/**
- * Repository cards – GENERIC NAMES (hardened).
- * Original internal names (`agentic_reliability_framework`, `arf-api`, etc.)
- * have been replaced to prevent reconnaissance.
- */
+// HARDENED: generic repository names (original internal names replaced)
 const REPOS = [
   {
     name: 'Core Governance Engine',
@@ -237,16 +221,11 @@ const REPOS = [
   },
 ];
 
-/** Map badge colour to Tailwind text class. */
 const BADGE_ICON_CLASSES: Record<string, string> = {
   green: 'text-green-400',
   blue: 'text-blue-400',
   purple: 'text-purple-400',
 };
-
-// ============================================================================
-// Main component
-// ============================================================================
 
 export default function LandingPage() {
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
@@ -258,19 +237,13 @@ export default function LandingPage() {
   const [sandboxResponse, setSandboxResponse] = useState<Record<string, unknown> | null>(null);
   const [sandboxError, setSandboxError] = useState<string | null>(null);
 
-  // Force Mermaid to re‑render after mount (fixes diagram not showing)
-  const [mermaidKey, setMermaidKey] = useState(0);
-  useEffect(() => {
-    setMermaidKey(prev => prev + 1);
-  }, []);
-
   const isMounted = useRef(true);
   useEffect(() => {
     isMounted.current = true;
-    const currentRefs = timeoutRefs.current;
+    const refs = timeoutRefs.current;
     return () => {
       isMounted.current = false;
-      Object.values(currentRefs).forEach(clearTimeout);
+      Object.values(refs).forEach(clearTimeout);
     };
   }, []);
 
@@ -349,7 +322,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen text-white">
-      {/* Hero section – original, with rel added */}
+      {/* Hero – original */}
       <section
         ref={heroRef}
         className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
@@ -439,7 +412,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Problem / Solution / Outcome & How ARF Works – diagram restored */}
+      {/* Problem/Solution/Outcome & How ARF Works – diagram */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <div className="grid md:grid-cols-3 gap-6 text-center mb-8">
@@ -470,7 +443,7 @@ export default function LandingPage() {
           </div>
 
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <figure key={mermaidKey}>
+          <figure>
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
             <figcaption className="sr-only">
               Infrastructure signals are evaluated by ARF, which then decides to approve, deny, or escalate.
@@ -482,7 +455,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Key Capabilities – original */}
+      {/* Key Capabilities */}
       <section
         ref={capabilitiesRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -499,7 +472,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Enterprise Trust – original */}
+      {/* Enterprise Trust */}
       <section className="container mx-auto px-4 py-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
@@ -536,27 +509,21 @@ export default function LandingPage() {
 
           <div className="flex flex-wrap justify-center gap-6 mt-8">
             {TRUST_BADGES.map((badge) => (
-              <div
-                key={badge.label}
-                className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700"
-              >
+              <div key={badge.label} className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700">
                 <Shield className={`w-4 h-4 ${BADGE_ICON_CLASSES[badge.color]}`} /> {badge.label}
               </div>
             ))}
           </div>
 
           <div className="text-center mt-8">
-            <Link
-              href="/pricing"
-              className="bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition inline-flex items-center gap-2"
-            >
+            <Link href="/pricing" className="bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition inline-flex items-center gap-2">
               View Access Models <ArrowRight size={16} />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Access Models – original */}
+      {/* Access Models */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 max-w-4xl mx-auto">
           <h3 className="text-xl font-semibold mb-1 text-center">Access Models</h3>
@@ -598,7 +565,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Try the Advisory API – original */}
+      {/* Try the Advisory API */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-1">Try the Advisory API</h2>
@@ -660,7 +627,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Ecosystem Overview – restored */}
+      {/* Ecosystem Overview */}
       <section
         ref={ecosystemRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -675,7 +642,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Demos – original */}
+      {/* Live Demos */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -693,7 +660,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Open Specs & Protected Core – original wording (proprietary) */}
+      {/* Open Specs & Protected Core – original wording, generic repo names */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -719,7 +686,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer – hardened (no emails, contact link) */}
+      {/* Footer – no emails, contact link */}
       <footer
         ref={footerRef}
         className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
@@ -731,32 +698,11 @@ export default function LandingPage() {
             <h3 className="text-xl font-semibold text-white mb-4">Connect with Us</h3>
             <div className="flex flex-wrap justify-center gap-6">
               <div className="flex items-center gap-2">
-                <ContactLink
-                  href="/contact"
-                  icon={<Mail className="w-5 h-5" />}
-                  text="Contact us"
-                  emoji="📬"
-                />
+                <ContactLink href="/contact" icon={<Mail className="w-5 h-5" />} text="Contact us" emoji="📬" />
               </div>
-              <ContactLink
-                href="https://www.linkedin.com/in/petterjuan/"
-                icon={<span className="text-xl">🔗</span>}
-                text="Juan Petter"
-                emoji="🔗"
-              />
-              <ContactLink
-                href="https://calendly.com/petter2025us/30min"
-                icon={<Calendar className="w-5 h-5" />}
-                text="Book a Call"
-                emoji="📅"
-              />
-              <ContactLink
-                href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
-                icon={<MessageSquare className="w-5 h-5" />}
-                text="Join Slack"
-                emoji="💬"
-                onClick={trackSlackClick}
-              />
+              <ContactLink href="https://www.linkedin.com/in/petterjuan/" icon={<span className="text-xl">🔗</span>} text="Juan Petter" emoji="🔗" />
+              <ContactLink href="https://calendly.com/petter2025us/30min" icon={<Calendar className="w-5 h-5" />} text="Book a Call" emoji="📅" />
+              <ContactLink href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" icon={<MessageSquare className="w-5 h-5" />} text="Join Slack" emoji="💬" onClick={trackSlackClick} />
             </div>
           </div>
 
@@ -766,10 +712,7 @@ export default function LandingPage() {
               The core ARF engine is available to qualified pilots under a time‑limited, hybrid evaluation.
               Use the contact form or apply directly.
             </p>
-            <Link
-              href="/signup"
-              className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
-            >
+            <Link href="/signup" className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
               <Mail className="w-4 h-4" /> Apply for Pilot Access
             </Link>
           </div>
@@ -788,12 +731,7 @@ export default function LandingPage() {
           <p className="text-sm">
             © 2026 ARF Foundation. Public repositories (arf-spec, arf-frontend) are licensed
             under{' '}
-            <a
-              href="https://github.com/arf-foundation/arf-spec/blob/main/LICENSE"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-white transition"
-            >
+            <a href="https://github.com/arf-foundation/arf-spec/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition">
               Apache 2.0
             </a>
             . The core engine is proprietary and access-controlled.
@@ -801,17 +739,13 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Toast notifications */}
       {copiedFullSnippet && <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Command copied! 🚀</div>}
       {copyError && <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-800 text-white px-4 py-2 rounded-lg shadow-lg border border-red-700 animate-slide-up">{copyError}</div>}
     </div>
   );
 }
 
-// ============================================================================
-// Sub‑components (unchanged except for rel attributes)
-// ============================================================================
-
+// Sub‑components
 function EcoCard({
   icon: Icon,
   title,
