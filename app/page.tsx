@@ -583,7 +583,7 @@ export default function LandingPage() {
           <p className="text-sm text-gray-400 text-center mb-6">
             ARF uses a hybrid pricing model: a fixed deployment fee starting at $50k,
             plus either outcome‑based pricing or a monthly retainer. Pilot access is
-            time‑limited and free for qualified organizations — no commitment required.
+            time‑limited and free for qualified organizations — commitment required.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-8">
             <div className="text-center">
