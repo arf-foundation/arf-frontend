@@ -1,30 +1,6 @@
 'use client';
-+'use client';
-
-/**
- * Landing page for the Agentic Reliability Framework (ARF).
- *
- * This page serves as the primary marketing surface for the ARF governance layer.
- * It explains the problem of ungoverned AI agents, presents ARF as the solution,
- * and provides multiple pathways for enterprise customers to engage (pilot sign‑up,
- * sandbox API, live demos, specification access).
- *
- * **Hardening (kept invisible):**
- * - All internal repository names are replaced with generic labels
- *   (e.g., "Core Governance Engine" instead of `agentic_reliability_framework`).
- * - Email addresses are removed; contact is handled via `/contact` page.
- * - Every external link with `target="_blank"` includes `rel="noopener noreferrer"`.
- * - Content Security Policy is enforced by `proxy.ts` using per‑request nonces.
- * - Source maps disabled, console logs stripped.
- *
- * Visual appearance is restored to the original: original hero subhead,
- * Mermaid diagram, Ecosystem Overview, and the original "Open Specifications" wording.
- *
- * @module LandingPage
- */
 
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { useState, useEffect, useRef, type ReactNode, type ElementType } from 'react';
 import {
   ArrowRight,
@@ -42,17 +18,12 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  Gauge,
-  Star,
   Shield,
   Lock,
   FileText,
   Calendar,
 } from 'lucide-react';
 import { useInView } from './hooks/useInView';
-
-// Dynamically import Mermaid with SSR disabled – ensures it renders in the browser only.
-const Mermaid = dynamic(() => import('../components/Mermaid'), { ssr: false });
 
 declare global {
   interface Window {
@@ -61,35 +32,13 @@ declare global {
 }
 
 // ============================================================================
-// Content constants
+// Content constants (all original)
 // ============================================================================
 
-/** Mermaid diagram – original */
-const DIAGRAM = `flowchart TD
-    subgraph Input["Infrastructure Signals"]
-        A[Agent Intent]
-        B[Telemetry Data]
-    end
-    subgraph Governance["ARF Governance"]
-        C[Evaluate & Decide]
-    end
-    subgraph Outcomes["Outcome"]
-        F[✅ Approve]
-        G[⚠️ Escalate]
-        H[❌ Deny]
-    end
-    A --> C
-    B --> C
-    C --> F
-    C --> G
-    C --> H`;
-
-/** cURL command – original */
 const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
-/** Feature cards – original */
 const FEATURES = [
   {
     title: 'Continuous Risk Calibration',
@@ -125,7 +74,6 @@ const FEATURES = [
   },
 ];
 
-/** Ecosystem cards – original */
 const ECOSYSTEM = [
   {
     icon: Rocket,
@@ -164,7 +112,6 @@ const ECOSYSTEM = [
   },
 ];
 
-/** Demo cards – original */
 const DEMOS = [
   {
     title: 'Risk Dashboard',
@@ -202,14 +149,13 @@ const DEMOS = [
   },
 ];
 
-/** Trust badges – original */
 const TRUST_BADGES = [
   { label: 'Architected for SOC2 readiness', color: 'green' },
   { label: 'Security‑first operational design', color: 'blue' },
   { label: 'Supports privacy‑conscious deployments', color: 'purple' },
 ];
 
-/** Repository cards – hardened (generic names) */
+// Hardened: generic repository names (no internal names exposed)
 const REPOS = [
   {
     name: 'Core Governance Engine',
@@ -240,7 +186,6 @@ const BADGE_ICON_CLASSES: Record<string, string> = {
 };
 
 export default function LandingPage() {
-  const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
   const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
@@ -260,12 +205,6 @@ export default function LandingPage() {
     };
   }, []);
 
-  const [mermaidKey, setMermaidKey] = useState(0);
-  useEffect(() => {
-    const timer = setTimeout(() => setMermaidKey(prev => prev + 1), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
   const setCopyState = (key: string, value: boolean, duration = 2000) => {
     if (timeoutRefs.current[key]) clearTimeout(timeoutRefs.current[key]);
     if (value) {
@@ -275,9 +214,6 @@ export default function LandingPage() {
       }, duration);
     }
     switch (key) {
-      case 'email':
-        setCopiedEmail(value);
-        break;
       case 'fullSnippet':
         setCopiedFullSnippet(value);
         break;
@@ -299,7 +235,6 @@ export default function LandingPage() {
     }
   };
 
-  const handleCopyEmail = () => handleCopy('juan@arf-ai.com', 'email');
   const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
   const handleCopySandboxResponse = () => {
     if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
@@ -345,7 +280,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen text-white">
-      {/* Hero – original */}
+      {/* Hero section */}
       <section
         ref={heroRef}
         className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
@@ -409,7 +344,7 @@ export default function LandingPage() {
         </p>
       </section>
 
-      {/* Community links – rel added */}
+      {/* Community links */}
       <div className="container mx-auto px-4 mb-12">
         <div className="flex flex-wrap justify-center gap-8 items-center">
           <div className="flex items-center gap-2">
@@ -435,7 +370,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Problem/Solution/Outcome & How ARF Works – diagram */}
+      {/* Problem / Solution / Outcome & How ARF Works – with static SVG */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <div className="grid md:grid-cols-3 gap-6 text-center mb-8">
@@ -466,8 +401,13 @@ export default function LandingPage() {
           </div>
 
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <figure key={mermaidKey} >
-            <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
+          <figure className="flex justify-center my-6">
+            <img
+              src="/diagram.svg"
+              alt="ARF Governance Flow"
+              className="w-full max-w-4xl h-auto"
+              style={{ maxWidth: '100%', height: 'auto' }}
+            />
             <figcaption className="sr-only">
               Infrastructure signals are evaluated by ARF, which then decides to approve, deny, or escalate.
             </figcaption>
@@ -650,7 +590,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Ecosystem Overview – restored */}
+      {/* Ecosystem Overview */}
       <section
         ref={ecosystemRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -683,7 +623,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Open Specs & Protected Core – original wording, generic repo names */}
+      {/* Open Specs & Protected Core */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -709,7 +649,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer – no emails, contact link */}
+      {/* Footer */}
       <footer
         ref={footerRef}
         className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
@@ -721,22 +661,11 @@ export default function LandingPage() {
             <h3 className="text-xl font-semibold text-white mb-4">Connect with Us</h3>
             <div className="flex flex-wrap justify-center gap-6">
               <div className="flex items-center gap-2">
-                <ContactLink
-                  href="/contact"
-                  icon={<Mail className="w-5 h-5" />}
-                  text="Contact us"
-                  emoji="📬"
-                />
+                <ContactLink href="/contact" icon={<Mail className="w-5 h-5" />} text="Contact us" emoji="📬" />
               </div>
-              <ContactLink href="https://www.linkedin.com/in/petterjuan/" icon={<Calendar className="w-5 h-5" />} text="Juan Petter" emoji="🔗" />
+              <ContactLink href="https://www.linkedin.com/in/petterjuan/" icon={<span className="text-xl">🔗</span>} text="Juan Petter" emoji="🔗" />
               <ContactLink href="https://calendly.com/petter2025us/30min" icon={<Calendar className="w-5 h-5" />} text="Book a Call" emoji="📅" />
-              <ContactLink
-                href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
-                icon={<MessageSquare className="w-5 h-5" />}
-                text="Join Slack"
-                emoji="💬"
-                onClick={trackSlackClick}
-              />
+              <ContactLink href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" icon={<MessageSquare className="w-5 h-5" />} text="Join Slack" emoji="💬" onClick={trackSlackClick} />
             </div>
           </div>
 
@@ -774,7 +703,6 @@ export default function LandingPage() {
       </footer>
 
       {/* Toast notifications */}
-      {copiedEmail && <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Email copied! ✉️</div>}
       {copiedFullSnippet && <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Command copied! 🚀</div>}
       {copyError && <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-800 text-white px-4 py-2 rounded-lg shadow-lg border border-red-700 animate-slide-up">{copyError}</div>}
     </div>
