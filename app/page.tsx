@@ -49,7 +49,7 @@ import {
   Shield,
   Lock,
   FileText,
-  LinkedIn,
+  
   Calendar,
 } from 'lucide-react';
 import { useInView } from './hooks/useInView';
@@ -745,7 +745,7 @@ export default function LandingPage() {
               </div>
               <ContactLink
                 href="https://www.linkedin.com/in/petterjuan/"
-                icon={<LinkedIn className="w-5 h-5" />}
+                icon={<span className="text-xl">🔗</span>}
                 text="Juan Petter"
                 emoji="🔗"
               />
