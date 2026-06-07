@@ -12,7 +12,6 @@
     </style>
   </defs>
 
-  <!-- Subgraph: Input -->
   <rect x="50" y="50" width="200" height="150" class="subgraph" rx="10"/>
   <text x="150" y="80" class="subgraph" text-anchor="middle">Infrastructure Signals</text>
   <rect x="80" y="100" width="140" height="40" class="node"/>
@@ -20,13 +19,11 @@
   <rect x="80" y="150" width="140" height="40" class="node"/>
   <text x="150" y="175" class="node">Telemetry Data</text>
 
-  <!-- Subgraph: Governance -->
   <rect x="300" y="50" width="200" height="100" class="subgraph" rx="10"/>
   <text x="400" y="80" class="subgraph" text-anchor="middle">ARF Governance</text>
   <rect x="330" y="100" width="140" height="40" class="node"/>
-  <text x="400" y="125" class="node">Evaluate & Decide</text>
+  <text x="400" y="125" class="node">Evaluate &amp; Decide</text>
 
-  <!-- Subgraph: Outcomes -->
   <rect x="550" y="50" width="200" height="150" class="subgraph" rx="10"/>
   <text x="650" y="80" class="subgraph" text-anchor="middle">Outcome</text>
   <rect x="580" y="100" width="140" height="30" class="node"/>
@@ -36,7 +33,6 @@
   <rect x="580" y="180" width="140" height="30" class="node"/>
   <text x="650" y="200" class="node">❌ Deny</text>
 
-  <!-- Edges -->
   <line x1="220" y1="120" x2="330" y2="120" class="edge"/>
   <line x1="220" y1="170" x2="330" y2="140" class="edge"/>
   <line x1="470" y1="120" x2="580" y2="115" class="edge"/>
