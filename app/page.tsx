@@ -1,4 +1,4 @@
-'use client';
++'use client';
 
 /**
  * Landing page for the Agentic Reliability Framework (ARF).
