@@ -160,12 +160,28 @@ const TRUST_BADGES = [
   { label: 'Supports privacy‑conscious deployments', color: 'purple' },
 ];
 
-/** Repository cards for the "Open Specs & Protected Core" section. */
+/** Repository cards for the "Open Specs & Protected Core" section – GENERIC NAMES (hardened). */
 const REPOS = [
-  { name: "Core Governance Engine", desc: "Protected core engine – Bayesian risk scoring, semantic memory, governance loop.", isPrivate: true },
-  { name: "API Control Plane", desc: "Access‑controlled API gateway – governs access, enforces quotas, logs every decision.", isPrivate: true },
-  { name: "Management UI", desc: "Frontend dashboard – pilot access only", isPrivate: true },
-  { name: "Open Specification", desc: "Canonical specification – Apache 2.0", isPrivate: false },
+  {
+    name: 'Core Governance Engine',
+    desc: 'Protected core engine – real‑time risk calibration, historical memory, deterministic governance.',
+    isPrivate: true,
+  },
+  {
+    name: 'API Control Plane',
+    desc: 'API control plane – governs access, enforces quotas, and logs every decision.',
+    isPrivate: true,
+  },
+  {
+    name: 'Enterprise Layer',
+    desc: 'Enterprise layer – tamper‑proof audit trails, SSO, and commercial SLAs.',
+    isPrivate: true,
+  },
+  {
+    name: 'Open Specification',
+    desc: 'Canonical specification – data models, API contracts, decision rules (shared under written terms).',
+    isPrivate: false,
+  },
 ];
 
 /** Map badge color names to Tailwind text classes for the shield icons. */
@@ -194,7 +210,6 @@ export default function LandingPage() {
   /* ------------------------------------------------------------------
    * Local state for clipboard operations and sandbox API demo
    * ------------------------------------------------------------------ */
-  const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
   const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
@@ -228,9 +243,6 @@ export default function LandingPage() {
       }, duration);
     }
     switch (key) {
-      case 'email':
-        setCopiedEmail(value);
-        break;
       case 'fullSnippet':
         setCopiedFullSnippet(value);
         break;
@@ -241,7 +253,8 @@ export default function LandingPage() {
   };
 
   /** Generic clipboard writer with error handling. */
-      try {
+  const handleCopy = async (text: string, key: string, successMessage?: string) => {
+    try {
       await navigator.clipboard.writeText(text);
       setCopyState(key, true);
       setCopyError(null);
@@ -252,7 +265,7 @@ export default function LandingPage() {
     }
   };
 
-    const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
+  const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
   const handleCopySandboxResponse = () => {
     if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
   };
@@ -675,12 +688,11 @@ export default function LandingPage() {
             <div className="flex flex-wrap justify-center gap-6">
               <div className="flex items-center gap-2">
                 <ContactLink
-                  href="mailto:contact@arf-ai.com"
+                  href="/contact"
                   icon={<Mail className="w-5 h-5" />}
-                  text="contact@arf-ai.com"
+                  text="Contact us"
                   emoji="📬"
                 />
-                
               </div>
               <ContactLink href="https://www.linkedin.com/in/petterjuan/" text="Juan Petter" emoji="🔗" />
               <ContactLink href="https://calendly.com/petter2025us/30min" text="Book a Call" emoji="📅" />
@@ -698,14 +710,14 @@ export default function LandingPage() {
             <h4 className="text-lg font-semibold text-white mb-2">Request Pilot Access</h4>
             <p className="text-sm text-gray-400 mb-4">
               The core ARF engine is available to qualified pilots under a time‑limited, hybrid evaluation.
-              Email us with your organization, use case, and expected evaluation volume.
+              Use the contact form or apply directly.
             </p>
-            <a
-              href="mailto:contact@arf-ai.com?subject=ARF%20Pilot%20Access%20Request"
+            <Link
+              href="/signup"
               className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
             >
               <Mail className="w-4 h-4" /> Apply for Pilot Access
-            </a>
+            </Link>
           </div>
 
           <div className="flex flex-wrap justify-center gap-6 mb-4">
@@ -713,10 +725,10 @@ export default function LandingPage() {
             <Link href="/signup" className="hover:text-white transition">Request Access</Link>
             <Link href="/terms" className="hover:text-white transition">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
-            <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer" rel="noopener noreferrer">GitHub</a>
-            <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer" rel="noopener noreferrer">🤗 Hugging Face</a>
-            <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" rel="noopener noreferrer" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer" rel="noopener noreferrer"><MessageSquare size={18} /> Slack</a>
-            <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1" rel="noopener noreferrer" rel="noopener noreferrer">LinkedIn</a>
+            <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">GitHub</a>
+            <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">🤗 Hugging Face</a>
+            <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" rel="noopener noreferrer" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1"><MessageSquare size={18} /> Slack</a>
+            <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">LinkedIn</a>
           </div>
 
           <p className="text-sm">
@@ -728,7 +740,6 @@ export default function LandingPage() {
       </footer>
 
       {/* Toast notifications */}
-      {copiedEmail && <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Email copied! ✉️</div>}
       {copiedFullSnippet && <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Command copied! 🚀</div>}
       {copyError && <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-800 text-white px-4 py-2 rounded-lg shadow-lg border border-red-700 animate-slide-up">{copyError}</div>}
     </div>
@@ -736,14 +747,9 @@ export default function LandingPage() {
 }
 
 // ============================================================================
-// Sub‑components
+// Sub‑components (unchanged except for ContactLink which already uses rel)
 // ============================================================================
 
-/**
- * Collapsible feature card.
- *
- * Displays an icon, title, short description, and an expandable details section.
- */
 function FeatureCard({
   title,
   description,
@@ -792,9 +798,6 @@ function FeatureCard({
   );
 }
 
-/**
- * Demo card linking to an external demo or an internal page.
- */
 function DemoCard({
   title,
   description,
@@ -817,16 +820,10 @@ function DemoCard({
       </span>
     </div>
   );
-  if (external) return <a href={link} target="_blank" rel="noopener noreferrer" className="block h-full" rel="noopener noreferrer" rel="noopener noreferrer">{content}</a>;
+  if (external) return <a href={link} target="_blank" rel="noopener noreferrer" className="block h-full">{content}</a>;
   return <Link href={link} className="block h-full">{content}</Link>;
 }
 
-/**
- * Repository card for the "Open Specs & Protected Core" section.
- *
- * Shows the repository name, a short description, and an access‑controlled badge
- * when the repository is private.
- */
 function RepoCard({ name, desc, isPrivate = false }: { name: string; desc: string; isPrivate?: boolean }) {
   return (
     <div className={`bg-gray-800/80 p-4 rounded-lg border transition ${isPrivate ? 'border-gray-700 opacity-80 cursor-default' : 'border-gray-700 hover:border-blue-500 group'}`}>
@@ -853,9 +850,6 @@ function RepoCard({ name, desc, isPrivate = false }: { name: string; desc: strin
   );
 }
 
-/**
- * Contact link with emoji, optional icon, and hover effects.
- */
 function ContactLink({
   href,
   icon,
