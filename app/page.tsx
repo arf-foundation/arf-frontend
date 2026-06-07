@@ -260,6 +260,12 @@ export default function LandingPage() {
     };
   }, []);
 
+  const [mermaidKey, setMermaidKey] = useState(0);
+  useEffect(() => {
+    const timer = setTimeout(() => setMermaidKey(prev => prev + 1), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   const setCopyState = (key: string, value: boolean, duration = 2000) => {
     if (timeoutRefs.current[key]) clearTimeout(timeoutRefs.current[key]);
     if (value) {
@@ -460,7 +466,7 @@ export default function LandingPage() {
           </div>
 
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
-          <figure>
+          <figure key={mermaidKey} >
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
             <figcaption className="sr-only">
               Infrastructure signals are evaluated by ARF, which then decides to approve, deny, or escalate.

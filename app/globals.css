@@ -104,3 +104,4 @@ body {
 main > div:first-child {
   background-color: transparent;
 }
+.mermaid-figure { min-height: 300px; }
