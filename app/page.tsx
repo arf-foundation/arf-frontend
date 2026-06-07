@@ -241,8 +241,7 @@ export default function LandingPage() {
   };
 
   /** Generic clipboard writer with error handling. */
-  const handleCopy = async (text: string, key: string, successMessage?: string) => {
-    try {
+      try {
       await navigator.clipboard.writeText(text);
       setCopyState(key, true);
       setCopyError(null);
@@ -253,8 +252,7 @@ export default function LandingPage() {
     }
   };
 
-  const handleCopyEmail = () => handleCopy('contact-ai.com', 'email');
-  const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
+    const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
   const handleCopySandboxResponse = () => {
     if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
   };
@@ -677,19 +675,12 @@ export default function LandingPage() {
             <div className="flex flex-wrap justify-center gap-6">
               <div className="flex items-center gap-2">
                 <ContactLink
-                  href="mailto:contact-ai.com"
+                  href="mailto:contact@arf-ai.com"
                   icon={<Mail className="w-5 h-5" />}
-                  text="contact-ai.com"
+                  text="contact@arf-ai.com"
                   emoji="📬"
                 />
-                <button
-                  type="button"
-                  onClick={handleCopyEmail}
-                  className="p-2 bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
-                  aria-label="Copy email address"
-                >
-                  {copiedEmail ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400 group-hover:text-white" />}
-                </button>
+                
               </div>
               <ContactLink href="https://www.linkedin.com/in/petterjuan/" text="Juan Petter" emoji="🔗" />
               <ContactLink href="https://calendly.com/petter2025us/30min" text="Book a Call" emoji="📅" />
@@ -710,7 +701,7 @@ export default function LandingPage() {
               Email us with your organization, use case, and expected evaluation volume.
             </p>
             <a
-              href="mailto:contact-ai.com?subject=ARF%20Pilot%20Access%20Request"
+              href="mailto:contact@arf-ai.com?subject=ARF%20Pilot%20Access%20Request"
               className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
             >
               <Mail className="w-4 h-4" /> Apply for Pilot Access
