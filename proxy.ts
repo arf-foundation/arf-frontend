@@ -6,6 +6,8 @@ export default function proxy(_request: NextRequest) {
   void _request;
 
   void _request;
+
+  void _request;
   const nonce = uuidv4();
   const csp = [
     `default-src 'self'`,
