@@ -1,3 +1,4 @@
+'use client';
 // hooks/useInView.ts
 import { useEffect, useRef, useState } from 'react';
 
