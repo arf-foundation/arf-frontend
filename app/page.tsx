@@ -13,7 +13,7 @@
  *   (e.g., "Core Governance Engine" instead of `agentic_reliability_framework`).
  * - Email addresses are removed; contact is handled via `/contact` page.
  * - Every external link with `target="_blank"` includes `rel="noopener noreferrer"`.
- * - Content Security Policy is enforced by `proxy.ts` with per‑request nonces.
+ * - Content Security Policy is enforced by `proxy.ts` using per‑request nonces.
  * - Source maps disabled, console logs stripped.
  *
  * Visual appearance is restored to the original: original hero subhead,
@@ -23,6 +23,7 @@
  */
 
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useState, useEffect, useRef, type ReactNode, type ElementType } from 'react';
 import {
   ArrowRight,
@@ -40,13 +41,17 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Gauge,
+  Star,
   Shield,
   Lock,
   FileText,
   Calendar,
 } from 'lucide-react';
 import { useInView } from './hooks/useInView';
-import Mermaid from '../components/Mermaid';
+
+// Dynamically import Mermaid with SSR disabled – ensures it renders in the browser only.
+const Mermaid = dynamic(() => import('../components/Mermaid'), { ssr: false });
 
 declare global {
   interface Window {
@@ -58,6 +63,7 @@ declare global {
 // Content constants
 // ============================================================================
 
+/** Mermaid diagram – original */
 const DIAGRAM = `flowchart TD
     subgraph Input["Infrastructure Signals"]
         A[Agent Intent]
@@ -77,10 +83,12 @@ const DIAGRAM = `flowchart TD
     C --> G
     C --> H`;
 
+/** cURL command – original */
 const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
+/** Feature cards – original */
 const FEATURES = [
   {
     title: 'Continuous Risk Calibration',
@@ -116,6 +124,7 @@ const FEATURES = [
   },
 ];
 
+/** Ecosystem cards – original */
 const ECOSYSTEM = [
   {
     icon: Rocket,
@@ -154,6 +163,7 @@ const ECOSYSTEM = [
   },
 ];
 
+/** Demo cards – original */
 const DEMOS = [
   {
     title: 'Risk Dashboard',
@@ -191,13 +201,14 @@ const DEMOS = [
   },
 ];
 
+/** Trust badges – original */
 const TRUST_BADGES = [
   { label: 'Architected for SOC2 readiness', color: 'green' },
   { label: 'Security‑first operational design', color: 'blue' },
   { label: 'Supports privacy‑conscious deployments', color: 'purple' },
 ];
 
-// HARDENED: generic repository names (original internal names replaced)
+/** Repository cards – hardened (generic names) */
 const REPOS = [
   {
     name: 'Core Governance Engine',
@@ -206,7 +217,7 @@ const REPOS = [
   },
   {
     name: 'API Control Plane',
-    desc: 'Access‑controlled API gateway – governs access, enforces quotas, logs every decision.',
+    desc: 'API control plane – governs access, enforces quotas, and logs every decision.',
     isPrivate: true,
   },
   {
@@ -228,6 +239,7 @@ const BADGE_ICON_CLASSES: Record<string, string> = {
 };
 
 export default function LandingPage() {
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
   const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
@@ -256,6 +268,9 @@ export default function LandingPage() {
       }, duration);
     }
     switch (key) {
+      case 'email':
+        setCopiedEmail(value);
+        break;
       case 'fullSnippet':
         setCopiedFullSnippet(value);
         break;
@@ -277,6 +292,7 @@ export default function LandingPage() {
     }
   };
 
+  const handleCopyEmail = () => handleCopy('juan@arf-ai.com', 'email');
   const handleCopyFullSnippet = () => handleCopy(CURL_COMMAND, 'fullSnippet', 'curl command');
   const handleCopySandboxResponse = () => {
     if (sandboxResponse) handleCopy(JSON.stringify(sandboxResponse, null, 2), 'sandboxResponse', 'API response');
@@ -627,7 +643,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Ecosystem Overview */}
+      {/* Ecosystem Overview – restored */}
       <section
         ref={ecosystemRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -698,11 +714,22 @@ export default function LandingPage() {
             <h3 className="text-xl font-semibold text-white mb-4">Connect with Us</h3>
             <div className="flex flex-wrap justify-center gap-6">
               <div className="flex items-center gap-2">
-                <ContactLink href="/contact" icon={<Mail className="w-5 h-5" />} text="Contact us" emoji="📬" />
+                <ContactLink
+                  href="/contact"
+                  icon={<Mail className="w-5 h-5" />}
+                  text="Contact us"
+                  emoji="📬"
+                />
               </div>
-              <ContactLink href="https://www.linkedin.com/in/petterjuan/" icon={<span className="text-xl">🔗</span>} text="Juan Petter" emoji="🔗" />
+              <ContactLink href="https://www.linkedin.com/in/petterjuan/" icon={<Calendar className="w-5 h-5" />} text="Juan Petter" emoji="🔗" />
               <ContactLink href="https://calendly.com/petter2025us/30min" icon={<Calendar className="w-5 h-5" />} text="Book a Call" emoji="📅" />
-              <ContactLink href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" icon={<MessageSquare className="w-5 h-5" />} text="Join Slack" emoji="💬" onClick={trackSlackClick} />
+              <ContactLink
+                href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
+                icon={<MessageSquare className="w-5 h-5" />}
+                text="Join Slack"
+                emoji="💬"
+                onClick={trackSlackClick}
+              />
             </div>
           </div>
 
@@ -739,13 +766,18 @@ export default function LandingPage() {
         </div>
       </footer>
 
+      {/* Toast notifications */}
+      {copiedEmail && <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Email copied! ✉️</div>}
       {copiedFullSnippet && <div className="fixed bottom-20 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700 animate-slide-up">Command copied! 🚀</div>}
       {copyError && <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-800 text-white px-4 py-2 rounded-lg shadow-lg border border-red-700 animate-slide-up">{copyError}</div>}
     </div>
   );
 }
 
+// ============================================================================
 // Sub‑components
+// ============================================================================
+
 function EcoCard({
   icon: Icon,
   title,
