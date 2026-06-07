@@ -8,16 +8,22 @@
  * and provides multiple pathways for enterprise customers to engage (pilot sign‑up,
  * sandbox API, live demos, specification access).
  *
- * Key design decisions:
- * - Hybrid pricing (fixed deployment fee + outcome‑based or retainer) is explained
- *   in the Access Models section.
- * - Trust badges (SOC2 readiness, security‑first design, privacy‑conscious
- *   deployments) appear immediately after the hero call‑to‑action to reduce
- *   perceived risk.
- * - The pilot testimonial was intentionally removed to avoid any appearance of
- *   unsubstantiated marketing claims.
- * - All live‑demo and sandbox‑API sections clearly state that responses are mock
- *   data and that the real engine is access‑controlled.
+ * **Hardening & Mathematical Justification**:
+ * - All internal repository names are replaced with generic labels
+ *   (e.g., "Core Governance Engine" instead of `agentic_reliability_framework`).
+ *   This eliminates reconnaissance vectors for attackers.
+ * - Email addresses are removed; contact is handled via `/contact` page and
+ *   `/api/contact` endpoint, preventing email harvesting.
+ * - Every external link with `target="_blank"` includes `rel="noopener noreferrer"`
+ *   to prevent reverse tabnabbing (CWE-1022).
+ * - Content Security Policy is enforced by `proxy.ts` using per‑request nonces,
+ *   eliminating `unsafe-inline` and `unsafe-eval`. The CSP header is not defined
+ *   in this component but is set at the proxy level.
+ * - All client‑side source maps are disabled in `next.config.ts`, and console logs
+ *   are stripped in production via `compiler.removeConsole`.
+ *
+ * The page uses intersection observers (`useInView`) for scroll‑triggered fade‑in
+ * animations, reducing layout shifts and improving perceived performance.
  *
  * @module LandingPage
  */
@@ -27,6 +33,9 @@ import { useState, useEffect, useRef, type ReactNode, type ElementType } from 'r
 import {
   ArrowRight,
   Rocket,
+  BookOpen,
+  Users,
+  Code,
   Cpu,
   Brain,
   Scale,
@@ -37,6 +46,8 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Gauge,
+  Star,
   Shield,
   Lock,
   FileText,
@@ -54,7 +65,7 @@ declare global {
 // Content constants
 // ============================================================================
 
-/** Mermaid diagram showing the ARF governance flow (Agent Intent + Telemetry → Evaluate & Decide → Approve/Deny/Escalate). */
+/** Mermaid diagram showing the ARF governance flow. */
 const DIAGRAM = `flowchart TD
     subgraph Input["Infrastructure Signals"]
         A[Agent Intent]
@@ -74,12 +85,12 @@ const DIAGRAM = `flowchart TD
     C --> G
     C --> H`;
 
-/** cURL command demonstrating the public sandbox API (mock responses only). */
+/** cURL command for the public sandbox API (mock responses only). */
 const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
-/** Feature cards displayed in the "Key Capabilities" section. */
+/** Feature cards – unchanged from original marketing. */
 const FEATURES = [
   {
     title: 'Continuous Risk Calibration',
@@ -115,7 +126,46 @@ const FEATURES = [
   },
 ];
 
-/** Demo cards for the "Live Demos" section. */
+/** Ecosystem cards – restored from original backup. */
+const ECOSYSTEM = [
+  {
+    icon: Rocket,
+    title: 'Research',
+    description: 'Foundations in reliability engineering',
+    details:
+      'Ongoing investigation into validation methods for AI‑generated outputs, uncertainty quantification, and calibration. This work anchors the framework’s approach to risk estimation.',
+  },
+  {
+    icon: Code,
+    title: 'Public Specification',
+    description: 'Open data models, API contracts, decision rules',
+    details:
+      'The arf‑spec repository defines the canonical specification, shared under written terms with qualified pilots. It provides full transparency into the system’s contracts without exposing proprietary implementation details.',
+  },
+  {
+    icon: Users,
+    title: 'API Control Plane',
+    description: 'Access‑controlled governance endpoints',
+    details:
+      'The protected control layer exposes governed operations for evaluation, audit queries, and quota management. The public sandbox returns only advisory mock responses.',
+  },
+  {
+    icon: BookOpen,
+    title: 'Management Interface',
+    description: 'Dashboards for governance insights',
+    details:
+      'An interactive interface built with modern web technologies. Public demos use mock data; connected instances provide real‑time visibility into decisions and system health.',
+  },
+  {
+    icon: Shield,
+    title: 'Enterprise Extension',
+    description: 'Enforcement, audit, and commercial support',
+    details:
+      'Adds mechanical enforcement with real‑world integrations, tamper‑proof audit logs, multi‑tenancy, and outcome‑based commercial terms. Available under a commercial license to qualified organizations.',
+  },
+];
+
+/** Demo cards – unchanged. */
 const DEMOS = [
   {
     title: 'Risk Dashboard',
@@ -153,14 +203,18 @@ const DEMOS = [
   },
 ];
 
-/** Trust badges displayed beneath the hero CTA. */
+/** Trust badges – originally present. */
 const TRUST_BADGES = [
   { label: 'Architected for SOC2 readiness', color: 'green' },
   { label: 'Security‑first operational design', color: 'blue' },
   { label: 'Supports privacy‑conscious deployments', color: 'purple' },
 ];
 
-/** Repository cards for the "Open Specs & Protected Core" section – GENERIC NAMES (hardened). */
+/**
+ * Repository cards – GENERIC NAMES (hardened).
+ * Original internal names (`agentic_reliability_framework`, `arf-api`, etc.)
+ * have been replaced to prevent reconnaissance.
+ */
 const REPOS = [
   {
     name: 'Core Governance Engine',
@@ -169,7 +223,7 @@ const REPOS = [
   },
   {
     name: 'API Control Plane',
-    desc: 'API control plane – governs access, enforces quotas, and logs every decision.',
+    desc: 'Access‑controlled API gateway – governs access, enforces quotas, logs every decision.',
     isPrivate: true,
   },
   {
@@ -184,7 +238,7 @@ const REPOS = [
   },
 ];
 
-/** Map badge color names to Tailwind text classes for the shield icons. */
+/** Map badge colour to Tailwind text class. */
 const BADGE_ICON_CLASSES: Record<string, string> = {
   green: 'text-green-400',
   blue: 'text-blue-400',
@@ -200,16 +254,18 @@ const BADGE_ICON_CLASSES: Record<string, string> = {
  *
  * Renders the full marketing landing page for ARF, including hero, trust badges,
  * problem/solution/outcome summary, "How ARF Works" diagram, key capabilities,
- * enterprise trust section, access models, sandbox API demo, live demos, open specs,
- * and a footer with contact links and legal navigation.
+ * ecosystem overview, enterprise trust section, access models, sandbox API demo,
+ * live demos, open specs, and a footer with contact links and legal navigation.
  *
  * All interactive elements (copy buttons, sandbox fetch) are self‑contained.
- * The component uses the `useInView` hook for scroll‑triggered fade‑in animations.
+ * The component uses `useInView` for scroll‑triggered fade‑in animations.
+ *
+ * @returns {JSX.Element} The rendered landing page.
  */
 export default function LandingPage() {
-  /* ------------------------------------------------------------------
-   * Local state for clipboard operations and sandbox API demo
-   * ------------------------------------------------------------------ */
+  // --------------------------------------------------------------------------
+  // State for clipboard and sandbox API demo
+  // --------------------------------------------------------------------------
   const [copiedFullSnippet, setCopiedFullSnippet] = useState(false);
   const [copiedSandboxResponse, setCopiedSandboxResponse] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
@@ -302,8 +358,9 @@ export default function LandingPage() {
     }
   };
 
-  // Intersection observers for scroll‑triggered fade‑in
+  // Intersection observers for scroll animations
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2, once: true });
+  const { ref: ecosystemRef, inView: ecosystemInView } = useInView({ threshold: 0.2, once: true });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2, once: true });
   const { ref: demosRef, inView: demosInView } = useInView({ threshold: 0.2, once: true });
   const { ref: reposRef, inView: reposInView } = useInView({ threshold: 0.2, once: true });
@@ -311,9 +368,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen text-white">
-      {/* ==================================================================
-           Hero section – headline, subhead, trust badges, primary CTAs
-           ================================================================== */}
+      {/* Hero section – unchanged but hardened (CSP handled by proxy.ts) */}
       <section
         ref={heroRef}
         className={`container mx-auto px-4 py-20 text-center transition-opacity duration-1000 ${
@@ -329,8 +384,10 @@ export default function LandingPage() {
         </div>
 
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-          Every AI‑assisted infrastructure decision is evaluated, logged, and kept under your
-          control — without slowing your team down.
+          ARF is an{' '}
+          <strong>access‑controlled governance layer</strong> that helps organisations make
+          safe, accountable, and transparent decisions when using AI agents to manage
+          cloud resources.
         </p>
 
         <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 mb-8 max-w-md mx-auto">
@@ -356,33 +413,26 @@ export default function LandingPage() {
             View Technical Spec <ArrowRight size={18} />
           </a>
         </div>
-
-        {/* Trust badges – immediately after hero CTA */}
         <div className="mt-8">
           <div className="flex flex-wrap justify-center gap-4">
-            <div className="bg-gray-800/80 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700">
-              <Shield className="w-4 h-4 text-green-400" /> Architected for SOC2 readiness
-            </div>
-            <div className="bg-gray-800/80 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700">
-              <Shield className="w-4 h-4 text-blue-400" /> Security‑first operational design
-            </div>
-            <div className="bg-gray-800/80 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700">
-              <Shield className="w-4 h-4 text-purple-400" /> Supports privacy‑conscious deployments
-            </div>
+            {TRUST_BADGES.map((badge) => (
+              <div key={badge.label} className="bg-gray-800/80 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700">
+                <Shield className={`w-4 h-4 ${BADGE_ICON_CLASSES[badge.color]}`} /> {badge.label}
+              </div>
+            ))}
           </div>
           <p className="text-xs text-gray-400 mt-3">
             Designed for regulated environments – audit trails, SSO, and deterministic
             enforcement available in pilot.
           </p>
         </div>
-
         <p className="text-gray-400 text-sm mt-4">
           ⚡ The public sandbox returns only mock advisory responses. Real enforcement,
           audit trails, and confidence guarantees require a pilot agreement.
         </p>
       </section>
 
-      {/* Community links */}
+      {/* Community links – hardened with rel="noopener noreferrer" */}
       <div className="container mx-auto px-4 mb-12">
         <div className="flex flex-wrap justify-center gap-8 items-center">
           <div className="flex items-center gap-2">
@@ -408,7 +458,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Problem / Solution / Outcome + How ARF Works – combined concise block */}
+      {/* Problem / Solution / Outcome & How ARF Works */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <div className="grid md:grid-cols-3 gap-6 text-center mb-8">
@@ -437,7 +487,6 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
-
           <h2 className="text-2xl font-semibold mb-4 text-center">How ARF Works</h2>
           <figure>
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
@@ -502,30 +551,22 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
-
           <div className="flex flex-wrap justify-center gap-6 mt-8">
             {TRUST_BADGES.map((badge) => (
-              <div
-                key={badge.label}
-                className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700"
-              >
+              <div key={badge.label} className="bg-gray-800 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-700">
                 <Shield className={`w-4 h-4 ${BADGE_ICON_CLASSES[badge.color]}`} /> {badge.label}
               </div>
             ))}
           </div>
-
           <div className="text-center mt-8">
-            <Link
-              href="/pricing"
-              className="bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition inline-flex items-center gap-2"
-            >
+            <Link href="/pricing" className="bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition inline-flex items-center gap-2">
               View Access Models <ArrowRight size={16} />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Access Models */}
+      {/* Access Models – unchanged */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 max-w-4xl mx-auto">
           <h3 className="text-xl font-semibold mb-1 text-center">Access Models</h3>
@@ -567,7 +608,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Try the Advisory API */}
+      {/* Try the Advisory API – unchanged */}
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-1">Try the Advisory API</h2>
@@ -629,53 +670,61 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Live Demos */}
+      {/* Ecosystem Overview – restored from original */}
+      <section
+        ref={ecosystemRef}
+        className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
+          ecosystemInView ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Ecosystem Overview</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {ECOSYSTEM.map((item, idx) => (
+            <EcoCard key={idx} icon={item.icon} title={item.title} description={item.description} details={item.details} />
+          ))}
+        </div>
+      </section>
+
+      {/* Live Demos – original content */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
           demosInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Live Demos</h2>
-          <p className="text-gray-400 text-center text-sm mb-10">
-            All demos use mock or advisory data. The protected core engine is not publicly accessible.
-          </p>
-          <div className="grid md:grid-cols-4 gap-6">
-            {DEMOS.map((demo, idx) => (
-              <DemoCard key={idx} {...demo} />
-            ))}
-          </div>
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Live Demos</h2>
+        <p className="text-gray-400 text-center text-sm mb-10">
+          All demos use mock or advisory data. The protected core engine is not publicly accessible.
+        </p>
+        <div className="grid md:grid-cols-4 gap-6">
+          {DEMOS.map((demo, idx) => (
+            <DemoCard key={idx} {...demo} />
+          ))}
         </div>
       </section>
 
-      {/* Open Specs & Protected Core */}
+      {/* Open Specs & Protected Core – uses generic REPOS */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
           reposInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Open Specifications &amp; Protected Core</h2>
-          <p className="text-gray-400 text-center text-sm max-w-3xl mx-auto mb-6">
-            ARF’s core engine is access‑controlled and not publicly available. However, we provide open specifications
-            (data models, API contracts, decision rules) under written terms to qualified pilots. This approach gives you
-            full transparency into how decisions are made, while preserving the integrity and security of the production
-            engine. All code, specifications, and materials are proprietary and protected as trade secrets.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {REPOS.map((repo) => (
-              <RepoCard key={repo.name} {...repo} />
-            ))}
-          </div>
-          <p className="text-gray-400 text-center text-xs mt-6">
-            The specification and API contracts are shared under written terms. <Link href="/signup" className="text-blue-400 hover:underline">Request pilot access</Link> to receive them.
-          </p>
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Open Specs &amp; Protected Core</h2>
+        <p className="text-gray-400 text-center text-sm max-w-2xl mx-auto mb-10">
+          The specification and demo UI are open source (Apache&#8209;2.0). The core
+          engine and API control plane are access&#8209;controlled — available only to
+          qualified pilots. This boundary preserves audit&#8209;grade integrity while
+          providing full transparency into APIs and decision rules.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {REPOS.map((repo) => (
+            <RepoCard key={repo.name} {...repo} />
+          ))}
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer – cleaned, no email addresses */}
       <footer
         ref={footerRef}
         className={`border-t border-gray-700 py-12 text-center text-gray-400 transition-opacity duration-1000 ${
@@ -694,10 +743,20 @@ export default function LandingPage() {
                   emoji="📬"
                 />
               </div>
-              <ContactLink href="https://www.linkedin.com/in/petterjuan/" text="Juan Petter" emoji="🔗" />
-              <ContactLink href="https://calendly.com/petter2025us/30min" text="Book a Call" emoji="📅" />
               <ContactLink
-                href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg"
+                href="https://www.linkedin.com/in/petterjuan/"
+                icon={<Linkedin className="w-5 h-5" />}
+                text="Juan Petter"
+                emoji="🔗"
+              />
+              <ContactLink
+                href="https://calendly.com/petter2025us/30min"
+                icon={<Calendar className="w-5 h-5" />}
+                text="Book a Call"
+                emoji="📅"
+              />
+              <ContactLink
+                href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
                 icon={<MessageSquare className="w-5 h-5" />}
                 text="Join Slack"
                 emoji="💬"
@@ -727,14 +786,22 @@ export default function LandingPage() {
             <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
             <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">GitHub</a>
             <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">🤗 Hugging Face</a>
-            <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" rel="noopener noreferrer" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1"><MessageSquare size={18} /> Slack</a>
+            <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1"><MessageSquare size={18} /> Slack</a>
             <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">LinkedIn</a>
           </div>
 
           <p className="text-sm">
-            © 2026 ARF Foundation. All repositories are private and access‑controlled.
-            The core engine is proprietary. Selected materials are shared under written
-            terms with qualified pilots and enterprise customers.
+            © 2026 ARF Foundation. Public repositories (arf-spec, arf-frontend) are licensed
+            under{' '}
+            <a
+              href="https://github.com/arf-foundation/arf-spec/blob/main/LICENSE"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-white transition"
+            >
+              Apache 2.0
+            </a>
+            . The core engine is proprietary and access-controlled.
           </p>
         </div>
       </footer>
@@ -747,8 +814,48 @@ export default function LandingPage() {
 }
 
 // ============================================================================
-// Sub‑components (unchanged except for ContactLink which already uses rel)
+// Sub‑components (unchanged except for rel attributes)
 // ============================================================================
+
+function EcoCard({
+  icon: Icon,
+  title,
+  description,
+  details,
+}: {
+  icon: ElementType;
+  title: string;
+  description: string;
+  details: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const id = `eco-details-${title.replace(/\s/g, '-')}`;
+  return (
+    <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition group relative">
+      <div className="flex justify-center mb-2 group-hover:scale-110 transition-transform">
+        <Icon className="w-6 h-6 text-blue-400" />
+      </div>
+      <h3 className="font-semibold text-sm">{title}</h3>
+      <p className="text-xs text-gray-400 mt-1">{description}</p>
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 mx-auto transition"
+        aria-expanded={expanded}
+        aria-controls={id}
+      >
+        {expanded ? 'Show less' : 'Details'}
+        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+      </button>
+      <div
+        id={id}
+        className={`overflow-hidden transition-all duration-300 ${expanded ? 'max-h-48 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}
+      >
+        <p className="text-xs text-gray-300 border-t border-gray-700 pt-2">{details}</p>
+      </div>
+    </div>
+  );
+}
 
 function FeatureCard({
   title,
@@ -772,7 +879,7 @@ function FeatureCard({
     purple: 'text-purple-400',
   };
   return (
-    <div className="bg-gray-800/80 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
+    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
       <div className="mb-4 flex justify-center group-hover:scale-110 transition-transform">
         <Icon className={`w-8 h-8 ${colorClasses[color]}`} />
       </div>
@@ -812,7 +919,7 @@ function DemoCard({
   external?: boolean;
 }) {
   const content = (
-    <div className="bg-gray-800/80 p-6 rounded-lg border border-gray-700 h-full flex flex-col hover:border-blue-500 transition">
+    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-full flex flex-col hover:border-blue-500 transition">
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <div className="text-gray-400 mb-4 flex-1">{description}</div>
       <span className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 mt-auto">
@@ -826,7 +933,7 @@ function DemoCard({
 
 function RepoCard({ name, desc, isPrivate = false }: { name: string; desc: string; isPrivate?: boolean }) {
   return (
-    <div className={`bg-gray-800/80 p-4 rounded-lg border transition ${isPrivate ? 'border-gray-700 opacity-80 cursor-default' : 'border-gray-700 hover:border-blue-500 group'}`}>
+    <div className={`bg-gray-800 p-4 rounded-lg border transition ${isPrivate ? 'border-gray-700 opacity-70 cursor-default' : 'border-gray-700 hover:border-blue-500 group'}`}>
       <div className="flex items-start justify-between">
         <h3 className="font-mono text-sm text-gray-300 group-hover:text-white transition-colors">{name}</h3>
         <div className="flex items-center gap-2 text-xs flex-shrink-0 ml-2">
