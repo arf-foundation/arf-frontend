@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
-export const runtime = 'edge';
 
 export function proxy(_request: NextRequest) {
+  void _request;  // mark as used to suppress lint warning
+
   const nonce = uuidv4();
   const csp = [
     `default-src 'self'`,
