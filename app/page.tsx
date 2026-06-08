@@ -138,22 +138,22 @@ const TRUST_BADGES = [
 
 const REPOS = [
   {
-    name: 'agentic_reliability_framework',
+    name: 'Core Governance Engine',
     desc: 'Protected core engine – real‑time risk calibration, historical memory, deterministic governance.',
     isPrivate: true,
   },
   {
-    name: 'arf-api',
+    name: 'API Control Plane',
     desc: 'API control plane – governs access, enforces quotas, and logs every decision.',
     isPrivate: true,
   },
   {
-    name: 'enterprise',
+    name: 'Enterprise Layer',
     desc: 'Enterprise layer – tamper‑proof audit trails, SSO, and commercial SLAs.',
     isPrivate: true,
   },
   {
-    name: 'arf-spec',
+    name: 'Open Specification',
     desc: 'Canonical specification – data models, API contracts, decision rules (shared under written terms).',
     isPrivate: true,
   },
@@ -308,7 +308,7 @@ export default function LandingPage() {
             rel="noopener noreferrer"
             className="border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-white transition flex items-center gap-2"
           >
-            View Technical Spec <ArrowRight size={18} />
+            View business briefing <ArrowRight size={18} />
           </a>
         </div>
 
