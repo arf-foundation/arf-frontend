@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image'; // <-- added for logos
 import { useState, useEffect, useRef, type ReactNode, type ElementType } from 'react';
 import {
   ArrowRight,
@@ -682,6 +683,39 @@ export default function LandingPage() {
               <Mail className="w-4 h-4" /> Apply for Pilot Access
             </a>
           </div>
+
+          {/* ========= ADDED LOGOS SECTION ========= */}
+          <div className="flex justify-center items-center gap-8 mb-8">
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-opacity hover:opacity-80"
+            >
+              <Image
+                src="/ARF - Transparent Primary Logo.png"
+                alt="ARF Foundation"
+                width={140}
+                height={50}
+                className="h-10 w-auto"
+              />
+            </a>
+            <a
+              href="https://github.com/enterprise"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-opacity hover:opacity-80"
+            >
+              <Image
+                src="/GitHub_Lockup_White.svg"
+                alt="GitHub Enterprise"
+                width={140}
+                height={40}
+                className="h-10 w-auto"
+              />
+            </a>
+          </div>
+          {/* ========= END OF LOGOS SECTION ========= */}
 
           <div className="flex flex-wrap justify-center gap-6 mb-4">
             <Link href="/pricing" className="hover:text-white transition">Access Models</Link>
