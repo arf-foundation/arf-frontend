@@ -723,7 +723,7 @@ export default function LandingPage() {
             <Link href="/terms" className="hover:text-white transition">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
             <a href="https://github.com/arf-foundation" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">GitHub</a>
-            <a href="https://huggingface.co/A-R-F" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">🤗 Hugging Face</a>
+            <a href="https://huggingface.co/ARF-AI" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">🤗 Hugging Face</a>
             <a href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg" target="_blank" rel="noopener noreferrer" onClick={trackSlackClick} className="hover:text-white transition flex items-center gap-1"><MessageSquare size={18} /> Slack</a>
             <a href="https://www.linkedin.com/company/agentic-reliability" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">LinkedIn</a>
           </div>
