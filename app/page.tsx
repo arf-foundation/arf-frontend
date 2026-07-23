@@ -13,8 +13,6 @@ import {
   MessageSquare,
   Copy,
   Check,
-  ChevronDown,
-  ChevronUp,
   Shield,
   Lock,
   FileText,
@@ -450,13 +448,13 @@ export default function LandingPage() {
               Autonomous AI is moving from copilots to autonomous workflows. As AI gains the ability to act – not just recommend – organizations need infrastructure that governs execution, manages operational risk, and provides auditability by design.
             </p>
             <p>
-              ARF AI delivers that control plane. Built for the era where AI doesn't just answer questions – it deploys code, modifies infrastructure, and makes decisions that affect business outcomes.
+              ARF AI delivers that control plane. Built for the era where AI doesn&rsquo;t just answer questions – it deploys code, modifies infrastructure, and makes decisions that affect business outcomes.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Who It’s For */}
+      {/* Who It&rsquo;s For */}
       <section
         ref={whoRef}
         className={`container mx-auto px-4 mb-16 transition-opacity duration-1000 ${
@@ -688,7 +686,7 @@ export default function LandingPage() {
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Documentation &amp; Technical Specifications</h2>
           <p className="text-gray-400 text-center text-sm max-w-3xl mx-auto mb-6">
-            Public documentation outlines ARF's capabilities and integration patterns.
+            Public documentation outlines ARF&rsquo;s capabilities and integration patterns.
             Full technical specifications (data models, API contracts, decision rules) are shared
             with qualified pilots under written terms.
           </p>
