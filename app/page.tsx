@@ -38,48 +38,66 @@ declare global {
 // ============================================================================
 
 const DIAGRAM = `flowchart LR
-    A[LLM / AI Agent] --> B[Policy Engine]
-    B --> C[Governance Loop]
-    C --> D[Risk Assessment]
-    D --> E[Human Approval]
-    E --> F[Execution]`;
+    A[Application] --> B[LLM / AI Agent]
+    B --> C[ARF Control Plane]
+    C --> D[Policies]
+    D --> E[Risk Engine]
+    E --> F[Approval]
+    F --> G[Execution]
+    G --> H[Audit Trail]`;
 
 const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
-const FEATURES = [
+const CAPABILITIES = [
   {
-    title: 'Policy Enforcement & Compliance',
-    description: 'Deterministic policy gates that cannot be bypassed—ensuring every AI action meets regulatory and internal standards.',
+    title: 'Policy Enforcement',
+    description: 'Deterministic policy gates that cannot be bypassed.',
     icon: Shield,
     color: 'green',
-    details:
-      'Define and enforce granular policies (region, resource type, cost) before any autonomous action is taken. Violations are blocked and logged automatically.',
+    items: [
+      'Deterministic execution gates',
+      'Approval workflows',
+      'Regional policy controls',
+      'Cost guardrails',
+    ],
   },
   {
-    title: 'Decision Governance & Audit',
-    description: 'Tamper‑evident records and cryptographic signing provide irrefutable proof of every decision.',
+    title: 'Decision Governance',
+    description: 'Tamper‑evident records with cryptographic signing.',
     icon: FileText,
     color: 'blue',
-    details:
-      'Every approve, deny, or escalate decision is timestamped, attributed, and stored with full context. Audit trails withstand regulatory scrutiny and internal review.',
+    items: [
+      'Full audit trail',
+      'Cryptographic attestation',
+      'Attribution & accountability',
+      'Regulatory‑ready logs',
+    ],
   },
   {
-    title: 'Reliability & Fault Tolerance',
-    description: 'Continuous monitoring, predictive foresight, and automated recovery keep AI operations stable.',
+    title: 'Continuous Reliability',
+    description: 'Proactive monitoring, predictive foresight, and automated recovery.',
     icon: Cpu,
     color: 'yellow',
-    details:
-      'Proactive anomaly detection, Lyapunov stability analysis, and temporal drift monitoring prevent silent failures and enable self‑stabilising responses.',
+    items: [
+      'Anomaly detection',
+      'Predictive health scoring',
+      'Control‑theoretic stability monitoring',
+      'Self‑stabilising responses',
+    ],
   },
   {
-    title: 'Observability & Operational Insights',
-    description: 'Transparent risk scoring, causal explanations, and real‑time dashboards give operators full situational awareness.',
+    title: 'Operational Transparency',
+    description: 'Explainable risk scoring, causal reasoning, and real‑time observability.',
     icon: Network,
     color: 'purple',
-    details:
-      'Understand why each decision was made, explore counterfactual what‑if scenarios, and gain actionable insights into system health.',
+    items: [
+      'Explainable risk scores – never a black box',
+      'Counterfactual what‑if analysis',
+      'Real‑time dashboards',
+      'Causal attribution',
+    ],
   },
 ];
 
@@ -143,8 +161,8 @@ const REPOS = [
     isPrivate: true,
   },
   {
-    name: 'Open Specification',
-    desc: 'Canonical specification – data models, API contracts, decision rules (shared under written terms).',
+    name: 'Enterprise Specification',
+    desc: 'Full technical specification, data models, and API contracts (shared under written terms).',
     isPrivate: true,
   },
 ];
@@ -261,6 +279,7 @@ export default function LandingPage() {
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.2, once: true });
   const { ref: problemRef, inView: problemInView } = useInView({ threshold: 0.2, once: true });
   const { ref: whyRef, inView: whyInView } = useInView({ threshold: 0.2, once: true });
+  const { ref: whyNowRef, inView: whyNowInView } = useInView({ threshold: 0.2, once: true });
   const { ref: whoRef, inView: whoInView } = useInView({ threshold: 0.2, once: true });
   const { ref: capabilitiesRef, inView: capabilitiesInView } = useInView({ threshold: 0.2, once: true });
   const { ref: trustRef, inView: trustInView } = useInView({ threshold: 0.2, once: true });
@@ -286,17 +305,16 @@ export default function LandingPage() {
         </div>
 
         <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-          Deploy autonomous agents with deterministic governance, continuous reliability, and complete audit trails.
+          Safely deploy autonomous AI in production with deterministic governance, continuous reliability, and enterprise‑grade auditability.
         </p>
 
         <p className="text-gray-300 max-w-2xl mx-auto mb-6">
-          ARF AI is not an AI model. It is the infrastructure layer that governs autonomous AI systems – enforcing policy, managing risk, and providing irrefutable operational records.
+          <strong>ARF AI is not an AI model.</strong> It is the infrastructure layer that governs autonomous AI systems – enforcing policy, managing risk, and providing irrefutable operational records.
         </p>
 
         <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 mb-8 max-w-md mx-auto">
           <p className="text-blue-300 text-sm">
-            🔐 Pilot access is by invitation only. Every application is personally
-            reviewed by the founder and matched to qualified use cases.
+            Pilot programs are offered to qualified organizations where ARF is a strong fit. Every application is personally reviewed by the founder.
           </p>
         </div>
 
@@ -336,8 +354,8 @@ export default function LandingPage() {
         </div>
 
         <p className="text-gray-400 text-sm mt-4">
-          ⚡ The public sandbox returns only simulated responses. Real enforcement,
-          audit trails, and confidence guarantees require a pilot agreement.
+          ⚡ The public sandbox returns only simulated responses. Real enforcement and
+          confidence guarantees require a pilot agreement.
         </p>
       </section>
 
@@ -375,29 +393,23 @@ export default function LandingPage() {
         }`}
       >
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
-          <div className="grid md:grid-cols-3 gap-6 text-center mb-8">
+          <div className="grid md:grid-cols-3 gap-6 text-center">
             <div>
               <div className="text-red-400 font-bold text-xl mb-2">⚠️ Problem</div>
               <p className="text-gray-300">
-                AI agents fail silently in production, generating untraceable,
-                unauditable decisions that expose your organization to operational
-                risk and compliance gaps.
+                AI agents make autonomous decisions that are difficult to govern, audit, and control.
               </p>
             </div>
             <div>
               <div className="text-green-400 font-bold text-xl mb-2">🔧 Solution</div>
               <p className="text-gray-300">
-                ARF wraps AI outputs in a deterministic governance layer that
-                evaluates, constrains, and logs every decision — keeping you in
-                control, always.
+                ARF applies deterministic policy enforcement before every autonomous action.
               </p>
             </div>
             <div>
               <div className="text-blue-400 font-bold text-xl mb-2">📈 Outcome</div>
               <p className="text-gray-300">
-                Auditable operations with mechanical enforcement, calibrated
-                confidence, and decision trails that withstand regulatory scrutiny
-                and internal review.
+                Every decision becomes explainable, auditable, and operationally trustworthy.
               </p>
             </div>
           </div>
@@ -414,11 +426,31 @@ export default function LandingPage() {
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 border border-gray-700">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">Why ARF?</h2>
           <div className="max-w-3xl mx-auto text-center text-gray-300 space-y-4">
-            <p className="text-lg">
-              LLMs are probabilistic. Enterprise systems require deterministic behaviour. ARF bridges that gap.
+            <p className="text-lg font-semibold">
+              Foundation models are probabilistic. Enterprise operations require deterministic control. ARF bridges that gap.
             </p>
             <p>
-              Autonomous AI promises unprecedented speed and scale, but without governance it introduces unacceptable operational risk. ARF provides the missing control plane—translating probabilistic model outputs into verifiable, auditable actions that align with your business policies.
+              Autonomous AI promises unprecedented speed and scale, but without governance it introduces unacceptable operational risk. ARF provides the missing control plane – translating probabilistic model outputs into verifiable, auditable actions that align with your business policies.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Now? */}
+      <section
+        ref={whyNowRef}
+        className={`container mx-auto px-4 mb-16 transition-opacity duration-1000 ${
+          whyNowInView ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 backdrop-blur-sm rounded-2xl p-8 border border-blue-800/50">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">Why Now?</h2>
+          <div className="max-w-3xl mx-auto text-center text-gray-300 space-y-4">
+            <p className="text-lg">
+              Autonomous AI is moving from copilots to autonomous workflows. As AI gains the ability to act – not just recommend – organizations need infrastructure that governs execution, manages operational risk, and provides auditability by design.
+            </p>
+            <p>
+              ARF AI delivers that control plane. Built for the era where AI doesn't just answer questions – it deploys code, modifies infrastructure, and makes decisions that affect business outcomes.
             </p>
           </div>
         </div>
@@ -454,16 +486,16 @@ export default function LandingPage() {
           <figure>
             <Mermaid chart={DIAGRAM} className="overflow-x-auto flex justify-center" />
             <figcaption className="sr-only">
-              LLM or AI agent output flows through the policy engine, governance loop, risk assessment, human approval, and finally execution.
+              Application → LLM → ARF Control Plane → Policies → Risk Engine → Approval → Execution → Audit Trail
             </figcaption>
           </figure>
           <p className="text-xs text-gray-500 mt-2 text-center">
-            AI intent → Policy Enforcement → Governance → Risk → Human Approval → Execution
+            Application → LLM → ARF Control Plane → Policies → Risk Engine → Approval → Execution → Audit Trail
           </p>
         </div>
       </div>
 
-      {/* Key Capabilities */}
+      {/* Enterprise Capabilities */}
       <section
         ref={capabilitiesRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -473,8 +505,8 @@ export default function LandingPage() {
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Enterprise Capabilities</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {FEATURES.map((feature, idx) => (
-              <FeatureCard key={idx} {...feature} />
+            {CAPABILITIES.map((cap, idx) => (
+              <CapabilityCard key={idx} {...cap} />
             ))}
           </div>
         </div>
@@ -536,9 +568,8 @@ export default function LandingPage() {
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 max-w-4xl mx-auto">
           <h3 className="text-xl font-semibold mb-1 text-center">Access Models</h3>
           <p className="text-sm text-gray-400 text-center mb-6">
-            ARF uses a hybrid pricing model: a fixed deployment fee starting at $50k,
-            plus either outcome‑based pricing or a monthly retainer. Pilot access is
-            time‑limited and free for qualified organizations — no commitment required.
+            ARF uses a hybrid pricing model: a fixed deployment fee, plus either outcome‑based pricing or a monthly retainer.
+            Pilot access is time‑limited and free for qualified organizations — no commitment required.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-8">
             <div className="text-center">
@@ -561,9 +592,9 @@ export default function LandingPage() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-400">Enterprise</div>
-              <div className="text-gray-400 text-sm mt-1">Commercial · Hybrid</div>
+              <div className="text-gray-400 text-sm mt-1">Commercial · Custom</div>
               <ul className="text-sm text-gray-300 mt-2 space-y-1 text-left">
-                <li>✓ Fixed deployment fee (starts $50k)</li>
+                <li>✓ Custom deployment fee</li>
                 <li>✓ Outcome‑based or retainer maintenance</li>
                 <li>✓ SSO, multi‑tenancy, SLA</li>
                 <li>✓ Full enforcement + audit trails</li>
@@ -577,8 +608,8 @@ export default function LandingPage() {
       <div className="container mx-auto px-4 mb-16">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
           <h2 className="text-2xl font-semibold mb-1">Try the Evaluation API</h2>
-          <p className="text-sm text-amber-400 mb-4">
-            This endpoint returns simulated responses. The protected core engine is not publicly accessible.
+          <p className="text-xs text-gray-500 mb-4">
+            This endpoint returns simulated responses. Real enforcement requires a pilot agreement.
           </p>
 
           <div className="flex flex-col gap-4">
@@ -624,10 +655,6 @@ export default function LandingPage() {
             )}
             {sandboxError && <p className="text-sm text-red-400">Failed to reach sandbox: {sandboxError}</p>}
           </div>
-          <p className="text-sm text-gray-400 mt-4">
-            The response includes a recommendation and a justification that clearly states the evaluation is simulated. 
-            Mechanical enforcement requires a pilot agreement.
-          </p>
         </div>
       </div>
 
@@ -651,7 +678,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Open Specs & Protected Core */}
+      {/* Documentation & Technical Specifications */}
       <section
         ref={reposRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -659,11 +686,11 @@ export default function LandingPage() {
         }`}
       >
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Open Specifications &amp; Protected Core</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Documentation &amp; Technical Specifications</h2>
           <p className="text-gray-400 text-center text-sm max-w-3xl mx-auto mb-6">
-            ARF’s core engine is proprietary and access‑controlled. We provide open specifications
-            (data models, API contracts, decision rules) under written terms to qualified pilots,
-            ensuring full transparency into how decisions are made.
+            Public documentation outlines ARF's capabilities and integration patterns.
+            Full technical specifications (data models, API contracts, decision rules) are shared
+            with qualified pilots under written terms.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {REPOS.map((repo) => (
@@ -671,7 +698,7 @@ export default function LandingPage() {
             ))}
           </div>
           <p className="text-gray-400 text-center text-xs mt-6">
-            <Link href="/signup" className="text-blue-400 hover:underline">Request pilot access</Link> to receive specifications and API contracts.
+            <Link href="/signup" className="text-blue-400 hover:underline">Request pilot access</Link> to receive full specifications.
           </p>
         </div>
       </section>
@@ -767,8 +794,7 @@ export default function LandingPage() {
           </div>
 
           <p className="text-sm">
-            © 2026 ARF Foundation. All rights reserved. The core engine is proprietary and access‑controlled.
-            Specifications are shared under written terms with qualified pilots and enterprise customers.
+            © 2026 ARF Foundation. All rights reserved.
           </p>
         </div>
       </footer>
@@ -784,9 +810,13 @@ export default function LandingPage() {
 // Sub‑components
 // ============================================================================
 
-function FeatureCard({ title, description, icon: Icon, color, details }: { title: string; description: string; icon: ElementType; color: string; details: string }) {
-  const [expanded, setExpanded] = useState(false);
-  const id = `feature-details-${title.replace(/\s/g, '-')}`;
+function CapabilityCard({ title, description, icon: Icon, color, items }: {
+  title: string;
+  description: string;
+  icon: ElementType;
+  color: string;
+  items: string[];
+}) {
   const colorClasses: Record<string, string> = {
     blue: 'text-blue-400',
     green: 'text-green-400',
@@ -794,28 +824,20 @@ function FeatureCard({ title, description, icon: Icon, color, details }: { title
     purple: 'text-purple-400',
   };
   return (
-    <div className="bg-gray-800/80 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition relative group">
-      <div className="mb-4 flex justify-center group-hover:scale-110 transition-transform">
+    <div className="bg-gray-800/80 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition">
+      <div className="mb-4 flex justify-center">
         <Icon className={`w-8 h-8 ${colorClasses[color]}`} />
       </div>
       <h3 className="text-xl font-semibold mb-2 text-center">{title}</h3>
-      <p className="text-gray-400 text-center mb-2">{description}</p>
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1 mx-auto transition"
-        aria-expanded={expanded}
-        aria-controls={id}
-      >
-        {expanded ? 'Show less' : 'Details'}
-        {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-      </button>
-      <div
-        id={id}
-        className={`overflow-hidden transition-all duration-300 ${expanded ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}
-      >
-        <p className="text-sm text-gray-300 border-t border-gray-700 pt-4">{details}</p>
-      </div>
+      <p className="text-gray-400 text-center mb-4">{description}</p>
+      <ul className="space-y-2 text-sm text-gray-300">
+        {items.map((item, idx) => (
+          <li key={idx} className="flex items-start gap-2">
+            <Check className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -842,7 +864,7 @@ function RepoCard({ name, desc, isPrivate = false }: { name: string; desc: strin
         <div className="flex items-center gap-2 text-xs flex-shrink-0 ml-2">
           {isPrivate && (
             <span className="px-2 py-0.5 bg-gray-700 rounded-full text-gray-400 flex items-center gap-1">
-              <Shield size={10} /> Access‑controlled
+              <Shield size={10} /> Pilot‑only
             </span>
           )}
         </div>
