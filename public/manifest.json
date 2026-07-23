@@ -1,9 +1,27 @@
 {
-  "name": "ARF Frontend",
+  "name": "ARF AI Governance Console",
   "short_name": "ARF",
-  "description": "Agentic Reliability Framework – Bayesian governance dashboard",
+  "description": "Enterprise control plane for autonomous AI – deterministic governance, continuous reliability, and enterprise-grade auditability.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
-  "theme_color": "#3b82f6"
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }
