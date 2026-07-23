@@ -6,12 +6,8 @@ import { useState, useEffect, useRef, type ReactNode, type ElementType } from 'r
 import {
   ArrowRight,
   Rocket,
-  BookOpen,
-  Users,
-  Code,
   Cpu,
   Brain,
-  Scale,
   Network,
   Mail,
   MessageSquare,
@@ -185,10 +181,10 @@ export default function LandingPage() {
   const isMounted = useRef(true);
   useEffect(() => {
     isMounted.current = true;
+    const timeoutRefsCurrent = timeoutRefs.current;
     return () => {
       isMounted.current = false;
-      const refs = timeoutRefs.current;
-      Object.values(refs).forEach(clearTimeout);
+      Object.values(timeoutRefsCurrent).forEach(clearTimeout);
     };
   }, []);
 
@@ -635,7 +631,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Live Demos */}
+      {/* Interactive Demonstrations */}
       <section
         ref={demosRef}
         className={`container mx-auto px-4 py-16 transition-opacity duration-1000 ${
@@ -734,7 +730,7 @@ export default function LandingPage() {
           </div>
 
           <div className="flex justify-center items-center gap-8 mb-8">
-            <a href="/" className="transition-opacity hover:opacity-80">
+            <Link href="/" className="transition-opacity hover:opacity-80">
               <Image
                 src="/ARF - Transparent Primary Logo.png"
                 alt="ARF AI"
@@ -742,7 +738,7 @@ export default function LandingPage() {
                 height={50}
                 className="h-10 w-auto"
               />
-            </a>
+            </Link>
             <a
               href="https://github.com/enterprise"
               target="_blank"
