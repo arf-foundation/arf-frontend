@@ -6,7 +6,7 @@ import { ArrowRight, RefreshCw, Info, Network, Shield, Lock, FileText, AlertTria
 import DashboardBottomNav from '../../components/DashboardBottomNav';
 
 // ----------------------------------------------------------------------
-// Type definitions
+// Type definitions (unchanged)
 // ----------------------------------------------------------------------
 interface RiskBreakdown {
   conjugate: number;
@@ -63,7 +63,7 @@ interface AuditLogEntry {
 }
 
 // ----------------------------------------------------------------------
-// Helper: generate deterministic mock risk data
+// Helper: generate deterministic mock risk data (unchanged)
 // ----------------------------------------------------------------------
 const generateMockRisk = (): RiskData => {
   const seed = Math.floor(Date.now() / 10000);
@@ -123,7 +123,7 @@ const mockMemoryStats = {
 };
 
 // ----------------------------------------------------------------------
-// Reusable Components
+// Reusable Components (unchanged except minor tweaks)
 // ----------------------------------------------------------------------
 const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
   const radius = size * 0.35;
@@ -222,7 +222,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsHttpWarning(true);
     }
   }, []);
@@ -243,7 +242,6 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshData();
     const interval = setInterval(refreshData, 30000);
     return () => clearInterval(interval);
@@ -252,7 +250,7 @@ export default function Dashboard() {
   if (!riskData) {
     return (
       <div className="min-h-screen text-white flex items-center justify-center p-4">
-        <div className="text-xl animate-pulse">Loading dashboard simulation...</div>
+        <div className="text-xl animate-pulse">Loading simulation...</div>
       </div>
     );
   }
@@ -261,16 +259,16 @@ export default function Dashboard() {
     <div className="min-h-screen text-white">
       <div className="container mx-auto px-4 py-6 sm:py-8 pb-20">
         <div className="max-w-7xl mx-auto space-y-6">
-          {/* HTTP Warning */}
+          {/* HTTP Warning (unchanged) */}
           {isHttpWarning && (
             <div className="bg-red-900/50 border border-red-700 rounded-lg p-3 text-center backdrop-blur-sm">
               <p className="text-red-200 text-sm">⚠️ Security warning: You are viewing this page over HTTP. Sensitive data (simulated) could be intercepted. <a href={window.location.href.replace('http:', 'https:')} className="ml-2 underline font-semibold hover:text-red-100">Switch to HTTPS</a></p>
             </div>
           )}
 
-          {/* Demo Disclaimer */}
+          {/* Sandbox Disclaimer */}
           <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 text-center flex flex-wrap justify-between items-center gap-2 backdrop-blur-sm">
-            <p className="text-blue-200 text-sm flex-1">🚀 This is a <strong>simulated demo</strong> using mock data. The real ARF engine requires pilot access.</p>
+            <p className="text-blue-200 text-sm flex-1">🔍 Public sandbox – all data is simulated. Production governance requires a pilot agreement.</p>
             <Link href="/signup" className="text-blue-400 hover:text-blue-300 text-sm font-medium underline whitespace-nowrap">Request pilot access →</Link>
           </div>
 
@@ -279,7 +277,7 @@ export default function Dashboard() {
             <div className="space-y-6">
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                  <h1 className="text-2xl font-bold">ARF System Risk</h1>
+                  <h1 className="text-2xl font-bold">System Risk</h1>
                   <button onClick={refreshData} disabled={isRefreshing} aria-label="Refresh data" className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"><RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} /></button>
                 </div>
                 <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
@@ -301,14 +299,14 @@ export default function Dashboard() {
 
               {quota && (
                 <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                  <div className="flex justify-between items-start mb-4"><h2 className="text-xl font-semibold">Your Plan (Demo)</h2><span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-medium">{quota.tier.toUpperCase()}</span></div>
+                  <div className="flex justify-between items-start mb-4"><h2 className="text-xl font-semibold">Plan (Sandbox)</h2><span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-medium">{quota.tier.toUpperCase()}</span></div>
                   <div className="mb-4"><div className="flex justify-between text-sm mb-1"><span className="text-gray-300">Remaining evaluations this month</span><span className="font-mono font-medium text-white">{quota.remaining.toLocaleString()}</span></div><div className="w-full bg-gray-700 rounded-full h-2"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${(quota.remaining / quota.limit) * 100}%` }} /></div><p className="text-xs text-gray-400 mt-2">Limit: {quota.limit.toLocaleString()} evaluations/month (simulated)</p></div>
                   <Link href="/pricing" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium">View access models → <ArrowRight size={14} /></Link>
                 </div>
               )}
 
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Network className="w-5 h-5 text-green-400" /> Semantic Memory (Simulated)</h2>
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Network className="w-5 h-5 text-green-400" /> Semantic Memory (Sandbox)</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                   <div><div className="text-2xl font-bold text-blue-400">{mockMemoryStats.similar_incidents}</div><div className="text-xs text-gray-400">Similar Incidents</div></div>
                   <div><div className="text-2xl font-bold text-purple-400">{mockMemoryStats.rag_similarity.toFixed(2)}</div><div className="text-xs text-gray-400">RAG Similarity</div></div>
@@ -318,7 +316,7 @@ export default function Dashboard() {
               </div>
 
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4">Recent Incidents (Simulated)</h2>
+                <h2 className="text-xl font-semibold mb-4">Recent Incidents (Sandbox)</h2>
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -349,7 +347,7 @@ export default function Dashboard() {
                     </tbody>
                   </table>
                 </div>
-                <p className="text-xs text-gray-500 mt-4 text-center">Data shown is simulated for demonstration purposes only.</p>
+                <p className="text-xs text-gray-500 mt-4 text-center">Simulated data for demonstration purposes only.</p>
               </div>
 
               <Testimonial />
@@ -398,7 +396,7 @@ export default function Dashboard() {
               </div>
 
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Clock className="w-5 h-5 text-yellow-400" /> Cooldown & Rate Limits (Simulated)</h2>
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Clock className="w-5 h-5 text-yellow-400" /> Cooldown & Rate Limits (Sandbox)</h2>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-gray-700/30 rounded-lg"><div><span className="font-mono text-sm">payment-api</span><span className="text-xs text-gray-400 ml-2">(policy: latency_gt_100)</span></div><span className="text-xs bg-yellow-900 text-yellow-200 px-2 py-0.5 rounded-full">Cooldown: 45s remaining</span></div>
                   <div className="flex justify-between items-center p-3 bg-gray-700/30 rounded-lg"><div><span className="font-mono text-sm">database</span><span className="text-xs text-gray-400 ml-2">(policy: cpu_high)</span></div><span className="text-xs bg-orange-900 text-orange-200 px-2 py-0.5 rounded-full">Rate limit: 2/5 per hour</span></div>
@@ -440,8 +438,8 @@ export default function Dashboard() {
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700 text-center">
                 <h2 className="text-xl font-semibold mb-2">Export Compliance Report</h2>
                 <p className="text-gray-300 mb-4">Generate a summary report of governance decisions, policy violations, and system status for auditors.</p>
-                <button className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg font-medium transition"><Printer size={16} /> Print / Save as PDF (mock)</button>
-                <p className="text-xs text-gray-500 mt-3">Mock action – real engine provides automated compliance report generation.</p>
+                <button className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg font-medium transition"><Printer size={16} /> Print / Save as PDF (simulated)</button>
+                <p className="text-xs text-gray-500 mt-3">Simulated action – real engine provides automated compliance report generation.</p>
               </div>
 
               <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-2xl p-6 border border-gray-700 text-center backdrop-blur-sm">
