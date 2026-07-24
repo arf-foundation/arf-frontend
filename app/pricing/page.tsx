@@ -4,9 +4,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Check, Mail } from 'lucide-react';
 
-// This page describes access models, not per‑seat pricing.
-// Outcome‑based pricing is explained, and the free “tier” is replaced by a sandbox demo.
-
 export default function PricingPage() {
   const [copiedEmail, setCopiedEmail] = useState(false);
 
@@ -19,27 +16,26 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen text-white">
       <div className="container mx-auto px-4 py-8 sm:py-16">
-        {/* Glass card container for the whole pricing content */}
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-700 p-6 sm:p-8 max-w-5xl mx-auto">
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Access Models & Pilot Program
+              Access Models
             </h1>
             <p className="text-base sm:text-xl text-gray-300 max-w-2xl mx-auto px-2">
-              The core ARF engine is protected and access‑controlled. Choose the right path for your organisation.
+              ARF AI uses a hybrid pricing model – fixed deployment, plus outcome‑based or retainer. Pilot access is free for qualified organizations.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
-            {/* Sandbox – free, sanitised demo */}
+            {/* Sandbox – simulation only */}
             <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5 sm:p-6 flex flex-col">
               <h2 className="text-xl sm:text-2xl font-bold mb-2">Sandbox</h2>
               <div className="text-3xl sm:text-4xl font-bold text-blue-400 mb-2">Free</div>
-              <p className="text-gray-400 text-xs sm:text-sm mb-4">No commitment, no engine access</p>
+              <p className="text-gray-400 text-xs sm:text-sm mb-4">Simulation only, no engine access</p>
               <ul className="space-y-2 sm:space-y-3 flex-1">
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>1,000 advisory evaluations/month</span>
+                  <span>1,000 evaluations/month</span>
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
@@ -47,7 +43,7 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>UI dashboard with demo data</span>
+                  <span>Governance Console (demo data)</span>
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
                   <span className="w-4" />✗ No statistical engine
@@ -61,12 +57,12 @@ export default function PricingPage() {
                   href="/dashboard"
                   className="w-full block text-center border border-gray-600 text-gray-300 py-2 rounded-lg hover:border-blue-500 hover:text-white transition text-sm sm:text-base"
                 >
-                  Try Sandbox →
+                  Open Sandbox →
                 </Link>
               </div>
             </div>
 
-            {/* Pilot – time‑limited trial, qualified access */}
+            {/* Pilot */}
             <div className="bg-gray-800 rounded-2xl border-2 border-blue-500 shadow-lg shadow-blue-500/20 p-5 sm:p-6 flex flex-col relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
                 Recommended
@@ -89,7 +85,7 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Direct founder support</span>
+                  <span>Founder‑led onboarding</span>
                 </li>
               </ul>
               <p className="text-xs text-gray-400 mt-4 border-t border-gray-700 pt-3">
@@ -105,11 +101,11 @@ export default function PricingPage() {
               </div>
             </div>
 
-            {/* Enterprise – outcome‑based pricing */}
+            {/* Enterprise */}
             <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5 sm:p-6 flex flex-col">
               <h2 className="text-xl sm:text-2xl font-bold mb-2">Enterprise</h2>
-              <div className="text-3xl sm:text-4xl font-bold text-gray-400 mb-2">Outcome‑based</div>
-              <p className="text-gray-400 text-xs sm:text-sm mb-4">Pay for verified risk reduction</p>
+              <div className="text-3xl sm:text-4xl font-bold text-gray-400 mb-2">Custom</div>
+              <p className="text-gray-400 text-xs sm:text-sm mb-4">Pricing tailored to deployment scope</p>
               <ul className="space-y-2 sm:space-y-3 flex-1">
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
@@ -117,26 +113,26 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>SLA and deployment options discussed during pilot</span>
+                  <span>SSO, multi‑tenancy, SLA</span>
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>SSO and custom deployment available</span>
+                  <span>Custom deployment options</span>
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm">
                   <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Outcome‑based pricing tied to measured risk reduction</span>
+                  <span>Outcome‑based or retainer pricing</span>
                 </li>
               </ul>
               <p className="text-xs text-gray-400 mt-4 border-t border-gray-700 pt-3">
-                We measure risk reduction via auditable pre/post risk scores – you pay only for verified improvement.
+                We align pricing with verified risk reduction – you pay for measurable operational improvements.
               </p>
               <div className="mt-6 sm:mt-8">
                 <button
                   onClick={handleCopyEmail}
                   className="w-full flex items-center justify-center gap-2 border border-gray-600 text-gray-300 py-2 rounded-lg hover:border-blue-500 hover:text-white transition text-sm sm:text-base"
                 >
-                  <Mail size={16} /> Copy email to enquire
+                  <Mail size={16} /> Contact us
                 </button>
                 {copiedEmail && (
                   <p className="text-xs text-green-400 text-center mt-2">Email copied! ✉️</p>
