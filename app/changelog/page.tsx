@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Calendar, Tag, Copy, Check, Mail, Sparkles, ArrowRight, Shield } from 'lucide-react';
+import { Calendar, Tag, Copy, Check, Mail, Sparkles, ArrowRight, Shield, MessageSquare, Rocket } from 'lucide-react';
 import Link from 'next/link';
 
 // Types for changelog entries
@@ -56,7 +56,6 @@ const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/eva
 export default function ChangelogPage() {
   const [entries, setEntries] = useState<ChangelogEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
 
   useEffect(() => {
@@ -76,11 +75,10 @@ export default function ChangelogPage() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const loaded = data.entries || [];
-        // If loaded entries are empty, use defaults so the page is never blank
         setEntries(loaded.length > 0 ? loaded : DEFAULT_ENTRIES);
       } catch (err) {
         console.warn('Changelog JSON not available, using default entries.', err);
-        setEntries(DEFAULT_ENTRIES);  // fallback to built‑in entries
+        setEntries(DEFAULT_ENTRIES);
       } finally {
         setLoading(false);
       }
