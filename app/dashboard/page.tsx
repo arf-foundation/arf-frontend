@@ -222,6 +222,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsHttpWarning(true);
     }
   }, []);
@@ -242,6 +243,7 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshData();
     const interval = setInterval(refreshData, 30000);
     return () => clearInterval(interval);
