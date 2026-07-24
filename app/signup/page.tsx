@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Send, Check, Loader2, Shield,  Eye, FileText } from 'lucide-react';
+import { Send, Check, Loader2, Shield, Eye, FileText } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SignupPage() {
@@ -192,10 +192,10 @@ export default function SignupPage() {
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Request Pilot Access</h1>
           <p className="text-gray-400 text-sm sm:text-base mb-4">
-            The core ARF engine is access‑controlled and offered under outcome‑based pricing.
-            Fill out this form to start a conversation with our founder.
+            Pilot programs are offered to qualified organizations where ARF is a strong fit.
+            Fill out this form to start a conversation with our founder – no commitment required.
           </p>
-          {/* Trust bar – addresses certainty preference & compliance sensitivity */}
+          {/* Trust bar */}
           <div className="inline-flex items-center gap-4 text-xs text-gray-400 bg-gray-800/50 rounded-full px-4 py-1 border border-gray-700">
             <span className="flex items-center gap-1"><Shield size={12} /> Deterministic enforcement</span>
             <span className="flex items-center gap-1"><Eye size={12} /> Full audit trail</span>
@@ -204,7 +204,7 @@ export default function SignupPage() {
         </div>
 
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5 sm:p-6 md:p-8">
-          {/* Progress bar – reduces perceived friction */}
+          {/* Progress bar */}
           <div className="mb-6">
             <div className="flex justify-between text-xs text-gray-400 mb-1">
               <span>Step {step} of {totalSteps}</span>
@@ -218,7 +218,7 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Step indicator (visual only – progress bar above does the job, kept for clarity) */}
+          {/* Step indicator */}
           <div className="flex justify-between mb-6">
             {[1, 2, 3].map(i => (
               <div key={i} className="flex-1 text-center">
@@ -235,7 +235,7 @@ export default function SignupPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-            {/* Step 1: Personal & Company */}
+            {/* Step 1: Personal & Company (unchanged) */}
             {step === 1 && (
               <>
                 <div>
@@ -350,7 +350,7 @@ export default function SignupPage() {
               </>
             )}
 
-            {/* Step 2: Use Case & Technical Details */}
+            {/* Step 2: Use Case & Technical Details (unchanged) */}
             {step === 2 && (
               <>
                 <div>
@@ -373,7 +373,7 @@ export default function SignupPage() {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="expectedVolume" className="block text-sm font-medium text-gray-300 mb-1">Expected monthly incident evaluations *</label>
+                  <label htmlFor="expectedVolume" className="block text-sm font-medium text-gray-300 mb-1">Expected monthly evaluations *</label>
                   <select
                     id="expectedVolume"
                     name="expectedVolume"
@@ -514,7 +514,7 @@ export default function SignupPage() {
                     className="mt-1 w-4 h-4 bg-gray-900 border-gray-700 rounded focus:ring-blue-500"
                   />
                   <label htmlFor="agreeToTerms" className="text-sm text-gray-300">
-                    I understand that the ARF core engine is proprietary and access‑controlled and that access is granted at the founder’s discretion.  
+                    I understand that ARF is proprietary and access is granted at the founder’s discretion.  
                     I agree to the{' '}
                     <Link href="/terms" className="text-blue-400 hover:underline">Terms of Service</Link>
                     {' '}and{' '}
@@ -524,7 +524,6 @@ export default function SignupPage() {
                 {fieldErrors.agreeToTerms && (
                   <p className="text-red-400 text-xs mt-1">{fieldErrors.agreeToTerms}</p>
                 )}
-                {/* Loss-aversion + urgency nudge */}
                 <p className="text-xs text-gray-500 italic">
                   Every ungoverned AI decision is a liability. Turn your AI operations into an auditable asset.
                 </p>
