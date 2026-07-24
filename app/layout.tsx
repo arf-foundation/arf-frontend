@@ -7,39 +7,40 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL('https://arf-frontend-sandy.vercel.app'),
   title: {
-    default: 'Agentic Reliability Framework (ARF) – Governance for AI Systems',
-    template: '%s | ARF',
+    default: 'ARF AI – Enterprise Control Plane for Autonomous AI',
+    template: '%s | ARF AI',
   },
   description:
-    'ARF is a governance layer for AI systems. The core engine is access‑controlled and offered to qualified pilots under outcome‑based pricing.',
+    'Deploy autonomous AI with deterministic governance, continuous reliability, and complete audit trails. ARF AI is the infrastructure layer that governs agentic systems.',
   keywords: [
-    'AI reliability',
-    'self-healing systems',
     'AI governance',
-    'pilot program',
-    'access control',
-    'Bayesian inference',
-    'cloud governance',
-    'enterprise AI',
+    'enterprise AI infrastructure',
+    'autonomous AI control plane',
+    'deterministic policy enforcement',
+    'AI reliability',
+    'decision governance',
+    'audit trails',
+    'risk management',
+    'AI operations',
   ],
   authors: [{ name: 'Juan Petter', url: 'https://www.linkedin.com/in/juan-petter' }],
   creator: 'ARF Foundation',
   publisher: 'ARF Foundation',
   robots: 'index, follow',
   openGraph: {
-    title: 'ARF – Agentic Reliability Framework',
+    title: 'ARF AI – Enterprise Control Plane for Autonomous AI',
     description:
-      'Stewarded, pilot‑first reliability framework for AI systems. Core engine is access‑controlled.',
+      'Deploy autonomous AI with deterministic governance, continuous reliability, and complete audit trails.',
     url: 'https://arf-frontend-sandy.vercel.app',
-    siteName: 'ARF',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'ARF Dashboard Preview' }],
+    siteName: 'ARF AI',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'ARF AI Governance Console' }],
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ARF – Agentic Reliability Framework',
-    description: 'Access‑controlled governance for cloud infrastructure.',
+    title: 'ARF AI – Enterprise Control Plane for Autonomous AI',
+    description: 'Deterministic governance for autonomous AI. Enterprise‑grade auditability.',
     creator: '@arf_foundation',
     images: ['/og-image.png'],
   },
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'ARF',
+    title: 'ARF AI',
   },
   formatDetection: { telephone: false },
 };
@@ -117,7 +118,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-gray-100">
         <NavBar />
-        {/* No background – grid fully visible, cards remain solid via globals.css */}
         <div className="relative z-10 backdrop-blur-sm">
           <main>{children}</main>
         </div>
