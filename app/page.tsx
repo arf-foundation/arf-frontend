@@ -294,6 +294,11 @@ export default function LandingPage() {
           heroInView ? 'opacity-100' : 'opacity-0'
         }`}
       >
+        {/* ─── Axiom badge ────────────────────────────── */}
+        <div className="inline-block px-3 py-1 bg-blue-900/40 border border-blue-500/40 rounded-full text-blue-300 text-xs mb-4">
+          v4.3.2 — Axiom
+        </div>
+
         <div className="flex flex-col items-center gap-3 mb-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
             <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
