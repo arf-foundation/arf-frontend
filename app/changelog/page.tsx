@@ -13,8 +13,20 @@ interface ChangelogEntry {
   link?: string;
 }
 
-// Default entries to showcase v4.3.2 upgrades even when no JSON is loaded
+// Default entries to showcase v4.3.2 upgrades even when no JSON is loaded.
+// These are also merged into public/data/changelog.json, but are kept here
+// too (and re-merged in on every load) so the showcase content can never
+// silently disappear if changelog.json is later edited, reverted, or fails
+// to load.
 const DEFAULT_ENTRIES: ChangelogEntry[] = [
+  {
+    date: '2026-07-30',
+    title: 'v4.3.2 Axiom — Enterprise Control Plane',
+    description:
+      'The first named ARF AI release. Axiom introduces deterministic replay verification, active cost inference via Bayesian experimental design, a hardened gateway with defense-in-depth, and a fully enterprise-positioned Governance Console. All Dependabot alerts resolved across all repositories.',
+    type: 'public',
+    link: 'https://github.com/arf-foundation/agentic_reliability_framework/releases/tag/v4.3.2-axiom',
+  },
   {
     date: '2026-07-23',
     title: 'Enterprise Repositioning & Governance Console',
@@ -74,8 +86,20 @@ export default function ChangelogPage() {
         const res = await fetch('/data/changelog.json');
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        const loaded = data.entries || [];
-        setEntries(loaded.length > 0 ? loaded : DEFAULT_ENTRIES);
+        const loaded: ChangelogEntry[] = data.entries || [];
+
+        // Merge in any showcase entries not already present in the loaded
+        // JSON (matched by date+title), so they're always visible regardless
+        // of the JSON file's state, without duplicating entries that are
+        // already there.
+        const loadedKeys = new Set(loaded.map((e) => `${e.date}|${e.title}`));
+        const missingDefaults = DEFAULT_ENTRIES.filter(
+          (e) => !loadedKeys.has(`${e.date}|${e.title}`)
+        );
+        const merged = [...missingDefaults, ...loaded].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        setEntries(merged.length > 0 ? merged : DEFAULT_ENTRIES);
       } catch (err) {
         console.warn('Changelog JSON not available, using default entries.', err);
         setEntries(DEFAULT_ENTRIES);
