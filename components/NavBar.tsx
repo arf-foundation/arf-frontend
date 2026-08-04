@@ -1,127 +1,168 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Menu, Moon, Sun, X } from 'lucide-react';
+
+/* ----------------------------------------------------------------------------
+   NavBar — 8 links + CTA reduced to 4 primary links + two buttons.
+   Product / Docs / Pricing / Console are the only things a buyer needs before
+   they talk to us. History, Changelog, FAQ, Spec and the community links live
+   in the footer. "Whitepaper (soon)" is gone — we don't advertise what doesn't
+   exist. Sign In is OUTLINED (a place you log into, WorkOS AuthKit later);
+   Request Pilot Access stays the single filled CTA.
+
+   "Docs" has no dedicated internal route (no /spec page in this repo) — it
+   points at the same external GitHub org the previous "Spec" nav item used.
+--------------------------------------------------------------------------- */
+
+const PRIMARY_LINKS = [
+  { label: 'Product', href: '/#capabilities' },
+  { label: 'Docs', href: 'https://github.com/arf-foundation', external: true },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Console', href: '/dashboard' },
+] as const;
+
+type Theme = 'light' | 'dark';
 
 export default function NavBar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Lazy initializer instead of an effect: layout.tsx's blocking inline
+  // script already applies `.dark` to <html> before this component hydrates
+  // (CSP here allows 'unsafe-inline', so that script can run pre-paint), so
+  // reading the class back here is a synchronous read of already-settled
+  // DOM state, not a guess to correct later — no set-state-in-effect, and no
+  // one-frame icon flash while an effect would otherwise catch up.
+  const [theme, setTheme] = useState<Theme>(() =>
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+  );
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const closeMenu = () => setMobileMenuOpen(false);
+  const toggleTheme = () => {
+    const next: Theme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    document.documentElement.classList.toggle('dark', next === 'dark');
+    try {
+      window.localStorage.setItem('arf-theme', next);
+    } catch {
+      /* storage unavailable — the toggle still works for this session */
+    }
+  };
 
   return (
-    <nav className="bg-gray-800 text-white shadow-md" aria-label="Main navigation">
-      <div className="container mx-auto flex items-center justify-between p-4">
-        <Link
-          href="/"
-          className="font-bold hover:underline whitespace-nowrap text-lg"
-        >
-          ARF AI
+    <header className="arf-page-root sticky top-0 z-40 border-b border-[color:var(--hairline)] bg-[color:var(--surface-canvas)]/85 backdrop-blur-md">
+      <div className="arf-shell flex h-[74px] items-center justify-between gap-8">
+        <Link href="/" className="flex items-center gap-3" aria-label="ARF AI home">
+          <span className="h-[22px] w-[22px] rounded-md bg-gradient-to-br from-arf-blue to-arf-purple" />
+          <span className="text-base font-semibold tracking-[-0.02em]">ARF AI</span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-4">
-          <Link href="/dashboard" className="hover:underline text-sm">Governance Console</Link>
-          <Link href="/history" className="hover:underline text-sm">History</Link>
-          <Link href="/changelog" className="hover:underline text-sm">Changelog</Link>
-          <Link href="/faq" className="hover:underline text-sm">FAQ</Link>
-          <span className="text-sm text-gray-500 cursor-not-allowed" aria-disabled="true">
-            Whitepaper <span className="text-xs text-gray-600">(soon)</span>
-          </span>
-          <Link href="/pricing" className="hover:underline text-sm font-medium text-blue-400">
-            Access Models
-          </Link>
-          <a
-            href="https://github.com/arf-foundation"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline text-sm"
+        <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
+          {PRIMARY_LINKS.map((link) =>
+            'external' in link && link.external ? (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[14.5px] font-medium text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)]"
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-[14.5px] font-medium text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)]"
+              >
+                {link.label}
+              </Link>
+            )
+          )}
+        </nav>
+
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            className="hidden h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)] sm:inline-flex"
           >
-            Spec
-          </a>
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+
+          {/* Placeholder for WorkOS AuthKit — swap href for the hosted login URL */}
+          <Link href="/signup" className="arf-btn-ghost hidden sm:inline-flex" data-workos="authkit-signin">
+            Sign In
+          </Link>
+
           <Link
             href="/signup"
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition ml-2 whitespace-nowrap"
+            className="hidden items-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-[17px] py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(51,88,232,0.7)] transition hover:brightness-110 sm:inline-flex"
           >
             Request Pilot Access
           </Link>
-        </div>
 
-        <div className="flex items-center gap-3 md:hidden">
-          <Link
-            href="/signup"
-            className="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg text-xs font-medium transition whitespace-nowrap"
-          >
-            Pilot Access
-          </Link>
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-menu"
-            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            type="button"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-menu"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] md:hidden"
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
         </div>
       </div>
 
-      <div
-        id="mobile-menu"
-        className={`md:hidden overflow-hidden transition-all duration-300 ${
-          mobileMenuOpen ? 'max-h-96 border-t border-gray-700' : 'max-h-0'
-        }`}
-        aria-hidden={!mobileMenuOpen}
-      >
-        <div className="flex flex-col gap-1 px-4 py-3">
-          <Link
-            href="/dashboard"
-            className="block px-4 py-3 rounded-md hover:bg-gray-700 transition text-sm"
-            onClick={closeMenu}
-          >
-            Governance Console
-          </Link>
-          <Link
-            href="/history"
-            className="block px-4 py-3 rounded-md hover:bg-gray-700 transition text-sm"
-            onClick={closeMenu}
-          >
-            History
-          </Link>
-          <Link
-            href="/changelog"
-            className="block px-4 py-3 rounded-md hover:bg-gray-700 transition text-sm"
-            onClick={closeMenu}
-          >
-            Changelog
-          </Link>
-          <Link
-            href="/faq"
-            className="block px-4 py-3 rounded-md hover:bg-gray-700 transition text-sm"
-            onClick={closeMenu}
-          >
-            FAQ
-          </Link>
-          <span className="block px-4 py-3 rounded-md text-sm text-gray-500 cursor-not-allowed">
-            Whitepaper <span className="text-xs text-gray-600">(coming soon)</span>
-          </span>
-          <Link
-            href="/pricing"
-            className="block px-4 py-3 rounded-md hover:bg-gray-700 transition text-sm font-medium text-blue-400"
-            onClick={closeMenu}
-          >
-            Access Models
-          </Link>
-          <a
-            href="https://github.com/arf-foundation"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block px-4 py-3 rounded-md hover:bg-gray-700 transition text-sm"
-            onClick={closeMenu}
-          >
-            Spec
-          </a>
+      {mobileOpen && (
+        <div id="mobile-nav-menu" className="border-t border-[color:var(--hairline)] bg-[color:var(--surface-canvas)] md:hidden">
+          <div className="arf-shell flex flex-col gap-1 py-4">
+            {PRIMARY_LINKS.map((link) =>
+              'external' in link && link.external ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-2 py-3 text-base font-medium text-[color:var(--text-secondary)]"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-2 py-3 text-base font-medium text-[color:var(--text-secondary)]"
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
+            <div className="mt-2 flex flex-col gap-2.5">
+              <Link href="/signup" className="arf-btn-ghost justify-center">
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-5 py-3 text-sm font-semibold text-white"
+              >
+                Request Pilot Access <ArrowRight size={16} />
+              </Link>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[color:var(--hairline)] px-5 py-3 text-sm font-semibold"
+              >
+                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                {theme === 'dark' ? 'Light theme' : 'Dark theme'}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </nav>
+      )}
+    </header>
   );
 }
