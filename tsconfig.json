@@ -36,6 +36,7 @@
     "__tests__",
     "**/*.test.ts",
     "**/*.test.tsx",
-    "jest.config.cjs"
+    "jest.config.cjs",
+    "design_handoff_arf_enterprise_refresh"
   ]
 }

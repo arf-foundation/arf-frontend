@@ -13,6 +13,8 @@ const eslintConfig = defineConfig([
     "build/**",
     "coverage/**",
     "next-env.d.ts",
+    // Design handoff bundle: reference/example files, not shipped app code.
+    "design_handoff_arf_enterprise_refresh/**",
   ]),
   // Allow require in .cjs files (e.g., jest.config.cjs)
   {
