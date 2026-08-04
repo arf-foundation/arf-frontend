@@ -1,170 +1,334 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { useState } from 'react';
-import { Check, Mail } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+
+/* ============================================================================
+   /pricing — ported to the landing-page design system.
+
+   Same tokens, same three card weights, same rhythm. Two additions this page
+   needs and the landing page does not:
+     • a comparison table, because the buying question here is "what changes
+       between tiers", and the honest answer is a single line: the sandbox
+       advises, a pilot enforces.
+     • the commercial-model explainer, because hybrid pricing (deployment fee +
+       outcome or retainer) is unfamiliar and a three-column card grid answers
+       it faster than prose.
+
+   Enterprise is dominant via a 2px gradient border, not a "Recommended" badge.
+   Server component — no hooks needed here.
+
+   Open item (per design_handoff_arf_enterprise_refresh/README.md — not
+   invented here, flag before merging): the SSO row and the outcome-based
+   measurement answer below are inferred commercial claims that need
+   confirmation from the founder before this ships.
+   ========================================================================= */
+
+export const metadata: Metadata = {
+  title: 'Access models',
+  description:
+    'A fixed deployment fee, plus either outcome-based pricing or a monthly retainer. Pilot access is time-limited and free for qualified organisations.',
+};
+
+const TIERS = [
+  {
+    name: 'Sandbox',
+    meta: 'Simulation only',
+    price: 'Free',
+    note: 'No agreement required',
+    items: [
+      '1,000 evaluations / month',
+      'Mock responses — not production',
+      'Public API + Governance Console',
+      'Community support',
+    ],
+    cta: { label: 'Try the sandbox', href: '/#explore' },
+    dominant: false,
+  },
+  {
+    name: 'Pilot',
+    meta: 'Time-limited · free',
+    price: 'By review',
+    note: 'Every application read by the founder',
+    items: [
+      'Protected core access',
+      'Real enforcement, not simulation',
+      'Full technical specification',
+      'Founder-led onboarding',
+      'Outcome-based or retainer after pilot',
+    ],
+    cta: { label: 'Request pilot access', href: '/signup' },
+    dominant: false,
+  },
+  {
+    name: 'Enterprise',
+    meta: 'Commercial · custom',
+    price: 'Custom',
+    note: 'Deployment fee + outcome or retainer',
+    items: [
+      'Everything in Pilot',
+      'Custom deployment fee',
+      'SSO, multi-tenancy, SLA',
+      'Full enforcement + audit trails',
+      'Named support engineer',
+    ],
+    cta: { label: 'Talk to us', href: '/signup' },
+    dominant: true,
+  },
+] as const;
+
+const COMPARISON = [
+  { label: 'Evaluations', sandbox: '1,000 / month', pilot: 'Scoped to use case', enterprise: 'Contracted volume' },
+  { label: 'Enforcement', sandbox: 'Simulated only', pilot: 'Real, deterministic', enterprise: 'Real, deterministic' },
+  { label: 'Audit trail', sandbox: 'Sample records', pilot: 'Signed, exportable', enterprise: 'Signed + retention policy' },
+  { label: 'Governance Console', sandbox: 'Mock data', pilot: 'Your decisions', enterprise: 'Multi-tenant, RBAC' },
+  { label: 'Technical specification', sandbox: 'Public overview', pilot: 'Full, under NDA', enterprise: 'Full + integration support' },
+  { label: 'SSO', sandbox: '—', pilot: '—', enterprise: 'SAML / OIDC via WorkOS' },
+  { label: 'Support', sandbox: 'Community', pilot: 'Founder-led', enterprise: 'Named engineer + SLA' },
+  { label: 'Commercials', sandbox: 'Free', pilot: 'Free, time-limited', enterprise: 'Deployment fee + outcome or retainer' },
+] as const;
+
+const MODEL = [
+  {
+    n: '01',
+    title: 'Fixed deployment fee',
+    body: 'Integration into your infrastructure, policy authoring, and the initial control-plane configuration. One-time, scoped in writing.',
+  },
+  {
+    n: '02',
+    title: 'Outcome-based or retainer',
+    body: 'Then either a share of measured risk reduction, or a flat monthly retainer. You choose which at the end of the pilot.',
+  },
+  {
+    n: '03',
+    title: 'Pilot costs nothing',
+    body: 'Time-limited and free for qualified organisations. No commitment, no auto-conversion — the commercial conversation happens after.',
+  },
+] as const;
+
+const FAQ = [
+  {
+    q: 'Why is the pilot free?',
+    a: 'Governance only proves itself against real decisions. A time-limited pilot lets your risk owners see enforcement and audit evidence on your own traffic before any commercial conversation.',
+  },
+  {
+    q: 'What does outcome-based pricing measure?',
+    a: 'Measured risk reduction against a baseline agreed at the start of the pilot — blocked high-risk actions, resolved exceptions, audit findings closed. If the measurement is contested, you take the retainer instead.',
+  },
+  {
+    q: 'Can we run ARF in our own environment?',
+    a: 'Yes. Enterprise deployments run inside your perimeter. The control plane never needs to send decision payloads outside your infrastructure.',
+  },
+  {
+    q: 'What happens when the pilot ends?',
+    a: 'Nothing automatic. There is no auto-conversion and no billing surprise — the pilot simply stops enforcing unless you sign an Enterprise agreement.',
+  },
+  {
+    q: 'Is the sandbox safe to point at production data?',
+    a: 'No. The sandbox returns simulated responses and should be treated as a demonstration surface. Use synthetic or redacted payloads.',
+  },
+  {
+    q: 'How do you handle SSO and provisioning?',
+    a: 'Enterprise plans use SAML or OIDC through WorkOS, with directory sync for provisioning. Sandbox and pilot use a single founder-issued credential.',
+  },
+] as const;
 
 export default function PricingPage() {
-  const [copiedEmail, setCopiedEmail] = useState(false);
-
-  const handleCopyEmail = async () => {
-    await navigator.clipboard.writeText('juan@arf-ai.com');
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2000);
-  };
-
   return (
-    <div className="min-h-screen text-white">
-      <div className="container mx-auto px-4 py-8 sm:py-16">
-        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-700 p-6 sm:p-8 max-w-5xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Access Models
-            </h1>
-            <p className="text-base sm:text-xl text-gray-300 max-w-2xl mx-auto px-2">
-              ARF AI uses a hybrid pricing model – fixed deployment, plus outcome‑based or retainer. Pilot access is free for qualified organizations.
-            </p>
-          </div>
+    <div className="arf-page-root">
+      {/* ─── Page header ─────────────────────────────────────────────────── */}
+      <section className="arf-hero-wash">
+        <div className="arf-shell pb-[72px] pt-[88px] text-center">
+          <p className="arf-eyebrow mb-5">Access models</p>
+          <h1 className="mx-auto mb-[22px] max-w-[19ch] text-[clamp(2.25rem,4.4vw,3.125rem)] font-bold leading-[1.05] tracking-[-0.031em] text-pretty">
+            Priced against <span className="arf-gradient-text">governed outcomes</span>
+          </h1>
+          <p className="mx-auto max-w-[62ch] text-lg leading-[1.6] text-[color:var(--text-secondary)] text-pretty">
+            A fixed deployment fee, plus either outcome-based pricing or a monthly retainer. Pilot access is
+            time-limited and free for qualified organisations — no commitment required.
+          </p>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
-            {/* Sandbox – simulation only */}
-            <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5 sm:p-6 flex flex-col">
-              <h2 className="text-xl sm:text-2xl font-bold mb-2">Sandbox</h2>
-              <div className="text-3xl sm:text-4xl font-bold text-blue-400 mb-2">Free</div>
-              <p className="text-gray-400 text-xs sm:text-sm mb-4">Simulation only, no engine access</p>
-              <ul className="space-y-2 sm:space-y-3 flex-1">
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>1,000 evaluations/month</span>
-                </li>
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Sanitized API endpoint</span>
-                </li>
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Governance Console (demo data)</span>
-                </li>
-                <li className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
-                  <span className="w-4" />✗ No statistical engine
-                </li>
-                <li className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
-                  <span className="w-4" />✗ No audit logs
-                </li>
-              </ul>
-              <div className="mt-6 sm:mt-8">
-                <Link
-                  href="/dashboard"
-                  className="w-full block text-center border border-gray-600 text-gray-300 py-2 rounded-lg hover:border-blue-500 hover:text-white transition text-sm sm:text-base"
-                >
-                  Open Sandbox →
-                </Link>
-              </div>
-            </div>
-
-            {/* Pilot */}
-            <div className="bg-gray-800 rounded-2xl border-2 border-blue-500 shadow-lg shadow-blue-500/20 p-5 sm:p-6 flex flex-col relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
-                Recommended
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold mb-2">Pilot</h2>
-              <div className="text-3xl sm:text-4xl font-bold text-purple-400 mb-2">Time‑limited</div>
-              <p className="text-gray-400 text-xs sm:text-sm mb-4">Free trial for qualified organisations</p>
-              <ul className="space-y-2 sm:space-y-3 flex-1">
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Full engine access</span>
-                </li>
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Audit logs & support</span>
-                </li>
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Up to 10,000 evaluations/month</span>
-                </li>
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Founder‑led onboarding</span>
-                </li>
-              </ul>
-              <p className="text-xs text-gray-400 mt-4 border-t border-gray-700 pt-3">
-                Subject to mutual qualification agreement. No credit card required.
-              </p>
-              <div className="mt-6 sm:mt-8">
-                <Link
-                  href="/signup"
-                  className="w-full block text-center bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition text-sm sm:text-base"
-                >
-                  Request Pilot Access →
-                </Link>
-              </div>
-            </div>
-
-            {/* Enterprise */}
-            <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5 sm:p-6 flex flex-col">
-              <h2 className="text-xl sm:text-2xl font-bold mb-2">Enterprise</h2>
-              <div className="text-3xl sm:text-4xl font-bold text-gray-400 mb-2">Custom</div>
-              <p className="text-gray-400 text-xs sm:text-sm mb-4">Pricing tailored to deployment scope</p>
-              <ul className="space-y-2 sm:space-y-3 flex-1">
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Unlimited evaluations</span>
-                </li>
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>SSO, multi‑tenancy, SLA</span>
-                </li>
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Custom deployment options</span>
-                </li>
-                <li className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Check size={16} className="text-green-400 flex-shrink-0" />
-                  <span>Outcome‑based or retainer pricing</span>
-                </li>
-              </ul>
-              <p className="text-xs text-gray-400 mt-4 border-t border-gray-700 pt-3">
-                We align pricing with verified risk reduction – you pay for measurable operational improvements.
-              </p>
-              <div className="mt-6 sm:mt-8">
-                <button
-                  onClick={handleCopyEmail}
-                  className="w-full flex items-center justify-center gap-2 border border-gray-600 text-gray-300 py-2 rounded-lg hover:border-blue-500 hover:text-white transition text-sm sm:text-base"
-                >
-                  <Mail size={16} /> Contact us
-                </button>
-                {copiedEmail && (
-                  <p className="text-xs text-green-400 text-center mt-2">Email copied! ✉️</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-10 sm:mt-12 text-gray-400 text-xs sm:text-sm max-w-2xl mx-auto px-2">
-            <p className="mb-2">
-              <strong>Why outcome‑based pricing?</strong> We believe you should pay for value, not infrastructure.
-              ARF’s pricing is directly tied to the amount of operational risk the system removes from your AI workflows.
-            </p>
-            <p>
-              Questions?{' '}
-              <Link href="/faq" className="text-blue-400 hover:underline">
-                Read our FAQ
-              </Link>{' '}
-              or{' '}
-              <a
-                href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:underline"
+      {/* ─── Tiers ───────────────────────────────────────────────────────── */}
+      <section className="arf-shell pb-24">
+        <div className="grid items-start gap-[22px] md:grid-cols-3">
+          {TIERS.map((tier) =>
+            tier.dominant ? (
+              <div
+                key={tier.name}
+                className="rounded-2xl bg-gradient-to-br from-arf-blue to-arf-purple p-0.5 shadow-[0_30px_60px_-30px_rgba(51,88,232,0.6)]"
               >
-                join Slack
-              </a>
-              .
-            </p>
+                <div className="rounded-[14px] bg-[color:var(--surface-raised)] p-9">
+                  <TierBody {...tier} />
+                </div>
+              </div>
+            ) : (
+              <div key={tier.name} className="arf-card-light p-8">
+                <TierBody {...tier} />
+              </div>
+            ),
+          )}
+        </div>
+      </section>
+
+      {/* ─── Comparison ──────────────────────────────────────────────────── */}
+      <section className="arf-shell pb-[112px]">
+        <div className="mb-9 grid gap-16 lg:grid-cols-[0.85fr_1.15fr]">
+          <h2 className="max-w-[14ch] text-h2 font-semibold">What each model includes</h2>
+          <p className="max-w-[54ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
+            The difference that matters is enforcement: the sandbox advises, a pilot enforces. Everything else follows
+            from that line.
+          </p>
+        </div>
+
+        <div className="arf-card overflow-x-auto">
+          <table className="w-full min-w-[720px] border-collapse text-left">
+            <caption className="sr-only">Capabilities available in the Sandbox, Pilot and Enterprise access models</caption>
+            <thead>
+              <tr className="border-b border-[color:var(--hairline)] bg-[color:var(--surface-sunken)]">
+                <th scope="col" className="px-6 py-4 font-mono text-[10.5px] font-medium uppercase tracking-[0.13em] text-[color:var(--text-secondary)]">
+                  Capability
+                </th>
+                <th scope="col" className="px-5 py-4 text-sm font-semibold">Sandbox</th>
+                <th scope="col" className="px-5 py-4 text-sm font-semibold">Pilot</th>
+                <th scope="col" className="px-5 py-4 text-sm font-semibold text-arf-blue">Enterprise</th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARISON.map((row) => (
+                <tr key={row.label} className="border-b border-[color:var(--hairline)] last:border-b-0">
+                  <th scope="row" className="px-6 py-4 text-left text-[14.5px] font-medium leading-[1.4]">
+                    {row.label}
+                  </th>
+                  <td className="px-5 py-4 text-sm leading-[1.4] text-[color:var(--text-secondary)]">{row.sandbox}</td>
+                  <td className="px-5 py-4 text-sm leading-[1.4] text-[color:var(--text-secondary)]">{row.pilot}</td>
+                  <td className="px-5 py-4 text-sm leading-[1.4]">{row.enterprise}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ─── Commercial model ────────────────────────────────────────────── */}
+      <section className="arf-shell pb-[112px]">
+        <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-14">
+          <h2 className="mb-3 text-[30px] font-semibold leading-[1.14] tracking-[-0.024em]">
+            How the commercial model works
+          </h2>
+          <p className="mb-10 max-w-[66ch] text-base leading-[1.65] text-[color:var(--text-primary)]/85 text-pretty">
+            ARF is not sold per seat. Governance value scales with the volume and consequence of the decisions being
+            governed, so the model has two parts.
+          </p>
+          <div className="grid gap-[22px] md:grid-cols-3">
+            {MODEL.map((item) => (
+              <div
+                key={item.n}
+                className="rounded-2xl border border-[color:var(--hairline)] bg-[color:var(--surface-raised)] p-7"
+              >
+                <p className="mb-4 font-mono text-[11px] font-medium text-arf-blue">{item.n}</p>
+                <h3 className="mb-2.5 text-lg font-semibold tracking-[-0.016em]">{item.title}</h3>
+                <p className="text-small text-[color:var(--text-secondary)]">{item.body}</p>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* ─── FAQ ─────────────────────────────────────────────────────────── */}
+      <section className="arf-shell pb-[112px]">
+        <h2 className="mb-9 text-h2 font-semibold">Common questions</h2>
+        <div className="grid gap-x-14 gap-y-10 md:grid-cols-2">
+          {FAQ.map((item) => (
+            <div key={item.q} className="border-t border-[color:var(--hairline)] pt-[22px]">
+              <h3 className="mb-2.5 text-[17px] font-semibold leading-[1.35] tracking-[-0.014em]">{item.q}</h3>
+              <p className="text-[15px] leading-[1.65] text-[color:var(--text-secondary)] text-pretty">{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Closing CTA band ────────────────────────────────────────────── */}
+      <section className="arf-dark-wash bg-arf-dark py-[88px]">
+        <div className="arf-shell flex flex-wrap items-center justify-between gap-14">
+          <div>
+            <h2 className="mb-3 max-w-[20ch] text-h2 font-semibold text-white">
+              Start in the sandbox. Convert when the evidence is there.
+            </h2>
+            <p className="max-w-[56ch] text-base leading-[1.65] text-white/70 text-pretty">
+              Pilot applications include your organisation, use case, and expected evaluation volume. We reply within
+              two business days.
+            </p>
+          </div>
+          <div className="flex flex-shrink-0 flex-wrap gap-3">
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-2 rounded-[10px] bg-[color:var(--color-arf-canvas)] px-6 py-[15px] text-[15.5px] font-semibold text-arf-ink transition hover:bg-white"
+            >
+              Request Pilot Access <ArrowRight size={18} />
+            </Link>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 rounded-[10px] border border-white/30 px-6 py-[15px] text-[15.5px] font-semibold text-white transition hover:border-white/60"
+            >
+              Open Console
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
+  );
+}
+
+function TierBody({
+  name,
+  meta,
+  price,
+  note,
+  items,
+  cta,
+  dominant,
+}: {
+  name: string;
+  meta: string;
+  price: string;
+  note: string;
+  items: readonly string[];
+  cta: { label: string; href: string };
+  dominant: boolean;
+}) {
+  return (
+    <>
+      <p className={`mb-1.5 font-semibold tracking-[-0.018em] ${dominant ? 'text-[21px]' : 'text-[19px]'}`}>{name}</p>
+      <p className={`mb-5.5 font-mono text-[13px] ${dominant ? 'text-arf-blue' : 'text-[color:var(--text-muted)]'}`}>
+        {meta}
+      </p>
+      <p className={`mb-1.5 font-semibold leading-none tracking-[-0.027em] ${dominant ? 'text-[32px]' : 'text-[30px]'}`}>
+        {price}
+      </p>
+      <p className="mb-6 text-[13.5px] leading-[1.5] text-[color:var(--text-muted)]">{note}</p>
+      <ul className="mb-6 flex flex-col gap-2.5 border-t border-[color:var(--hairline)] pt-5.5">
+        {items.map((item) => (
+          <li key={item} className="text-[14.5px] leading-[1.5] text-[color:var(--text-secondary)]">
+            {item}
+          </li>
+        ))}
+      </ul>
+      {dominant ? (
+        <Link
+          href={cta.href}
+          className="block rounded-[9px] bg-gradient-to-br from-arf-blue to-arf-purple py-3 text-center text-[14.5px] font-semibold text-white transition hover:brightness-110"
+        >
+          {cta.label}
+        </Link>
+      ) : (
+        <Link
+          href={cta.href}
+          className="block rounded-[9px] border border-[color:var(--hairline)] py-2.5 text-center text-[14.5px] font-semibold transition hover:border-arf-blue hover:text-arf-blue"
+        >
+          {cta.label}
+        </Link>
+      )}
+    </>
   );
 }
