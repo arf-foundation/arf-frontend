@@ -245,7 +245,9 @@ main > div:first-child {
   .arf-page-root h4,
   .arf-page-root p,
   .arf-page-root span,
-  .arf-page-root li {
+  .arf-page-root li,
+  .arf-page-root th,
+  .arf-page-root td {
     color: var(--text-primary);
   }
   @media (prefers-reduced-motion: reduce) {
