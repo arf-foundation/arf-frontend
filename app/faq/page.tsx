@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
+import Link from 'next/link';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function FAQPage() {
@@ -32,7 +33,7 @@ export default function FAQPage() {
               question="How do I get access to the real engine?"
               answer={
                 <>
-                  Submit a <a href="/signup" className="text-blue-400 hover:underline">pilot request</a> or contact us at <a href="mailto:juan@arf-ai.com" className="text-blue-400 hover:underline">juan@arf-ai.com</a>. Access is reviewed case by case for qualified use cases.
+                  Submit a <Link href="/signup" className="text-blue-400 hover:underline">pilot request</Link> or contact us at <a href="mailto:juan@arf-ai.com" className="text-blue-400 hover:underline">juan@arf-ai.com</a>. Access is reviewed case by case for qualified use cases.
                 </>
               }
             />
@@ -116,7 +117,7 @@ export default function FAQPage() {
         </section>
 
         <p className="text-gray-400 text-xs sm:text-sm border-t border-gray-700 pt-4 mt-8">
-          For more help, <a href="/signup" className="text-blue-400 hover:underline">request pilot access</a> or contact us directly.
+          For more help, <Link href="/signup" className="text-blue-400 hover:underline">request pilot access</Link> or contact us directly.
         </p>
       </div>
     </div>
@@ -126,16 +127,19 @@ export default function FAQPage() {
 // Collapsible FAQ item component (responsive)
 function FAQItem({ question, answer }: { question: string; answer: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const panelId = useId();
   return (
     <div className="border-b border-gray-700 pb-4">
       <button
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-controls={panelId}
         className="w-full flex justify-between items-center text-left text-base sm:text-lg font-medium text-gray-100 hover:text-blue-400 transition py-1"
       >
         {question}
         {open ? <ChevronUp size={20} className="shrink-0" /> : <ChevronDown size={20} className="shrink-0" />}
       </button>
-      {open && <div className="mt-2 text-gray-300 space-y-2 text-sm sm:text-base">{answer}</div>}
+      {open && <div id={panelId} className="mt-2 text-gray-300 space-y-2 text-sm sm:text-base">{answer}</div>}
     </div>
   );
 }

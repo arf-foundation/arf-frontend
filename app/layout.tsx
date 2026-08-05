@@ -159,7 +159,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        {/* No favicon.svg source exists -- was a broken reference (removed
+            rather than left pointing at nothing); the PNG and .ico below
+            cover every real browser target already. */}
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />

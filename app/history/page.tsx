@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   LineChart,
   Line,
@@ -83,7 +84,7 @@ export default function HistoryPage() {
           <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 text-center">
             <p className="text-blue-200 text-sm">
               📊 This is a <strong>simulated demo</strong> using mock data. The real ARF engine requires pilot access.
-              <a href="/signup" className="ml-2 underline font-semibold hover:text-blue-100">Request pilot access →</a>
+              <Link href="/signup" className="ml-2 underline font-semibold hover:text-blue-100">Request pilot access →</Link>
             </p>
           </div>
 
@@ -194,12 +195,12 @@ export default function HistoryPage() {
           <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-2xl p-6 border border-gray-700 text-center">
             <h2 className="text-xl font-semibold mb-2">Get real‑time risk history</h2>
             <p className="text-gray-300 mb-4">Access detailed historical risk trends and audit trails.</p>
-            <a
+            <Link
               href="/signup"
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium transition"
             >
               Request Pilot Access <TrendingUp size={16} />
-            </a>
+            </Link>
           </div>
         </div>
       </div>
