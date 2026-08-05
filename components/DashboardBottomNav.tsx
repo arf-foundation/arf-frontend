@@ -15,8 +15,8 @@ export default function DashboardBottomNav({ activeTab, onTabChange }: Props) {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-sm border-t border-gray-800 shadow-lg md:hidden">
-      <div role="tablist" aria-label="Dashboard sections" className="flex justify-around items-center py-2">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-[color:var(--hairline)] bg-[color:var(--surface-raised)]/95 shadow-lg backdrop-blur-sm md:hidden">
+      <div role="tablist" aria-label="Dashboard sections" className="flex items-center justify-around py-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -29,8 +29,8 @@ export default function DashboardBottomNav({ activeTab, onTabChange }: Props) {
               aria-controls={`tabpanel-${tab.id}`}
               aria-label={tab.label}
               onClick={() => onTabChange(tab.id)}
-              className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-colors ${
-                isActive ? 'text-blue-400' : 'text-gray-400 hover:text-gray-200'
+              className={`flex flex-col items-center gap-1 rounded-lg px-4 py-2 transition-colors ${
+                isActive ? 'text-arf-blue' : 'text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]'
               }`}
             >
               <Icon size={22} />

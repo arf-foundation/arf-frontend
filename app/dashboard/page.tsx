@@ -5,6 +5,23 @@ import Link from 'next/link';
 import { ArrowRight, RefreshCw, Info, Network, Shield, Lock, FileText, AlertTriangle, Clock, Printer } from 'lucide-react';
 import DashboardBottomNav from '../../components/DashboardBottomNav';
 
+/* ============================================================================
+   Design-migration pass (P3, enterprise-refresh audit). Structure and mock
+   data are unchanged -- this re-skins the page onto the token system
+   app/page.tsx and app/pricing/page.tsx already use: arf-page-root,
+   .arf-card-substantial in place of the single repeated bg-gray-800/90
+   backdrop-blur rounded-2xl border pattern (13 instances before this),
+   the gradient-tint panel pattern for the two CTA bands, and CSS custom
+   properties (--surface-*, --text-*, --hairline) everywhere a color was
+   previously a flat gray-N shade, so the page now actually respects the
+   site's light/dark toggle instead of always being dark.
+
+   Kept deliberately theme-invariant: the APPROVE/DENY/ESCALATE and
+   severity badges. These are semantic status color, not the brand accent,
+   and stay as dark chips regardless of page theme -- the same choice
+   .arf-card-anchored already makes elsewhere in this design system.
+   ========================================================================= */
+
 // ----------------------------------------------------------------------
 // Type definitions (unchanged)
 // ----------------------------------------------------------------------
@@ -123,23 +140,25 @@ const mockMemoryStats = {
 };
 
 // ----------------------------------------------------------------------
-// Reusable Components (unchanged except minor tweaks)
+// Reusable components
 // ----------------------------------------------------------------------
 const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
   const radius = size * 0.35;
   const strokeWidth = size * 0.1;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - risk);
+  // Status color is semantic (good/warn/critical), intentionally not the
+  // brand accent -- kept as literal hex, same as before.
   const getColor = () => {
-    if (risk < 0.4) return '#22c55e';
-    if (risk < 0.7) return '#eab308';
-    return '#ef4444';
+    if (risk < 0.4) return '#3f7a5c';
+    if (risk < 0.7) return '#a66a1e';
+    return '#b3392a';
   };
 
   return (
     <div className="relative inline-flex items-center justify-center">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#374151" strokeWidth={strokeWidth} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" style={{ stroke: 'var(--hairline)' }} strokeWidth={strokeWidth} />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -153,7 +172,7 @@ const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
           style={{ transition: 'stroke-dashoffset 0.5s ease' }}
         />
-        <text x={size / 2} y={size / 2 + size * 0.08} textAnchor="middle" fill="#fff" fontSize={size * 0.12} fontWeight="bold">
+        <text x={size / 2} y={size / 2 + size * 0.08} textAnchor="middle" style={{ fill: 'var(--text-primary)' }} fontSize={size * 0.12} fontWeight="bold">
           {(risk * 100).toFixed(0)}%
         </text>
       </svg>
@@ -162,51 +181,51 @@ const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
 };
 
 const RiskFactorBreakdown = ({ breakdown, weights }: { breakdown: RiskBreakdown; weights: RiskWeights }) => (
-  <div className="border-t border-gray-700 pt-4">
-    <div className="text-gray-400 text-sm mb-2 flex items-center gap-1">
+  <div className="border-t border-[color:var(--hairline)] pt-4">
+    <div className="mb-2 flex items-center gap-1 text-sm text-[color:var(--text-muted)]">
       Risk Factor Breakdown
-      <span title="Weighted contributions from each Bayesian component"><Info size={14} className="text-gray-500 cursor-help" /></span>
+      <span title="Weighted contributions from each Bayesian component"><Info size={14} className="cursor-help text-[color:var(--text-muted)]" /></span>
     </div>
     <div className="space-y-2">
       <div className="flex justify-between text-sm"><span>Conjugate prior</span><span className="font-mono">{(breakdown.conjugate * 100).toFixed(1)}% (weight {weights.conjugate.toFixed(2)})</span></div>
-      <div className="w-full bg-gray-700 rounded-full h-1.5"><div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${weights.conjugate * 100}%` }} /></div>
+      <div className="h-1.5 w-full rounded-full bg-[color:var(--surface-sunken)]"><div className="h-1.5 rounded-full bg-arf-blue" style={{ width: `${weights.conjugate * 100}%` }} /></div>
       <div className="flex justify-between text-sm"><span>HMC prediction</span><span className="font-mono">{(breakdown.hmc * 100).toFixed(1)}% (weight {weights.hmc.toFixed(2)})</span></div>
-      <div className="w-full bg-gray-700 rounded-full h-1.5"><div className="bg-purple-500 h-1.5 rounded-full" style={{ width: `${weights.hmc * 100}%` }} /></div>
+      <div className="h-1.5 w-full rounded-full bg-[color:var(--surface-sunken)]"><div className="h-1.5 rounded-full bg-arf-purple" style={{ width: `${weights.hmc * 100}%` }} /></div>
       <div className="flex justify-between text-sm"><span>Hyperprior shrinkage</span><span className="font-mono">{(breakdown.hyperprior * 100).toFixed(1)}% (weight {weights.hyperprior.toFixed(2)})</span></div>
-      <div className="w-full bg-gray-700 rounded-full h-1.5"><div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${weights.hyperprior * 100}%` }} /></div>
+      <div className="h-1.5 w-full rounded-full bg-[color:var(--surface-sunken)]"><div className="h-1.5 rounded-full bg-[#3f7a5c]" style={{ width: `${weights.hyperprior * 100}%` }} /></div>
     </div>
   </div>
 );
 
 const StatusBadge = ({ status }: { status: string }) => {
-  const color = status === 'critical' ? 'bg-red-600' : status === 'warning' ? 'bg-yellow-500' : 'bg-green-500';
-  return <span className={`inline-block px-3 py-1 rounded-full text-white font-medium text-sm ${color}`}>{status.toUpperCase()}</span>;
+  const color = status === 'critical' ? 'bg-[#b3392a]' : status === 'warning' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]';
+  return <span className={`inline-block rounded-full px-3 py-1 text-sm font-medium text-white ${color}`}>{status.toUpperCase()}</span>;
 };
 
 const TrustBadges = () => (
-  <div className="flex flex-wrap justify-center gap-4 my-6">
-    <div className="bg-gray-800 px-3 py-1 rounded-full text-xs flex items-center gap-1"><Shield className="w-3 h-3 text-green-400" /> SOC2 Type II (Audit ready)</div>
-    <div className="bg-gray-800 px-3 py-1 rounded-full text-xs flex items-center gap-1"><Shield className="w-3 h-3 text-blue-400" /> ISO 27001 (Compliant)</div>
-    <div className="bg-gray-800 px-3 py-1 rounded-full text-xs flex items-center gap-1"><Shield className="w-3 h-3 text-purple-400" /> GDPR Ready</div>
+  <div className="my-6 flex flex-wrap justify-center gap-3">
+    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs"><Shield className="h-3.5 w-3.5 text-arf-blue" /> SOC2 Type II (Audit ready)</div>
+    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs"><Shield className="h-3.5 w-3.5 text-arf-blue" /> ISO 27001 (Compliant)</div>
+    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs"><Shield className="h-3.5 w-3.5 text-arf-purple" /> GDPR Ready</div>
   </div>
 );
 
 const Testimonial = () => (
-  <div className="bg-gray-800/50 rounded-xl p-5 italic text-gray-300 border-l-4 border-blue-400 my-6">
+  <div className="my-6 rounded-xl border-l-4 border-arf-blue bg-[color:var(--surface-sunken)] p-5 font-serif italic text-[color:var(--text-secondary)]">
     “ARF caught a misconfiguration that would have exposed customer data. The audit trail saved us hours of investigation.”<br/>
-    <span className="text-white font-medium mt-2 block">— CISO, Fortune 500 (pilot customer)</span>
+    <span className="mt-2 block font-sans font-medium not-italic text-[color:var(--text-primary)]">— CISO, Fortune 500 (pilot customer)</span>
   </div>
 );
 
 const LegalFooter = () => (
-  <div className="border-t border-gray-800 mt-8 pt-6 text-center text-xs text-gray-500 flex flex-wrap justify-center gap-4">
-    <Link href="/terms" className="hover:text-gray-300">Terms of Service</Link>
-    <Link href="/privacy" className="hover:text-gray-300">Privacy Policy</Link>
+  <div className="mt-8 flex flex-wrap justify-center gap-4 border-t border-[color:var(--hairline)] pt-6 text-center text-xs text-[color:var(--text-muted)]">
+    <Link href="/terms" className="hover:text-[color:var(--text-primary)]">Terms of Service</Link>
+    <Link href="/privacy" className="hover:text-[color:var(--text-primary)]">Privacy Policy</Link>
     {/* Imprint link removed: pointed at /legal/imprint, which doesn't exist
         anywhere in this app. Not repointing it at /terms or /privacy --
         an Impressum covers different legal content (company registration,
         address) that isn't safe to fabricate or imply from either page. */}
-    <a href="mailto:juan@arf-ai.com" className="hover:text-gray-300">Contact</a>
+    <a href="mailto:juan@arf-ai.com" className="hover:text-[color:var(--text-primary)]">Contact</a>
   </div>
 );
 
@@ -260,27 +279,27 @@ export default function Dashboard() {
 
   if (!riskData) {
     return (
-      <div className="min-h-screen text-white flex items-center justify-center p-4">
-        <div className="text-xl animate-pulse">Loading simulation...</div>
+      <div className="arf-page-root flex min-h-screen items-center justify-center p-4">
+        <div className="animate-pulse text-xl">Loading simulation...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen text-white">
-      <div className="container mx-auto px-4 py-6 sm:py-8 pb-20">
-        <div className="max-w-7xl mx-auto space-y-6">
-          {/* HTTP Warning (unchanged) */}
+    <div className="arf-page-root min-h-screen">
+      <div className="arf-shell py-8 pb-24 sm:py-10 md:pb-10">
+        <div className="space-y-6">
+          {/* HTTP Warning (unchanged logic) */}
           {isHttpWarning && (
-            <div className="bg-red-900/50 border border-red-700 rounded-lg p-3 text-center backdrop-blur-sm">
-              <p className="text-red-200 text-sm">⚠️ Security warning: You are viewing this page over HTTP. Sensitive data (simulated) could be intercepted. <a href={window.location.href.replace('http:', 'https:')} className="ml-2 underline font-semibold hover:text-red-100">Switch to HTTPS</a></p>
+            <div className="rounded-lg border border-[#b3392a]/30 bg-[#b3392a]/10 p-3 text-center">
+              <p className="text-sm text-[#b3392a]">⚠️ Security warning: You are viewing this page over HTTP. Sensitive data (simulated) could be intercepted. <a href={window.location.href.replace('http:', 'https:')} className="ml-2 font-semibold underline hover:opacity-80">Switch to HTTPS</a></p>
             </div>
           )}
 
           {/* Sandbox Disclaimer */}
-          <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 text-center flex flex-wrap justify-between items-center gap-2 backdrop-blur-sm">
-            <p className="text-blue-200 text-sm flex-1">🔍 Public sandbox – all data is simulated. Production governance requires a pilot agreement.</p>
-            <Link href="/signup" className="text-blue-400 hover:text-blue-300 text-sm font-medium underline whitespace-nowrap">Request pilot access →</Link>
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-arf-blue/25 bg-arf-blue/10 p-3 text-center">
+            <p className="flex-1 text-sm text-[color:var(--text-secondary)]">🔍 Public sandbox – all data is simulated. Production governance requires a pilot agreement.</p>
+            <Link href="/signup" className="whitespace-nowrap text-sm font-medium text-arf-blue underline hover:opacity-80">Request pilot access →</Link>
           </div>
 
           {/* Page heading + tab switcher. Previously the only heading was an
@@ -291,7 +310,7 @@ export default function Dashboard() {
               Compliance at all on desktop. This adds both a real, always-
               visible tablist and a persistent page heading. */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h1 className="text-2xl font-bold">Governance Console</h1>
+            <h1 className="text-h2 font-semibold">Governance Console</h1>
             <div role="tablist" aria-label="Dashboard sections" className="hidden gap-2 md:flex">
               {TABS.map((tab) => (
                 <button
@@ -302,7 +321,9 @@ export default function Dashboard() {
                   aria-controls={`tabpanel-${tab.id}`}
                   onClick={() => setActiveTab(tab.id)}
                   className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                    activeTab === tab.id ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    activeTab === tab.id
+                      ? 'bg-gradient-to-br from-arf-blue to-arf-purple text-white'
+                      : 'bg-[color:var(--surface-sunken)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]'
                   }`}
                 >
                   {tab.label}
@@ -314,70 +335,70 @@ export default function Dashboard() {
           {/* Risk Tab Content */}
           {activeTab === 'risk' && (
             <div className="space-y-6" role="tabpanel" id="tabpanel-risk" aria-labelledby="tab-risk">
-              <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                  <h2 className="text-2xl font-bold">System Risk</h2>
-                  <button onClick={refreshData} disabled={isRefreshing} aria-label="Refresh data" className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"><RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} /></button>
+              <div className="arf-card-substantial p-6">
+                <div className="mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                  <h2 className="text-h3 font-semibold">System Risk</h2>
+                  <button onClick={refreshData} disabled={isRefreshing} aria-label="Refresh data" className="rounded-lg border border-[color:var(--hairline)] p-2 transition hover:border-arf-blue disabled:opacity-50"><RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} /></button>
                 </div>
-                <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
+                <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
                   <div className="flex-shrink-0"><RiskGauge risk={riskData.risk} size={180} /></div>
                   <div className="flex-1 space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                      <div><div className="text-gray-400 text-sm">Risk Score</div><div className="text-3xl font-bold text-white">{(riskData.risk * 100).toFixed(0)}%</div></div>
-                      <div><div className="text-gray-400 text-sm">Status</div><StatusBadge status={riskData.status} /></div>
-                      <div><div className="text-gray-400 text-sm">Posterior Variance</div><div className="font-mono text-lg">{riskData.variance.toFixed(4)}</div></div>
-                      <div><div className="text-gray-400 text-sm">Confidence Interval (90%)</div><div className="font-mono text-sm">[{Math.max(0, riskData.risk - 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}, {Math.min(1, riskData.risk + 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}]</div></div>
+                      <div><div className="text-sm text-[color:var(--text-muted)]">Risk Score</div><div className="text-3xl font-bold">{(riskData.risk * 100).toFixed(0)}%</div></div>
+                      <div><div className="text-sm text-[color:var(--text-muted)]">Status</div><StatusBadge status={riskData.status} /></div>
+                      <div><div className="text-sm text-[color:var(--text-muted)]">Posterior Variance</div><div className="font-mono text-lg">{riskData.variance.toFixed(4)}</div></div>
+                      <div><div className="text-sm text-[color:var(--text-muted)]">Confidence Interval (90%)</div><div className="font-mono text-sm">[{Math.max(0, riskData.risk - 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}, {Math.min(1, riskData.risk + 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}]</div></div>
                     </div>
                     <RiskFactorBreakdown breakdown={riskData.breakdown} weights={riskData.weights} />
                   </div>
                 </div>
-                {lastUpdated && <p className="text-xs text-gray-400 text-center mt-4">Last updated: {lastUpdated.toLocaleTimeString()}</p>}
+                {lastUpdated && <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">Last updated: {lastUpdated.toLocaleTimeString()}</p>}
               </div>
 
               <TrustBadges />
 
               {quota && (
-                <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                  <div className="flex justify-between items-start mb-4"><h2 className="text-xl font-semibold">Plan (Sandbox)</h2><span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-medium">{quota.tier.toUpperCase()}</span></div>
-                  <div className="mb-4"><div className="flex justify-between text-sm mb-1"><span className="text-gray-300">Remaining evaluations this month</span><span className="font-mono font-medium text-white">{quota.remaining.toLocaleString()}</span></div><div className="w-full bg-gray-700 rounded-full h-2"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${(quota.remaining / quota.limit) * 100}%` }} /></div><p className="text-xs text-gray-400 mt-2">Limit: {quota.limit.toLocaleString()} evaluations/month (simulated)</p></div>
-                  <Link href="/pricing" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium">View access models → <ArrowRight size={14} /></Link>
+                <div className="arf-card-substantial p-6">
+                  <div className="mb-4 flex items-start justify-between"><h2 className="text-h3 font-semibold">Plan (Sandbox)</h2><span className="rounded-full bg-gradient-to-br from-arf-blue to-arf-purple px-3 py-1 text-xs font-medium text-white">{quota.tier.toUpperCase()}</span></div>
+                  <div className="mb-4"><div className="mb-1 flex justify-between text-sm"><span className="text-[color:var(--text-secondary)]">Remaining evaluations this month</span><span className="font-mono font-medium">{quota.remaining.toLocaleString()}</span></div><div className="h-2 w-full rounded-full bg-[color:var(--surface-sunken)]"><div className="h-2 rounded-full bg-arf-blue" style={{ width: `${(quota.remaining / quota.limit) * 100}%` }} /></div><p className="mt-2 text-xs text-[color:var(--text-muted)]">Limit: {quota.limit.toLocaleString()} evaluations/month (simulated)</p></div>
+                  <Link href="/pricing" className="inline-flex items-center gap-2 text-sm font-medium text-arf-blue hover:opacity-80">View access models → <ArrowRight size={14} /></Link>
                 </div>
               )}
 
-              <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Network className="w-5 h-5 text-green-400" /> Semantic Memory (Sandbox)</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                  <div><div className="text-2xl font-bold text-blue-400">{mockMemoryStats.similar_incidents}</div><div className="text-xs text-gray-400">Similar Incidents</div></div>
-                  <div><div className="text-2xl font-bold text-purple-400">{mockMemoryStats.rag_similarity.toFixed(2)}</div><div className="text-xs text-gray-400">RAG Similarity</div></div>
-                  <div><div className="text-2xl font-bold text-yellow-400">{mockMemoryStats.cache_hits}</div><div className="text-xs text-gray-400">Cache Hits</div></div>
-                  <div><div className="text-xs font-mono text-gray-300 break-words">{mockMemoryStats.memory_usage}</div><div className="text-xs text-gray-400">Index Type</div></div>
+              <div className="arf-card-substantial p-6">
+                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><Network className="h-5 w-5 text-arf-blue" /> Semantic Memory (Sandbox)</h2>
+                <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-4">
+                  <div><div className="text-2xl font-bold text-arf-blue">{mockMemoryStats.similar_incidents}</div><div className="text-xs text-[color:var(--text-muted)]">Similar Incidents</div></div>
+                  <div><div className="text-2xl font-bold text-arf-purple">{mockMemoryStats.rag_similarity.toFixed(2)}</div><div className="text-xs text-[color:var(--text-muted)]">RAG Similarity</div></div>
+                  <div><div className="text-2xl font-bold text-[#a66a1e]">{mockMemoryStats.cache_hits}</div><div className="text-xs text-[color:var(--text-muted)]">Cache Hits</div></div>
+                  <div><div className="break-words font-mono text-xs text-[color:var(--text-secondary)]">{mockMemoryStats.memory_usage}</div><div className="text-xs text-[color:var(--text-muted)]">Index Type</div></div>
                 </div>
               </div>
 
-              <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4">Recent Incidents (Sandbox)</h2>
-                <div className="hidden sm:block overflow-x-auto">
+              <div className="arf-card-substantial p-6">
+                <h2 className="mb-4 text-h3 font-semibold">Recent Incidents (Sandbox)</h2>
+                <div className="hidden overflow-x-auto sm:block">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-gray-700">
-                        <th className="text-left py-2 px-2">Time</th>
-                        <th className="text-left py-2 px-2">Service</th>
-                        <th className="text-left py-2 px-2">Metric</th>
-                        <th className="text-right py-2 px-2">Value</th>
-                        <th className="text-right py-2 px-2">Risk</th>
-                        <th className="text-right py-2 px-2">Action</th>
+                      <tr className="border-b border-[color:var(--hairline)]">
+                        <th className="px-2 py-2 text-left">Time</th>
+                        <th className="px-2 py-2 text-left">Service</th>
+                        <th className="px-2 py-2 text-left">Metric</th>
+                        <th className="px-2 py-2 text-right">Value</th>
+                        <th className="px-2 py-2 text-right">Risk</th>
+                        <th className="px-2 py-2 text-right">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {MOCK_INCIDENTS.map((inc) => (
-                        <tr key={inc.id} className="border-b border-gray-700/50">
-                          <td className="py-2 px-2 text-gray-300">{inc.timestamp}</td>
-                          <td className="py-2 px-2 text-gray-300">{inc.service}</td>
-                          <td className="py-2 px-2 text-gray-300">{inc.metric}</td>
-                          <td className="py-2 px-2 text-right font-mono text-gray-300">{inc.value}</td>
-                          <td className="py-2 px-2 text-right font-mono text-yellow-400">{inc.risk.toFixed(2)}</td>
-                          <td className="py-2 px-2 text-right">
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${inc.action === 'ESCALATE' ? 'bg-red-900 text-red-200' : inc.action === 'DENY' ? 'bg-orange-900 text-orange-200' : 'bg-green-900 text-green-200'}`}>
+                        <tr key={inc.id} className="border-b border-[color:var(--hairline)]">
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">{inc.timestamp}</td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">{inc.service}</td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">{inc.metric}</td>
+                          <td className="px-2 py-2 text-right font-mono text-[color:var(--text-secondary)]">{inc.value}</td>
+                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">{inc.risk.toFixed(2)}</td>
+                          <td className="px-2 py-2 text-right">
+                            <span className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === 'ESCALATE' ? 'bg-[#b3392a]' : inc.action === 'DENY' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]'}`}>
                               {inc.action}
                             </span>
                           </td>
@@ -393,24 +414,24 @@ export default function Dashboard() {
                     scrolls; same row data, same values. */}
                 <div className="flex flex-col gap-2.5 sm:hidden">
                   {MOCK_INCIDENTS.map((inc) => (
-                    <div key={inc.id} className="rounded-lg bg-gray-700/30 p-3">
+                    <div key={inc.id} className="rounded-lg bg-[color:var(--surface-sunken)] p-3">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm text-gray-200">{inc.service}</p>
-                          <p className="text-xs text-gray-400">{inc.timestamp}</p>
+                          <p className="text-sm">{inc.service}</p>
+                          <p className="text-xs text-[color:var(--text-muted)]">{inc.timestamp}</p>
                         </div>
-                        <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${inc.action === 'ESCALATE' ? 'bg-red-900 text-red-200' : inc.action === 'DENY' ? 'bg-orange-900 text-orange-200' : 'bg-green-900 text-green-200'}`}>
+                        <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === 'ESCALATE' ? 'bg-[#b3392a]' : inc.action === 'DENY' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]'}`}>
                           {inc.action}
                         </span>
                       </div>
-                      <div className="mt-2 flex items-center justify-between text-xs text-gray-400">
-                        <span>{inc.metric}: <span className="font-mono text-gray-300">{inc.value}</span></span>
-                        <span>Risk: <span className="font-mono text-yellow-400">{inc.risk.toFixed(2)}</span></span>
+                      <div className="mt-2 flex items-center justify-between text-xs text-[color:var(--text-muted)]">
+                        <span>{inc.metric}: <span className="font-mono text-[color:var(--text-secondary)]">{inc.value}</span></span>
+                        <span>Risk: <span className="font-mono text-[#a66a1e]">{inc.risk.toFixed(2)}</span></span>
                       </div>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-4 text-center">Simulated data for demonstration purposes only.</p>
+                <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">Simulated data for demonstration purposes only.</p>
               </div>
 
               <Testimonial />
@@ -420,56 +441,56 @@ export default function Dashboard() {
           {/* Governance Tab Content */}
           {activeTab === 'governance' && (
             <div className="space-y-6" role="tabpanel" id="tabpanel-governance" aria-labelledby="tab-governance">
-              <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-orange-400" /> Policy Violations (Last 7 days)</h2>
+              <div className="arf-card-substantial p-6">
+                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><AlertTriangle className="h-5 w-5 text-[#a66a1e]" /> Policy Violations (Last 7 days)</h2>
                 <div className="space-y-3">
                   {MOCK_POLICY_VIOLATIONS.map((v) => (
-                    <div key={v.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 bg-gray-700/30 rounded-lg">
-                      <div><span className="font-mono text-sm">{v.policy}</span><span className="text-xs text-gray-400 ml-2">on {v.component}</span></div>
-                      <div className="flex items-center gap-3 mt-1 sm:mt-0">
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${v.severity === 'high' ? 'bg-red-900 text-red-200' : v.severity === 'medium' ? 'bg-yellow-900 text-yellow-200' : 'bg-blue-900 text-blue-200'}`}>{v.severity.toUpperCase()}</span>
-                        <span className="text-xs text-gray-400">{v.timestamp}</span>
+                    <div key={v.id} className="flex flex-col gap-1 rounded-lg bg-[color:var(--surface-sunken)] p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+                      <div><span className="font-mono text-sm">{v.policy}</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">on {v.component}</span></div>
+                      <div className="flex items-center gap-3">
+                        <span className={`rounded-full px-2 py-0.5 text-xs text-white ${v.severity === 'high' ? 'bg-[#b3392a]' : v.severity === 'medium' ? 'bg-[#a66a1e]' : 'bg-arf-blue'}`}>{v.severity.toUpperCase()}</span>
+                        <span className="text-xs text-[color:var(--text-muted)]">{v.timestamp}</span>
                       </div>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-4 text-center">Simulated data – real engine provides live policy enforcement.</p>
+                <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">Simulated data – real engine provides live policy enforcement.</p>
               </div>
 
-              <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-blue-400" /> Audit Trail (Recent decisions)</h2>
+              <div className="arf-card-substantial p-6">
+                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><FileText className="h-5 w-5 text-arf-blue" /> Audit Trail (Recent decisions)</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-gray-700"><th className="text-left py-2 px-2">Timestamp</th><th className="text-left py-2 px-2">Component</th><th className="text-left py-2 px-2">Action</th><th className="text-right py-2 px-2">Risk</th><th className="text-right py-2 px-2">Decision</th><th className="text-left py-2 px-2">User</th></tr></thead>
+                    <thead><tr className="border-b border-[color:var(--hairline)]"><th className="px-2 py-2 text-left">Timestamp</th><th className="px-2 py-2 text-left">Component</th><th className="px-2 py-2 text-left">Action</th><th className="px-2 py-2 text-right">Risk</th><th className="px-2 py-2 text-right">Decision</th><th className="px-2 py-2 text-left">User</th></tr></thead>
                     <tbody>
                       {MOCK_AUDIT_LOGS.map((log) => (
-                        <tr key={log.id} className="border-b border-gray-700/50">
-                          <td className="py-2 px-2 text-gray-300 whitespace-nowrap">{log.timestamp}</td>
-                          <td className="py-2 px-2 text-gray-300">{log.component}</td>
-                          <td className="py-2 px-2 text-gray-300">{log.action}</td>
-                          <td className="py-2 px-2 text-right font-mono text-yellow-400">{log.riskScore.toFixed(2)}</td>
-                          <td className="py-2 px-2 text-right"><span className={`px-2 py-0.5 rounded-full text-xs ${log.decision === 'ESCALATE' ? 'bg-red-900 text-red-200' : log.decision === 'DENY' ? 'bg-orange-900 text-orange-200' : 'bg-green-900 text-green-200'}`}>{log.decision}</span></td>
-                          <td className="py-2 px-2 text-gray-400">{log.user}</td>
+                        <tr key={log.id} className="border-b border-[color:var(--hairline)]">
+                          <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">{log.timestamp}</td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.component}</td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.action}</td>
+                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">{log.riskScore.toFixed(2)}</td>
+                          <td className="px-2 py-2 text-right"><span className={`rounded-full px-2 py-0.5 text-xs text-white ${log.decision === 'ESCALATE' ? 'bg-[#b3392a]' : log.decision === 'DENY' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]'}`}>{log.decision}</span></td>
+                          <td className="px-2 py-2 text-[color:var(--text-muted)]">{log.user}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                <p className="text-xs text-gray-500 mt-4 text-center">Audit logs are immutable and cryptographically signed in production.</p>
+                <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">Audit logs are immutable and cryptographically signed in production.</p>
               </div>
 
-              <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Clock className="w-5 h-5 text-yellow-400" /> Cooldown & Rate Limits (Sandbox)</h2>
+              <div className="arf-card-substantial p-6">
+                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><Clock className="h-5 w-5 text-[#a66a1e]" /> Cooldown & Rate Limits (Sandbox)</h2>
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-gray-700/30 rounded-lg"><div><span className="font-mono text-sm">payment-api</span><span className="text-xs text-gray-400 ml-2">(policy: latency_gt_100)</span></div><span className="text-xs bg-yellow-900 text-yellow-200 px-2 py-0.5 rounded-full">Cooldown: 45s remaining</span></div>
-                  <div className="flex justify-between items-center p-3 bg-gray-700/30 rounded-lg"><div><span className="font-mono text-sm">database</span><span className="text-xs text-gray-400 ml-2">(policy: cpu_high)</span></div><span className="text-xs bg-orange-900 text-orange-200 px-2 py-0.5 rounded-full">Rate limit: 2/5 per hour</span></div>
+                  <div className="flex items-center justify-between rounded-lg bg-[color:var(--surface-sunken)] p-3"><div><span className="font-mono text-sm">payment-api</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">(policy: latency_gt_100)</span></div><span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">Cooldown: 45s remaining</span></div>
+                  <div className="flex items-center justify-between rounded-lg bg-[color:var(--surface-sunken)] p-3"><div><span className="font-mono text-sm">database</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">(policy: cpu_high)</span></div><span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">Rate limit: 2/5 per hour</span></div>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-2xl p-6 border border-gray-700 text-center backdrop-blur-sm">
-                <h2 className="text-xl font-semibold mb-2">Take full control of governance</h2>
-                <p className="text-gray-300 mb-4">Policy enforcement, audit trails, and compliance reporting are available in the real engine.</p>
-                <Link href="/signup" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium transition">Request Pilot Access <ArrowRight size={16} /></Link>
+              <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-6 text-center">
+                <h2 className="mb-2 text-h3 font-semibold">Take full control of governance</h2>
+                <p className="mb-4 text-[color:var(--text-secondary)]">Policy enforcement, audit trails, and compliance reporting are available in the real engine.</p>
+                <Link href="/signup" className="arf-btn-primary">Request Pilot Access <ArrowRight size={16} /></Link>
               </div>
             </div>
           )}
@@ -477,19 +498,19 @@ export default function Dashboard() {
           {/* Compliance Tab Content */}
           {activeTab === 'compliance' && (
             <div className="space-y-6" role="tabpanel" id="tabpanel-compliance" aria-labelledby="tab-compliance">
-              <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Shield className="w-5 h-5 text-green-400" /> Compliance & Certifications</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div className="text-center p-3 bg-gray-700/30 rounded-lg"><div className="text-2xl font-bold text-green-400">✓</div><div className="text-sm">SOC2 Type II</div><div className="text-xs text-gray-400">Audit ready</div></div>
-                  <div className="text-center p-3 bg-gray-700/30 rounded-lg"><div className="text-2xl font-bold text-blue-400">✓</div><div className="text-sm">ISO 27001</div><div className="text-xs text-gray-400">Compliant</div></div>
-                  <div className="text-center p-3 bg-gray-700/30 rounded-lg"><div className="text-2xl font-bold text-purple-400">✓</div><div className="text-sm">GDPR</div><div className="text-xs text-gray-400">Ready</div></div>
+              <div className="arf-card-substantial p-6">
+                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><Shield className="h-5 w-5 text-[#3f7a5c]" /> Compliance & Certifications</h2>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center"><div className="text-2xl font-bold text-[#3f7a5c]">✓</div><div className="text-sm">SOC2 Type II</div><div className="text-xs text-[color:var(--text-muted)]">Audit ready</div></div>
+                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center"><div className="text-2xl font-bold text-arf-blue">✓</div><div className="text-sm">ISO 27001</div><div className="text-xs text-[color:var(--text-muted)]">Compliant</div></div>
+                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center"><div className="text-2xl font-bold text-arf-purple">✓</div><div className="text-sm">GDPR</div><div className="text-xs text-[color:var(--text-muted)]">Ready</div></div>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">The real engine provides evidence packages for auditors.</p>
+                <p className="mt-4 text-xs text-[color:var(--text-muted)]">The real engine provides evidence packages for auditors.</p>
               </div>
 
-              <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Lock className="w-5 h-5 text-blue-400" /> Data Retention & Privacy</h2>
-                <ul className="list-disc list-inside text-sm text-gray-300 space-y-2">
+              <div className="arf-card-substantial p-6">
+                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><Lock className="h-5 w-5 text-arf-blue" /> Data Retention & Privacy</h2>
+                <ul className="list-inside list-disc space-y-2 text-sm text-[color:var(--text-secondary)]">
                   <li>Sandbox logs retained for 30 days</li>
                   <li>Pilot/Enterprise logs retained up to 12 months</li>
                   <li>No raw customer data stored – only anonymised risk metrics</li>
@@ -498,17 +519,17 @@ export default function Dashboard() {
                 </ul>
               </div>
 
-              <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700 text-center">
-                <h2 className="text-xl font-semibold mb-2">Export Compliance Report</h2>
-                <p className="text-gray-300 mb-4">Generate a summary report of governance decisions, policy violations, and system status for auditors.</p>
-                <button onClick={() => window.print()} className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg font-medium transition"><Printer size={16} /> Print / Save as PDF (simulated)</button>
-                <p className="text-xs text-gray-500 mt-3">Simulated action – real engine provides automated compliance report generation.</p>
+              <div className="arf-card-substantial p-6 text-center">
+                <h2 className="mb-2 text-h3 font-semibold">Export Compliance Report</h2>
+                <p className="mb-4 text-[color:var(--text-secondary)]">Generate a summary report of governance decisions, policy violations, and system status for auditors.</p>
+                <button onClick={() => window.print()} className="arf-btn-secondary"><Printer size={16} /> Print / Save as PDF (simulated)</button>
+                <p className="mt-3 text-xs text-[color:var(--text-muted)]">Simulated action – real engine provides automated compliance report generation.</p>
               </div>
 
-              <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-2xl p-6 border border-gray-700 text-center backdrop-blur-sm">
-                <h2 className="text-xl font-semibold mb-2">Get audit‑ready with ARF</h2>
-                <p className="text-gray-300 mb-4">Immutable logs, deterministic enforcement, and compliance evidence packages.</p>
-                <Link href="/signup" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium transition">Request Pilot Access <ArrowRight size={16} /></Link>
+              <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-6 text-center">
+                <h2 className="mb-2 text-h3 font-semibold">Get audit‑ready with ARF</h2>
+                <p className="mb-4 text-[color:var(--text-secondary)]">Immutable logs, deterministic enforcement, and compliance evidence packages.</p>
+                <Link href="/signup" className="arf-btn-primary">Request Pilot Access <ArrowRight size={16} /></Link>
               </div>
             </div>
           )}
