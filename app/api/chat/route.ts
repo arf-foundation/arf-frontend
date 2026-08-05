@@ -54,6 +54,27 @@ function isRateLimited(key: string): boolean {
   return recent.length > RATE_LIMIT_MAX_REQUESTS;
 }
 
+/* prompt.txt says "Return only the JSON object. No markdown." but smaller/
+   faster models (Haiku included) frequently wrap structured output in
+   ```json fences anyway despite an explicit instruction not to -- confirmed
+   against the live connector: the first real request came back fenced and
+   failed a bare JSON.parse. Strip fences, then fall back to slicing the
+   outermost {...} span before giving up, rather than failing every request
+   with correctly-shaped-but-wrapped output. */
+function extractJson(text: string): unknown {
+  const trimmed = text.trim();
+  const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
+  const candidate = fenced ? fenced[1] : trimmed;
+  try {
+    return JSON.parse(candidate);
+  } catch {
+    const start = candidate.indexOf('{');
+    const end = candidate.lastIndexOf('}');
+    if (start === -1 || end === -1 || end <= start) throw new Error('No JSON object found');
+    return JSON.parse(candidate.slice(start, end + 1));
+  }
+}
+
 export async function POST(req: Request) {
   const clientKey = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
   if (isRateLimited(clientKey)) {
@@ -87,7 +108,7 @@ export async function POST(req: Request) {
 
     let parsed: unknown;
     try {
-      parsed = JSON.parse(textBlock.text);
+      parsed = extractJson(textBlock.text);
     } catch {
       console.error('ARF agent: model output was not valid JSON', {
         promptVersion: PROMPT_VERSION,
