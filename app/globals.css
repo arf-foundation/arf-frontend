@@ -4,6 +4,18 @@
    complete no-ops: every heading/list/paragraph on both legal pages
    rendered with zero typographic hierarchy. */
 @plugin "@tailwindcss/typography";
+/* Tailwind v4's `dark:` variant defaults to @media (prefers-color-scheme),
+   not this site's actual dark-mode mechanism (a `.dark` class NavBar's
+   toggle adds/removes on <html>, independent of OS preference). Without
+   this, any `dark:`-prefixed utility anywhere in the app would silently
+   follow OS preference instead of the site's own toggle -- confirmed this
+   was already live and wrong on the landing page's trusted-by placeholder
+   stripes (dark:bg-[...]), and would have repeated on every dark:prose-invert
+   this migration needs. Root-cause fix once, here, instead of working
+   around it per class site-wide. Doesn't touch the separate CSS-custom-
+   property token system (--surface-canvas etc.) below, which was already
+   correctly scoped to the `.dark` class directly. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #0a0c10;
