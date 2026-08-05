@@ -136,7 +136,12 @@ main > div:first-child {
   --color-arf-ink: #191816;
   --color-arf-ink-2: #3f3d38;
   --color-arf-ink-3: #56534d;   /* 7.3:1 on canvas — small mono labels */
-  --color-arf-muted: #6b6862;   /* 4.6:1 on canvas — eyebrows, secondary */
+  --color-arf-muted: #605c54;   /* ~6.3:1 on canvas — eyebrows, secondary; darkened from the
+                                    original #6b6862 (~5.3:1 computed, closest-to-floor token
+                                    in the ramp, sitting directly beside headings site-wide as
+                                    eyebrow labels) after a reported light-mode contrast issue
+                                    with no visual tooling available to pinpoint the exact
+                                    element -- this was the most likely single-token fix. */
   --color-arf-line: rgba(25, 24, 22, 0.09);
   --color-arf-dark: #131218;
 

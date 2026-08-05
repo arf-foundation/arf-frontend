@@ -495,7 +495,7 @@ export default function LandingPage() {
       <section id="architecture" className="arf-shell pb-[120px]">
         <p className="arf-eyebrow mb-3.5">Architecture</p>
         <h2 className="mb-11 text-h2 font-semibold">How ARF works</h2>
-        <div className="arf-card p-11">
+        <div className="arf-card p-5 sm:p-8 lg:p-11">
           <ol className="flex flex-col gap-3 lg:flex-row lg:items-stretch">
             {[...DECISION_PATH].map((step) => (
               <li
@@ -512,11 +512,15 @@ export default function LandingPage() {
               <p className="mb-3.5 font-mono text-[10.5px] font-medium uppercase tracking-[0.13em] text-white/80">
                 ARF control plane
               </p>
-              <div className="flex flex-1 gap-2.5">
+              {/* flex-col below sm: 3 unwrapped flex-1 columns had ~80px each
+                  on a 375px viewport once shell + card padding were
+                  subtracted, cutting off "Risk Engine" -- stack instead of
+                  cramming until there's room to go side-by-side. */}
+              <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:gap-2.5">
                 {CONTROL_PLANE.map((node) => (
                   <div
                     key={node.label}
-                    className="flex flex-1 items-center rounded-[10px] border border-white/25 bg-white/15 px-3 py-4"
+                    className="flex flex-1 items-center rounded-[10px] border border-white/25 bg-white/15 px-3 py-3 sm:py-4"
                   >
                     <span className="text-[13.5px] font-semibold tracking-[-0.01em] text-white">{node.label}</span>
                   </div>
