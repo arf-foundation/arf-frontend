@@ -228,6 +228,26 @@ main > div:first-child {
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
   }
+  /* Belt-and-suspenders: headings/paragraphs in the redesigned pages were
+     reported as low-contrast in light mode despite inheriting color from
+     .arf-page-root, which traces correctly through every layer/selector
+     check done against the actual compiled CSS (no competing rule targets
+     these elements, no layer-order issue found). Rather than keep guessing
+     at a mechanism that isn't reproducible without a browser, apply color
+     directly to these elements instead of relying on inheritance at all --
+     eliminates the failure mode regardless of its actual cause. Elements
+     with their own explicit color utility (text-white on dark bands, etc.)
+     are unaffected: utilities is a higher-priority layer than components.
+     */
+  .arf-page-root h1,
+  .arf-page-root h2,
+  .arf-page-root h3,
+  .arf-page-root h4,
+  .arf-page-root p,
+  .arf-page-root span,
+  .arf-page-root li {
+    color: var(--text-primary);
+  }
   @media (prefers-reduced-motion: reduce) {
     .arf-page-root { scroll-behavior: auto; }
   }
