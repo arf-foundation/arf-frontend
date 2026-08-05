@@ -3,6 +3,7 @@ import { Instrument_Sans, JetBrains_Mono, Newsreader } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import ServiceWorkerRegister from '../components/ServiceWorkerRegister';
 import NavBar from '../components/NavBar';
+import ChatWidget from '../components/ChatWidget';
 import './globals.css';
 
 /* ----------------------------------------------------------------------------
@@ -174,6 +175,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <NavBar />
         <main id="main">{children}</main>
+        <ChatWidget />
         <Analytics />
         <ServiceWorkerRegister />
       </body>
