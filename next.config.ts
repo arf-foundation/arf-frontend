@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/v1/:path*',
-        destination: 'https://A-R-F-ARF-Sandbox-API.hf.space/v1/:path*',
+        destination: 'https://a-r-f-arf-sandbox-api.hf.space/v1/:path*',
       },
     ];
   },

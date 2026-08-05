@@ -349,6 +349,30 @@ export default function Dashboard() {
                     </tbody>
                   </table>
                 </div>
+                {/* The table above is hidden below sm with no prior fallback --
+                    was invisible on every phone. Stacked cards instead of just
+                    letting the table scroll, since 6 columns of dense numeric
+                    data doesn't reflow to a narrow screen as readably as it
+                    scrolls; same row data, same values. */}
+                <div className="flex flex-col gap-2.5 sm:hidden">
+                  {MOCK_INCIDENTS.map((inc) => (
+                    <div key={inc.id} className="rounded-lg bg-gray-700/30 p-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm text-gray-200">{inc.service}</p>
+                          <p className="text-xs text-gray-400">{inc.timestamp}</p>
+                        </div>
+                        <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${inc.action === 'ESCALATE' ? 'bg-red-900 text-red-200' : inc.action === 'DENY' ? 'bg-orange-900 text-orange-200' : 'bg-green-900 text-green-200'}`}>
+                          {inc.action}
+                        </span>
+                      </div>
+                      <div className="mt-2 flex items-center justify-between text-xs text-gray-400">
+                        <span>{inc.metric}: <span className="font-mono text-gray-300">{inc.value}</span></span>
+                        <span>Risk: <span className="font-mono text-yellow-400">{inc.risk.toFixed(2)}</span></span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
                 <p className="text-xs text-gray-500 mt-4 text-center">Simulated data for demonstration purposes only.</p>
               </div>
 

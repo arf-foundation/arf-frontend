@@ -277,7 +277,14 @@ export default function LandingPage() {
     setSandboxLoading(true);
     setSandboxError(null);
     try {
-      const res = await fetch('https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate', {
+      // Relative path through next.config.ts's rewrite (/api/v1/:path* ->
+      // the sandbox API), not the absolute URL: the CSP's connect-src does
+      // not allowlist the sandbox's own domain, so a direct browser fetch
+      // to it is silently blocked. app/dashboard/EvaluateForm.tsx already
+      // does it this way. The displayed CURL_COMMAND above keeps the real
+      // external URL -- that's accurate for someone running curl from their
+      // own machine, unaffected by this page's CSP.
+      const res = await fetch('/api/v1/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
