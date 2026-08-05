@@ -55,7 +55,10 @@ const DIAGRAM = `flowchart LR
     F --> G[Execution]
     G --> H[Audit Trail]`;
 
-const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
+// arf-ai-... not a-r-f-...: the HF org renamed A-R-F -> ARF-AI and the old
+// domain 404s directly (verified against HF's api/spaces endpoint), even
+// though HF still lists it as a "READY" mapping.
+const CURL_COMMAND = `curl -X POST https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 

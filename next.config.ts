@@ -31,7 +31,12 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/v1/:path*',
-        destination: 'https://a-r-f-arf-sandbox-api.hf.space/v1/:path*',
+        // The old a-r-f-... domain 404s (verified directly): the HF org
+        // renamed A-R-F -> ARF-AI. HF's own space API still lists the old
+        // domain as a "READY" mapping, but hitting it directly returns HF's
+        // generic 404 page, not the space -- only the new canonical host
+        // actually works. Confirmed against HF's api/spaces endpoint.
+        destination: 'https://arf-ai-arf-sandbox-api.hf.space/v1/:path*',
       },
     ];
   },
