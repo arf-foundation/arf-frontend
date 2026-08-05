@@ -202,7 +202,10 @@ const LegalFooter = () => (
   <div className="border-t border-gray-800 mt-8 pt-6 text-center text-xs text-gray-500 flex flex-wrap justify-center gap-4">
     <Link href="/terms" className="hover:text-gray-300">Terms of Service</Link>
     <Link href="/privacy" className="hover:text-gray-300">Privacy Policy</Link>
-    <Link href="/legal/imprint" className="hover:text-gray-300">Imprint</Link>
+    {/* Imprint link removed: pointed at /legal/imprint, which doesn't exist
+        anywhere in this app. Not repointing it at /terms or /privacy --
+        an Impressum covers different legal content (company registration,
+        address) that isn't safe to fabricate or imply from either page. */}
     <a href="mailto:juan@arf-ai.com" className="hover:text-gray-300">Contact</a>
   </div>
 );
@@ -211,6 +214,12 @@ const LegalFooter = () => (
 // Main Dashboard Component
 // ----------------------------------------------------------------------
 type TabType = 'risk' | 'governance' | 'compliance';
+
+const TABS: { id: TabType; label: string }[] = [
+  { id: 'risk', label: 'Risk Intelligence' },
+  { id: 'governance', label: 'Governance Operations' },
+  { id: 'compliance', label: 'Compliance' },
+];
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('risk');
@@ -274,12 +283,40 @@ export default function Dashboard() {
             <Link href="/signup" className="text-blue-400 hover:text-blue-300 text-sm font-medium underline whitespace-nowrap">Request pilot access →</Link>
           </div>
 
+          {/* Page heading + tab switcher. Previously the only heading was an
+              <h1> inside the Risk tab's own card, so Governance and
+              Compliance had no <h1> anywhere on the page. Also: the only
+              control that ever called setActiveTab was DashboardBottomNav,
+              which is md:hidden -- there was no way to reach Governance or
+              Compliance at all on desktop. This adds both a real, always-
+              visible tablist and a persistent page heading. */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <h1 className="text-2xl font-bold">Governance Console</h1>
+            <div role="tablist" aria-label="Dashboard sections" className="hidden gap-2 md:flex">
+              {TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  id={`tab-${tab.id}`}
+                  aria-selected={activeTab === tab.id}
+                  aria-controls={`tabpanel-${tab.id}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                    activeTab === tab.id ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Risk Tab Content */}
           {activeTab === 'risk' && (
-            <div className="space-y-6">
+            <div className="space-y-6" role="tabpanel" id="tabpanel-risk" aria-labelledby="tab-risk">
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                  <h1 className="text-2xl font-bold">System Risk</h1>
+                  <h2 className="text-2xl font-bold">System Risk</h2>
                   <button onClick={refreshData} disabled={isRefreshing} aria-label="Refresh data" className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"><RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} /></button>
                 </div>
                 <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
@@ -382,7 +419,7 @@ export default function Dashboard() {
 
           {/* Governance Tab Content */}
           {activeTab === 'governance' && (
-            <div className="space-y-6">
+            <div className="space-y-6" role="tabpanel" id="tabpanel-governance" aria-labelledby="tab-governance">
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-orange-400" /> Policy Violations (Last 7 days)</h2>
                 <div className="space-y-3">
@@ -439,7 +476,7 @@ export default function Dashboard() {
 
           {/* Compliance Tab Content */}
           {activeTab === 'compliance' && (
-            <div className="space-y-6">
+            <div className="space-y-6" role="tabpanel" id="tabpanel-compliance" aria-labelledby="tab-compliance">
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><Shield className="w-5 h-5 text-green-400" /> Compliance & Certifications</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -464,7 +501,7 @@ export default function Dashboard() {
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-700 text-center">
                 <h2 className="text-xl font-semibold mb-2">Export Compliance Report</h2>
                 <p className="text-gray-300 mb-4">Generate a summary report of governance decisions, policy violations, and system status for auditors.</p>
-                <button className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg font-medium transition"><Printer size={16} /> Print / Save as PDF (simulated)</button>
+                <button onClick={() => window.print()} className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg font-medium transition"><Printer size={16} /> Print / Save as PDF (simulated)</button>
                 <p className="text-xs text-gray-500 mt-3">Simulated action – real engine provides automated compliance report generation.</p>
               </div>
 

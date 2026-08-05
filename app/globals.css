@@ -1,4 +1,9 @@
 @import "tailwindcss";
+/* Registers the `prose`/`prose-invert` utilities app/privacy and app/terms
+   already use -- the plugin was never installed, so those classes were
+   complete no-ops: every heading/list/paragraph on both legal pages
+   rendered with zero typographic hierarchy. */
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #0a0c10;
