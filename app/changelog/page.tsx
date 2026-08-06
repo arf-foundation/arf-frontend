@@ -123,12 +123,12 @@ export default function ChangelogPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+      <div className="arf-page-root min-h-screen">
         <div className="container mx-auto px-4 py-20">
-          <div className="max-w-4xl mx-auto text-center">
+          <div className="mx-auto max-w-4xl text-center">
             <div className="animate-pulse space-y-6">
-              <div className="h-10 bg-gray-700 rounded w-2/3 mx-auto" />
-              <div className="h-5 bg-gray-700 rounded w-1/2 mx-auto" />
+              <div className="mx-auto h-10 w-2/3 rounded bg-[color:var(--surface-raised)]" />
+              <div className="mx-auto h-5 w-1/2 rounded bg-[color:var(--surface-raised)]" />
             </div>
           </div>
         </div>
@@ -137,48 +137,48 @@ export default function ChangelogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+    <div className="arf-page-root min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto max-w-4xl">
           {/* Hero */}
-          <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+          <div className="mb-12 text-center">
+            <h1 className="arf-gradient-text mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
               What’s New in ARF AI
             </h1>
-            <p className="text-gray-300 max-w-2xl mx-auto text-base sm:text-lg">
+            <p className="mx-auto max-w-2xl text-base text-[color:var(--text-secondary)] sm:text-lg">
               Updates to the ARF AI Governance Console, public sandbox, and the protected core engine (available to pilot customers).
             </p>
           </div>
 
           {/* Changelog entries */}
-          <div className="space-y-8 mb-16">
+          <div className="mb-16 space-y-8">
             {entries.map((entry, idx) => (
               <div
                 key={idx}
-                className={`relative bg-gray-800/70 backdrop-blur-sm rounded-xl border p-6 transition hover:shadow-xl hover:border-blue-500/50 ${
+                className={`relative rounded-xl border p-6 transition hover:border-arf-blue/50 hover:shadow-xl ${
                   entry.type === 'pilot'
-                    ? 'border-purple-800/60 bg-purple-900/10'
-                    : 'border-gray-700'
+                    ? 'border-arf-purple/40 bg-arf-purple/5'
+                    : 'border-[color:var(--hairline)] bg-[color:var(--surface-raised)]'
                 }`}
               >
                 {entry.type === 'pilot' && (
-                  <div className="absolute top-0 right-4 -translate-y-1/2">
-                    <span className="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                  <div className="absolute right-4 top-0 -translate-y-1/2">
+                    <span className="flex items-center gap-1 rounded-full bg-arf-purple px-3 py-1 text-xs font-bold text-white shadow-lg">
                       <Shield size={12} /> PILOT
                     </span>
                   </div>
                 )}
-                <div className="flex flex-wrap items-center gap-3 mb-3">
+                <div className="mb-3 flex flex-wrap items-center gap-3">
                   <span
-                    className={`text-xs font-medium px-3 py-1 rounded-full ${
+                    className={`rounded-full border px-3 py-1 text-xs font-medium ${
                       entry.type === 'public'
-                        ? 'bg-blue-900/80 text-blue-200 border border-blue-700'
-                        : 'bg-purple-900/80 text-purple-200 border border-purple-700'
+                        ? 'border-arf-blue/40 bg-arf-blue/10 text-arf-blue'
+                        : 'border-arf-purple/40 bg-arf-purple/10 text-arf-purple'
                     }`}
                   >
                     {entry.type === 'public' ? '📘 Public Console' : '✈️ Pilot Program'}
                   </span>
-                  <span className="text-gray-400 text-sm flex items-center gap-1">
+                  <span className="flex items-center gap-1 text-sm text-[color:var(--text-muted)]">
                     <Calendar size={14} />
                     {formatDate(entry.date)}
                   </span>
@@ -187,20 +187,20 @@ export default function ChangelogPage() {
                       href={entry.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-400 text-sm hover:underline flex items-center gap-1 ml-auto"
+                      className="ml-auto flex items-center gap-1 text-sm text-arf-blue hover:underline"
                     >
                       <Tag size={14} /> Release notes
                     </a>
                   )}
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">{entry.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{entry.description}</p>
+                <h3 className="mb-2 text-xl font-bold text-[color:var(--text-primary)]">{entry.title}</h3>
+                <p className="leading-relaxed text-[color:var(--text-secondary)]">{entry.description}</p>
                 {entry.type === 'pilot' && (
                   <div className="mt-4 flex items-center gap-2">
-                    <Sparkles size={16} className="text-purple-400" />
+                    <Sparkles size={16} className="text-arf-purple" />
                     <Link
                       href="/signup"
-                      className="text-sm font-medium text-purple-400 hover:text-purple-300 transition inline-flex items-center gap-1"
+                      className="inline-flex items-center gap-1 text-sm font-medium text-arf-purple transition hover:brightness-110"
                     >
                       Available to pilot customers → <ArrowRight size={14} />
                     </Link>
@@ -211,51 +211,51 @@ export default function ChangelogPage() {
           </div>
 
           {/* Newsletter – lead capture placeholder */}
-          <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-8 mb-12 text-center">
-            <Mail className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-            <h2 className="text-2xl font-bold mb-2">Stay ahead of autonomous AI governance</h2>
-            <p className="text-gray-400 max-w-md mx-auto mb-6">
+          <div className="arf-card mb-12 p-8 text-center">
+            <Mail className="mx-auto mb-3 h-8 w-8 text-arf-blue" />
+            <h2 className="mb-2 text-2xl font-bold">Stay ahead of autonomous AI governance</h2>
+            <p className="mx-auto mb-6 max-w-md text-[color:var(--text-muted)]">
               Newsletter signup is coming soon. For now, join our Slack community to get early updates and discuss ARF with the team.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col justify-center gap-3 sm:flex-row">
               <a
                 href="https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#4A154B] hover:bg-[#3e0e3f] text-white rounded-lg font-medium transition"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#4A154B] px-6 py-3 font-medium text-white transition hover:bg-[#3e0e3f]"
               >
                 <MessageSquare size={18} /> Join Slack
               </a>
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
+                className="inline-flex items-center gap-2 rounded-lg bg-arf-blue px-6 py-3 font-medium text-white transition hover:brightness-110"
               >
                 Request Pilot Access <ArrowRight size={16} />
               </Link>
             </div>
-            <p className="text-xs text-gray-500 mt-4">No spam. Unsubscribe anytime once the newsletter launches.</p>
+            <p className="mt-4 text-xs text-[color:var(--text-muted)]">No spam. Unsubscribe anytime once the newsletter launches.</p>
           </div>
 
           {/* Sandbox API section */}
-          <div className="bg-gray-800/70 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Rocket size={18} className="text-green-400" />
+          <div className="arf-card p-6">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+              <Rocket size={18} className="text-green-500" />
               Try the Sandbox API
             </h2>
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 bg-gray-900 p-4 rounded-lg">
-                <pre className="text-sm font-mono text-green-300 flex-1 overflow-x-auto whitespace-pre-wrap break-all">{CURL_COMMAND}</pre>
+              <div className="flex items-center gap-2 rounded-lg bg-[color:var(--surface-sunken)] p-4">
+                <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm text-green-500">{CURL_COMMAND}</pre>
                 <button
                   onClick={() => copyCode(CURL_COMMAND)}
-                  className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition shrink-0"
+                  className="shrink-0 rounded-lg border border-[color:var(--hairline)] p-2 transition hover:border-[color:var(--color-arf-blue)]"
                   aria-label="Copy curl command"
                 >
-                  {copiedCode ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-300" />}
+                  {copiedCode ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 text-[color:var(--text-secondary)]" />}
                 </button>
               </div>
-              <p className="text-sm text-amber-300/80">
+              <p className="text-sm text-amber-500">
                 ⚠️ This is a simulated evaluation endpoint. It does <strong>not</strong> use the protected core engine. For pilot access,{' '}
-                <Link href="/signup" className="underline text-amber-200 hover:text-amber-100">request here</Link>.
+                <Link href="/signup" className="underline hover:brightness-110">request here</Link>.
               </p>
             </div>
           </div>

@@ -163,21 +163,21 @@ export default function SignupPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-6 sm:p-8 text-center">
-          <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Check className="w-8 h-8 text-green-400" />
+      <div className="arf-page-root flex min-h-screen items-center justify-center p-4">
+        <div className="arf-card w-full max-w-md p-6 text-center sm:p-8">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
+            <Check className="h-8 w-8 text-green-500" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Application received</h1>
-          <p className="text-gray-300 mb-4">
+          <h1 className="mb-2 text-2xl font-bold">Application received</h1>
+          <p className="mb-4 text-[color:var(--text-secondary)]">
             You’ve taken the first step to equip your team with audit‑ready AI governance. Our founder will personally review your application.
           </p>
-          <p className="text-gray-400 text-sm mb-6">
+          <p className="mb-6 text-sm text-[color:var(--text-muted)]">
             If your use case is a fit, you’ll receive a <strong>30‑minute onboarding call</strong> within 3–5 business days. No commitment — outcome‑based pricing only applies after the pilot.
           </p>
           <Link
             href="/"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition"
+            className="inline-block rounded-lg bg-arf-blue px-6 py-2 text-white transition hover:brightness-110"
           >
             Return home
           </Link>
@@ -187,47 +187,47 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white py-8 sm:py-16 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Request Pilot Access</h1>
-          <p className="text-gray-400 text-sm sm:text-base mb-4">
+    <div className="arf-page-root min-h-screen px-4 py-8 sm:py-16">
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-6 text-center sm:mb-8">
+          <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Request Pilot Access</h1>
+          <p className="mb-4 text-sm text-[color:var(--text-muted)] sm:text-base">
             Pilot programs are offered to qualified organizations where ARF is a strong fit.
             Fill out this form to start a conversation with our founder – no commitment required.
           </p>
           {/* Trust bar */}
-          <div className="inline-flex items-center gap-4 text-xs text-gray-400 bg-gray-800/50 rounded-full px-4 py-1 border border-gray-700">
+          <div className="inline-flex items-center gap-4 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-raised)]/50 px-4 py-1 text-xs text-[color:var(--text-muted)]">
             <span className="flex items-center gap-1"><Shield size={12} /> Deterministic enforcement</span>
             <span className="flex items-center gap-1"><Eye size={12} /> Full audit trail</span>
             <span className="flex items-center gap-1"><FileText size={12} /> SOC2‑ready logs</span>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5 sm:p-6 md:p-8">
+        <div className="arf-card p-5 sm:p-6 md:p-8">
           {/* Progress bar */}
           <div className="mb-6">
-            <div className="flex justify-between text-xs text-gray-400 mb-1">
+            <div className="mb-1 flex justify-between text-xs text-[color:var(--text-muted)]">
               <span>Step {step} of {totalSteps}</span>
               <span>{progressPercent}% complete</span>
             </div>
-            <div className="w-full bg-gray-700 rounded-full h-1.5">
+            <div className="h-1.5 w-full rounded-full bg-[color:var(--hairline)]">
               <div
-                className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                className="h-1.5 rounded-full bg-arf-blue transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
           </div>
 
           {/* Step indicator */}
-          <div className="flex justify-between mb-6">
+          <div className="mb-6 flex justify-between">
             {[1, 2, 3].map(i => (
               <div key={i} className="flex-1 text-center">
-                <div className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center text-sm font-bold ${
-                  step === i ? 'bg-blue-600 text-white' : step > i ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-400'
+                <div className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                  step === i ? 'bg-arf-blue text-white' : step > i ? 'bg-green-600 text-white' : 'bg-[color:var(--hairline)] text-[color:var(--text-muted)]'
                 }`}>
                   {step > i ? '✓' : i}
                 </div>
-                <div className="text-xs mt-1 text-gray-400">
+                <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                   {i === 1 ? 'About you' : i === 2 ? 'Technical details' : 'Budget & terms'}
                 </div>
               </div>
@@ -239,7 +239,7 @@ export default function SignupPage() {
             {step === 1 && (
               <>
                 <div>
-                  <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">Full name *</label>
+                  <label htmlFor="fullName" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Full name *</label>
                   <input
                     type="text"
                     id="fullName"
@@ -248,16 +248,14 @@ export default function SignupPage() {
                     value={formData.fullName}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.fullName = el; }}
-                    className={`w-full px-4 py-2 bg-gray-900 border rounded-lg focus:outline-none focus:border-blue-500 text-white ${
-                      fieldErrors.fullName ? 'border-red-500' : 'border-gray-700'
-                    }`}
+                    className={`arf-input ${fieldErrors.fullName ? 'arf-input-error' : ''}`}
                   />
                   {fieldErrors.fullName && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.fullName}</p>
+                    <p className="mt-1 text-xs text-red-500">{fieldErrors.fullName}</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">Work email *</label>
+                  <label htmlFor="email" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Work email *</label>
                   <input
                     type="email"
                     id="email"
@@ -266,17 +264,15 @@ export default function SignupPage() {
                     value={formData.email}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.email = el; }}
-                    className={`w-full px-4 py-2 bg-gray-900 border rounded-lg focus:outline-none focus:border-blue-500 text-white ${
-                      fieldErrors.email ? 'border-red-500' : 'border-gray-700'
-                    }`}
+                    className={`arf-input ${fieldErrors.email ? 'arf-input-error' : ''}`}
                   />
                   {fieldErrors.email && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.email}</p>
+                    <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>
                   )}
-                  <p className="text-gray-500 text-xs mt-1">We’ll only use this for pilot coordination – no mailing lists, no spam.</p>
+                  <p className="mt-1 text-xs text-[color:var(--text-muted)]">We’ll only use this for pilot coordination – no mailing lists, no spam.</p>
                 </div>
                 <div>
-                  <label htmlFor="company" className="block text-sm font-medium text-gray-300 mb-1">Company / Organisation *</label>
+                  <label htmlFor="company" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Company / Organisation *</label>
                   <input
                     type="text"
                     id="company"
@@ -285,16 +281,14 @@ export default function SignupPage() {
                     value={formData.company}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.company = el; }}
-                    className={`w-full px-4 py-2 bg-gray-900 border rounded-lg focus:outline-none focus:border-blue-500 text-white ${
-                      fieldErrors.company ? 'border-red-500' : 'border-gray-700'
-                    }`}
+                    className={`arf-input ${fieldErrors.company ? 'arf-input-error' : ''}`}
                   />
                   {fieldErrors.company && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.company}</p>
+                    <p className="mt-1 text-xs text-red-500">{fieldErrors.company}</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="industry" className="block text-sm font-medium text-gray-300 mb-1">Industry *</label>
+                  <label htmlFor="industry" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Industry *</label>
                   <select
                     id="industry"
                     name="industry"
@@ -302,9 +296,7 @@ export default function SignupPage() {
                     value={formData.industry}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.industry = el; }}
-                    className={`w-full px-4 py-2 bg-gray-900 border rounded-lg focus:outline-none focus:border-blue-500 text-white ${
-                      fieldErrors.industry ? 'border-red-500' : 'border-gray-700'
-                    }`}
+                    className={`arf-input ${fieldErrors.industry ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select industry</option>
                     <option value="Fintech / Banking">Fintech / Banking</option>
@@ -317,11 +309,11 @@ export default function SignupPage() {
                     <option value="Other">Other</option>
                   </select>
                   {fieldErrors.industry && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.industry}</p>
+                    <p className="mt-1 text-xs text-red-500">{fieldErrors.industry}</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="jobRole" className="block text-sm font-medium text-gray-300 mb-1">Job role / title *</label>
+                  <label htmlFor="jobRole" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Job role / title *</label>
                   <select
                     id="jobRole"
                     name="jobRole"
@@ -329,9 +321,7 @@ export default function SignupPage() {
                     value={formData.jobRole}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.jobRole = el; }}
-                    className={`w-full px-4 py-2 bg-gray-900 border rounded-lg focus:outline-none focus:border-blue-500 text-white ${
-                      fieldErrors.jobRole ? 'border-red-500' : 'border-gray-700'
-                    }`}
+                    className={`arf-input ${fieldErrors.jobRole ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select role</option>
                     <option value="CTO / VP Engineering">CTO / VP Engineering</option>
@@ -344,7 +334,7 @@ export default function SignupPage() {
                     <option value="Other">Other</option>
                   </select>
                   {fieldErrors.jobRole && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.jobRole}</p>
+                    <p className="mt-1 text-xs text-red-500">{fieldErrors.jobRole}</p>
                   )}
                 </div>
               </>
@@ -354,7 +344,7 @@ export default function SignupPage() {
             {step === 2 && (
               <>
                 <div>
-                  <label htmlFor="useCase" className="block text-sm font-medium text-gray-300 mb-1">Use case description *</label>
+                  <label htmlFor="useCase" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Use case description *</label>
                   <textarea
                     id="useCase"
                     name="useCase"
@@ -364,16 +354,14 @@ export default function SignupPage() {
                     onChange={handleChange}
                     ref={el => { inputRefs.current.useCase = el; }}
                     placeholder="What AI systems would you govern with ARF? What risks do you need to mitigate?"
-                    className={`w-full px-4 py-2 bg-gray-900 border rounded-lg focus:outline-none focus:border-blue-500 text-white ${
-                      fieldErrors.useCase ? 'border-red-500' : 'border-gray-700'
-                    }`}
+                    className={`arf-input ${fieldErrors.useCase ? 'arf-input-error' : ''}`}
                   />
                   {fieldErrors.useCase && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.useCase}</p>
+                    <p className="mt-1 text-xs text-red-500">{fieldErrors.useCase}</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="expectedVolume" className="block text-sm font-medium text-gray-300 mb-1">Expected monthly evaluations *</label>
+                  <label htmlFor="expectedVolume" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Expected monthly evaluations *</label>
                   <select
                     id="expectedVolume"
                     name="expectedVolume"
@@ -381,9 +369,7 @@ export default function SignupPage() {
                     value={formData.expectedVolume}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.expectedVolume = el; }}
-                    className={`w-full px-4 py-2 bg-gray-900 border rounded-lg focus:outline-none focus:border-blue-500 text-white ${
-                      fieldErrors.expectedVolume ? 'border-red-500' : 'border-gray-700'
-                    }`}
+                    className={`arf-input ${fieldErrors.expectedVolume ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select volume</option>
                     <option value="< 1,000">&lt; 1,000</option>
@@ -392,11 +378,11 @@ export default function SignupPage() {
                     <option value="> 100,000">&gt; 100,000</option>
                   </select>
                   {fieldErrors.expectedVolume && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.expectedVolume}</p>
+                    <p className="mt-1 text-xs text-red-500">{fieldErrors.expectedVolume}</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="cloudEnvironment" className="block text-sm font-medium text-gray-300 mb-1">Cloud environment *</label>
+                  <label htmlFor="cloudEnvironment" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Cloud environment *</label>
                   <select
                     id="cloudEnvironment"
                     name="cloudEnvironment"
@@ -404,9 +390,7 @@ export default function SignupPage() {
                     value={formData.cloudEnvironment}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.cloudEnvironment = el; }}
-                    className={`w-full px-4 py-2 bg-gray-900 border rounded-lg focus:outline-none focus:border-blue-500 text-white ${
-                      fieldErrors.cloudEnvironment ? 'border-red-500' : 'border-gray-700'
-                    }`}
+                    className={`arf-input ${fieldErrors.cloudEnvironment ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select cloud</option>
                     <option value="AWS">AWS</option>
@@ -416,11 +400,11 @@ export default function SignupPage() {
                     <option value="Multi‑cloud">Multi‑cloud</option>
                   </select>
                   {fieldErrors.cloudEnvironment && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.cloudEnvironment}</p>
+                    <p className="mt-1 text-xs text-red-500">{fieldErrors.cloudEnvironment}</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="aiMaturity" className="block text-sm font-medium text-gray-300 mb-1">Current AI maturity *</label>
+                  <label htmlFor="aiMaturity" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Current AI maturity *</label>
                   <select
                     id="aiMaturity"
                     name="aiMaturity"
@@ -428,9 +412,7 @@ export default function SignupPage() {
                     value={formData.aiMaturity}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.aiMaturity = el; }}
-                    className={`w-full px-4 py-2 bg-gray-900 border rounded-lg focus:outline-none focus:border-blue-500 text-white ${
-                      fieldErrors.aiMaturity ? 'border-red-500' : 'border-gray-700'
-                    }`}
+                    className={`arf-input ${fieldErrors.aiMaturity ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select maturity level</option>
                     <option value="Exploring / Proof of concept">Exploring / Proof of concept</option>
@@ -439,7 +421,7 @@ export default function SignupPage() {
                     <option value="Full autonomous operations">Full autonomous operations</option>
                   </select>
                   {fieldErrors.aiMaturity && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.aiMaturity}</p>
+                    <p className="mt-1 text-xs text-red-500">{fieldErrors.aiMaturity}</p>
                   )}
                 </div>
               </>
@@ -448,12 +430,12 @@ export default function SignupPage() {
             {/* Step 3: Budget, Timeline & Terms */}
             {step === 3 && (
               <>
-                <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4 text-sm text-blue-200 mb-4">
+                <div className="mb-4 rounded-lg border border-arf-blue/30 bg-arf-blue/10 p-4 text-sm text-[color:var(--text-secondary)]">
                   <div className="flex items-start gap-2">
-                    <Shield size={18} className="mt-0.5 flex-shrink-0" />
+                    <Shield size={18} className="mt-0.5 flex-shrink-0 text-arf-blue" />
                     <div>
-                      <p className="font-semibold mb-1">Pilot slots are reviewed monthly</p>
-                      <p className="text-blue-300">
+                      <p className="mb-1 font-semibold text-[color:var(--text-primary)]">Pilot slots are reviewed monthly</p>
+                      <p>
                         Once submitted, your application will be personally reviewed by the founder.
                         If qualified, you’ll receive an email to schedule a 30‑minute onboarding call.
                         Pilot access is time‑limited and free; pricing is outcome‑based after the evaluation period.
@@ -463,25 +445,25 @@ export default function SignupPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="budgetApproved" className="block text-sm font-medium text-gray-300 mb-1">
-                    Do you have an approved budget for AI governance? <span className="text-gray-500">(optional)</span>
+                  <label htmlFor="budgetApproved" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">
+                    Do you have an approved budget for AI governance? <span className="text-[color:var(--text-muted)]">(optional)</span>
                   </label>
                   <select
                     id="budgetApproved"
                     name="budgetApproved"
                     value={formData.budgetApproved}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+                    className="arf-input"
                   >
                     <option value="">Prefer not to say</option>
                     <option value="Yes, approved">Yes, approved</option>
                     <option value="In discussion">In discussion</option>
                     <option value="Not yet">Not yet</option>
                   </select>
-                  <p className="text-gray-500 text-xs mt-1">This helps us understand your procurement timeline. No budget is required to apply.</p>
+                  <p className="mt-1 text-xs text-[color:var(--text-muted)]">This helps us understand your procurement timeline. No budget is required to apply.</p>
                 </div>
                 <div>
-                  <label htmlFor="timeline" className="block text-sm font-medium text-gray-300 mb-1">Planned deployment timeline *</label>
+                  <label htmlFor="timeline" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Planned deployment timeline *</label>
                   <select
                     id="timeline"
                     name="timeline"
@@ -489,9 +471,7 @@ export default function SignupPage() {
                     value={formData.timeline}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.timeline = el; }}
-                    className={`w-full px-4 py-2 bg-gray-900 border rounded-lg focus:outline-none focus:border-blue-500 text-white ${
-                      fieldErrors.timeline ? 'border-red-500' : 'border-gray-700'
-                    }`}
+                    className={`arf-input ${fieldErrors.timeline ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select timeline</option>
                     <option value="Immediate (< 1 month)">Immediate (&lt; 1 month)</option>
@@ -500,7 +480,7 @@ export default function SignupPage() {
                     <option value="> 6 months / exploratory">&gt; 6 months / exploratory</option>
                   </select>
                   {fieldErrors.timeline && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.timeline}</p>
+                    <p className="mt-1 text-xs text-red-500">{fieldErrors.timeline}</p>
                   )}
                 </div>
                 <div className="flex items-start gap-3">
@@ -511,34 +491,34 @@ export default function SignupPage() {
                     required
                     checked={formData.agreeToTerms}
                     onChange={handleChange}
-                    className="mt-1 w-4 h-4 bg-gray-900 border-gray-700 rounded focus:ring-blue-500"
+                    className="mt-1 h-4 w-4 rounded border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] focus:ring-arf-blue"
                   />
-                  <label htmlFor="agreeToTerms" className="text-sm text-gray-300">
-                    I understand that ARF is proprietary and access is granted at the founder’s discretion.  
+                  <label htmlFor="agreeToTerms" className="text-sm text-[color:var(--text-secondary)]">
+                    I understand that ARF is proprietary and access is granted at the founder’s discretion.
                     I agree to the{' '}
-                    <Link href="/terms" className="text-blue-400 hover:underline">Terms of Service</Link>
+                    <Link href="/terms" className="text-arf-blue hover:underline">Terms of Service</Link>
                     {' '}and{' '}
-                    <Link href="/privacy" className="text-blue-400 hover:underline">Privacy Policy</Link>.
+                    <Link href="/privacy" className="text-arf-blue hover:underline">Privacy Policy</Link>.
                   </label>
                 </div>
                 {fieldErrors.agreeToTerms && (
-                  <p className="text-red-400 text-xs mt-1">{fieldErrors.agreeToTerms}</p>
+                  <p className="mt-1 text-xs text-red-500">{fieldErrors.agreeToTerms}</p>
                 )}
-                <p className="text-xs text-gray-500 italic">
+                <p className="text-xs italic text-[color:var(--text-muted)]">
                   Every ungoverned AI decision is a liability. Turn your AI operations into an auditable asset.
                 </p>
                 <div className="flex justify-between pt-4">
                   <button
                     type="button"
                     onClick={prevStep}
-                    className="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                    className="rounded-lg border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-4 py-2 text-[color:var(--text-primary)] transition hover:border-[color:var(--color-arf-blue)]"
                   >
                     Back
                   </button>
                   <button
                     type="submit"
                     disabled={loading || !formData.agreeToTerms}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 rounded-lg bg-arf-blue px-6 py-2 font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {loading ? (
                       <>
@@ -562,7 +542,7 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={prevStep}
-                    className="mr-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                    className="mr-2 rounded-lg border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-4 py-2 text-[color:var(--text-primary)] transition hover:border-[color:var(--color-arf-blue)]"
                   >
                     Back
                   </button>
@@ -570,7 +550,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+                  className="rounded-lg bg-arf-blue px-6 py-2 text-white transition hover:brightness-110"
                 >
                   Next →
                 </button>
@@ -579,14 +559,14 @@ export default function SignupPage() {
           </form>
 
           {error && (
-            <div className="bg-red-900/50 border border-red-500 rounded-lg p-3 text-sm text-red-200 mt-6">
+            <div className="mt-6 rounded-lg border border-[#b3392a]/50 bg-[#b3392a]/10 p-3 text-sm text-[#b3392a]">
               {error}
             </div>
           )}
 
-          <p className="text-xs text-gray-500 text-center mt-6">
+          <p className="mt-6 text-center text-xs text-[color:var(--text-muted)]">
             Prefer to email? Contact us directly at{' '}
-            <a href="mailto:juan@arf-ai.com" className="text-blue-400 hover:underline">juan@arf-ai.com</a>
+            <a href="mailto:juan@arf-ai.com" className="text-arf-blue hover:underline">juan@arf-ai.com</a>
           </p>
         </div>
       </div>

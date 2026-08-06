@@ -340,6 +340,19 @@ main > div:first-child {
            hover:border-[color:var(--color-arf-blue)];
   }
 
+  .arf-input {
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    color: var(--text-primary);
+    @apply w-full rounded-lg px-4 py-2 transition outline-none;
+  }
+  .arf-input:focus {
+    border-color: var(--color-arf-blue);
+  }
+  .arf-input-error {
+    border-color: #b3392a;
+  }
+
   /* Hero wash — the ONLY page-level gradient */
   .arf-hero-wash {
     background-image:

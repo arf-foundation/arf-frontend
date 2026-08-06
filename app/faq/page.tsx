@@ -6,16 +6,16 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function FAQPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+    <div className="arf-page-root min-h-screen">
+      <div className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
+        <h1 className="arf-gradient-text mb-4 text-3xl font-bold sm:text-4xl">
           Frequently Asked Questions
         </h1>
-        <p className="text-gray-300 text-sm sm:text-base mb-8">Everything you need to know about ARF.</p>
+        <p className="mb-8 text-sm text-[color:var(--text-secondary)] sm:text-base">Everything you need to know about ARF.</p>
 
         {/* General */}
         <section className="mb-10 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">General</h2>
+          <h2 className="mb-4 border-b border-[color:var(--hairline)] pb-2 text-xl font-semibold sm:text-2xl">General</h2>
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
               question="What is ARF?"
@@ -33,7 +33,7 @@ export default function FAQPage() {
               question="How do I get access to the real engine?"
               answer={
                 <>
-                  Submit a <Link href="/signup" className="text-blue-400 hover:underline">pilot request</Link> or contact us at <a href="mailto:juan@arf-ai.com" className="text-blue-400 hover:underline">juan@arf-ai.com</a>. Access is reviewed case by case for qualified use cases.
+                  Submit a <Link href="/signup" className="text-arf-blue hover:underline">pilot request</Link> or contact us at <a href="mailto:juan@arf-ai.com" className="text-arf-blue hover:underline">juan@arf-ai.com</a>. Access is reviewed case by case for qualified use cases.
                 </>
               }
             />
@@ -42,7 +42,7 @@ export default function FAQPage() {
 
         {/* Usage */}
         <section className="mb-10 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Usage</h2>
+          <h2 className="mb-4 border-b border-[color:var(--hairline)] pb-2 text-xl font-semibold sm:text-2xl">Usage</h2>
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
               question="How do I interpret the risk score?"
@@ -61,7 +61,7 @@ export default function FAQPage() {
 
         {/* Performance & Limitations */}
         <section className="mb-10 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Performance & Limitations</h2>
+          <h2 className="mb-4 border-b border-[color:var(--hairline)] pb-2 text-xl font-semibold sm:text-2xl">Performance & Limitations</h2>
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
               question="How many requests per second can the real engine handle?"
@@ -76,7 +76,7 @@ export default function FAQPage() {
 
         {/* Engagement & Support */}
         <section className="mb-10 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Engagement & Support</h2>
+          <h2 className="mb-4 border-b border-[color:var(--hairline)] pb-2 text-xl font-semibold sm:text-2xl">Engagement & Support</h2>
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
               question="How can I engage with ARF?"
@@ -91,7 +91,7 @@ export default function FAQPage() {
               answer={
                 <>
                   There is an invite‑only Slack workspace for pilot customers and approved collaborators.{" "}
-                  <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                  <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-arf-blue hover:underline">
                     Join here
                   </a>
                   .
@@ -103,7 +103,7 @@ export default function FAQPage() {
 
         {/* Licensing */}
         <section className="mb-10 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Licensing</h2>
+          <h2 className="mb-4 border-b border-[color:var(--hairline)] pb-2 text-xl font-semibold sm:text-2xl">Licensing</h2>
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
               question="What license governs ARF materials?"
@@ -116,8 +116,8 @@ export default function FAQPage() {
           </div>
         </section>
 
-        <p className="text-gray-400 text-xs sm:text-sm border-t border-gray-700 pt-4 mt-8">
-          For more help, <Link href="/signup" className="text-blue-400 hover:underline">request pilot access</Link> or contact us directly.
+        <p className="mt-8 border-t border-[color:var(--hairline)] pt-4 text-xs text-[color:var(--text-muted)] sm:text-sm">
+          For more help, <Link href="/signup" className="text-arf-blue hover:underline">request pilot access</Link> or contact us directly.
         </p>
       </div>
     </div>
@@ -129,17 +129,17 @@ function FAQItem({ question, answer }: { question: string; answer: React.ReactNo
   const [open, setOpen] = useState(false);
   const panelId = useId();
   return (
-    <div className="border-b border-gray-700 pb-4">
+    <div className="border-b border-[color:var(--hairline)] pb-4">
       <button
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="w-full flex justify-between items-center text-left text-base sm:text-lg font-medium text-gray-100 hover:text-blue-400 transition py-1"
+        className="flex w-full items-center justify-between py-1 text-left text-base font-medium text-[color:var(--text-primary)] transition hover:text-arf-blue sm:text-lg"
       >
         {question}
         {open ? <ChevronUp size={20} className="shrink-0" /> : <ChevronDown size={20} className="shrink-0" />}
       </button>
-      {open && <div id={panelId} className="mt-2 text-gray-300 space-y-2 text-sm sm:text-base">{answer}</div>}
+      {open && <div id={panelId} className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)] sm:text-base">{answer}</div>}
     </div>
   );
 }

@@ -70,36 +70,36 @@ export default function HistoryPage() {
 
   if (loading && historyData.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex items-center justify-center p-4">
-        <div className="text-xl animate-pulse">Loading history simulation...</div>
+      <div className="arf-page-root flex min-h-screen items-center justify-center p-4">
+        <div className="animate-pulse text-xl">Loading history simulation...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+    <div className="arf-page-root min-h-screen">
       <div className="container mx-auto px-4 py-6 sm:py-8">
-        <div className="max-w-6xl mx-auto space-y-6">
+        <div className="mx-auto max-w-6xl space-y-6">
           {/* Disclaimer */}
-          <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 text-center">
-            <p className="text-blue-200 text-sm">
+          <div className="rounded-lg border border-arf-blue/30 bg-arf-blue/10 p-3 text-center">
+            <p className="text-sm text-[color:var(--text-secondary)]">
               📊 This is a <strong>simulated demo</strong> using mock data. The real ARF engine requires pilot access.
-              <Link href="/signup" className="ml-2 underline font-semibold hover:text-blue-100">Request pilot access →</Link>
+              <Link href="/signup" className="ml-2 font-semibold text-arf-blue underline hover:brightness-110">Request pilot access →</Link>
             </p>
           </div>
 
           {/* Header with refresh button */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">Risk History</h1>
-              <p className="text-gray-400 text-sm mt-1">
+              <h1 className="text-2xl font-bold sm:text-3xl">Risk History</h1>
+              <p className="mt-1 text-sm text-[color:var(--text-muted)]">
                 Simulated risk score evolution over the last 30 days
               </p>
             </div>
             <button
               onClick={refreshData}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-4 py-2 text-[color:var(--text-primary)] transition hover:border-[color:var(--color-arf-blue)] disabled:opacity-50"
             >
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
               Refresh
@@ -107,76 +107,76 @@ export default function HistoryPage() {
           </div>
 
           {/* Line chart */}
-          <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-400" /> Risk Trend (30 days)
+          <div className="arf-card p-6">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+              <TrendingUp className="h-5 w-5 text-arf-blue" /> Risk Trend (30 days)
             </h2>
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={historyData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" />
                   <XAxis
                     dataKey="timestamp"
                     tickFormatter={formatDate}
-                    stroke="#9ca3af"
+                    stroke="var(--text-muted)"
                     tick={{ fontSize: 12 }}
                   />
                   <YAxis
                     domain={[0, 1]}
                     tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
-                    stroke="#9ca3af"
+                    stroke="var(--text-muted)"
                     tick={{ fontSize: 12 }}
                   />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '0.5rem' }}
-                    labelStyle={{ color: '#fff' }}
+                    contentStyle={{ backgroundColor: 'var(--surface-raised)', border: '1px solid var(--hairline)', borderRadius: '0.5rem' }}
+                    labelStyle={{ color: 'var(--text-primary)' }}
                     formatter={(value: number) => `${(value * 100).toFixed(1)}%`}
                     labelFormatter={(label) => new Date(label).toLocaleDateString()}
                   />
                   <Line
                     type="monotone"
                     dataKey="risk_score"
-                    stroke="#3b82f6"
+                    stroke="#3358e8"
                     strokeWidth={2}
-                    dot={{ r: 3, fill: '#3b82f6' }}
+                    dot={{ r: 3, fill: '#3358e8' }}
                     activeDot={{ r: 6 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             </div>
             {lastUpdated && (
-              <p className="text-xs text-gray-400 text-center mt-4">
+              <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">
                 Last updated: {lastUpdated.toLocaleTimeString()}
               </p>
             )}
           </div>
 
           {/* Recent decisions table */}
-          <div className="bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-purple-400" /> Recent Decisions (Simulated)
+          <div className="arf-card p-6">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+              <Calendar className="h-5 w-5 text-arf-purple" /> Recent Decisions (Simulated)
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-700">
-                    <th className="text-left py-2 px-2 text-gray-400">Time</th>
-                    <th className="text-left py-2 px-2 text-gray-400">Service</th>
-                    <th className="text-right py-2 px-2 text-gray-400">Risk Score</th>
-                    <th className="text-right py-2 px-2 text-gray-400">Action</th>
+                  <tr className="border-b border-[color:var(--hairline)]">
+                    <th className="px-2 py-2 text-left text-[color:var(--text-muted)]">Time</th>
+                    <th className="px-2 py-2 text-left text-[color:var(--text-muted)]">Service</th>
+                    <th className="px-2 py-2 text-right text-[color:var(--text-muted)]">Risk Score</th>
+                    <th className="px-2 py-2 text-right text-[color:var(--text-muted)]">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {mockDecisions.map((decision) => (
-                    <tr key={decision.id} className="border-b border-gray-700/50 hover:bg-gray-700/30 transition">
-                      <td className="py-2 px-2 text-gray-300 whitespace-nowrap">{decision.timestamp}</td>
-                      <td className="py-2 px-2 text-gray-300">{decision.service}</td>
-                      <td className="py-2 px-2 text-right font-mono text-yellow-400">{(decision.risk * 100).toFixed(0)}%</td>
-                      <td className="py-2 px-2 text-right">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          decision.action === 'ESCALATE' ? 'bg-red-900 text-red-200' :
-                          decision.action === 'DENY' ? 'bg-orange-900 text-orange-200' :
-                          'bg-green-900 text-green-200'
+                    <tr key={decision.id} className="border-b border-[color:var(--hairline)] transition hover:bg-[color:var(--surface-sunken)]">
+                      <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">{decision.timestamp}</td>
+                      <td className="px-2 py-2 text-[color:var(--text-secondary)]">{decision.service}</td>
+                      <td className="px-2 py-2 text-right font-mono text-amber-500">{(decision.risk * 100).toFixed(0)}%</td>
+                      <td className="px-2 py-2 text-right">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${
+                          decision.action === 'ESCALATE' ? 'bg-[#b3392a]' :
+                          decision.action === 'DENY' ? 'bg-[#a66a1e]' :
+                          'bg-[#3f7a5c]'
                         }`}>
                           {decision.action}
                         </span>
@@ -186,18 +186,18 @@ export default function HistoryPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-gray-500 mt-4 text-center">
+            <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">
               Data shown is simulated for demonstration purposes only.
             </p>
           </div>
 
           {/* Call to action */}
-          <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-2xl p-6 border border-gray-700 text-center">
-            <h2 className="text-xl font-semibold mb-2">Get real‑time risk history</h2>
-            <p className="text-gray-300 mb-4">Access detailed historical risk trends and audit trails.</p>
+          <div className="arf-card-anchored p-6 text-center text-white">
+            <h2 className="mb-2 text-xl font-semibold">Get real‑time risk history</h2>
+            <p className="mb-4 text-white/80">Access detailed historical risk trends and audit trails.</p>
             <Link
               href="/signup"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium transition"
+              className="inline-flex items-center gap-2 rounded-lg bg-arf-blue px-6 py-2 font-medium text-white transition hover:brightness-110"
             >
               Request Pilot Access <TrendingUp size={16} />
             </Link>
