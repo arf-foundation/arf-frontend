@@ -4,6 +4,10 @@
 /node_modules
 /.pnp
 .pnp.*
+# this project is yarn-only -- yarn.lock is the real lockfile; a stray
+# package-lock.json (e.g. from `npm install`) diverges from what's actually
+# installed and confused `npm audit` into reporting phantom vulnerabilities
+package-lock.json
 .yarn/*
 !.yarn/patches
 !.yarn/plugins

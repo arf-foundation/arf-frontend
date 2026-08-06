@@ -1,0 +1,223 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   ARF AI — design tokens
+   Light is the primary experience; dark is an equal-parity option.
+   Rationale: warm grays, never pure black on pure white. The recognisable
+   blue→purple gradient survives as a single accent, used sparingly.
+   ========================================================================= */
+
+@theme {
+  /* Type */
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Brand accents (unchanged hue family from the previous site, retuned for light) */
+  --color-arf-blue: #3358e8;
+  --color-arf-blue-deep: #2743c4;
+  --color-arf-purple: #7a4be0;
+
+  /* Warm neutral ramp */
+  --color-arf-canvas: #faf9f7;
+  --color-arf-surface: #ffffff;
+  --color-arf-raised: #f5f4f1;
+  --color-arf-ink: #191816;
+  --color-arf-ink-2: #3f3d38;
+  --color-arf-ink-3: #56534d;   /* 7.3:1 on canvas — small mono labels */
+  --color-arf-muted: #6b6862;   /* 4.6:1 on canvas — eyebrows, secondary */
+  --color-arf-line: rgba(25, 24, 22, 0.09);
+  --color-arf-dark: #131218;
+
+  /* Type scale — one deliberate ramp, no ad-hoc sizes */
+  --text-display: 3.5rem;       /* 56px hero */
+  --text-display--line-height: 1.03;
+  --text-display--letter-spacing: -0.033em;
+  --text-h2: 2.25rem;           /* 36px section head */
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.026em;
+  --text-h2-lg: 2.625rem;       /* 42px — governance section only */
+  --text-h2-lg--line-height: 1.06;
+  --text-h2-lg--letter-spacing: -0.03em;
+  --text-h3: 1.3125rem;         /* 21px card title */
+  --text-h3--line-height: 1.25;
+  --text-h3--letter-spacing: -0.018em;
+  --text-lead: 1.15rem;         /* 18.5px hero sub */
+  --text-lead--line-height: 1.6;
+  --text-body: 1.0625rem;       /* 17px body */
+  --text-body--line-height: 1.65;
+  --text-small: 0.90625rem;     /* 14.5px */
+  --text-small--line-height: 1.6;
+  --text-eyebrow: 0.6875rem;    /* 11px mono */
+
+  /* Vertical rhythm — varied on purpose (see DESIGN_RATIONALE.md) */
+  --spacing-section-tight: 4.5rem;   /* 72px  — trust strip, logo row */
+  --spacing-section: 6.5rem;         /* 104px — default content section */
+  --spacing-section-airy: 7.5rem;    /* 120px — capabilities, architecture */
+}
+
+/* --------------------------------------------------------------------------
+   Theme surfaces. Light by default; .dark on <html> flips the ramp.
+   Only surfaces and ink invert — the accent gradient is identical in both.
+   ----------------------------------------------------------------------- */
+:root {
+  --surface-canvas: var(--color-arf-canvas);
+  --surface-raised: var(--color-arf-surface);
+  --surface-sunken: var(--color-arf-raised);
+  --text-primary: var(--color-arf-ink);
+  --text-secondary: var(--color-arf-ink-3);
+  --text-muted: var(--color-arf-muted);
+  --hairline: var(--color-arf-line);
+  --card-shadow: 0 2px 4px rgba(25, 24, 22, 0.03), 0 20px 44px -28px rgba(25, 24, 22, 0.42);
+  --card-shadow-hover: 0 4px 8px rgba(25, 24, 22, 0.05), 0 30px 60px -30px rgba(51, 88, 232, 0.5);
+}
+
+.dark {
+  --surface-canvas: #0e0d12;
+  --surface-raised: #17161d;
+  --surface-sunken: #1d1c25;
+  --text-primary: #faf9f7;
+  --text-secondary: rgba(250, 249, 247, 0.72);
+  --text-muted: rgba(250, 249, 247, 0.56);
+  --hairline: rgba(250, 249, 247, 0.12);
+  --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 44px -28px rgba(0, 0, 0, 0.8);
+  --card-shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.5), 0 30px 60px -30px rgba(51, 88, 232, 0.55);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--surface-canvas);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--color-arf-blue) 22%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-arf-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Page shell — one gutter value everywhere, so sections align optically */
+  .arf-shell {
+    @apply mx-auto w-full max-w-[1180px] px-6 sm:px-10 lg:px-[76px];
+  }
+
+  /* --- Card weights -------------------------------------------------------
+     Three distinct weights replace the single bg-gray-800 pattern:
+     substantial (capabilities/governance), light (demo/explore),
+     anchored (dark trust + quote bands).
+     --------------------------------------------------------------------- */
+  .arf-card {
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline);
+    box-shadow: var(--card-shadow);
+    @apply rounded-2xl;
+  }
+  .arf-card-substantial {
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline);
+    box-shadow: var(--card-shadow);
+    @apply rounded-2xl transition duration-300;
+  }
+  .arf-card-substantial:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+  }
+  .arf-card-light {
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline);
+    @apply rounded-2xl shadow-[0_16px_34px_-28px_rgba(25,24,22,0.4)];
+  }
+  .arf-card-anchored {
+    background: var(--color-arf-dark);
+    @apply rounded-2xl;
+  }
+
+  .arf-eyebrow {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    @apply text-[11px] leading-none uppercase tracking-[0.14em] font-medium;
+  }
+
+  .arf-gradient-text {
+    background: linear-gradient(100deg, var(--color-arf-blue), var(--color-arf-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .arf-btn-primary {
+    background: linear-gradient(135deg, var(--color-arf-blue), var(--color-arf-purple));
+    @apply inline-flex items-center gap-2 rounded-[10px] px-6 py-[15px] text-[15.5px] font-semibold text-white
+           shadow-[0_16px_34px_-16px_rgba(51,88,232,0.75)] transition hover:brightness-110;
+  }
+  .arf-btn-secondary {
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline);
+    color: var(--text-primary);
+    @apply inline-flex items-center gap-2 rounded-[10px] px-6 py-[15px] text-[15.5px] font-semibold
+           shadow-[0_8px_22px_-14px_rgba(25,24,22,0.4)] transition hover:border-[color:var(--color-arf-blue)];
+  }
+  /* Sign In: outlined, WorkOS-style — reads as "log in", not "request access" */
+  .arf-btn-ghost {
+    border: 1px solid var(--hairline);
+    color: var(--text-primary);
+    @apply inline-flex items-center gap-2 rounded-lg px-4 py-[9px] text-sm font-semibold transition
+           hover:border-[color:var(--color-arf-blue)];
+  }
+
+  /* Hero wash — the ONLY page-level gradient */
+  .arf-hero-wash {
+    background-image:
+      radial-gradient(1100px 560px at 18% -10%, rgba(51, 88, 232, 0.16), transparent 66%),
+      radial-gradient(760px 460px at 92% 20%, rgba(122, 75, 224, 0.14), transparent 70%);
+  }
+  .dark .arf-hero-wash {
+    background-image:
+      radial-gradient(1100px 560px at 18% -10%, rgba(51, 88, 232, 0.26), transparent 66%),
+      radial-gradient(760px 460px at 92% 20%, rgba(122, 75, 224, 0.22), transparent 70%);
+  }
+  .arf-dark-wash {
+    background-image:
+      radial-gradient(900px 420px at 16% 0%, rgba(51, 88, 232, 0.32), transparent 70%),
+      radial-gradient(680px 380px at 92% 100%, rgba(122, 75, 224, 0.28), transparent 72%);
+  }
+
+  /* Scroll reveal — subtle rise, disabled under prefers-reduced-motion */
+  .arf-reveal {
+    @apply opacity-0 translate-y-3 transition-all duration-700 ease-out;
+  }
+  .arf-reveal-in {
+    @apply opacity-100 translate-y-0;
+  }
+
+  /* Mermaid keeps working; it inherits the light palette instead of fighting it */
+  .arf-mermaid svg {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@keyframes arf-slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: arf-slide-up 0.24s ease-out both;
+}
