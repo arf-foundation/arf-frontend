@@ -12,6 +12,7 @@
     "test:coverage": "jest --coverage"
   },
   "devDependencies": {
+    "@browserbasehq/sdk": "^2.16.0",
     "@tailwindcss/oxide-linux-x64-gnu": "^4.3.0",
     "@tailwindcss/postcss": "^4.3.0",
     "@tailwindcss/typography": "^0.5.20",
@@ -30,6 +31,7 @@
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "next-pwa": "^5.6.0",
+    "playwright-core": "^1.62.1",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3"
   },
