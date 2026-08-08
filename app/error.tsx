@@ -25,7 +25,7 @@ export default function Error({
       <h2 className="text-2xl text-red-600 mb-4">Something went wrong!</h2>
       <p className="text-gray-700 mb-2">Try again, or contact support if it keeps happening.</p>
       {error.digest && (
-        <p className="text-xs text-gray-400 mb-6 font-mono">Reference: {error.digest}</p>
+        <p className="text-xs text-gray-700 mb-6 font-mono">Reference: {error.digest}</p>
       )}
       <button
         onClick={reset}
