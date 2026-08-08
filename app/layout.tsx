@@ -100,7 +100,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      style={{ colorScheme: 'light dark' }}
       className={`${instrumentSans.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
     >
       <head>

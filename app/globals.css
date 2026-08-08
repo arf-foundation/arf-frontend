@@ -175,6 +175,7 @@ main > div:first-child {
    Only surfaces and ink invert — the accent gradient is identical in both.
    ----------------------------------------------------------------------- */
 :root {
+  color-scheme: light;
   --surface-canvas: var(--color-arf-canvas);
   --surface-raised: var(--color-arf-surface);
   --surface-sunken: var(--color-arf-raised);
@@ -186,7 +187,20 @@ main > div:first-child {
   --card-shadow-hover: 0 4px 8px rgba(25, 24, 22, 0.05), 0 30px 60px -30px rgba(51, 88, 232, 0.5);
 }
 
+/* Was `<html style={{ colorScheme: 'light dark' }}>`, static and unconditional
+   in layout.tsx -- that tells the browser "either scheme is valid, follow the
+   OS," which makes Chromium/Edge apply their own auto-dark-mode colour
+   heuristics on top of the page's actual CSS whenever the OS preference
+   disagrees with which theme the site is *actually* showing (its `.dark`
+   class, driven by the NavBar toggle + localStorage, not the OS). Reported
+   symptom: light theme unreadable while Windows was set to dark, then the
+   same mismatch flipped to the dark theme once Windows switched to light --
+   classic browser-level colour-scheme fighting the page's own theme, not a
+   CSS contrast bug (computed styles were already correct in both cases,
+   confirmed via a real browser). Scoping color-scheme to whichever theme is
+   actually active removes the OS as a variable entirely. */
 .dark {
+  color-scheme: dark;
   --surface-canvas: #0e0d12;
   --surface-raised: #17161d;
   --surface-sunken: #1d1c25;
