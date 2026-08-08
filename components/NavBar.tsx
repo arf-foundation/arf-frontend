@@ -38,9 +38,18 @@ export default function NavBar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const toggleTheme = () => {
-    const next: Theme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
+    // Decide from the real DOM class, not the `theme` state variable. If
+    // React's initial read of that class (in the lazy initializer above)
+    // ever raced the pre-hydration blocking script and landed on the wrong
+    // value, deciding from `theme` would make the first click "correct" the
+    // mismatch instead of doing what was clicked — the class flips, but not
+    // to where the user expects — and only the second click, now reading a
+    // `theme` that finally matches reality, does the intended toggle. Sourcing
+    // the decision from the DOM itself removes the possibility of that
+    // divergence entirely; `theme` still drives the icon, nothing else.
+    const next: Theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
     document.documentElement.classList.toggle('dark', next === 'dark');
+    setTheme(next);
     try {
       window.localStorage.setItem('arf-theme', next);
     } catch {
