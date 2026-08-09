@@ -43,25 +43,6 @@
 /* ============================================
    STABLE DIMENSIONS – PREVENT FLICKERING & JUMPS
    ============================================ */
-.mermaid-wrapper {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  min-height: 300px;
-  background-color: #1f2937;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.mermaid-wrapper svg {
-  width: 100%;
-  height: auto;
-  max-height: 100%;
-  display: block;
-}
-
 .feature-card {
   min-height: 320px;
   display: flex;
@@ -373,10 +354,106 @@ main > div:first-child {
     @apply opacity-100 translate-y-0;
   }
 
-  /* Mermaid keeps working; it inherits the light palette instead of fighting it */
-  .arf-mermaid svg {
-    max-width: 100%;
-    height: auto;
+  /* --------------------------------------------------------------------
+     Architecture pipeline — a single animated diagram replaces what used
+     to be the same 7-stage flow rendered three times (styled grid, plain
+     arrow-text line, Mermaid diagram + its own sr-only caption). The
+     accessible description now lives once, in ArchitecturePipeline.tsx's
+     sr-only <ol>; everything below is aria-hidden decoration.
+     -------------------------------------------------------------------- */
+  .arf-pipeline {
+    @apply opacity-0 translate-y-3 transition-all duration-700 ease-out;
+  }
+  .arf-pipeline-in {
+    @apply opacity-100 translate-y-0;
+  }
+  .arf-pipeline-track {
+    @apply flex flex-col items-stretch gap-2 lg:flex-row lg:items-center lg:gap-0;
+  }
+  .arf-pipeline-item {
+    @apply flex flex-1 flex-col items-stretch lg:flex-row lg:items-center;
+  }
+  .arf-pipeline-node {
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    transition: transform 200ms ease, border-color 200ms ease;
+    @apply relative flex flex-1 flex-col items-center gap-1.5 rounded-xl px-4 py-5 text-center;
+  }
+  .arf-pipeline-node:hover {
+    border-color: var(--color-arf-blue);
+    transform: translateY(-3px);
+  }
+  .arf-pipeline-node-compact {
+    @apply px-3 py-3.5;
+  }
+  .arf-pipeline-node-ring {
+    background: color-mix(in oklch, var(--color-arf-blue) 12%, transparent);
+    @apply relative mb-1 flex h-9 w-9 items-center justify-center rounded-full;
+  }
+  .arf-pipeline-node-ring::before {
+    content: '';
+    border: 1.5px solid var(--color-arf-blue);
+    animation: arf-pipe-ripple 3.2s ease-out infinite paused;
+    animation-delay: calc(var(--i, 0) * 0.3s);
+    @apply absolute -inset-1 rounded-full opacity-0;
+  }
+  .arf-pipeline-in .arf-pipeline-node-ring::before {
+    animation-play-state: running;
+  }
+  .arf-pipeline-node-icon {
+    color: var(--color-arf-blue);
+    @apply h-4 w-4;
+  }
+  .arf-pipeline-node-n {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    @apply absolute right-2.5 top-2.5 text-[9.5px] tracking-[0.08em];
+  }
+  .arf-pipeline-node-label {
+    @apply text-[13.5px] font-semibold tracking-[-0.01em];
+  }
+  .arf-pipeline-node-meta {
+    color: var(--text-muted);
+    @apply text-[11.5px] leading-[1.35];
+  }
+  .arf-pipeline-wire {
+    background: var(--hairline);
+    @apply relative mx-1 my-2 h-8 w-[2px] self-center overflow-hidden rounded-full lg:my-0 lg:h-[2px] lg:w-8 lg:flex-shrink-0;
+  }
+  .arf-pipeline-wire-compact {
+    @apply my-1.5 h-5 lg:h-[2px] lg:w-5;
+  }
+  .arf-pipeline-wire::after {
+    content: '';
+    background: linear-gradient(180deg, transparent, var(--color-arf-blue), var(--color-arf-purple), transparent);
+    animation: arf-pipe-sweep-v 2.4s ease-in-out infinite paused;
+    @apply absolute inset-x-0 -top-full h-full;
+  }
+  .arf-pipeline-in .arf-pipeline-wire::after {
+    animation-play-state: running;
+  }
+  @media (min-width: 1024px) {
+    .arf-pipeline-wire::after {
+      background: linear-gradient(90deg, transparent, var(--color-arf-blue), var(--color-arf-purple), transparent);
+      animation-name: arf-pipe-sweep-h;
+      @apply inset-y-0 -left-full top-0 h-full w-full;
+    }
+  }
+  .arf-pipeline-cluster {
+    border: 1px solid var(--hairline);
+    animation: arf-pipe-cluster-glow 3.2s ease-in-out infinite paused;
+    @apply flex flex-[2.2] flex-col gap-3 rounded-2xl p-4;
+  }
+  .arf-pipeline-in .arf-pipeline-cluster {
+    animation-play-state: running;
+  }
+  .arf-pipeline-cluster-label {
+    font-family: var(--font-mono);
+    color: var(--color-arf-blue);
+    @apply text-[10.5px] font-medium uppercase tracking-[0.13em];
+  }
+  .arf-pipeline-cluster-track {
+    @apply flex flex-col items-stretch gap-1.5 lg:flex-row lg:items-center;
   }
 }
 
@@ -386,4 +463,28 @@ main > div:first-child {
 }
 .animate-slide-up {
   animation: arf-slide-up 0.24s ease-out both;
+}
+
+@keyframes arf-pipe-ripple {
+  0% { transform: scale(0.85); opacity: 0.55; }
+  70% { transform: scale(1.55); opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes arf-pipe-sweep-h {
+  0% { transform: translateX(-10%); }
+  100% { transform: translateX(210%); }
+}
+@keyframes arf-pipe-sweep-v {
+  0% { transform: translateY(-10%); }
+  100% { transform: translateY(210%); }
+}
+@keyframes arf-pipe-cluster-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 transparent;
+    border-color: var(--hairline);
+  }
+  50% {
+    box-shadow: 0 0 32px -6px color-mix(in oklch, var(--color-arf-purple) 45%, transparent);
+    border-color: color-mix(in oklch, var(--color-arf-blue) 45%, transparent);
+  }
 }

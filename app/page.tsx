@@ -21,7 +21,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { useInView } from './hooks/useInView';
-import Mermaid from '../components/Mermaid';
+import ArchitecturePipeline from '../components/ArchitecturePipeline';
 
 declare global {
   interface Window {
@@ -45,15 +45,6 @@ declare global {
      .arf-card-light        explore/demo cards (lighter, exploratory)
      .arf-card-anchored     dark trust strip, quote band, decision panel
    ========================================================================= */
-
-const DIAGRAM = `flowchart LR
-    A[Application] --> B[LLM / AI Agent]
-    B --> C[ARF Control Plane]
-    C --> D[Policies]
-    D --> E[Risk Engine]
-    E --> F[Approval]
-    F --> G[Execution]
-    G --> H[Audit Trail]`;
 
 // arf-ai-... not a-r-f-...: the HF org renamed A-R-F -> ARF-AI and the old
 // domain 404s directly (verified against HF's api/spaces endpoint), even
@@ -500,71 +491,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Architecture — styled flow, Mermaid retained as fallback ─────────── */}
+      {/* ─── Architecture — one animated pipeline, no restated copies ─────────── */}
       <section id="architecture" className="arf-shell pb-[120px]">
         <p className="arf-eyebrow mb-3.5">Architecture</p>
         <h2 className="mb-11 text-h2 font-semibold">How ARF works</h2>
         <div className="arf-card p-5 sm:p-8 lg:p-11">
-          <ol className="flex flex-col gap-3 lg:flex-row lg:items-stretch">
-            {[...DECISION_PATH].map((step) => (
-              <li
-                key={step.label}
-                className="flex flex-1 flex-col justify-center gap-1.5 rounded-xl bg-[color:var(--surface-sunken)] px-4 py-5"
-              >
-                <span className="text-[14.5px] font-semibold tracking-[-0.012em]">{step.label}</span>
-                <span className="font-mono text-[10.5px] uppercase tracking-[0.08em] text-[color:var(--text-muted)]">
-                  {step.meta}
-                </span>
-              </li>
-            ))}
-            <li className="flex flex-[2.2] flex-col rounded-2xl bg-gradient-to-br from-arf-blue to-arf-purple p-4 shadow-[0_18px_36px_-20px_rgba(51,88,232,0.8)]">
-              <p className="mb-3.5 font-mono text-[10.5px] font-medium uppercase tracking-[0.13em] text-white/80">
-                ARF control plane
-              </p>
-              {/* flex-col below sm: 3 unwrapped flex-1 columns had ~80px each
-                  on a 375px viewport once shell + card padding were
-                  subtracted, cutting off "Risk Engine" -- stack instead of
-                  cramming until there's room to go side-by-side. */}
-              <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:gap-2.5">
-                {CONTROL_PLANE.map((node) => (
-                  <div
-                    key={node.label}
-                    className="flex flex-1 items-center rounded-[10px] border border-white/25 bg-white/15 px-3 py-3 sm:py-4"
-                  >
-                    <span className="text-[13.5px] font-semibold tracking-[-0.01em] text-white">{node.label}</span>
-                  </div>
-                ))}
-              </div>
-            </li>
-            {[...DECISION_TAIL].map((step) => (
-              <li
-                key={step.label}
-                className="flex flex-1 flex-col justify-center gap-1.5 rounded-xl bg-[color:var(--surface-sunken)] px-4 py-5"
-              >
-                <span className="text-[14.5px] font-semibold tracking-[-0.012em]">{step.label}</span>
-                <span className="font-mono text-[10.5px] uppercase tracking-[0.08em] text-[color:var(--text-muted)]">
-                  {step.meta}
-                </span>
-              </li>
-            ))}
-          </ol>
-
-          <p className="mt-6 font-mono text-[12.5px] leading-[1.6] text-[color:var(--text-secondary)]">
-            Application → LLM → ARF Control Plane → Policies → Risk Engine → Approval → Execution → Audit Trail
-          </p>
-
-          {/* Mermaid stays functional — kept as the canonical, accessible source */}
-          <details className="mt-6 border-t border-[color:var(--hairline)] pt-5">
-            <summary className="cursor-pointer font-mono text-[11px] uppercase tracking-[0.13em] text-[color:var(--text-muted)]">
-              View source diagram
-            </summary>
-            <figure className="mt-5">
-              <Mermaid chart={DIAGRAM} className="arf-mermaid flex justify-center overflow-x-auto" />
-              <figcaption className="sr-only">
-                Application → LLM → ARF Control Plane → Policies → Risk Engine → Approval → Execution → Audit Trail
-              </figcaption>
-            </figure>
-          </details>
+          <ArchitecturePipeline />
         </div>
       </section>
 
