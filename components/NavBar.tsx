@@ -94,7 +94,7 @@ export default function NavBar() {
             type="button"
             onClick={toggleTheme}
             aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-            className="hidden h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)] sm:inline-flex"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)]"
           >
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
@@ -160,14 +160,6 @@ export default function NavBar() {
               >
                 Request Pilot Access <ArrowRight size={16} />
               </Link>
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[color:var(--hairline)] px-5 py-3 text-sm font-semibold"
-              >
-                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                {theme === 'dark' ? 'Light theme' : 'Dark theme'}
-              </button>
             </div>
           </div>
         </div>

@@ -59,7 +59,6 @@ async function main() {
   });
 
   const sweep1 = await page.evaluate(() => {
-    const el = document.querySelector('.arf-pipeline-wire::after') || document.querySelector('.arf-pipeline-wire');
     const target = document.querySelector('.arf-pipeline-wire');
     if (!target) return null;
     const cs = getComputedStyle(target, '::after');
