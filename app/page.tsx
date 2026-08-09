@@ -7,8 +7,6 @@ import {
   ArrowRight,
   Brain,
   Building2,
-  Check,
-  Copy,
   Cpu,
   Factory,
   FileText,
@@ -17,12 +15,11 @@ import {
   Landmark,
   Lock,
   Network,
-  Rocket,
   Shield,
 } from 'lucide-react';
 import { useInView } from './hooks/useInView';
 import ArchitecturePipeline from '../components/ArchitecturePipeline';
-import { CapabilityCard, TierBody } from '@arf/ui';
+import { CapabilityCard, TierBody, SandboxCard } from '@arf/ui';
 
 declare global {
   interface Window {
@@ -641,49 +638,15 @@ export default function LandingPage() {
         </div>
         <div className="grid gap-[22px] lg:grid-cols-[1.2fr_0.9fr_0.9fr]">
           {/* API */}
-          <div className="arf-card-light flex flex-col p-7">
-            <p className="mb-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.13em] text-arf-blue">API</p>
-            <h3 className="mb-2 text-h3 font-semibold">Evaluation endpoint</h3>
-            <p className="mb-4.5 text-small text-[color:var(--text-secondary)]">
-              Send an incident, get a governed decision back.
-            </p>
-            <pre className="mb-4.5 overflow-x-auto whitespace-pre-wrap break-all rounded-[11px] bg-arf-dark p-4 font-mono text-[11.5px] leading-[1.7] text-[#9fe7b8]">
-              {CURL_COMMAND}
-            </pre>
-            <div className="mt-auto flex flex-wrap gap-2.5">
-              <button
-                type="button"
-                onClick={fetchSandboxResponse}
-                disabled={sandboxLoading}
-                className="inline-flex items-center gap-2 rounded-[9px] bg-gradient-to-br from-arf-blue to-arf-purple px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
-              >
-                {sandboxLoading ? (
-                  <>Evaluating…</>
-                ) : (
-                  <>
-                    <Rocket size={16} /> Try it live
-                  </>
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="inline-flex items-center gap-2 rounded-[9px] border border-[color:var(--hairline)] px-4 py-2.5 text-sm font-semibold transition hover:border-arf-blue"
-                aria-label="Copy curl command"
-              >
-                {copied ? <Check size={16} className="text-arf-blue" /> : <Copy size={16} />}
-                {copied ? 'Copied' : 'Copy curl'}
-              </button>
-            </div>
-            {sandboxResponse && (
-              <pre className="mt-4 max-h-64 overflow-auto whitespace-pre-wrap rounded-[11px] border border-[color:var(--hairline)] bg-arf-dark p-4 font-mono text-[11px] leading-[1.7] text-[#9fe7b8]">
-                {JSON.stringify(sandboxResponse, null, 2)}
-              </pre>
-            )}
-            {sandboxError && (
-              <p className="mt-3 text-sm text-[#b0453a]">Failed to reach sandbox: {sandboxError}</p>
-            )}
-          </div>
+          <SandboxCard
+            curlCommand={CURL_COMMAND}
+            loading={sandboxLoading}
+            response={sandboxResponse}
+            error={sandboxError}
+            copied={copied}
+            onTryLive={fetchSandboxResponse}
+            onCopy={handleCopy}
+          />
 
           {/* Console */}
           <div className="arf-card-light flex flex-col p-7">
