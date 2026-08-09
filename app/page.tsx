@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useInView } from './hooks/useInView';
 import ArchitecturePipeline from '../components/ArchitecturePipeline';
-import { CapabilityCard } from '@arf/ui';
+import { CapabilityCard, TierBody } from '@arf/ui';
 
 declare global {
   interface Window {
@@ -618,12 +618,12 @@ export default function LandingPage() {
                 className="rounded-2xl bg-gradient-to-br from-arf-blue to-arf-purple p-0.5 shadow-[0_30px_60px_-30px_rgba(51,88,232,0.6)]"
               >
                 <div className="rounded-[14px] bg-[color:var(--surface-raised)] p-9">
-                  <TierBody {...tier} />
+                  <TierBody {...tier} renderLink={Link} />
                 </div>
               </div>
             ) : (
               <div key={tier.name} className="arf-card-light p-8">
-                <TierBody {...tier} />
+                <TierBody {...tier} renderLink={Link} />
               </div>
             ),
           )}
@@ -833,52 +833,3 @@ function PathRow({ n, label, meta }: { n: string; label: string; meta: string })
   );
 }
 
-function TierBody({
-  name,
-  meta,
-  price,
-  items,
-  cta,
-  dominant,
-}: {
-  name: string;
-  meta: string;
-  price: string;
-  items: readonly string[];
-  cta: { label: string; href: string };
-  dominant: boolean;
-}) {
-  return (
-    <>
-      <p className={`mb-1.5 font-semibold tracking-[-0.018em] ${dominant ? 'text-[21px]' : 'text-[19px]'}`}>{name}</p>
-      <p className={`mb-5.5 font-mono text-[13px] ${dominant ? 'text-arf-blue' : 'text-[color:var(--text-muted)]'}`}>
-        {meta}
-      </p>
-      <p className={`mb-6 font-semibold leading-none tracking-[-0.027em] ${dominant ? 'text-[32px]' : 'text-[30px]'}`}>
-        {price}
-      </p>
-      <ul className="mb-6 flex flex-col gap-2.5 border-t border-[color:var(--hairline)] pt-5.5">
-        {items.map((item) => (
-          <li key={item} className="text-[14.5px] leading-[1.5] text-[color:var(--text-secondary)]">
-            {item}
-          </li>
-        ))}
-      </ul>
-      {dominant ? (
-        <Link
-          href={cta.href}
-          className="block rounded-[9px] bg-gradient-to-br from-arf-blue to-arf-purple py-3 text-center text-[14.5px] font-semibold text-white transition hover:brightness-110"
-        >
-          {cta.label}
-        </Link>
-      ) : (
-        <Link
-          href={cta.href}
-          className="block rounded-[9px] border border-[color:var(--hairline)] py-2.5 text-center text-[14.5px] font-semibold transition hover:border-arf-blue hover:text-arf-blue"
-        >
-          {cta.label}
-        </Link>
-      )}
-    </>
-  );
-}
