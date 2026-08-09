@@ -26,6 +26,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  transpilePackages: ['@arf/ui'],
   turbopack: {},
   async rewrites() {
     return [

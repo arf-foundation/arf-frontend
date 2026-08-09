@@ -2,8 +2,12 @@
 
 # dependencies
 /node_modules
+packages/*/node_modules
 /.pnp
 .pnp.*
+
+# workspace package build output -- regenerated via `yarn build` in each package
+packages/*/dist
 # this project is yarn-only -- yarn.lock is the real lockfile; a stray
 # package-lock.json (e.g. from `npm install`) diverges from what's actually
 # installed and confused `npm audit` into reporting phantom vulnerabilities
