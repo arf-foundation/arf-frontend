@@ -51,3 +51,12 @@ next-env.d.ts
 
 # scripts/check-contrast*.mjs output -- regenerate locally, don't commit
 scripts/*.png
+
+# design-sync machine state -- staged converter scripts, build output, and
+# verification cache; not the durable set (config.json, NOTES.md,
+# conventions.md, previews/, overrides/ ARE committed, per the skill)
+packages/*/.ds-sync
+packages/*/ds-bundle
+packages/*/.design-sync/.cache
+packages/*/.design-sync/learnings
+packages/*/.design-sync/node_modules
