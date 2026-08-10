@@ -2,9 +2,17 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowRight, RefreshCw, Network, Shield, Lock, FileText, AlertTriangle, Clock, Printer } from 'lucide-react';
+import { ArrowRight, RefreshCw, Network, Shield, Lock, FileText, AlertTriangle, Clock, Printer, ChevronRight } from 'lucide-react';
 import DashboardBottomNav from '../../components/DashboardBottomNav';
-import { DashboardMetricCard, RiskGauge, RiskFactorBreakdown, StatusBadge, riskColor } from '@arf/ui';
+import {
+  DashboardMetricCard,
+  RiskGauge,
+  RiskFactorBreakdown,
+  StatusBadge,
+  riskColor,
+  ExplainabilityModal,
+  type ExplainabilitySection,
+} from '@arf/ui';
 
 /* ============================================================================
    Design-migration pass (P3, enterprise-refresh audit). Structure and mock
@@ -141,6 +149,73 @@ const mockMemoryStats = {
 };
 
 // ----------------------------------------------------------------------
+// Audit Trail explainability -- one decision record's provenance.
+//
+// This describes the REAL ARF engine's methodology (Bayesian risk fusion,
+// doubly-robust causal counterfactual estimation, immutable+signable
+// records) applied to this simulated row. Two things are deliberately
+// NOT claimed, because they aren't true of the OSS/sandbox path:
+//   - that this specific number was computed live by that engine (it's a
+//     illustrative derivation from the mock riskScore, labeled as such)
+//   - that "similar past incidents" retrieval is semantic/NLP similarity
+//     (it's metric-fingerprint similarity -- see the Semantic Memory card)
+// ----------------------------------------------------------------------
+function auditLogExplanation(log: AuditLogEntry): {
+  title: string;
+  summary: string;
+  sections: ExplainabilitySection[];
+  footer: string;
+} {
+  const riskBand = log.riskScore >= 0.7 ? 'high' : log.riskScore >= 0.4 ? 'moderate' : 'low';
+  const outcome =
+    log.decision === 'ESCALATE' ? 'escalated for review' : log.decision === 'DENY' ? 'blocked' : 'approved automatically';
+  const altAction = log.decision === 'APPROVE' ? 'denied' : log.decision === 'DENY' ? 'approved' : 'auto-approved without escalation';
+  // Illustrative, derived from the mock risk score -- not a live estimate.
+  const illustrativeDelta = Math.round(log.riskScore * 28);
+
+  return {
+    title: `${log.action} — ${log.component}`,
+    summary: `This ${log.action} on ${log.component} was ${outcome} because the risk model scored it in the ${riskBand} band (${(log.riskScore * 100).toFixed(0)}%). The decision record below is immutable once created.`,
+    sections: [
+      {
+        heading: 'Risk assessment',
+        body: (
+          <>
+            Risk score {log.riskScore.toFixed(2)} comes from ARF&rsquo;s Bayesian fusion model: a fast per-category
+            conjugate prior, an offline Hamiltonian Monte Carlo model over contextual features, and hierarchical
+            shrinkage across categories, combined by weight of evidence. Posterior variance — the model&rsquo;s own
+            uncertainty in this score — shrinks as more real outcomes are observed for {log.component}.
+          </>
+        ),
+      },
+      {
+        heading: 'Counterfactual',
+        body: (
+          <>
+            If this had been {altAction} instead, ARF&rsquo;s doubly-robust causal effect estimator projects success
+            probability would have shifted by roughly {illustrativeDelta}% (illustrative for this sandbox — the real
+            estimator combines inverse-probability weighting with outcome regression, reports a bootstrap confidence
+            interval, and includes an E-value check for how much unmeasured confounding would overturn the result).
+          </>
+        ),
+      },
+      {
+        heading: 'Record integrity',
+        body: (
+          <>
+            Decision records are deep-frozen at creation — every field becomes immutable — and can be signed with
+            RSA-SHA256 for tamper detection. Attributed to <span className="font-mono">{log.user}</span> at{' '}
+            {log.timestamp}.
+          </>
+        ),
+      },
+    ],
+    footer:
+      "Sandbox illustration — this reflects the real ARF engine's methodology applied to simulated inputs, not a live production evaluation.",
+  };
+}
+
+// ----------------------------------------------------------------------
 // Reusable components
 // ----------------------------------------------------------------------
 const TrustBadges = () => (
@@ -188,6 +263,7 @@ export default function Dashboard() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isHttpWarning, setIsHttpWarning] = useState(false);
+  const [explainLog, setExplainLog] = useState<AuditLogEntry | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
@@ -411,11 +487,23 @@ export default function Dashboard() {
               <DashboardMetricCard
                 title="Audit Trail (Recent decisions)"
                 icon={FileText}
-                footer="Audit logs are immutable and cryptographically signed in production."
+                footer="Audit logs are immutable and cryptographically signable in production. Click a row to see how a decision was reached."
               >
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-[color:var(--hairline)]"><th className="px-2 py-2 text-left">Timestamp</th><th className="px-2 py-2 text-left">Component</th><th className="px-2 py-2 text-left">Action</th><th className="px-2 py-2 text-right">Risk</th><th className="px-2 py-2 text-right">Decision</th><th className="px-2 py-2 text-left">User</th></tr></thead>
+                    <thead>
+                      <tr className="border-b border-[color:var(--hairline)]">
+                        <th className="px-2 py-2 text-left">Timestamp</th>
+                        <th className="px-2 py-2 text-left">Component</th>
+                        <th className="px-2 py-2 text-left">Action</th>
+                        <th className="px-2 py-2 text-right">Risk</th>
+                        <th className="px-2 py-2 text-right">Decision</th>
+                        <th className="px-2 py-2 text-left">User</th>
+                        <th className="px-2 py-2 text-right">
+                          <span className="sr-only">Explain</span>
+                        </th>
+                      </tr>
+                    </thead>
                     <tbody>
                       {MOCK_AUDIT_LOGS.map((log) => (
                         <tr key={log.id} className="border-b border-[color:var(--hairline)]">
@@ -425,12 +513,27 @@ export default function Dashboard() {
                           <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">{log.riskScore.toFixed(2)}</td>
                           <td className="px-2 py-2 text-right"><span className={`rounded-full px-2 py-0.5 text-xs text-white ${log.decision === 'ESCALATE' ? 'bg-[#b3392a]' : log.decision === 'DENY' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]'}`}>{log.decision}</span></td>
                           <td className="px-2 py-2 text-[color:var(--text-muted)]">{log.user}</td>
+                          <td className="px-2 py-2 text-right">
+                            <button
+                              type="button"
+                              onClick={() => setExplainLog(log)}
+                              aria-label={`Explain ${log.action} on ${log.component}`}
+                              aria-haspopup="dialog"
+                              className="inline-flex items-center justify-center rounded-lg p-1 text-[color:var(--text-muted)] transition hover:text-arf-blue"
+                            >
+                              <ChevronRight className="h-4 w-4" />
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               </DashboardMetricCard>
+
+              {explainLog && (
+                <ExplainabilityModal open={!!explainLog} onClose={() => setExplainLog(null)} {...auditLogExplanation(explainLog)} />
+              )}
 
               <DashboardMetricCard title="Cooldown & Rate Limits (Sandbox)" icon={Clock} iconClassName="text-[#a66a1e]">
                 <div className="space-y-3">

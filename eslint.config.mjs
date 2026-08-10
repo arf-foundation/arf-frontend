@@ -21,6 +21,12 @@ const eslintConfig = defineConfig([
     "packages/*/.ds-sync/**",
     "packages/*/ds-bundle/**",
     "packages/*/.design-sync/.cache/**",
+    // Each workspace package's own esbuild output (dist/) -- minified,
+    // bundled, JSX-transformed code. Not hand-written source; linting it
+    // both wastes time and produces false positives from rules (like
+    // react-hooks/refs) whose AST heuristics assume idiomatic un-bundled
+    // React, not esbuild's renamed/inlined jsx() call structure.
+    "packages/*/dist/**",
   ]),
   // Allow require in .cjs files (e.g., jest.config.cjs)
   {
