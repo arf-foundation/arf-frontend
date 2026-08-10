@@ -408,8 +408,11 @@ export default function Dashboard() {
                 </div>
               </DashboardMetricCard>
 
-              <div className="arf-card-substantial p-6">
-                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><FileText className="h-5 w-5 text-arf-blue" /> Audit Trail (Recent decisions)</h2>
+              <DashboardMetricCard
+                title="Audit Trail (Recent decisions)"
+                icon={FileText}
+                footer="Audit logs are immutable and cryptographically signed in production."
+              >
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead><tr className="border-b border-[color:var(--hairline)]"><th className="px-2 py-2 text-left">Timestamp</th><th className="px-2 py-2 text-left">Component</th><th className="px-2 py-2 text-left">Action</th><th className="px-2 py-2 text-right">Risk</th><th className="px-2 py-2 text-right">Decision</th><th className="px-2 py-2 text-left">User</th></tr></thead>
@@ -427,8 +430,7 @@ export default function Dashboard() {
                     </tbody>
                   </table>
                 </div>
-                <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">Audit logs are immutable and cryptographically signed in production.</p>
-              </div>
+              </DashboardMetricCard>
 
               <div className="arf-card-substantial p-6">
                 <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><Clock className="h-5 w-5 text-[#a66a1e]" /> Cooldown & Rate Limits (Sandbox)</h2>
