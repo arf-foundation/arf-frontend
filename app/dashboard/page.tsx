@@ -432,13 +432,12 @@ export default function Dashboard() {
                 </div>
               </DashboardMetricCard>
 
-              <div className="arf-card-substantial p-6">
-                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><Clock className="h-5 w-5 text-[#a66a1e]" /> Cooldown & Rate Limits (Sandbox)</h2>
+              <DashboardMetricCard title="Cooldown & Rate Limits (Sandbox)" icon={Clock} iconClassName="text-[#a66a1e]">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between rounded-lg bg-[color:var(--surface-sunken)] p-3"><div><span className="font-mono text-sm">payment-api</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">(policy: latency_gt_100)</span></div><span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">Cooldown: 45s remaining</span></div>
                   <div className="flex items-center justify-between rounded-lg bg-[color:var(--surface-sunken)] p-3"><div><span className="font-mono text-sm">database</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">(policy: cpu_high)</span></div><span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">Rate limit: 2/5 per hour</span></div>
                 </div>
-              </div>
+              </DashboardMetricCard>
 
               <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-6 text-center">
                 <h2 className="mb-2 text-h3 font-semibold">Take full control of governance</h2>
