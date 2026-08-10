@@ -181,7 +181,8 @@ function auditLogExplanation(log: AuditLogEntry): {
         heading: 'Risk assessment',
         body: (
           <>
-            Risk score {log.riskScore.toFixed(2)} comes from ARF&rsquo;s Bayesian fusion model: a fast per-category
+            Risk score {log.riskScore.toFixed(2)}{' '}
+            comes from ARF&rsquo;s Bayesian fusion model: a fast per-category
             conjugate prior, an offline Hamiltonian Monte Carlo model over contextual features, and hierarchical
             shrinkage across categories, combined by weight of evidence. Posterior variance — the model&rsquo;s own
             uncertainty in this score — shrinks as more real outcomes are observed for {log.component}.
@@ -192,7 +193,8 @@ function auditLogExplanation(log: AuditLogEntry): {
         heading: 'Counterfactual',
         body: (
           <>
-            If this had been {altAction} instead, ARF&rsquo;s doubly-robust causal effect estimator projects success
+            If this had been {altAction}{' '}
+            instead, ARF&rsquo;s doubly-robust causal effect estimator projects success
             probability would have shifted by roughly {illustrativeDelta}% (illustrative for this sandbox — the real
             estimator combines inverse-probability weighting with outcome regression, reports a bootstrap confidence
             interval, and includes an E-value check for how much unmeasured confounding would overturn the result).
