@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default function TermsPage() {
-  const effectiveDate = "May 16, 2026";
+  const effectiveDate = "August 10, 2026";
 
   return (
     <div className="arf-page-root min-h-screen">
@@ -41,6 +41,7 @@ export default function TermsPage() {
               <ul>
                 <li><strong>Sandbox API</strong> – returns <strong>mock data only</strong>, rate‑limited, for demonstration purposes.</li>
                 <li><strong>Demo dashboard</strong> – visualises mock data.</li>
+                <li><strong>AI agent chat</strong> – a Claude‑backed assistant (available site‑wide and at /agent) that classifies incident text you submit. Rate‑limited; responses are AI‑generated and may be inaccurate.</li>
                 <li><strong>Public specification</strong> – shared under written terms, not open source.</li>
               </ul>
               <p>
@@ -77,7 +78,7 @@ export default function TermsPage() {
 
               <h2>8. Disclaimer of Warranties</h2>
               <p>
-                The sandbox API is provided “as is” with mock data. We disclaim all warranties. It is not suitable for production.
+                The sandbox API is provided “as is” with mock data. We disclaim all warranties. It is not suitable for production. The AI agent chat produces AI‑generated output that may be inaccurate or incomplete; it does not constitute governance advice and should not be relied on for real operational decisions.
               </p>
 
               <h2>9. Limitation of Liability</h2>

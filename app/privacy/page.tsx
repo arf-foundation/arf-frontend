@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
-  const effectiveDate = "May 16, 2026";
+  const effectiveDate = "August 10, 2026";
 
   return (
     <div className="arf-page-root min-h-screen">
@@ -38,25 +38,28 @@ export default function PrivacyPage() {
               <ul><li>Email address</li><li>Account credentials</li></ul>
               <h3>API and Usage Data (sandbox)</h3>
               <ul><li>API keys</li><li>Mock evaluation requests and responses</li><li>Timestamps, IP addresses, endpoints</li></ul>
+              <h3>AI Agent Chat (ARF Institutional Memory Agent)</h3>
+              <ul><li>Message text you submit to the chat widget or the /agent page</li><li>The model&rsquo;s generated response</li></ul>
               <h3>Technical Data</h3>
               <ul><li>Browser and device information</li><li>Log files</li></ul>
               <h3>Payment Data</h3>
               <ul><li>None – paid tiers are handled via separate written agreements, not through this site.</li></ul>
 
               <h2>3. How We Collect Data</h2>
-              <p>Through signup forms, API usage, cookies, and analytics (Vercel Analytics).</p>
+              <p>Through signup forms, API usage, the AI agent chat widget, cookies, and analytics (Vercel Analytics).</p>
 
               <h2>4. Purpose of Processing</h2>
-              <p>To provide the sandbox, enforce rate limits, improve the service, and send critical updates.</p>
+              <p>To provide the sandbox, enforce rate limits, generate AI agent chat responses, improve the service, and send critical updates.</p>
 
               <h2>5. Legal Basis (GDPR)</h2>
-              <p>Contractual necessity (sandbox), legitimate interests (security, improvement), and consent (optional newsletters).</p>
+              <p>Contractual necessity (sandbox, AI agent chat), legitimate interests (security, improvement), and consent (optional newsletters).</p>
 
               <h2>6. Data Sharing</h2>
               <p>We share data with:</p>
               <ul>
                 <li><strong>Vercel</strong> – hosting and analytics</li>
                 <li><strong>Hugging Face</strong> – demo hosting (mock data only)</li>
+                <li><strong>Anthropic</strong> – the AI agent chat widget and /agent page send your submitted message text to Anthropic&rsquo;s Claude API for processing. Each request is evaluated independently; the agent does not retain conversation history between messages.</li>
                 <li><strong>GitHub</strong> – repository links</li>
                 <li><strong>Slack</strong> – community (no data shared unless you click)</li>
               </ul>
@@ -64,6 +67,7 @@ export default function PrivacyPage() {
               <h2>7. Data Retention</h2>
               <ul>
                 <li><strong>Sandbox usage logs</strong>: 30 days</li>
+                <li><strong>AI agent chat logs</strong>: retained in server logs for 30 days for abuse monitoring and debugging; not stored in a database or used for model training</li>
                 <li><strong>Pilot signup data</strong>: up to 12 months (if you later enter a written agreement)</li>
                 <li><strong>Account data</strong>: retained while your account is active</li>
                 <li><strong>API keys</strong>: retained until you request deletion</li>
