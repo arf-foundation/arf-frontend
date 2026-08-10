@@ -314,15 +314,14 @@ export default function Dashboard() {
                 </div>
               )}
 
-              <div className="arf-card-substantial p-6">
-                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><Network className="h-5 w-5 text-arf-blue" /> Semantic Memory (Sandbox)</h2>
+              <DashboardMetricCard title="Semantic Memory (Sandbox)" icon={Network}>
                 <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-4">
                   <div><div className="text-2xl font-bold text-arf-blue">{mockMemoryStats.similar_incidents}</div><div className="text-xs text-[color:var(--text-muted)]">Similar Incidents</div></div>
                   <div><div className="text-2xl font-bold text-arf-purple">{mockMemoryStats.rag_similarity.toFixed(2)}</div><div className="text-xs text-[color:var(--text-muted)]">RAG Similarity</div></div>
                   <div><div className="text-2xl font-bold text-[#a66a1e]">{mockMemoryStats.cache_hits}</div><div className="text-xs text-[color:var(--text-muted)]">Cache Hits</div></div>
                   <div><div className="break-words font-mono text-xs text-[color:var(--text-secondary)]">{mockMemoryStats.memory_usage}</div><div className="text-xs text-[color:var(--text-muted)]">Index Type</div></div>
                 </div>
-              </div>
+              </DashboardMetricCard>
 
               <div className="arf-card-substantial p-6">
                 <h2 className="mb-4 text-h3 font-semibold">Recent Incidents (Sandbox)</h2>
