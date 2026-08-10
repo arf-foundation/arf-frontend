@@ -41,7 +41,7 @@ declare global {
    Card weights — three, not one:
      .arf-card-substantial  capabilities + governance (soft shadow, hover lift)
      .arf-card-light        explore/demo cards (lighter, exploratory)
-     .arf-card-anchored     dark trust strip, quote band, decision panel
+     .arf-card-anchored     dark trust strip, quote band
    ========================================================================= */
 
 // arf-ai-... not a-r-f-...: the HF org renamed A-R-F -> ARF-AI and the old
@@ -129,22 +129,6 @@ const INDUSTRIES = [
   { name: 'Government & Defence', icon: Landmark },
   { name: 'Critical Infrastructure', icon: Factory },
   { name: 'Enterprise AI Platforms', icon: Globe },
-] as const;
-
-const DECISION_PATH = [
-  { n: '01', label: 'Application', meta: 'client' },
-  { n: '02', label: 'LLM / AI Agent', meta: 'probabilistic' },
-] as const;
-
-const CONTROL_PLANE = [
-  { label: 'Policies', state: 'matched' },
-  { label: 'Risk Engine', state: 'scored 0.31' },
-  { label: 'Approval', state: 'granted' },
-] as const;
-
-const DECISION_TAIL = [
-  { n: '06', label: 'Execution', meta: 'gated' },
-  { n: '07', label: 'Audit Trail', meta: 'signed' },
 ] as const;
 
 const SPECS = [
@@ -308,62 +292,31 @@ export default function LandingPage() {
 
   return (
     <div className="arf-page-root">
-      {/* ─── Hero: badge, headline, ONE subheadline, two CTAs, live decision panel ── */}
+      {/* ─── Hero: badge, headline, ONE subheadline, two CTAs ──────────────────
+          No longer paired with a decision-path visual here -- that content
+          duplicated the Architecture section's pipeline one scroll down.
+          Single canonical version now lives there (components/ArchitecturePipeline). */}
       <section className="arf-hero-wash">
-        <div className="arf-shell grid items-center gap-16 py-[88px] pb-[104px] lg:grid-cols-[1.05fr_0.95fr]">
-          <div>
+        <div className="arf-shell py-[88px] pb-[104px]">
+          <div className="mx-auto max-w-[680px] text-center">
             <p className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-arf-blue/25 bg-[color:var(--surface-raised)]/75 px-3 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-arf-blue">
               <span className="h-1.5 w-1.5 rounded-full bg-arf-blue" />
               Control plane for autonomous AI
             </p>
-            <h1 className="mb-6 max-w-[15ch] text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[1.03] tracking-[-0.033em] text-pretty">
+            <h1 className="mx-auto mb-6 max-w-[20ch] text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[1.03] tracking-[-0.033em] text-pretty">
               Enterprise infrastructure for <span className="arf-gradient-text">autonomous AI</span>
             </h1>
-            <p className="mb-9 max-w-[48ch] text-[18.5px] leading-[1.6] text-[color:var(--text-secondary)] text-pretty">
+            <p className="mx-auto mb-9 max-w-[52ch] text-[18.5px] leading-[1.6] text-[color:var(--text-secondary)] text-pretty">
               Safely deploy autonomous AI in production with deterministic governance, continuous reliability, and
               enterprise-grade auditability.
             </p>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3">
               <Link href="/signup" className="arf-btn-primary">
                 Request Pilot Access <ArrowRight size={18} />
               </Link>
               <Link href="/dashboard" className="arf-btn-secondary">
                 Open Governance Console
               </Link>
-            </div>
-          </div>
-
-          {/* Decision path — the architecture promise, made concrete in the hero */}
-          <div className="arf-card-anchored p-7 shadow-[0_40px_80px_-40px_rgba(19,18,24,0.75)]">
-            <div className="mb-5 flex items-center justify-between gap-3">
-              <p className="font-mono text-[10.5px] font-medium uppercase tracking-[0.13em] text-white/60">
-                Decision path
-              </p>
-              <p className="font-mono text-[10.5px] text-white/50">evaluate · 42ms</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              {DECISION_PATH.map((step) => (
-                <PathRow key={step.n} {...step} />
-              ))}
-              <div className="rounded-xl border border-arf-purple/50 bg-gradient-to-br from-arf-blue/25 to-arf-purple/20 p-3.5">
-                <p className="mb-3 font-mono text-[10px] font-medium uppercase tracking-[0.13em] text-[#c3cfff]">
-                  ARF control plane
-                </p>
-                <div className="flex flex-col gap-[7px]">
-                  {CONTROL_PLANE.map((node) => (
-                    <div
-                      key={node.label}
-                      className="flex items-center justify-between gap-3 rounded-lg bg-arf-dark/60 px-3.5 py-2.5"
-                    >
-                      <span className="text-[13.5px] font-semibold text-white">{node.label}</span>
-                      <span className="font-mono text-[10px] text-[#9fe7b8]">{node.state}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {DECISION_TAIL.map((step) => (
-                <PathRow key={step.n} {...step} />
-              ))}
             </div>
           </div>
         </div>
@@ -736,14 +689,4 @@ export default function LandingPage() {
 }
 
 /* ============================ Sub-components ============================== */
-
-function PathRow({ n, label, meta }: { n: string; label: string; meta: string }) {
-  return (
-    <div className="flex items-center gap-3 rounded-[10px] bg-white/[0.06] px-4 py-3.5">
-      <span className="font-mono text-[10px] text-white/50">{n}</span>
-      <span className="flex-1 text-sm font-semibold text-white">{label}</span>
-      <span className="font-mono text-[10.5px] text-white/55">{meta}</span>
-    </div>
-  );
-}
 
