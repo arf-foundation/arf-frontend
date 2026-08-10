@@ -296,6 +296,22 @@ export default function LandingPage() {
           No longer paired with a decision-path visual here -- that content
           duplicated the Architecture section's pipeline one scroll down.
           Single canonical version now lives there (components/ArchitecturePipeline). */}
+      {/* ─── "What's new" strip — surfaces recent shipped capability to
+          first-time visitors (ICPs evaluating trust/maturity) without
+          adding a 5th item to NavBar's deliberately-curated 4-link set. */}
+      <div className="border-b border-[color:var(--hairline)] bg-[color:var(--surface-raised)] py-2.5 text-center text-sm">
+        <Link
+          href="/changelog"
+          className="inline-flex items-center gap-2 text-[color:var(--text-secondary)] transition hover:text-arf-blue"
+        >
+          <span className="rounded-full bg-gradient-to-br from-arf-blue to-arf-purple px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.05em] text-white">
+            New
+          </span>
+          Explainable governance decisions + real PDF compliance export
+          <ArrowRight size={13} />
+        </Link>
+      </div>
+
       <section className="arf-hero-wash">
         <div className="arf-shell py-[88px] pb-[104px]">
           <div className="mx-auto max-w-[680px] text-center">

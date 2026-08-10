@@ -20,6 +20,14 @@ interface ChangelogEntry {
 // to load.
 const DEFAULT_ENTRIES: ChangelogEntry[] = [
   {
+    date: '2026-08-10',
+    title: 'Governance Console: Explainability & Compliance Export',
+    description:
+      'Every card in the Governance Console is now clickable. System Risk, Semantic Memory, Policy Violations, Audit Trail, and Cooldown & Rate Limits each open a plain-English explanation of the real methodology behind them — Bayesian risk fusion (conjugate prior + Hamiltonian Monte Carlo + hierarchical shrinkage), doubly-robust causal counterfactual estimation, FAISS-based incident retrieval, and immutable, cryptographically-signable decision records. Compliance officers can now generate and download a real PDF audit report — governance decisions, policy violations, and certifications — directly from the console.',
+    type: 'public',
+    link: 'https://github.com/arf-foundation/arf-frontend',
+  },
+  {
     date: '2026-07-30',
     title: 'v4.3.2 Axiom — Enterprise Control Plane',
     description:
