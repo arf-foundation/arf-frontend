@@ -498,3 +498,28 @@ main > div:first-child {
 .arf-status-pulse {
   animation: arf-status-pulse 2s ease-in-out infinite;
 }
+
+/* Print isolation for PrintableReportModal -- printing the compliance
+   report should print the report, not the dashboard page it's floating
+   over. Unlayered so it reliably wins regardless of what else is on the
+   page underneath. .arf-no-print marks in-report chrome (the toolbar,
+   close button) that shouldn't appear in the printed/PDF output. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #arf-printable-report,
+  #arf-printable-report * {
+    visibility: visible;
+  }
+  #arf-printable-report {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-height: none !important;
+  }
+  .arf-no-print {
+    display: none !important;
+  }
+}

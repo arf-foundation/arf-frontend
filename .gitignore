@@ -51,6 +51,7 @@ next-env.d.ts
 
 # scripts/check-contrast*.mjs output -- regenerate locally, don't commit
 scripts/*.png
+scripts/*.pdf
 
 # design-sync machine state -- staged converter scripts, build output, and
 # verification cache; not the durable set (config.json, NOTES.md,

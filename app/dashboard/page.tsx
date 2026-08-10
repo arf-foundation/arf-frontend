@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowRight, RefreshCw, Network, Shield, Lock, FileText, AlertTriangle, Clock, Printer, ChevronRight } from 'lucide-react';
+import { ArrowRight, RefreshCw, Network, Shield, Lock, FileText, AlertTriangle, Clock, Printer, ChevronRight, Download } from 'lucide-react';
 import DashboardBottomNav from '../../components/DashboardBottomNav';
 import {
   DashboardMetricCard,
@@ -12,6 +12,7 @@ import {
   riskColor,
   ExplainabilityModal,
   type ExplainabilitySection,
+  PrintableReportModal,
 } from '@arf/ui';
 
 /* ============================================================================
@@ -467,6 +468,9 @@ export default function Dashboard() {
   const [showMemoryExplain, setShowMemoryExplain] = useState(false);
   const [explainViolation, setExplainViolation] = useState<PolicyViolation | null>(null);
   const [explainCooldown, setExplainCooldown] = useState<CooldownEntry | null>(null);
+  const [reportGeneratedAt, setReportGeneratedAt] = useState<string | null>(null);
+  const [downloadingReport, setDownloadingReport] = useState(false);
+  const [reportDownloadError, setReportDownloadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
@@ -488,6 +492,38 @@ export default function Dashboard() {
       setLastUpdated(new Date());
       setIsRefreshing(false);
     }, 500);
+  }, []);
+
+  const downloadComplianceReport = useCallback(async () => {
+    setDownloadingReport(true);
+    setReportDownloadError(null);
+    try {
+      // Matches lib/governanceMockData's fixed mock timestamp range -- this
+      // report has no date-range picker (yet), so it always requests the
+      // full range the mock data actually spans.
+      const res = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ startDate: '2026-05-13', endDate: '2026-05-14' }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || `HTTP ${res.status}`);
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'arf-compliance-report.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setReportDownloadError(err instanceof Error ? err.message : 'Failed to generate report');
+    } finally {
+      setDownloadingReport(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -753,7 +789,10 @@ export default function Dashboard() {
                     </thead>
                     <tbody>
                       {MOCK_AUDIT_LOGS.map((log) => (
-                        <tr key={log.id} className="border-b border-[color:var(--hairline)]">
+                        <tr
+                          key={log.id}
+                          className="border-b border-[color:var(--hairline)] transition hover:bg-[color:var(--surface-sunken)]"
+                        >
                           <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">{log.timestamp}</td>
                           <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.component}</td>
                           <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.action}</td>
@@ -766,9 +805,9 @@ export default function Dashboard() {
                               onClick={() => setExplainLog(log)}
                               aria-label={`Explain ${log.action} on ${log.component}`}
                               aria-haspopup="dialog"
-                              className="inline-flex items-center justify-center rounded-lg p-1 text-[color:var(--text-muted)] transition hover:text-arf-blue"
+                              className="inline-flex items-center justify-center rounded-lg p-1"
                             >
-                              <ChevronRight className="h-4 w-4" />
+                              <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
                             </button>
                           </td>
                         </tr>
@@ -846,9 +885,139 @@ export default function Dashboard() {
               <div className="arf-card-substantial p-6 text-center">
                 <h2 className="mb-2 text-h3 font-semibold">Export Compliance Report</h2>
                 <p className="mb-4 text-[color:var(--text-secondary)]">Generate a summary report of governance decisions, policy violations, and system status for auditors.</p>
-                <button onClick={() => window.print()} className="arf-btn-secondary"><Printer size={16} /> Print / Save as PDF (simulated)</button>
-                <p className="mt-3 text-xs text-[color:var(--text-muted)]">Simulated action – real engine provides automated compliance report generation.</p>
+                <button
+                  onClick={() =>
+                    setReportGeneratedAt(
+                      new Date().toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })
+                    )
+                  }
+                  className="arf-btn-secondary"
+                >
+                  <Printer size={16} /> Generate report
+                </button>
+                <p className="mt-3 text-xs text-[color:var(--text-muted)]">Report data is simulated — production deployments generate this automatically from live, immutable governance records.</p>
               </div>
+
+              {reportGeneratedAt && (
+                <PrintableReportModal
+                  open={!!reportGeneratedAt}
+                  onClose={() => setReportGeneratedAt(null)}
+                  title="ARF Governance Compliance Report"
+                  generatedAt={reportGeneratedAt}
+                  footer="Simulated report — generated from public sandbox data, not a live production audit export. The real engine produces this automatically from immutable, signable decision records."
+                  actions={
+                    <button
+                      type="button"
+                      onClick={downloadComplianceReport}
+                      disabled={downloadingReport}
+                      className="arf-btn-primary disabled:opacity-60"
+                    >
+                      <Download size={16} /> {downloadingReport ? 'Generating PDF…' : 'Download PDF'}
+                    </button>
+                  }
+                >
+                  <div className="rounded-lg border border-arf-blue/25 bg-arf-blue/10 p-3 text-center text-sm text-[color:var(--text-secondary)]">
+                    🔍 Simulated sandbox report — reporting period: last 7 days.
+                  </div>
+                  {reportDownloadError && (
+                    <p className="text-center text-sm text-[#b3392a]">Couldn&rsquo;t generate the PDF: {reportDownloadError}</p>
+                  )}
+
+                  <section>
+                    <h3 className="arf-eyebrow mb-3">System status</h3>
+                    <div className="grid grid-cols-2 gap-4 rounded-lg border border-[color:var(--hairline)] p-4 sm:grid-cols-4">
+                      <div>
+                        <div className="text-xs text-[color:var(--text-muted)]">Current risk</div>
+                        <div className="text-lg font-bold" style={{ color: riskColor(riskData.risk) }}>
+                          {(riskData.risk * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-[color:var(--text-muted)]">Status</div>
+                        <StatusBadge status={riskData.status} />
+                      </div>
+                      <div>
+                        <div className="text-xs text-[color:var(--text-muted)]">Policy violations (7d)</div>
+                        <div className="text-lg font-bold">{MOCK_POLICY_VIOLATIONS.length}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-[color:var(--text-muted)]">Decisions logged</div>
+                        <div className="text-lg font-bold">{MOCK_AUDIT_LOGS.length}</div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="arf-eyebrow mb-3">Policy violations</h3>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-[color:var(--hairline)]">
+                          <th className="px-2 py-2 text-left">Policy</th>
+                          <th className="px-2 py-2 text-left">Component</th>
+                          <th className="px-2 py-2 text-left">Severity</th>
+                          <th className="px-2 py-2 text-left">Timestamp</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {MOCK_POLICY_VIOLATIONS.map((v) => (
+                          <tr key={v.id} className="border-b border-[color:var(--hairline)]">
+                            <td className="px-2 py-2 font-mono text-xs">{v.policy}</td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">{v.component}</td>
+                            <td className="px-2 py-2 capitalize text-[color:var(--text-secondary)]">{v.severity}</td>
+                            <td className="px-2 py-2 text-[color:var(--text-muted)]">{v.timestamp}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </section>
+
+                  <section>
+                    <h3 className="arf-eyebrow mb-3">Governance decisions</h3>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-[color:var(--hairline)]">
+                          <th className="px-2 py-2 text-left">Timestamp</th>
+                          <th className="px-2 py-2 text-left">Component</th>
+                          <th className="px-2 py-2 text-left">Action</th>
+                          <th className="px-2 py-2 text-right">Risk</th>
+                          <th className="px-2 py-2 text-left">Decision</th>
+                          <th className="px-2 py-2 text-left">User</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {MOCK_AUDIT_LOGS.map((log) => (
+                          <tr key={log.id} className="border-b border-[color:var(--hairline)]">
+                            <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">{log.timestamp}</td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.component}</td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.action}</td>
+                            <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">{log.riskScore.toFixed(2)}</td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.decision}</td>
+                            <td className="px-2 py-2 text-[color:var(--text-muted)]">{log.user}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </section>
+
+                  <section>
+                    <h3 className="arf-eyebrow mb-3">Compliance certifications</h3>
+                    <div className="grid grid-cols-3 gap-3 text-center text-sm">
+                      <div className="rounded-lg border border-[color:var(--hairline)] p-3">
+                        <div className="font-semibold">SOC 2 Type II</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">Audit ready</div>
+                      </div>
+                      <div className="rounded-lg border border-[color:var(--hairline)] p-3">
+                        <div className="font-semibold">ISO 27001</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">Compliant</div>
+                      </div>
+                      <div className="rounded-lg border border-[color:var(--hairline)] p-3">
+                        <div className="font-semibold">GDPR</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">Ready</div>
+                      </div>
+                    </div>
+                  </section>
+                </PrintableReportModal>
+              )}
 
               <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-6 text-center">
                 <h2 className="mb-2 text-h3 font-semibold">Get audit‑ready with ARF</h2>
