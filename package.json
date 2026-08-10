@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "dev": "next dev",
-    "build": "NEXT_TURBOPACK_BUILD=0 next build",
+    "build": "yarn workspace @arf/ui build && NEXT_TURBOPACK_BUILD=0 next build",
     "start": "next start",
     "lint": "eslint",
     "test": "jest --passWithNoTests",
