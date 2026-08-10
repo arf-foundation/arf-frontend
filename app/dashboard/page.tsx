@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowRight, RefreshCw, Info, Network, Shield, Lock, FileText, AlertTriangle, Clock, Printer } from 'lucide-react';
+import { ArrowRight, RefreshCw, Network, Shield, Lock, FileText, AlertTriangle, Clock, Printer } from 'lucide-react';
 import DashboardBottomNav from '../../components/DashboardBottomNav';
+import { DashboardMetricCard, RiskGauge, RiskFactorBreakdown, StatusBadge } from '@arf/ui';
 
 /* ============================================================================
    Design-migration pass (P3, enterprise-refresh audit). Structure and mock
@@ -142,66 +143,6 @@ const mockMemoryStats = {
 // ----------------------------------------------------------------------
 // Reusable components
 // ----------------------------------------------------------------------
-const RiskGauge = ({ risk, size = 180 }: { risk: number; size?: number }) => {
-  const radius = size * 0.35;
-  const strokeWidth = size * 0.1;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference * (1 - risk);
-  // Status color is semantic (good/warn/critical), intentionally not the
-  // brand accent -- kept as literal hex, same as before.
-  const getColor = () => {
-    if (risk < 0.4) return '#3f7a5c';
-    if (risk < 0.7) return '#a66a1e';
-    return '#b3392a';
-  };
-
-  return (
-    <div className="relative inline-flex items-center justify-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" style={{ stroke: 'var(--hairline)' }} strokeWidth={strokeWidth} />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={getColor()}
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: 'stroke-dashoffset 0.5s ease' }}
-        />
-        <text x={size / 2} y={size / 2 + size * 0.08} textAnchor="middle" style={{ fill: 'var(--text-primary)' }} fontSize={size * 0.12} fontWeight="bold">
-          {(risk * 100).toFixed(0)}%
-        </text>
-      </svg>
-    </div>
-  );
-};
-
-const RiskFactorBreakdown = ({ breakdown, weights }: { breakdown: RiskBreakdown; weights: RiskWeights }) => (
-  <div className="border-t border-[color:var(--hairline)] pt-4">
-    <div className="mb-2 flex items-center gap-1 text-sm text-[color:var(--text-muted)]">
-      Risk Factor Breakdown
-      <span title="Weighted contributions from each Bayesian component"><Info size={14} className="cursor-help text-[color:var(--text-muted)]" /></span>
-    </div>
-    <div className="space-y-2">
-      <div className="flex justify-between text-sm"><span>Conjugate prior</span><span className="font-mono">{(breakdown.conjugate * 100).toFixed(1)}% (weight {weights.conjugate.toFixed(2)})</span></div>
-      <div className="h-1.5 w-full rounded-full bg-[color:var(--surface-sunken)]"><div className="h-1.5 rounded-full bg-arf-blue" style={{ width: `${weights.conjugate * 100}%` }} /></div>
-      <div className="flex justify-between text-sm"><span>HMC prediction</span><span className="font-mono">{(breakdown.hmc * 100).toFixed(1)}% (weight {weights.hmc.toFixed(2)})</span></div>
-      <div className="h-1.5 w-full rounded-full bg-[color:var(--surface-sunken)]"><div className="h-1.5 rounded-full bg-arf-purple" style={{ width: `${weights.hmc * 100}%` }} /></div>
-      <div className="flex justify-between text-sm"><span>Hyperprior shrinkage</span><span className="font-mono">{(breakdown.hyperprior * 100).toFixed(1)}% (weight {weights.hyperprior.toFixed(2)})</span></div>
-      <div className="h-1.5 w-full rounded-full bg-[color:var(--surface-sunken)]"><div className="h-1.5 rounded-full bg-[#3f7a5c]" style={{ width: `${weights.hyperprior * 100}%` }} /></div>
-    </div>
-  </div>
-);
-
-const StatusBadge = ({ status }: { status: string }) => {
-  const color = status === 'critical' ? 'bg-[#b3392a]' : status === 'warning' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]';
-  return <span className={`inline-block rounded-full px-3 py-1 text-sm font-medium text-white ${color}`}>{status.toUpperCase()}</span>;
-};
-
 const TrustBadges = () => (
   <div className="my-6 flex flex-wrap justify-center gap-3">
     <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs"><Shield className="h-3.5 w-3.5 text-arf-blue" /> SOC2 Type II (Audit ready)</div>
@@ -335,11 +276,20 @@ export default function Dashboard() {
           {/* Risk Tab Content */}
           {activeTab === 'risk' && (
             <div className="space-y-6" role="tabpanel" id="tabpanel-risk" aria-labelledby="tab-risk">
-              <div className="arf-card-substantial p-6">
-                <div className="mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                  <h2 className="text-h3 font-semibold">System Risk</h2>
-                  <button onClick={refreshData} disabled={isRefreshing} aria-label="Refresh data" className="rounded-lg border border-[color:var(--hairline)] p-2 transition hover:border-arf-blue disabled:opacity-50"><RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} /></button>
-                </div>
+              <DashboardMetricCard
+                title="System Risk"
+                action={
+                  <button
+                    onClick={refreshData}
+                    disabled={isRefreshing}
+                    aria-label="Refresh data"
+                    className="rounded-lg border border-[color:var(--hairline)] p-2 transition hover:border-arf-blue disabled:opacity-50"
+                  >
+                    <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
+                  </button>
+                }
+                footer={lastUpdated && `Last updated: ${lastUpdated.toLocaleTimeString()}`}
+              >
                 <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
                   <div className="flex-shrink-0"><RiskGauge risk={riskData.risk} size={180} /></div>
                   <div className="flex-1 space-y-4">
@@ -352,8 +302,7 @@ export default function Dashboard() {
                     <RiskFactorBreakdown breakdown={riskData.breakdown} weights={riskData.weights} />
                   </div>
                 </div>
-                {lastUpdated && <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">Last updated: {lastUpdated.toLocaleTimeString()}</p>}
-              </div>
+              </DashboardMetricCard>
 
               <TrustBadges />
 

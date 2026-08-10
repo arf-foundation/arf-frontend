@@ -3,3 +3,7 @@ export { TierBody } from './TierBody';
 export { SandboxCard } from './SandboxCard';
 export { ConsoleCard } from './ConsoleCard';
 export { SpecsCard } from './SpecsCard';
+export { DashboardMetricCard } from './DashboardMetricCard';
+export { RiskGauge } from './RiskGauge';
+export { RiskFactorBreakdown } from './RiskFactorBreakdown';
+export { StatusBadge } from './StatusBadge';
