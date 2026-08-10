@@ -17,6 +17,17 @@ jobs:
           cache: 'yarn'
       - name: Install dependencies
         run: yarn install
+      - name: Build @arf/ui
+        # packages/ui's dist/ is gitignored (regenerated output) and nothing
+        # else in this pipeline builds it -- without this, every subsequent
+        # step that resolves the @arf/ui workspace package (jest, next build)
+        # fails with "Module not found: Can't resolve '@arf/ui'", since its
+        # package.json `main` points at ./dist/index.js. Only the esbuild JS
+        # bundle matters here; the build script's CSS-copy sub-step reads
+        # from a prior `next build`'s output, which doesn't exist yet at
+        # this point in CI, and warns instead of failing -- harmless, since
+        # the app's own Tailwind build never consumes @arf/ui's copied CSS.
+        run: cd packages/ui && yarn build
       - name: Check if yarn.lock changed
         id: lockfile-check
         run: |
