@@ -389,8 +389,12 @@ export default function Dashboard() {
           {/* Governance Tab Content */}
           {activeTab === 'governance' && (
             <div className="space-y-6" role="tabpanel" id="tabpanel-governance" aria-labelledby="tab-governance">
-              <div className="arf-card-substantial p-6">
-                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><AlertTriangle className="h-5 w-5 text-[#a66a1e]" /> Policy Violations (Last 7 days)</h2>
+              <DashboardMetricCard
+                title="Policy Violations (Last 7 days)"
+                icon={AlertTriangle}
+                iconClassName="text-[#a66a1e]"
+                footer="Simulated data – real engine provides live policy enforcement."
+              >
                 <div className="space-y-3">
                   {MOCK_POLICY_VIOLATIONS.map((v) => (
                     <div key={v.id} className="flex flex-col gap-1 rounded-lg bg-[color:var(--surface-sunken)] p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
@@ -402,8 +406,7 @@ export default function Dashboard() {
                     </div>
                   ))}
                 </div>
-                <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">Simulated data – real engine provides live policy enforcement.</p>
-              </div>
+              </DashboardMetricCard>
 
               <div className="arf-card-substantial p-6">
                 <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><FileText className="h-5 w-5 text-arf-blue" /> Audit Trail (Recent decisions)</h2>
