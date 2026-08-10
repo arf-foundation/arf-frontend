@@ -78,6 +78,14 @@ interface PolicyViolation {
   timestamp: string;
 }
 
+interface CooldownEntry {
+  id: string;
+  component: string;
+  policy: string;
+  kind: 'cooldown' | 'rate_limit';
+  status: string;
+}
+
 interface AuditLogEntry {
   id: string;
   action: string;
@@ -133,6 +141,13 @@ const MOCK_POLICY_VIOLATIONS: PolicyViolation[] = [
   { id: 'v3', policy: 'MaxPermissionLevelPolicy', component: 'auth-service', severity: 'low', timestamp: '2026-05-13 23:45:01' },
 ];
 
+// Same two rows as before, just as data instead of hand-duplicated JSX --
+// values unchanged, needed to give each row its own explain trigger.
+const MOCK_COOLDOWNS: CooldownEntry[] = [
+  { id: 'cd1', component: 'payment-api', policy: 'latency_gt_100', kind: 'cooldown', status: 'Cooldown: 45s remaining' },
+  { id: 'cd2', component: 'database', policy: 'cpu_high', kind: 'rate_limit', status: 'Rate limit: 2/5 per hour' },
+];
+
 const MOCK_AUDIT_LOGS: AuditLogEntry[] = [
   { id: 'a1', action: 'ProvisionResource', component: 'payment-api', riskScore: 0.82, decision: 'ESCALATE', timestamp: '2026-05-14 10:23:45', user: 'system' },
   { id: 'a2', action: 'GrantAccess', component: 'auth-service', riskScore: 0.45, decision: 'APPROVE', timestamp: '2026-05-14 09:15:22', user: 'admin@example.com' },
@@ -160,6 +175,9 @@ const mockMemoryStats = {
 //   - that "similar past incidents" retrieval is semantic/NLP similarity
 //     (it's metric-fingerprint similarity -- see the Semantic Memory card)
 // ----------------------------------------------------------------------
+const SANDBOX_FOOTER =
+  "Sandbox illustration — this reflects the real ARF engine's methodology applied to simulated inputs, not a live production evaluation.";
+
 function auditLogExplanation(log: AuditLogEntry): {
   title: string;
   summary: string;
@@ -212,8 +230,187 @@ function auditLogExplanation(log: AuditLogEntry): {
         ),
       },
     ],
-    footer:
-      "Sandbox illustration — this reflects the real ARF engine's methodology applied to simulated inputs, not a live production evaluation.",
+    footer: SANDBOX_FOOTER,
+  };
+}
+
+function systemRiskExplanation(risk: RiskData): {
+  title: string;
+  summary: string;
+  sections: ExplainabilitySection[];
+  footer: string;
+} {
+  return {
+    title: 'System Risk — how this score is computed',
+    summary: `This request scored ${(risk.risk * 100).toFixed(0)}% (${risk.status}). ARF combines three independent estimates into one risk score, weighted by how much evidence backs each.`,
+    sections: [
+      {
+        heading: 'Model architecture',
+        body: (
+          <>
+            A fast-updating conjugate Beta prior tracks outcomes per category from day one. An offline Hamiltonian
+            Monte Carlo model adds contextual/time-based signal once enough history exists. Hierarchical shrinkage
+            pulls sparse categories toward a shared trend across categories. The three are combined by weight of
+            evidence — categories with little history lean on the conjugate prior; well-observed categories lean
+            more on the trained models.
+          </>
+        ),
+      },
+      {
+        heading: 'Uncertainty',
+        body: (
+          <>
+            Posterior variance ({risk.variance.toFixed(4)}) is the analytic variance of the model&rsquo;s own Beta
+            distribution — real Bayesian uncertainty, not a guess, and it shrinks as more real outcomes are
+            observed. The confidence interval shown above is an illustrative band derived from that variance for
+            this sandbox; it is not necessarily the same construction production deployments use.
+          </>
+        ),
+      },
+      {
+        heading: 'Fusion weights',
+        body: (
+          <>
+            This score currently weights conjugate {risk.weights.conjugate.toFixed(2)}, HMC{' '}
+            {risk.weights.hmc.toFixed(2)}, hyperprior {risk.weights.hyperprior.toFixed(2)}. HMC and hyperprior are
+            optional refinements — if either model isn&rsquo;t trained yet for a category, weight shifts back to
+            the always-available conjugate prior rather than failing.
+          </>
+        ),
+      },
+    ],
+    footer: SANDBOX_FOOTER,
+  };
+}
+
+function semanticMemoryExplanation(stats: typeof mockMemoryStats): {
+  title: string;
+  summary: string;
+  sections: ExplainabilitySection[];
+  footer: string;
+} {
+  return {
+    title: 'Semantic Memory — how similar incidents are found',
+    summary: `ARF found ${stats.similar_incidents} related past incidents for this request, with a top similarity score of ${stats.rag_similarity.toFixed(2)}.`,
+    sections: [
+      {
+        heading: 'Retrieval method',
+        body: (
+          <>
+            Incidents are indexed in a FAISS nearest-neighbor index ({stats.memory_usage}) and ranked by similarity
+            s = 1 / (1 + distance) between the current incident&rsquo;s fingerprint and each stored one.
+          </>
+        ),
+      },
+      {
+        heading: 'What "similar" means',
+        body: (
+          <>
+            In the open-source/sandbox tier, incident fingerprints are built from structured metrics — component,
+            metric type, error rate, latency — not natural-language understanding. Two incidents are similar
+            because their operational signature matches, not because a language model read and compared their
+            descriptions.
+          </>
+        ),
+      },
+      {
+        heading: 'Why it matters for this decision',
+        body: (
+          <>
+            Retrieved incidents feed a weighted success-rate estimate that adjusts for each action&rsquo;s own
+            causal effect, so a policy that &ldquo;worked&rdquo; several times isn&rsquo;t credited for outcomes
+            that would have happened anyway.
+          </>
+        ),
+      },
+    ],
+    footer: SANDBOX_FOOTER,
+  };
+}
+
+function policyViolationExplanation(v: PolicyViolation): {
+  title: string;
+  summary: string;
+  sections: ExplainabilitySection[];
+  footer: string;
+} {
+  const severityNote =
+    v.severity === 'high'
+      ? 'high-severity violations block the action outright'
+      : v.severity === 'medium'
+        ? 'medium-severity violations are logged and typically escalated for review'
+        : 'low-severity violations are logged for audit without blocking';
+
+  return {
+    title: `${v.policy} — ${v.component}`,
+    summary: `${v.policy} flagged ${v.component} as a ${v.severity}-severity violation. Policies are evaluated deterministically, before any action reaches infrastructure.`,
+    sections: [
+      {
+        heading: 'How policies are structured',
+        body: (
+          <>
+            ARF policies compose from simple boolean building blocks (AND / OR / NOT) into rules like this one,
+            formally specified so their behavior is provable rather than only tested by example.
+          </>
+        ),
+      },
+      {
+        heading: 'Severity',
+        body: <>Severity ({v.severity}) reflects how directly this violation could affect production safety or compliance — {severityNote}.</>,
+      },
+      {
+        heading: 'Enforcement',
+        body: (
+          <>
+            Policy evaluation runs mechanically before infrastructure access is granted — not as an advisory
+            suggestion a human can silently skip. In production, a secondary evaluator cross-checks results and
+            logs any disagreement for investigation.
+          </>
+        ),
+      },
+    ],
+    footer: SANDBOX_FOOTER,
+  };
+}
+
+function cooldownExplanation(c: CooldownEntry): {
+  title: string;
+  summary: string;
+  sections: ExplainabilitySection[];
+  footer: string;
+} {
+  const metricHint = c.policy.includes('latency')
+    ? 'response latency'
+    : c.policy.includes('cpu')
+      ? 'CPU utilization'
+      : 'a monitored metric';
+
+  return {
+    title: `${c.component} — ${c.policy}`,
+    summary: `${c.component} is currently under a ${c.kind === 'cooldown' ? 'cooldown' : 'rate limit'} from policy ${c.policy}: ${c.status}.`,
+    sections: [
+      {
+        heading: 'Why rate limits exist',
+        body: (
+          <>
+            Healing policies define not just when to act, but how often — a cooldown window after an action fires,
+            and a maximum executions-per-hour cap — so an unstable signal can&rsquo;t trigger a runaway loop of
+            automated responses.
+          </>
+        ),
+      },
+      {
+        heading: 'This policy',
+        body: (
+          <>
+            Policy <span className="font-mono">{c.policy}</span> conditions on {metricHint}. Once triggered, it
+            enters a {c.kind === 'cooldown' ? 'cooldown' : 'rate-limit'} state before it can fire again on this
+            component.
+          </>
+        ),
+      },
+    ],
+    footer: SANDBOX_FOOTER,
   };
 }
 
@@ -266,6 +463,10 @@ export default function Dashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isHttpWarning, setIsHttpWarning] = useState(false);
   const [explainLog, setExplainLog] = useState<AuditLogEntry | null>(null);
+  const [showRiskExplain, setShowRiskExplain] = useState(false);
+  const [showMemoryExplain, setShowMemoryExplain] = useState(false);
+  const [explainViolation, setExplainViolation] = useState<PolicyViolation | null>(null);
+  const [explainCooldown, setExplainCooldown] = useState<CooldownEntry | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
@@ -378,9 +579,21 @@ export default function Dashboard() {
                       <div><div className="text-sm text-[color:var(--text-muted)]">Confidence Interval (90%)</div><div className="font-mono text-sm">[{Math.max(0, riskData.risk - 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}, {Math.min(1, riskData.risk + 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}]</div></div>
                     </div>
                     <RiskFactorBreakdown breakdown={riskData.breakdown} weights={riskData.weights} />
+                    <button
+                      type="button"
+                      onClick={() => setShowRiskExplain(true)}
+                      aria-haspopup="dialog"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-arf-blue hover:opacity-80"
+                    >
+                      Why this score? <ArrowRight size={14} />
+                    </button>
                   </div>
                 </div>
               </DashboardMetricCard>
+
+              {showRiskExplain && (
+                <ExplainabilityModal open={showRiskExplain} onClose={() => setShowRiskExplain(false)} {...systemRiskExplanation(riskData)} />
+              )}
 
               <TrustBadges />
 
@@ -399,7 +612,23 @@ export default function Dashboard() {
                   <div><div className="text-2xl font-bold text-[#a66a1e]">{mockMemoryStats.cache_hits}</div><div className="text-xs text-[color:var(--text-muted)]">Cache Hits</div></div>
                   <div><div className="break-words font-mono text-xs text-[color:var(--text-secondary)]">{mockMemoryStats.memory_usage}</div><div className="text-xs text-[color:var(--text-muted)]">Index Type</div></div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setShowMemoryExplain(true)}
+                  aria-haspopup="dialog"
+                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-arf-blue hover:opacity-80"
+                >
+                  How this works <ArrowRight size={14} />
+                </button>
               </DashboardMetricCard>
+
+              {showMemoryExplain && (
+                <ExplainabilityModal
+                  open={showMemoryExplain}
+                  onClose={() => setShowMemoryExplain(false)}
+                  {...semanticMemoryExplanation(mockMemoryStats)}
+                />
+              )}
 
               <div className="arf-card-substantial p-6">
                 <h2 className="mb-4 text-h3 font-semibold">Recent Incidents (Sandbox)</h2>
@@ -471,20 +700,36 @@ export default function Dashboard() {
                 title="Policy Violations (Last 7 days)"
                 icon={AlertTriangle}
                 iconClassName="text-[#a66a1e]"
-                footer="Simulated data – real engine provides live policy enforcement."
+                footer="Simulated data – real engine provides live policy enforcement. Click a violation to see why it fired."
               >
                 <div className="space-y-3">
                   {MOCK_POLICY_VIOLATIONS.map((v) => (
-                    <div key={v.id} className="flex flex-col gap-1 rounded-lg bg-[color:var(--surface-sunken)] p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => setExplainViolation(v)}
+                      aria-haspopup="dialog"
+                      aria-label={`Explain ${v.policy} on ${v.component}`}
+                      className="flex w-full flex-col gap-1 rounded-lg bg-[color:var(--surface-sunken)] p-3 text-left transition hover:bg-[color:var(--hairline)] sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+                    >
                       <div><span className="font-mono text-sm">{v.policy}</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">on {v.component}</span></div>
                       <div className="flex items-center gap-3">
                         <span className={`rounded-full px-2 py-0.5 text-xs text-white ${v.severity === 'high' ? 'bg-[#b3392a]' : v.severity === 'medium' ? 'bg-[#a66a1e]' : 'bg-arf-blue'}`}>{v.severity.toUpperCase()}</span>
                         <span className="text-xs text-[color:var(--text-muted)]">{v.timestamp}</span>
+                        <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </DashboardMetricCard>
+
+              {explainViolation && (
+                <ExplainabilityModal
+                  open={!!explainViolation}
+                  onClose={() => setExplainViolation(null)}
+                  {...policyViolationExplanation(explainViolation)}
+                />
+              )}
 
               <DashboardMetricCard
                 title="Audit Trail (Recent decisions)"
@@ -539,10 +784,32 @@ export default function Dashboard() {
 
               <DashboardMetricCard title="Cooldown & Rate Limits (Sandbox)" icon={Clock} iconClassName="text-[#a66a1e]">
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between rounded-lg bg-[color:var(--surface-sunken)] p-3"><div><span className="font-mono text-sm">payment-api</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">(policy: latency_gt_100)</span></div><span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">Cooldown: 45s remaining</span></div>
-                  <div className="flex items-center justify-between rounded-lg bg-[color:var(--surface-sunken)] p-3"><div><span className="font-mono text-sm">database</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">(policy: cpu_high)</span></div><span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">Rate limit: 2/5 per hour</span></div>
+                  {MOCK_COOLDOWNS.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setExplainCooldown(c)}
+                      aria-haspopup="dialog"
+                      aria-label={`Explain ${c.policy} on ${c.component}`}
+                      className="flex w-full items-center justify-between rounded-lg bg-[color:var(--surface-sunken)] p-3 text-left transition hover:bg-[color:var(--hairline)]"
+                    >
+                      <div><span className="font-mono text-sm">{c.component}</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">(policy: {c.policy})</span></div>
+                      <div className="flex items-center gap-3">
+                        <span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">{c.status}</span>
+                        <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </DashboardMetricCard>
+
+              {explainCooldown && (
+                <ExplainabilityModal
+                  open={!!explainCooldown}
+                  onClose={() => setExplainCooldown(null)}
+                  {...cooldownExplanation(explainCooldown)}
+                />
+              )}
 
               <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-6 text-center">
                 <h2 className="mb-2 text-h3 font-semibold">Take full control of governance</h2>
