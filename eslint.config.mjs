@@ -15,6 +15,12 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Design handoff bundle: reference/example files, not shipped app code.
     "design_handoff_arf_enterprise_refresh/**",
+    // design-sync machine state: staged converter scripts, generated bundle
+    // output (including vendored React itself under ds-bundle/_vendor/),
+    // and the verification cache -- none of it is source this repo owns.
+    "packages/*/.ds-sync/**",
+    "packages/*/ds-bundle/**",
+    "packages/*/.design-sync/.cache/**",
   ]),
   // Allow require in .cjs files (e.g., jest.config.cjs)
   {
