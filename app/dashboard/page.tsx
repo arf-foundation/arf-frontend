@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowRight, RefreshCw, Network, Shield, Lock, FileText, AlertTriangle, Clock, Printer } from 'lucide-react';
 import DashboardBottomNav from '../../components/DashboardBottomNav';
-import { DashboardMetricCard, RiskGauge, RiskFactorBreakdown, StatusBadge } from '@arf/ui';
+import { DashboardMetricCard, RiskGauge, RiskFactorBreakdown, StatusBadge, riskColor } from '@arf/ui';
 
 /* ============================================================================
    Design-migration pass (P3, enterprise-refresh audit). Structure and mock
@@ -294,7 +294,7 @@ export default function Dashboard() {
                   <div className="flex-shrink-0"><RiskGauge risk={riskData.risk} size={180} /></div>
                   <div className="flex-1 space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                      <div><div className="text-sm text-[color:var(--text-muted)]">Risk Score</div><div className="text-3xl font-bold">{(riskData.risk * 100).toFixed(0)}%</div></div>
+                      <div><div className="text-sm text-[color:var(--text-muted)]">Risk Score</div><div className="text-3xl font-bold transition-colors duration-500" style={{ color: riskColor(riskData.risk) }}>{(riskData.risk * 100).toFixed(0)}%</div></div>
                       <div><div className="text-sm text-[color:var(--text-muted)]">Status</div><StatusBadge status={riskData.status} /></div>
                       <div><div className="text-sm text-[color:var(--text-muted)]">Posterior Variance</div><div className="font-mono text-lg">{riskData.variance.toFixed(4)}</div></div>
                       <div><div className="text-sm text-[color:var(--text-muted)]">Confidence Interval (90%)</div><div className="font-mono text-sm">[{Math.max(0, riskData.risk - 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}, {Math.min(1, riskData.risk + 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}]</div></div>

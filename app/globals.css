@@ -488,3 +488,13 @@ main > div:first-child {
     border-color: color-mix(in oklch, var(--color-arf-blue) 45%, transparent);
   }
 }
+
+/* Dashboard StatusBadge -- pulse reserved for the "critical" state only,
+   so it actually signals urgency instead of every badge quietly buzzing. */
+@keyframes arf-status-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(179, 57, 42, 0.45); }
+  50% { box-shadow: 0 0 0 6px rgba(179, 57, 42, 0); }
+}
+.arf-status-pulse {
+  animation: arf-status-pulse 2s ease-in-out infinite;
+}

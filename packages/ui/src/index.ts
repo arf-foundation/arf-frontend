@@ -7,3 +7,4 @@ export { DashboardMetricCard } from './DashboardMetricCard';
 export { RiskGauge } from './RiskGauge';
 export { RiskFactorBreakdown } from './RiskFactorBreakdown';
 export { StatusBadge } from './StatusBadge';
+export { riskColor } from './riskColor';
