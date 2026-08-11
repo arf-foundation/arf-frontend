@@ -5,8 +5,7 @@
 
 **Interactive frontend for the Agentic Reliability Framework (ARF)** – a Bayesian‑powered governance system for AI infrastructure. This repository contains a **public, sanitised demo dashboard** that illustrates ARF concepts. The core engine is **access‑controlled** and available only to qualified pilots and enterprise customers.
 
-🔗 **Live demo:** [arf-frontend-sandy.vercel.app](https://arf-frontend-sandy.vercel.app)  
-📖 **Specification:** [arf-spec](https://github.com/arf-foundation/arf-spec)
+🔗 **Live demo:** [arf-frontend-sandy.vercel.app](https://arf-frontend-sandy.vercel.app)
 
 > ⚠️ **Important** – The ARF core engine (`agentic_reliability_framework`, `arf-api`) is **not open source**. It is proprietary, access‑controlled, and offered under outcome‑based pricing. This frontend repo contains only public, demo‑grade code.
 
@@ -71,8 +70,9 @@ The dashboard will be available at http://localhost:3000.
 
 | Project | Description | Access |
 |---------|-------------|--------|
-| [`arf-spec`](https://github.com/arf-foundation/arf-spec) | Canonical data models, API contracts | Public (Apache 2.0) |
+| [`arf-risk-demo`](https://github.com/arf-foundation/arf-risk-demo) | Public, client-side risk-scoring demo | Public (Apache 2.0) |
 | [`pitch-deck`](https://github.com/arf-foundation/pitch-deck) | Public overview and vision | Public |
+| **arf-spec** | Canonical data models, API contracts | **Access‑controlled** – pilot only |
 | **Core Engine** | Bayesian risk scoring, semantic memory | **Access‑controlled** – pilot only |
 | **API Control Plane** | Production FastAPI service | **Access‑controlled** – pilot only |
 

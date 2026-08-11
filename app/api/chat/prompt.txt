@@ -60,18 +60,18 @@ Rules:
 
 Compute `similarity_confidence` using the following binary evidence formula. Each factor is 0 or 1.
 
-- `root_cause_documented` = 1 if explicit root cause statement exists in input AND is corroborated by at least one log or remediation step; otherwise 0. Weight: 0.40.
-- `remediation_evidence_present` = 1 if remediation action and outcome are documented; otherwise 0. Weight: 0.30.
+- `root_cause_documented` = 1 if explicit root cause statement exists in input AND is corroborated by at least one log or remediation step; otherwise 0. Weight: 0.35.
+- `remediation_evidence_present` = 1 if remediation action and outcome are documented; otherwise 0. Weight: 0.35.
 - `log_completeness` = 1 if time-series logs or key metrics exist and cover the incident window; otherwise 0. Weight: 0.30.
 
 Formula:
 
 ```python
-raw_score = (0.4 * root_cause_documented) + (0.3 * remediation_evidence_present) + (0.3 * log_completeness)
-similarity_confidence = min(raw_score, 0.85)
+raw_score = (0.35 * root_cause_documented) + (0.35 * remediation_evidence_present) + (0.30 * log_completeness)
+similarity_confidence = min(raw_score, 0.80)
 ```
 
-Never exceed 0.85 unless root cause is explicitly documented and validated.
+Never exceed 0.80 unless root cause is explicitly documented and validated.
 
 Compute `pattern_signal_count` as the count of independent supporting signals (symptom matches, error codes, metric anomalies). Assign a known pattern only if `pattern_signal_count >= 2`.
 
@@ -79,12 +79,12 @@ Compute `pattern_signal_count` as the count of independent supporting signals (s
 
 Compute `risk_score` using a rule-based category lookup. Normalize to 0–1. Tune mappings with pilot data.
 
-- DB write or drop → 0.90
-- Multi-region routing change → 0.85
-- Security modification → 0.85
-- Production config change (multi-service) → 0.75
-- Single-service restart → 0.25
-- Non-production action → 0.15
+- DB write or drop → 0.88
+- Multi-region routing change → 0.80
+- Security modification → 0.82
+- Production config change (multi-service) → 0.72
+- Single-service restart → 0.20
+- Non-production action → 0.10
 
 When `normalized_category` is Database, Network, or Security, `risk_score` must be ≥ 0.7 unless explicitly stated otherwise.
 
@@ -278,8 +278,8 @@ If input is severely incomplete:
   "detected_patterns": ["Misconfiguration"],
   "pattern_signal_count": 3,
   "probable_root_cause": "DB connection pool misconfiguration (max connections too low)",
-  "similarity_confidence": 0.85,
-  "risk_score": 0.82,
+  "similarity_confidence": 0.80,
+  "risk_score": 0.78,
   "gating_rule_triggered": "risk_threshold_exceeded",
   "gating_rule_stack": ["db_network_security", "risk_threshold_exceeded", "policy_flag_present"],
   "policy_flag_frequency_hint": ["missing_observability"],
