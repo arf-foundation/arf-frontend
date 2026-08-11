@@ -33,7 +33,6 @@ const DEFAULT_ENTRIES: ChangelogEntry[] = [
     description:
       'The first named ARF AI release. Axiom introduces deterministic replay verification, active cost inference via Bayesian experimental design, a hardened gateway with defense-in-depth, and a fully enterprise-positioned Governance Console. All Dependabot alerts resolved across all repositories.',
     type: 'public',
-    link: 'https://github.com/arf-foundation/agentic_reliability_framework/releases/tag/v4.3.2-axiom',
   },
   {
     date: '2026-07-23',
@@ -41,7 +40,6 @@ const DEFAULT_ENTRIES: ChangelogEntry[] = [
     description:
       'The ARF AI public presence has been transformed into an enterprise‑grade control plane for autonomous AI. The landing page, navigation, and messaging now speak directly to CTOs, compliance officers, and AI infrastructure buyers. The live demo dashboard is rebranded as the Governance Console with clearer sandbox disclaimers and enterprise‑ready trust signals.',
     type: 'public',
-    link: 'https://github.com/arf-foundation/arf-frontend/releases/tag/v4.3.2',
   },
   {
     date: '2026-07-22',
@@ -49,7 +47,6 @@ const DEFAULT_ENTRIES: ChangelogEntry[] = [
     description:
       'Pilot customers can now enable continuous Bayesian risk tracking via the Augmented Gaussian Sum Filter. Operating in log‑odds space, the filter maintains a Gaussian mixture approximation of the posterior failure probability, updating with every decision. It resists covariance inflation and provides sharper risk estimates than the static conjugate prior—all while preserving deterministic replay via intent‑seeded RNG.',
     type: 'pilot',
-    link: 'https://github.com/arf-foundation/agentic_reliability_framework/releases/tag/v4.3.2',
   },
   {
     date: '2026-07-22',
@@ -57,7 +54,6 @@ const DEFAULT_ENTRIES: ChangelogEntry[] = [
     description:
       'The governance loop now learns operational cost parameters from human overrides using maximum entropy inverse reinforcement learning. With a Bayesian prior and MAP estimation, the engine continuously refines expected‑loss minimisation to better match your organisation’s risk appetite. Available after recording 10+ overrides.',
     type: 'pilot',
-    link: 'https://github.com/arf-foundation/agentic_reliability_framework/releases/tag/v4.3.2',
   },
   {
     date: '2026-07-22',
@@ -65,7 +61,6 @@ const DEFAULT_ENTRIES: ChangelogEntry[] = [
     description:
       'An optional offline RL policy can now override rule‑based decisions when confidence is high. Trained via Conservative Q‑Learning with a Lyapunov stability constraint, the policy minimises long‑term risk while respecting safety boundaries. This enables adaptive governance that improves with operational history—without online exploration.',
     type: 'pilot',
-    link: 'https://github.com/arf-foundation/agentic_reliability_framework/releases/tag/v4.3.2',
   },
 ];
 

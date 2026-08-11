@@ -12,13 +12,11 @@ import { ArrowRight, Menu, Moon, Sun, X } from 'lucide-react';
    exist. Sign In is OUTLINED (a place you log into, WorkOS AuthKit later);
    Request Pilot Access stays the single filled CTA.
 
-   "Docs" has no dedicated internal route (no /spec page in this repo) — it
-   points at the same external GitHub org the previous "Spec" nav item used.
 --------------------------------------------------------------------------- */
 
 const PRIMARY_LINKS = [
   { label: 'Product', href: '/#capabilities' },
-  { label: 'Docs', href: 'https://github.com/arf-foundation', external: true },
+  { label: 'Docs', href: '/faq' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Console', href: '/dashboard' },
 ] as const;

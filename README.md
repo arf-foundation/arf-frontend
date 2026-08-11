@@ -51,7 +51,7 @@ The dashboard will be available at http://localhost:3000.
 
 ## Architecture & Data Flow
 
-- **Next.js rewrites** – All `/api/v1/*` requests are proxied to the public sandbox API (`https://A-R-F-ARF-Sandbox-API.hf.space`). No API keys are exposed.
+- **Next.js rewrites** – All `/api/v1/*` requests are proxied to the public sandbox API (`https://arf-ai-arf-sandbox-api.hf.space`). No API keys are exposed.
 - **Sandbox API** – Returns a sanitised, mock evaluation (rate‑limited, no real Bayesian inference). The frontend transforms the sandbox response into the `EvaluateResponse` format used by the UI.
 - **Mock data** – Components like `RecentDecisions`, `MemoryStats`, and `RiskChart` use local mock data because the sandbox does not provide history or memory endpoints.
 
@@ -106,7 +106,7 @@ For questions about pilot access or enterprise licensing, email **petter2025us@o
 
 ### Development Workflow
 - After cloning, run `yarn install` and `yarn dev`. No additional configuration is needed.
-- To test the sandbox API integration locally, ensure you have an internet connection – the frontend will call `https://A-R-F-ARF-Sandbox-API.hf.space/v1/evaluate`.
+- To test the sandbox API integration locally, ensure you have an internet connection – the frontend will call `https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate`.
 - If you need to point to a different API backend, modify the `rewrites` section in `next.config.ts`.
 
 ### Reporting Issues
