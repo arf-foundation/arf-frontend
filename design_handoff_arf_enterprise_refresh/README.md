@@ -191,7 +191,7 @@ Server component; no hooks needed.
 
 ## Interactions & behavior
 
-- **Sandbox API.** `POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate`, body
+- **Sandbox API.** `POST https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate`, body
   `{service_name:'api', event_type:'latency', severity:'high', metrics:{latency_ms:450}}`.
   Byte-for-byte the current call, with the same `isMounted` guard and timer cleanup.
   Loading → "Evaluating…" + disabled; success → JSON in a dark `<pre>`; failure →

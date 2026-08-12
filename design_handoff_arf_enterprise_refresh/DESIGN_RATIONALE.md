@@ -187,7 +187,7 @@ motion is suppressed under `prefers-reduced-motion`.
   The architecture section leads with a styled flow (accessible `<ol>`, real
   text) and keeps the Mermaid render inside a `<details>` as the canonical source
   diagram — so the diagram stays functional without being the weak visual.
-- The sandbox `fetch` to `a-r-f-arf-sandbox-api.hf.space/v1/evaluate` is
+- The sandbox `fetch` to `arf-ai-arf-sandbox-api.hf.space/v1/evaluate` is
   byte-for-byte the same call, with the same mount-guard and timer cleanup.
 - No inline `<script>` for theme switching — the CSP forbids `unsafe-inline`, so
   the theme class is applied by `NavBar`'s client effect and persisted to

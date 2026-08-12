@@ -55,7 +55,7 @@ const DIAGRAM = `flowchart LR
     F --> G[Execution]
     G --> H[Audit Trail]`;
 
-const CURL_COMMAND = `curl -X POST https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate \\
+const CURL_COMMAND = `curl -X POST https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
 
@@ -272,7 +272,7 @@ export default function LandingPage() {
     setSandboxLoading(true);
     setSandboxError(null);
     try {
-      const res = await fetch('https://a-r-f-arf-sandbox-api.hf.space/v1/evaluate', {
+      const res = await fetch('https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
