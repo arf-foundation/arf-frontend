@@ -20,6 +20,7 @@ ARF Frontend provides a user‑friendly dashboard to **visualise risk metrics, s
 - 🧠 Memory graph statistics (cached demo values)
 - 📈 Historical risk chart (synthetic data)
 - 🧪 Incident evaluation form – calls the **public sandbox API** (sanitised, rate‑limited) and displays risk scores, recommended actions, and explanations.
+- 🤖 **Institutional Memory Agent** (`/agent`) - paste an incident description, get a structured governance evaluation (risk score, execution mode, gating rationale) back from a live Claude-backed endpoint. Public and unauthenticated.
 - 🔗 Links to pilot access request
 
 ---
@@ -60,8 +61,9 @@ The dashboard will be available at http://localhost:3000.
 - **Next.js rewrites** – All `/api/v1/*` requests are proxied to the public sandbox API (`https://arf-ai-arf-sandbox-api.hf.space`). No API keys are exposed.
 - **Sandbox API** – Returns a sanitised, mock evaluation (rate‑limited, no real Bayesian inference). The frontend transforms the sandbox response into the `EvaluateResponse` format used by the UI.
 - **Mock data** – Components like `RecentDecisions`, `MemoryStats`, and `RiskChart` use local mock data because the sandbox does not provide history or memory endpoints.
+- **Institutional Memory Agent** (`/agent`) – `POST /api/chat` calls Claude directly via a Vercel Connect connector, using the deterministic evaluation prompt in `app/api/chat/prompt.txt`. This is a real LLM call, separate from the sandbox API and from the protected ARF engine.
 
-> The live dashboard **never** calls the protected ARF engine. All data is either from the public sandbox or generated locally.
+> The live dashboard **never** calls the protected ARF engine. All data is either from the public sandbox, a direct Claude call (`/agent`), or generated locally.
 
 ## Public vs. Private – What This Repo Is (and Isn’t)
 
