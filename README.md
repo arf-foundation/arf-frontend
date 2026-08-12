@@ -38,7 +38,14 @@ yarn install
 
 ### Environment Variables
 
-**No environment variables are required** for the frontend to work. The sandbox API URL is hardcoded via Next.js rewrites (see next.config.ts).If you wish to change the API target, modify the rewrites section in next.config.ts.
+**No environment variables are required to run the dashboard itself** (`yarn dev`). The sandbox API URL is hardcoded via Next.js rewrites (see next.config.ts). If you wish to change the API target, modify the rewrites section in next.config.ts.
+
+Two API routes need credentials to work in production, and are inert (or error) without them locally:
+
+| Route | Requires | Purpose |
+|---|---|---|
+| `POST /api/pilot-request` | `NOTION_API_KEY`, `NOTION_DATABASE_ID` | Writes pilot signup submissions to Notion |
+| `POST /api/chat` (used by the `/agent` page) | Vercel Connect connector (`VERCEL_OIDC_TOKEN`, injected automatically on Vercel deploys) | Calls Claude for the public Institutional Memory Agent demo |
 
 ### Run the development server
 
