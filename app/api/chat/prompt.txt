@@ -278,7 +278,7 @@ If input is severely incomplete:
   "probable_root_cause": "DB connection pool misconfiguration (max connections too low)",
   "similarity_confidence": 0.67,
   "risk_score": 0.75,
-  "gating_rule_triggered": "risk_threshold_exceeded",
+  "gating_rule_triggered": "policy_flag_present",
   "gating_rule_stack": ["db_network_security", "risk_threshold_exceeded", "policy_flag_present"],
   "policy_flag_frequency_hint": ["missing_observability"],
   "healing_intent": {
