@@ -483,7 +483,7 @@ export default function Dashboard() {
   // tabs pattern): Left/Right (and Home/End) move selection + focus.
   const handleTabListKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const currentIndex = TABS.findIndex((t) => t.id === activeTab);
-    let nextIndex = currentIndex;
+    let nextIndex: number;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       nextIndex = (currentIndex + 1) % TABS.length;
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
