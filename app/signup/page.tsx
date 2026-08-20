@@ -222,6 +222,7 @@ export default function SignupPage() {
           <div
             className="mb-6 flex justify-between"
             role="progressbar"
+            aria-label="Signup progress"
             aria-valuenow={step}
             aria-valuemin={1}
             aria-valuemax={totalSteps}

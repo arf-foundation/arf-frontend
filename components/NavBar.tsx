@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { ArrowRight, Menu, Moon, Sun, X } from 'lucide-react';
 
 /* ----------------------------------------------------------------------------
@@ -23,31 +23,45 @@ const PRIMARY_LINKS = [
 
 type Theme = 'light' | 'dark';
 
+/* ----------------------------------------------------------------------------
+   The active theme lives on <html> as a `.dark` class, applied by the blocking
+   script in layout.tsx before first paint. That class is therefore external
+   state that React does not own, so it is read through useSyncExternalStore
+   rather than mirrored into useState.
+
+   The server snapshot is deliberately 'light' — SSR cannot know the visitor's
+   stored preference. Reading the real class during render instead would make
+   the first client render disagree with the SSR markup (different icon and
+   aria-label on the toggle), which React treats as a failed hydration: it
+   discards the server tree and regenerates it on the client. Because <html> is
+   a React host singleton, regenerating it clears every attribute React did not
+   itself render — stripping the `.dark` the blocking script had just applied,
+   so dark-mode visitors got the right theme until hydration and then a hard
+   flip to light. useSyncExternalStore is the sanctioned way to render the
+   server value during hydration and re-read the real one immediately after.
+--------------------------------------------------------------------------- */
+const subscribeToTheme = (onStoreChange: () => void) => {
+  const observer = new MutationObserver(onStoreChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  return () => observer.disconnect();
+};
+
+const getThemeSnapshot = (): Theme =>
+  document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+
+const getServerThemeSnapshot = (): Theme => 'light';
+
 export default function NavBar() {
-  // Lazy initializer instead of an effect: layout.tsx's blocking inline
-  // script already applies `.dark` to <html> before this component hydrates
-  // (CSP here allows 'unsafe-inline', so that script can run pre-paint), so
-  // reading the class back here is a synchronous read of already-settled
-  // DOM state, not a guess to correct later — no set-state-in-effect, and no
-  // one-frame icon flash while an effect would otherwise catch up.
-  const [theme, setTheme] = useState<Theme>(() =>
-    typeof document !== 'undefined' && document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-  );
+  const theme = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, getServerThemeSnapshot);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const toggleTheme = () => {
-    // Decide from the real DOM class, not the `theme` state variable. If
-    // React's initial read of that class (in the lazy initializer above)
-    // ever raced the pre-hydration blocking script and landed on the wrong
-    // value, deciding from `theme` would make the first click "correct" the
-    // mismatch instead of doing what was clicked — the class flips, but not
-    // to where the user expects — and only the second click, now reading a
-    // `theme` that finally matches reality, does the intended toggle. Sourcing
-    // the decision from the DOM itself removes the possibility of that
-    // divergence entirely; `theme` still drives the icon, nothing else.
+    // Decide from the real DOM class rather than `theme`, which is 'light' for
+    // the one render that hydration occupies. Toggling the class is all that is
+    // needed to update the icon too — the MutationObserver above sees the change
+    // and re-reads the snapshot, so there is no separate state to keep in sync.
     const next: Theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
     document.documentElement.classList.toggle('dark', next === 'dark');
-    setTheme(next);
     try {
       window.localStorage.setItem('arf-theme', next);
     } catch {
