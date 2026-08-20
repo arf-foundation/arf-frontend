@@ -33,7 +33,7 @@ export default function FAQPage() {
               question="How do I get access to the real engine?"
               answer={
                 <>
-                  Submit a <Link href="/signup" className="text-arf-blue hover:underline">pilot request</Link> or contact us at <a href="mailto:juan@arf-ai.com" className="text-arf-blue hover:underline">juan@arf-ai.com</a>. Access is reviewed case by case for qualified use cases.
+                  Submit a <Link href="/signup" className="text-arf-blue underline underline-offset-2">pilot request</Link> or contact us at <a href="mailto:juan@arf-ai.com" className="text-arf-blue underline underline-offset-2">juan@arf-ai.com</a>. Access is reviewed case by case for qualified use cases.
                 </>
               }
             />
@@ -91,7 +91,7 @@ export default function FAQPage() {
               answer={
                 <>
                   There is an invite‑only Slack workspace for pilot customers and approved collaborators.{" "}
-                  <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-arf-blue hover:underline">
+                  <a href="https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg" target="_blank" rel="noopener noreferrer" className="text-arf-blue underline underline-offset-2">
                     Join here
                   </a>
                   .
@@ -117,7 +117,7 @@ export default function FAQPage() {
         </section>
 
         <p className="mt-8 border-t border-[color:var(--hairline)] pt-4 text-xs text-[color:var(--text-muted)] sm:text-sm">
-          For more help, <Link href="/signup" className="text-arf-blue hover:underline">request pilot access</Link> or contact us directly.
+          For more help, <Link href="/signup" className="text-arf-blue underline underline-offset-2">request pilot access</Link> or contact us directly.
         </p>
       </div>
     </div>

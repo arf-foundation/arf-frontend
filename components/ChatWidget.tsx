@@ -263,6 +263,7 @@ export default function ChatWidget() {
 
           {/* Composer */}
           <div className="flex flex-shrink-0 items-end gap-2 border-t border-[color:var(--hairline)] bg-[color:var(--surface-raised)] p-3">
+            {/* text-base on small screens keeps iOS Safari from auto-zooming on focus; compact 13.5px from sm up */}
             <textarea
               ref={inputRef}
               value={input}
@@ -271,7 +272,7 @@ export default function ChatWidget() {
               placeholder="Describe an incident…"
               aria-label="Message the ARF agent"
               rows={1}
-              className="max-h-28 flex-1 resize-none rounded-xl border border-[color:var(--hairline)] bg-[color:var(--surface-canvas)] px-3 py-2.5 text-[13.5px] text-[color:var(--text-primary)] outline-none focus-visible:border-[color:var(--color-arf-blue)]"
+              className="max-h-28 flex-1 resize-none rounded-xl border border-[color:var(--hairline)] bg-[color:var(--surface-canvas)] px-3 py-2.5 text-base text-[color:var(--text-primary)] outline-none focus-visible:border-[color:var(--color-arf-blue)] sm:text-[13.5px]"
             />
             <button
               type="button"

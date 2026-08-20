@@ -526,9 +526,9 @@ export default function SignupPage() {
                   <label htmlFor="agreeToTerms" className="text-sm text-[color:var(--text-secondary)]">
                     I understand that ARF is proprietary and access is granted at the founder’s discretion.
                     I agree to the{' '}
-                    <Link href="/terms" className="text-arf-blue hover:underline">Terms of Service</Link>
+                    <Link href="/terms" className="text-arf-blue underline underline-offset-2">Terms of Service</Link>
                     {' '}and{' '}
-                    <Link href="/privacy" className="text-arf-blue hover:underline">Privacy Policy</Link>.
+                    <Link href="/privacy" className="text-arf-blue underline underline-offset-2">Privacy Policy</Link>.
                   </label>
                 </div>
                 {fieldErrors.agreeToTerms && (
@@ -596,7 +596,7 @@ export default function SignupPage() {
 
           <p className="mt-6 text-center text-xs text-[color:var(--text-muted)]">
             Prefer to email? Contact us directly at{' '}
-            <a href="mailto:juan@arf-ai.com" className="text-arf-blue hover:underline">juan@arf-ai.com</a>
+            <a href="mailto:juan@arf-ai.com" className="text-arf-blue underline underline-offset-2">juan@arf-ai.com</a>
           </p>
         </div>
       </div>
