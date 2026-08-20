@@ -171,11 +171,11 @@ export default function HistoryPage() {
                     <tr key={decision.id} className="border-b border-[color:var(--hairline)] transition hover:bg-[color:var(--surface-sunken)]">
                       <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">{decision.timestamp}</td>
                       <td className="px-2 py-2 text-[color:var(--text-secondary)]">{decision.service}</td>
-                      <td className="px-2 py-2 text-right font-mono text-amber-500">{(decision.risk * 100).toFixed(0)}%</td>
+                      <td className="px-2 py-2 text-right font-mono text-amber-700 dark:text-amber-400">{(decision.risk * 100).toFixed(0)}%</td>
                       <td className="px-2 py-2 text-right">
                         <span className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${
                           decision.action === 'ESCALATE' ? 'bg-[#b3392a]' :
-                          decision.action === 'DENY' ? 'bg-[#a66a1e]' :
+                          decision.action === 'DENY' ? 'bg-[#9c611c]' :
                           'bg-[#3f7a5c]'
                         }`}>
                           {decision.action}

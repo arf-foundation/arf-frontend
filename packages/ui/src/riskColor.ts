@@ -3,6 +3,6 @@
 // brand accent -- kept as literal hex, matching StatusBadge's own mapping.
 export function riskColor(risk: number): string {
   if (risk < 0.4) return '#3f7a5c';
-  if (risk < 0.7) return '#a66a1e';
+  if (risk < 0.7) return '#9c611c';
   return '#b3392a';
 }

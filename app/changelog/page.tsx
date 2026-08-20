@@ -176,7 +176,7 @@ export default function ChangelogPage() {
                     className={`rounded-full border px-3 py-1 text-xs font-medium ${
                       entry.type === 'public'
                         ? 'border-arf-blue/40 bg-arf-blue/10 text-arf-blue'
-                        : 'border-arf-purple/40 bg-arf-purple/10 text-arf-purple'
+                        : 'border-arf-purple/40 bg-arf-purple/10 text-[#6636c9] dark:text-[#a78bfa]'
                     }`}
                   >
                     {entry.type === 'public' ? '📘 Public Console' : '✈️ Pilot Program'}
@@ -247,7 +247,7 @@ export default function ChangelogPage() {
             </h2>
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2 rounded-lg bg-[color:var(--surface-sunken)] p-4">
-                <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm text-green-500">{CURL_COMMAND}</pre>
+                <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm text-green-800 dark:text-green-400">{CURL_COMMAND}</pre>
                 <button
                   onClick={() => copyCode(CURL_COMMAND)}
                   className="shrink-0 rounded-lg border border-[color:var(--hairline)] p-2 transition hover:border-[color:var(--color-arf-blue)]"
@@ -256,7 +256,7 @@ export default function ChangelogPage() {
                   {copiedCode ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 text-[color:var(--text-secondary)]" />}
                 </button>
               </div>
-              <p className="text-sm text-amber-500">
+              <p className="text-sm text-amber-700 dark:text-amber-400">
                 ⚠️ This is a simulated evaluation endpoint. It does <strong>not</strong> use the protected core engine. For pilot access,{' '}
                 <Link href="/signup" className="underline hover:brightness-110">request here</Link>.
               </p>

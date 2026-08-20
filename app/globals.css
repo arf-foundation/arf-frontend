@@ -193,6 +193,35 @@ main > div:first-child {
   --card-shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.5), 0 30px 60px -30px rgba(51, 88, 232, 0.55);
 }
 
+/* Anchor the themed canvas on <body>. The redesigned pages paint their own
+   canvas via `.arf-page-root`, but the unlayered `main > div:first-child {
+   background-color: transparent }` rule higher up strips that fill, leaving
+   the viewport on the browser-default white. In light mode dark text on white
+   still reads, but in dark mode it produced light text on a white page across
+   every route (a site-wide color-contrast failure caught by the axe audit).
+   Painting the canvas + ink on <body> guarantees the viewport carries the
+   correct surface/text color for whichever theme is active, in both the
+   redesigned and the older pages. Unlayered so it is not out-competed by the
+   transparency override above. */
+body {
+  background-color: var(--surface-canvas);
+  color: var(--text-primary);
+}
+
+/* Accent + semantic colors as TEXT on dark surfaces. The brand blue/purple and
+   the risk red/amber are tuned for white/light backgrounds; as small text on
+   the dark theme's surfaces they land around 3:1, under the 4.5:1 AA floor
+   (confirmed across /, /pricing, /faq, /dashboard, /signup, /changelog by the
+   axe color-contrast audit). Lighten each ONLY when used as a text color in
+   dark mode — the matching `bg-*` fills (badges, buttons) are untouched, so
+   white-on-accent chips keep their contrast. Unlayered so these win over the
+   Tailwind utilities layer without needing per-usage `dark:` variants. */
+.dark .text-arf-blue { color: #7f99f7; }
+.dark .text-arf-purple { color: #a78bfa; }
+.dark .text-\[\#b0453a\],
+.dark .text-\[\#b3392a\] { color: #f0857a; }
+.dark .text-\[\#9c611c\] { color: #d99a3d; }
+
 @layer base {
   ::selection {
     background: color-mix(in oklch, var(--color-arf-blue) 22%, transparent);
@@ -242,6 +271,20 @@ main > div:first-child {
   .arf-page-root th,
   .arf-page-root td {
     color: var(--text-primary);
+  }
+  /* Dark bands (.bg-arf-dark trust strip / quote band / footer,
+     .arf-card-anchored, .arf-dark-wash) carry light text by inheritance from a
+     container's `text-white` utility. The blanket rule above directly targets
+     those same descendant elements, overriding the inherited light color and
+     painting dark ink onto the dark band — a light-mode dark-on-dark failure
+     the audit found in the footer and the History CTA. Re-inherit the band's
+     own light text; any element with its own explicit color utility still wins
+     from the higher-priority utilities layer, so this only touches the
+     elements that were relying on inheritance. */
+  .arf-page-root .bg-arf-dark :where(h1, h2, h3, h4, p, span, li, th, td),
+  .arf-page-root .arf-card-anchored :where(h1, h2, h3, h4, p, span, li, th, td),
+  .arf-page-root .arf-dark-wash :where(h1, h2, h3, h4, p, span, li, th, td) {
+    color: inherit;
   }
   @media (prefers-reduced-motion: reduce) {
     .arf-page-root { scroll-behavior: auto; }

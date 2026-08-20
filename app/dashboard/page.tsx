@@ -668,7 +668,7 @@ export default function Dashboard() {
                 <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-4">
                   <div><div className="text-2xl font-bold text-arf-blue">{mockMemoryStats.similar_incidents}</div><div className="text-xs text-[color:var(--text-muted)]">Similar Incidents</div></div>
                   <div><div className="text-2xl font-bold text-arf-purple">{mockMemoryStats.rag_similarity.toFixed(2)}</div><div className="text-xs text-[color:var(--text-muted)]">RAG Similarity</div></div>
-                  <div><div className="text-2xl font-bold text-[#a66a1e]">{mockMemoryStats.cache_hits}</div><div className="text-xs text-[color:var(--text-muted)]">Cache Hits</div></div>
+                  <div><div className="text-2xl font-bold text-[#9c611c]">{mockMemoryStats.cache_hits}</div><div className="text-xs text-[color:var(--text-muted)]">Cache Hits</div></div>
                   <div><div className="break-words font-mono text-xs text-[color:var(--text-secondary)]">{mockMemoryStats.memory_usage}</div><div className="text-xs text-[color:var(--text-muted)]">Index Type</div></div>
                 </div>
                 <button
@@ -710,9 +710,9 @@ export default function Dashboard() {
                           <td className="px-2 py-2 text-[color:var(--text-secondary)]">{inc.service}</td>
                           <td className="px-2 py-2 text-[color:var(--text-secondary)]">{inc.metric}</td>
                           <td className="px-2 py-2 text-right font-mono text-[color:var(--text-secondary)]">{inc.value}</td>
-                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">{inc.risk.toFixed(2)}</td>
+                          <td className="px-2 py-2 text-right font-mono text-[#9c611c]">{inc.risk.toFixed(2)}</td>
                           <td className="px-2 py-2 text-right">
-                            <span className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === 'ESCALATE' ? 'bg-[#b3392a]' : inc.action === 'DENY' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]'}`}>
+                            <span className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === 'ESCALATE' ? 'bg-[#b3392a]' : inc.action === 'DENY' ? 'bg-[#9c611c]' : 'bg-[#3f7a5c]'}`}>
                               {inc.action}
                             </span>
                           </td>
@@ -734,13 +734,13 @@ export default function Dashboard() {
                           <p className="text-sm">{inc.service}</p>
                           <p className="text-xs text-[color:var(--text-muted)]">{inc.timestamp}</p>
                         </div>
-                        <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === 'ESCALATE' ? 'bg-[#b3392a]' : inc.action === 'DENY' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]'}`}>
+                        <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === 'ESCALATE' ? 'bg-[#b3392a]' : inc.action === 'DENY' ? 'bg-[#9c611c]' : 'bg-[#3f7a5c]'}`}>
                           {inc.action}
                         </span>
                       </div>
                       <div className="mt-2 flex items-center justify-between text-xs text-[color:var(--text-muted)]">
                         <span>{inc.metric}: <span className="font-mono text-[color:var(--text-secondary)]">{inc.value}</span></span>
-                        <span>Risk: <span className="font-mono text-[#a66a1e]">{inc.risk.toFixed(2)}</span></span>
+                        <span>Risk: <span className="font-mono text-[#9c611c]">{inc.risk.toFixed(2)}</span></span>
                       </div>
                     </div>
                   ))}
@@ -758,7 +758,7 @@ export default function Dashboard() {
               <DashboardMetricCard
                 title="Policy Violations (Last 7 days)"
                 icon={AlertTriangle}
-                iconClassName="text-[#a66a1e]"
+                iconClassName="text-[#9c611c]"
                 footer="Simulated data – real engine provides live policy enforcement. Click a violation to see why it fired."
               >
                 <div className="space-y-3">
@@ -773,7 +773,7 @@ export default function Dashboard() {
                     >
                       <div><span className="font-mono text-sm">{v.policy}</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">on {v.component}</span></div>
                       <div className="flex items-center gap-3">
-                        <span className={`rounded-full px-2 py-0.5 text-xs text-white ${v.severity === 'high' ? 'bg-[#b3392a]' : v.severity === 'medium' ? 'bg-[#a66a1e]' : 'bg-arf-blue'}`}>{v.severity.toUpperCase()}</span>
+                        <span className={`rounded-full px-2 py-0.5 text-xs text-white ${v.severity === 'high' ? 'bg-[#b3392a]' : v.severity === 'medium' ? 'bg-[#9c611c]' : 'bg-arf-blue'}`}>{v.severity.toUpperCase()}</span>
                         <span className="text-xs text-[color:var(--text-muted)]">{v.timestamp}</span>
                         <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
                       </div>
@@ -819,8 +819,8 @@ export default function Dashboard() {
                           <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">{log.timestamp}</td>
                           <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.component}</td>
                           <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.action}</td>
-                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">{log.riskScore.toFixed(2)}</td>
-                          <td className="px-2 py-2 text-right"><span className={`rounded-full px-2 py-0.5 text-xs text-white ${log.decision === 'ESCALATE' ? 'bg-[#b3392a]' : log.decision === 'DENY' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]'}`}>{log.decision}</span></td>
+                          <td className="px-2 py-2 text-right font-mono text-[#9c611c]">{log.riskScore.toFixed(2)}</td>
+                          <td className="px-2 py-2 text-right"><span className={`rounded-full px-2 py-0.5 text-xs text-white ${log.decision === 'ESCALATE' ? 'bg-[#b3392a]' : log.decision === 'DENY' ? 'bg-[#9c611c]' : 'bg-[#3f7a5c]'}`}>{log.decision}</span></td>
                           <td className="px-2 py-2 text-[color:var(--text-muted)]">{log.user}</td>
                           <td className="px-2 py-2 text-right">
                             <button
@@ -844,7 +844,7 @@ export default function Dashboard() {
                 <ExplainabilityModal open={!!explainLog} onClose={() => setExplainLog(null)} {...auditLogExplanation(explainLog)} />
               )}
 
-              <DashboardMetricCard title="Cooldown & Rate Limits (Sandbox)" icon={Clock} iconClassName="text-[#a66a1e]">
+              <DashboardMetricCard title="Cooldown & Rate Limits (Sandbox)" icon={Clock} iconClassName="text-[#9c611c]">
                 <div className="space-y-3">
                   {MOCK_COOLDOWNS.map((c) => (
                     <button
@@ -857,7 +857,7 @@ export default function Dashboard() {
                     >
                       <div><span className="font-mono text-sm">{c.component}</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">(policy: {c.policy})</span></div>
                       <div className="flex items-center gap-3">
-                        <span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">{c.status}</span>
+                        <span className="rounded-full bg-[#9c611c] px-2 py-0.5 text-xs text-white">{c.status}</span>
                         <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
                       </div>
                     </button>
@@ -1013,7 +1013,7 @@ export default function Dashboard() {
                             <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">{log.timestamp}</td>
                             <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.component}</td>
                             <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.action}</td>
-                            <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">{log.riskScore.toFixed(2)}</td>
+                            <td className="px-2 py-2 text-right font-mono text-[#9c611c]">{log.riskScore.toFixed(2)}</td>
                             <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.decision}</td>
                             <td className="px-2 py-2 text-[color:var(--text-muted)]">{log.user}</td>
                           </tr>
