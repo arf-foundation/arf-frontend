@@ -11,7 +11,7 @@ The previous page read as a research demo that had been re-labelled: dark-only,
 one card style repeated fourteen times, uniform `py-20` between every section,
 eight nav links, and a hero carrying nine competing elements. None of those are
 copy problems — the messaging was already enterprise-positioned. They are
-*hierarchy* problems. Everything below is in service of one goal: a CTO or
+_hierarchy_ problems. Everything below is in service of one goal: a CTO or
 compliance officer should know what ARF is, that it is enforced mechanically,
 and that it produces evidence, within about three seconds of landing.
 
@@ -25,21 +25,21 @@ and it is self-hosted via `next/font`, so the strict CSP needs no new font-src.
 
 One ramp, declared once in `@theme`, used everywhere:
 
-| Token | Size | Use |
-|---|---|---|
-| `text-display` | 56px / 1.03 / −0.033em | hero H1 only |
-| `text-h2-lg` | 42px / 1.06 / −0.03em | "Enterprise-grade governance" only |
-| `text-h2` | 36px / 1.10 / −0.026em | all other section heads |
-| `text-h3` | 21px / 1.25 / −0.018em | card titles |
-| `text-lead` | 18.5px / 1.6 | hero subheadline |
-| `text-body` | 17px / 1.65 | body copy |
-| `text-small` | 14.5px / 1.6 | card body, list items |
-| `--text-eyebrow` | 11px mono, 0.14em | section eyebrows, labels |
+| Token            | Size                   | Use                                |
+| ---------------- | ---------------------- | ---------------------------------- |
+| `text-display`   | 56px / 1.03 / −0.033em | hero H1 only                       |
+| `text-h2-lg`     | 42px / 1.06 / −0.03em  | "Enterprise-grade governance" only |
+| `text-h2`        | 36px / 1.10 / −0.026em | all other section heads            |
+| `text-h3`        | 21px / 1.25 / −0.018em | card titles                        |
+| `text-lead`      | 18.5px / 1.6           | hero subheadline                   |
+| `text-body`      | 17px / 1.65            | body copy                          |
+| `text-small`     | 14.5px / 1.6           | card body, list items              |
+| `--text-eyebrow` | 11px mono, 0.14em      | section eyebrows, labels           |
 
 Two supporting families, one job each. **Newsreader italic** appears exactly
 once — the pull quote — so the serif reads as a deliberate editorial moment
 rather than decoration. **JetBrains Mono** carries eyebrows, state labels and
-code; it is what lets an infrastructure product feel technical *without*
+code; it is what lets an infrastructure product feel technical _without_
 reverting to a dark developer dashboard.
 
 Negative tracking scales with size (−0.033em at 56px down to −0.012em at 15px).
@@ -59,6 +59,7 @@ hero              88 top / 104 bottom     generous, asymmetric
 trust strip       46                      tight, dense, scannable
 logo row          64 / 88
 problem trio      112                     first real breath
+who it's for      96                      added 2026-08-20, see §9
 why ARF           96
 why now           112  (inset gradient panel)
 industries        120
@@ -90,19 +91,19 @@ optically down the page.
 
 Light is primary; dark is equal parity, not an afterthought.
 
-| Role | Light | Dark |
-|---|---|---|
-| Canvas | `#faf9f7` warm off-white | `#0e0d12` |
-| Raised surface | `#ffffff` | `#17161d` |
-| Ink | `#191816` warm near-black | `#faf9f7` |
-| Secondary | `#56534d` (7.3:1) | white/72 |
-| Muted | `#6b6862` (4.6:1) | white/56 |
-| Hairline | `rgba(25,24,22,.09)` | `rgba(250,249,247,.12)` |
-| Accent | `#3358e8 → #7a4be0` | identical |
+| Role           | Light                     | Dark                    |
+| -------------- | ------------------------- | ----------------------- |
+| Canvas         | `#faf9f7` warm off-white  | `#0e0d12`               |
+| Raised surface | `#ffffff`                 | `#17161d`               |
+| Ink            | `#191816` warm near-black | `#faf9f7`               |
+| Secondary      | `#56534d` (7.3:1)         | white/72                |
+| Muted          | `#6b6862` (4.6:1)         | white/56                |
+| Hairline       | `rgba(25,24,22,.09)`      | `rgba(250,249,247,.12)` |
+| Accent         | `#3358e8 → #7a4be0`       | identical               |
 
 Never pure black on pure white — warm grays read as considered at scale and stop
 large text blocks from vibrating. Every muted tier clears WCAG AA at its
-shipping size; the one retained sandbox disclaimer is deliberately *not* the
+shipping size; the one retained sandbox disclaimer is deliberately _not_ the
 faintest text on the page, because it is compliance-relevant copy.
 
 The recognisable blue→purple gradient is **evolved, not discarded**. It survives
@@ -139,12 +140,21 @@ deterministic enforcement, cryptographic audit trail. Dark rather than floating
 white cards, because it anchors the fold and gives the page its first clear
 horizontal band.
 
-**Section order is unchanged** (Problem → Why → Why Now → Industries →
-Architecture → Capabilities → Trust → Access Models → Demo → Docs) with two
-consolidations: Interactive Demonstrations and Documentation merged into a
-single **Explore ARF** section with three columns (API / Console / Specs), and
-the case-study quote elevated from `/dashboard` to a full-bleed band between
-Capabilities and Access Models.
+**Section order** (as of 2026-08-20: Problem → **Who it's for** → Why → Why Now
+→ Industries → Architecture → Capabilities → Trust → Access Models → Demo →
+Docs) with two consolidations: Interactive Demonstrations and Documentation
+merged into a single **Explore ARF** section with three columns (API / Console
+/ Specs), and the case-study quote elevated from `/dashboard` to a full-bleed
+band between Capabilities and Access Models.
+
+**Who it's for** (added 2026-08-20) sits right after the Problem/Solution/
+Outcome trio, before Why ARF — "is this me" resolves before "why this
+approach." Three `arf-card-light` cards (Platform & SRE leads, Security &
+compliance leaders, teams adopting AI-driven operations), the same weight as
+Explore ARF: this section sets context, it isn't proof, so it doesn't compete
+with Governance/Capabilities for visual weight. Industries (built for
+regulated enterprises) already answered "who" by vertical; this answers it by
+role — the two are complementary, not redundant.
 
 **Removed or moved:** the standalone Slack/GitHub bar below the hero (now footer
 — it signalled open-source project, not enterprise product); two of the three
