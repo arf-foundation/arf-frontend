@@ -18,7 +18,7 @@ export default function DashboardBottomNav({ activeTab, onTabChange }: Props) {
   // Left/Right (and Home/End) move selection + focus between tabs.
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const currentIndex = tabs.findIndex((t) => t.id === activeTab);
-    let nextIndex = currentIndex;
+    let nextIndex: number;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       nextIndex = (currentIndex + 1) % tabs.length;
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
