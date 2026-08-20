@@ -74,6 +74,7 @@ export default function AgentPage() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Describe an incident..."
+          aria-label="Incident description"
         />
 
         <button

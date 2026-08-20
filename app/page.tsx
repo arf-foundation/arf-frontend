@@ -345,7 +345,7 @@ export default function LandingPage() {
             <div key={item.title} className="flex gap-4">
               <item.icon className="mt-0.5 h-6 w-6 flex-shrink-0 text-[#7fa0ff]" strokeWidth={1.5} />
               <div>
-                <h3 className="mb-1.5 text-[15.5px] font-semibold tracking-[-0.012em] text-white">{item.title}</h3>
+                <h2 className="mb-1.5 text-[15.5px] font-semibold tracking-[-0.012em] text-white">{item.title}</h2>
                 <p className="text-[13.5px] leading-[1.55] text-white/70">{item.body}</p>
               </div>
             </div>

@@ -9,7 +9,13 @@ export function RiskGauge({ risk, size = 180 }: { risk: number; size?: number })
 
   return (
     <div className="relative inline-flex items-center justify-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        role="img"
+        aria-label={`Risk score: ${(risk * 100).toFixed(0)} percent`}
+      >
         <circle
           cx={size / 2}
           cy={size / 2}
