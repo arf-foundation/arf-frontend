@@ -479,6 +479,28 @@ export default function Dashboard() {
     }
   }, []);
 
+  // Roving-tabindex arrow-key navigation for the desktop tablist (WAI-ARIA
+  // tabs pattern): Left/Right (and Home/End) move selection + focus.
+  const handleTabListKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const currentIndex = TABS.findIndex((t) => t.id === activeTab);
+    let nextIndex = currentIndex;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % TABS.length;
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + TABS.length) % TABS.length;
+    } else if (e.key === 'Home') {
+      nextIndex = 0;
+    } else if (e.key === 'End') {
+      nextIndex = TABS.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    const nextId = TABS[nextIndex].id;
+    setActiveTab(nextId);
+    document.getElementById(`tab-${nextId}`)?.focus();
+  };
+
   const refreshData = useCallback(() => {
     setIsRefreshing(true);
     setTimeout(() => {
@@ -567,7 +589,7 @@ export default function Dashboard() {
               visible tablist and a persistent page heading. */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-h2 font-semibold">Governance Console</h1>
-            <div role="tablist" aria-label="Dashboard sections" className="hidden gap-2 md:flex">
+            <div role="tablist" aria-label="Dashboard sections" onKeyDown={handleTabListKeyDown} className="hidden gap-2 md:flex">
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -575,6 +597,7 @@ export default function Dashboard() {
                   id={`tab-${tab.id}`}
                   aria-selected={activeTab === tab.id}
                   aria-controls={`tabpanel-${tab.id}`}
+                  tabIndex={activeTab === tab.id ? 0 : -1}
                   onClick={() => setActiveTab(tab.id)}
                   className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
                     activeTab === tab.id
@@ -590,7 +613,7 @@ export default function Dashboard() {
 
           {/* Risk Tab Content */}
           {activeTab === 'risk' && (
-            <div className="space-y-6" role="tabpanel" id="tabpanel-risk" aria-labelledby="tab-risk">
+            <div className="space-y-6" role="tabpanel" id="tabpanel-risk" aria-labelledby="tab-risk" tabIndex={0}>
               <DashboardMetricCard
                 title="System Risk"
                 action={
@@ -731,7 +754,7 @@ export default function Dashboard() {
 
           {/* Governance Tab Content */}
           {activeTab === 'governance' && (
-            <div className="space-y-6" role="tabpanel" id="tabpanel-governance" aria-labelledby="tab-governance">
+            <div className="space-y-6" role="tabpanel" id="tabpanel-governance" aria-labelledby="tab-governance" tabIndex={0}>
               <DashboardMetricCard
                 title="Policy Violations (Last 7 days)"
                 icon={AlertTriangle}
@@ -860,7 +883,7 @@ export default function Dashboard() {
 
           {/* Compliance Tab Content */}
           {activeTab === 'compliance' && (
-            <div className="space-y-6" role="tabpanel" id="tabpanel-compliance" aria-labelledby="tab-compliance">
+            <div className="space-y-6" role="tabpanel" id="tabpanel-compliance" aria-labelledby="tab-compliance" tabIndex={0}>
               <div className="arf-card-substantial p-6">
                 <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><Shield className="h-5 w-5 text-[#3f7a5c]" /> Compliance & Certifications</h2>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">

@@ -219,7 +219,14 @@ export default function SignupPage() {
           </div>
 
           {/* Step indicator */}
-          <div className="mb-6 flex justify-between">
+          <div
+            className="mb-6 flex justify-between"
+            role="progressbar"
+            aria-valuenow={step}
+            aria-valuemin={1}
+            aria-valuemax={totalSteps}
+            aria-valuetext={`Step ${step} of ${totalSteps}`}
+          >
             {[1, 2, 3].map(i => (
               <div key={i} className="flex-1 text-center">
                 <div className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
@@ -248,10 +255,12 @@ export default function SignupPage() {
                     value={formData.fullName}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.fullName = el; }}
+                    aria-invalid={!!fieldErrors.fullName}
+                    aria-describedby={fieldErrors.fullName ? 'fullName-error' : undefined}
                     className={`arf-input ${fieldErrors.fullName ? 'arf-input-error' : ''}`}
                   />
                   {fieldErrors.fullName && (
-                    <p className="mt-1 text-xs text-red-500">{fieldErrors.fullName}</p>
+                    <p id="fullName-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.fullName}</p>
                   )}
                 </div>
                 <div>
@@ -264,10 +273,12 @@ export default function SignupPage() {
                     value={formData.email}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.email = el; }}
+                    aria-invalid={!!fieldErrors.email}
+                    aria-describedby={fieldErrors.email ? 'email-error' : undefined}
                     className={`arf-input ${fieldErrors.email ? 'arf-input-error' : ''}`}
                   />
                   {fieldErrors.email && (
-                    <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>
+                    <p id="email-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>
                   )}
                   <p className="mt-1 text-xs text-[color:var(--text-muted)]">We’ll only use this for pilot coordination – no mailing lists, no spam.</p>
                 </div>
@@ -281,10 +292,12 @@ export default function SignupPage() {
                     value={formData.company}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.company = el; }}
+                    aria-invalid={!!fieldErrors.company}
+                    aria-describedby={fieldErrors.company ? 'company-error' : undefined}
                     className={`arf-input ${fieldErrors.company ? 'arf-input-error' : ''}`}
                   />
                   {fieldErrors.company && (
-                    <p className="mt-1 text-xs text-red-500">{fieldErrors.company}</p>
+                    <p id="company-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.company}</p>
                   )}
                 </div>
                 <div>
@@ -296,6 +309,8 @@ export default function SignupPage() {
                     value={formData.industry}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.industry = el; }}
+                    aria-invalid={!!fieldErrors.industry}
+                    aria-describedby={fieldErrors.industry ? 'industry-error' : undefined}
                     className={`arf-input ${fieldErrors.industry ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select industry</option>
@@ -309,7 +324,7 @@ export default function SignupPage() {
                     <option value="Other">Other</option>
                   </select>
                   {fieldErrors.industry && (
-                    <p className="mt-1 text-xs text-red-500">{fieldErrors.industry}</p>
+                    <p id="industry-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.industry}</p>
                   )}
                 </div>
                 <div>
@@ -321,6 +336,8 @@ export default function SignupPage() {
                     value={formData.jobRole}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.jobRole = el; }}
+                    aria-invalid={!!fieldErrors.jobRole}
+                    aria-describedby={fieldErrors.jobRole ? 'jobRole-error' : undefined}
                     className={`arf-input ${fieldErrors.jobRole ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select role</option>
@@ -334,7 +351,7 @@ export default function SignupPage() {
                     <option value="Other">Other</option>
                   </select>
                   {fieldErrors.jobRole && (
-                    <p className="mt-1 text-xs text-red-500">{fieldErrors.jobRole}</p>
+                    <p id="jobRole-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.jobRole}</p>
                   )}
                 </div>
               </>
@@ -354,10 +371,12 @@ export default function SignupPage() {
                     onChange={handleChange}
                     ref={el => { inputRefs.current.useCase = el; }}
                     placeholder="What AI systems would you govern with ARF? What risks do you need to mitigate?"
+                    aria-invalid={!!fieldErrors.useCase}
+                    aria-describedby={fieldErrors.useCase ? 'useCase-error' : undefined}
                     className={`arf-input ${fieldErrors.useCase ? 'arf-input-error' : ''}`}
                   />
                   {fieldErrors.useCase && (
-                    <p className="mt-1 text-xs text-red-500">{fieldErrors.useCase}</p>
+                    <p id="useCase-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.useCase}</p>
                   )}
                 </div>
                 <div>
@@ -369,6 +388,8 @@ export default function SignupPage() {
                     value={formData.expectedVolume}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.expectedVolume = el; }}
+                    aria-invalid={!!fieldErrors.expectedVolume}
+                    aria-describedby={fieldErrors.expectedVolume ? 'expectedVolume-error' : undefined}
                     className={`arf-input ${fieldErrors.expectedVolume ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select volume</option>
@@ -378,7 +399,7 @@ export default function SignupPage() {
                     <option value="> 100,000">&gt; 100,000</option>
                   </select>
                   {fieldErrors.expectedVolume && (
-                    <p className="mt-1 text-xs text-red-500">{fieldErrors.expectedVolume}</p>
+                    <p id="expectedVolume-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.expectedVolume}</p>
                   )}
                 </div>
                 <div>
@@ -390,6 +411,8 @@ export default function SignupPage() {
                     value={formData.cloudEnvironment}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.cloudEnvironment = el; }}
+                    aria-invalid={!!fieldErrors.cloudEnvironment}
+                    aria-describedby={fieldErrors.cloudEnvironment ? 'cloudEnvironment-error' : undefined}
                     className={`arf-input ${fieldErrors.cloudEnvironment ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select cloud</option>
@@ -400,7 +423,7 @@ export default function SignupPage() {
                     <option value="Multi‑cloud">Multi‑cloud</option>
                   </select>
                   {fieldErrors.cloudEnvironment && (
-                    <p className="mt-1 text-xs text-red-500">{fieldErrors.cloudEnvironment}</p>
+                    <p id="cloudEnvironment-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.cloudEnvironment}</p>
                   )}
                 </div>
                 <div>
@@ -412,6 +435,8 @@ export default function SignupPage() {
                     value={formData.aiMaturity}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.aiMaturity = el; }}
+                    aria-invalid={!!fieldErrors.aiMaturity}
+                    aria-describedby={fieldErrors.aiMaturity ? 'aiMaturity-error' : undefined}
                     className={`arf-input ${fieldErrors.aiMaturity ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select maturity level</option>
@@ -421,7 +446,7 @@ export default function SignupPage() {
                     <option value="Full autonomous operations">Full autonomous operations</option>
                   </select>
                   {fieldErrors.aiMaturity && (
-                    <p className="mt-1 text-xs text-red-500">{fieldErrors.aiMaturity}</p>
+                    <p id="aiMaturity-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.aiMaturity}</p>
                   )}
                 </div>
               </>
@@ -471,6 +496,8 @@ export default function SignupPage() {
                     value={formData.timeline}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.timeline = el; }}
+                    aria-invalid={!!fieldErrors.timeline}
+                    aria-describedby={fieldErrors.timeline ? 'timeline-error' : undefined}
                     className={`arf-input ${fieldErrors.timeline ? 'arf-input-error' : ''}`}
                   >
                     <option value="">Select timeline</option>
@@ -480,7 +507,7 @@ export default function SignupPage() {
                     <option value="> 6 months / exploratory">&gt; 6 months / exploratory</option>
                   </select>
                   {fieldErrors.timeline && (
-                    <p className="mt-1 text-xs text-red-500">{fieldErrors.timeline}</p>
+                    <p id="timeline-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.timeline}</p>
                   )}
                 </div>
                 <div className="flex items-start gap-3">
@@ -491,6 +518,8 @@ export default function SignupPage() {
                     required
                     checked={formData.agreeToTerms}
                     onChange={handleChange}
+                    aria-invalid={!!fieldErrors.agreeToTerms}
+                    aria-describedby={fieldErrors.agreeToTerms ? 'agreeToTerms-error' : undefined}
                     className="mt-1 h-4 w-4 rounded border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] focus:ring-arf-blue"
                   />
                   <label htmlFor="agreeToTerms" className="text-sm text-[color:var(--text-secondary)]">
@@ -502,7 +531,7 @@ export default function SignupPage() {
                   </label>
                 </div>
                 {fieldErrors.agreeToTerms && (
-                  <p className="mt-1 text-xs text-red-500">{fieldErrors.agreeToTerms}</p>
+                  <p id="agreeToTerms-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.agreeToTerms}</p>
                 )}
                 <p className="text-xs italic text-[color:var(--text-muted)]">
                   Every ungoverned AI decision is a liability. Turn your AI operations into an auditable asset.

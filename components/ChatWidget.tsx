@@ -202,6 +202,7 @@ export default function ChatWidget() {
         <div
           id="arf-chat-panel"
           role="dialog"
+          aria-modal="true"
           aria-label="ARF Institutional Memory Agent"
           className="arf-card-anchored fixed inset-0 z-40 flex flex-col overflow-hidden border border-[color:var(--hairline)] shadow-[0_40px_80px_-40px_rgba(19,18,24,0.75)] sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[600px] sm:max-h-[80vh] sm:w-[400px] sm:rounded-2xl"
         >
@@ -268,6 +269,7 @@ export default function ChatWidget() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onInputKeyDown}
               placeholder="Describe an incident…"
+              aria-label="Message the ARF agent"
               rows={1}
               className="max-h-28 flex-1 resize-none rounded-xl border border-[color:var(--hairline)] bg-[color:var(--surface-canvas)] px-3 py-2.5 text-[13.5px] text-[color:var(--text-primary)] outline-none focus-visible:border-[color:var(--color-arf-blue)]"
             />
