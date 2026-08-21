@@ -183,11 +183,50 @@ shadow, not a "Recommended" badge — the visual weight does the work.
 
 ## 7. Motion
 
-Subtle and cheap: three scroll-revealed sections (capabilities, governance,
-pricing) fade in with a 12px rise over 700ms via the existing
-`hooks/useInView.ts`. Everything above the fold renders static — an enterprise
-page should not make a buyer wait for an animation to read the value prop. All
-motion is suppressed under `prefers-reduced-motion`.
+Subtle and cheap, extended 2026-08-20 rather than left as three isolated
+sections. Still governed by the same rule: decorative motion stays restrained
+(the hero and above-the-fold content still render static, unchanged), but
+interaction _feedback_ — does a click register, does a route change
+acknowledge itself, is a card under the cursor alive — isn't decoration and
+doesn't cost the "buyer reads the value prop in three seconds" goal, so it's
+no longer treated as optional:
+
+- **Scroll reveal** (`hooks/useInView.ts` + `.arf-reveal`) now covers
+  capabilities, governance, pricing, Who ARF is for, and Industries — the
+  first three already had it; the last two didn't reveal at all before.
+  Each grid's items stagger in via inline `transitionDelay` scaled by index
+  (the same technique the architecture pipeline's ring already used for its
+  ripple, just applied to reveal timing) instead of the whole section fading
+  as one block. Governance additionally gets `.arf-reveal-deliberate` — a
+  larger rise and slower ease — matching its own "most visual weight"
+  billing above; every other section keeps the original 12px/700ms.
+- **Card hover**: `.arf-card-light` (Explore ARF, secondary pricing tiers,
+  Who ARF is for) previously had no `:hover` at all; now has a lighter lift
+  than `.arf-card-substantial`'s, staying in its own weight tier.
+- **Buttons**: all three `.arf-btn-*` classes, plus the inline button
+  treatments in `SandboxCard`/`TierBody`/the two modal close buttons, gained
+  `active:` press states — idle→hover was covered everywhere, hover→pressed
+  wasn't, anywhere on the site.
+- **Route transitions** (`components/RouteTransition.tsx`, wraps
+  `{children}` in `layout.tsx`): every navigation used to be a hard cut. Now
+  a cross-fade + rise, via the native View Transitions API where supported
+  and a CSS keyframe fallback (`.arf-route-fade`) elsewhere. Needs
+  `flushSync` around the state update inside the transition callback —
+  React's default batching defers the DOM write past the point the browser
+  captures its "after" snapshot otherwise.
+- **Mobile nav menu**: was a hard `{mobileOpen && (...)}` conditional: now a
+  `grid-template-rows` collapse, mounted through the closing transition
+  (`components/NavBar.tsx`) instead of unmounting instantly.
+- **Numbers**: `hooks/useCountUp.ts` (scroll-triggered, fixed target — the
+  quote-band pilot stats) and `hooks/useAnimatedNumber.ts` (tweens on value
+  change — the dashboard's System Risk score, which refreshes in place while
+  already visible, not on scroll) are the two variants; different trigger
+  models, same easing.
+
+All of the above still fully respects `prefers-reduced-motion` — every new
+hook checks it once (lazy-initialized state, not a ref: this project's lint
+rules don't allow reading a ref during render) and returns the end value
+directly rather than animating.
 
 ---
 

@@ -19,26 +19,46 @@
 
 /* Existing animations */
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.animate-fade-in { animation: fade-in 1s ease-out; }
+.animate-fade-in {
+  animation: fade-in 1s ease-out;
+}
 /* .animate-slide-up is (re)defined below, in the ARF token layer — its only
    consumer was the old app/page.tsx, now replaced; the redesign's copy-error
    toast (app/page.tsx) uses the token layer's faster, subtler version. */
 
 @keyframes glow {
-  0%, 100% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-  50% { text-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
+  0%,
+  100% {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 40px rgba(139, 92, 246, 0.8);
+  }
 }
-.glow-text { animation: glow 3s ease-in-out infinite; }
+.glow-text {
+  animation: glow 3s ease-in-out infinite;
+}
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
-.float-icon { animation: float 4s ease-in-out infinite; }
+.float-icon {
+  animation: float 4s ease-in-out infinite;
+}
 
 /* ============================================
    STABLE DIMENSIONS – PREVENT FLICKERING & JUMPS
@@ -99,9 +119,11 @@ main > div:first-child {
 
 @theme {
   /* Type */
-  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-newsreader), Georgia, serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-mono:
+    var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
 
   /* Brand accents (unchanged hue family from the previous site, retuned for light) */
   --color-arf-blue: #3358e8;
@@ -114,8 +136,8 @@ main > div:first-child {
   --color-arf-raised: #f5f4f1;
   --color-arf-ink: #191816;
   --color-arf-ink-2: #3f3d38;
-  --color-arf-ink-3: #56534d;   /* 7.3:1 on canvas — small mono labels */
-  --color-arf-muted: #605c54;   /* ~6.3:1 on canvas — eyebrows, secondary; darkened from the
+  --color-arf-ink-3: #56534d; /* 7.3:1 on canvas — small mono labels */
+  --color-arf-muted: #605c54; /* ~6.3:1 on canvas — eyebrows, secondary; darkened from the
                                     original #6b6862 (~5.3:1 computed, closest-to-floor token
                                     in the ramp, sitting directly beside headings site-wide as
                                     eyebrow labels) after a reported light-mode contrast issue
@@ -125,30 +147,30 @@ main > div:first-child {
   --color-arf-dark: #131218;
 
   /* Type scale — one deliberate ramp, no ad-hoc sizes */
-  --text-display: 3.5rem;       /* 56px hero */
+  --text-display: 3.5rem; /* 56px hero */
   --text-display--line-height: 1.03;
   --text-display--letter-spacing: -0.033em;
-  --text-h2: 2.25rem;           /* 36px section head */
+  --text-h2: 2.25rem; /* 36px section head */
   --text-h2--line-height: 1.1;
   --text-h2--letter-spacing: -0.026em;
-  --text-h2-lg: 2.625rem;       /* 42px — governance section only */
+  --text-h2-lg: 2.625rem; /* 42px — governance section only */
   --text-h2-lg--line-height: 1.06;
   --text-h2-lg--letter-spacing: -0.03em;
-  --text-h3: 1.3125rem;         /* 21px card title */
+  --text-h3: 1.3125rem; /* 21px card title */
   --text-h3--line-height: 1.25;
   --text-h3--letter-spacing: -0.018em;
-  --text-lead: 1.15rem;         /* 18.5px hero sub */
+  --text-lead: 1.15rem; /* 18.5px hero sub */
   --text-lead--line-height: 1.6;
-  --text-body: 1.0625rem;       /* 17px body */
+  --text-body: 1.0625rem; /* 17px body */
   --text-body--line-height: 1.65;
-  --text-small: 0.90625rem;     /* 14.5px */
+  --text-small: 0.90625rem; /* 14.5px */
   --text-small--line-height: 1.6;
-  --text-eyebrow: 0.6875rem;    /* 11px mono */
+  --text-eyebrow: 0.6875rem; /* 11px mono */
 
   /* Vertical rhythm — varied on purpose (see DESIGN_RATIONALE.md) */
-  --spacing-section-tight: 4.5rem;   /* 72px  — trust strip, logo row */
-  --spacing-section: 6.5rem;         /* 104px — default content section */
-  --spacing-section-airy: 7.5rem;    /* 120px — capabilities, architecture */
+  --spacing-section-tight: 4.5rem; /* 72px  — trust strip, logo row */
+  --spacing-section: 6.5rem; /* 104px — default content section */
+  --spacing-section-airy: 7.5rem; /* 120px — capabilities, architecture */
 }
 
 /* --------------------------------------------------------------------------
@@ -164,8 +186,10 @@ main > div:first-child {
   --text-secondary: var(--color-arf-ink-3);
   --text-muted: var(--color-arf-muted);
   --hairline: var(--color-arf-line);
-  --card-shadow: 0 2px 4px rgba(25, 24, 22, 0.03), 0 20px 44px -28px rgba(25, 24, 22, 0.42);
-  --card-shadow-hover: 0 4px 8px rgba(25, 24, 22, 0.05), 0 30px 60px -30px rgba(51, 88, 232, 0.5);
+  --card-shadow:
+    0 2px 4px rgba(25, 24, 22, 0.03), 0 20px 44px -28px rgba(25, 24, 22, 0.42);
+  --card-shadow-hover:
+    0 4px 8px rgba(25, 24, 22, 0.05), 0 30px 60px -30px rgba(51, 88, 232, 0.5);
 }
 
 /* Was `<html style={{ colorScheme: 'light dark' }}>`, static and unconditional
@@ -189,8 +213,10 @@ main > div:first-child {
   --text-secondary: rgba(250, 249, 247, 0.72);
   --text-muted: rgba(250, 249, 247, 0.56);
   --hairline: rgba(250, 249, 247, 0.12);
-  --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 44px -28px rgba(0, 0, 0, 0.8);
-  --card-shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.5), 0 30px 60px -30px rgba(51, 88, 232, 0.55);
+  --card-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 44px -28px rgba(0, 0, 0, 0.8);
+  --card-shadow-hover:
+    0 4px 8px rgba(0, 0, 0, 0.5), 0 30px 60px -30px rgba(51, 88, 232, 0.55);
 }
 
 @layer base {
@@ -203,7 +229,9 @@ main > div:first-child {
     border-radius: 4px;
   }
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
@@ -244,7 +272,9 @@ main > div:first-child {
     color: var(--text-primary);
   }
   @media (prefers-reduced-motion: reduce) {
-    .arf-page-root { scroll-behavior: auto; }
+    .arf-page-root {
+      scroll-behavior: auto;
+    }
   }
 
   /* Page shell — one gutter value everywhere, so sections align optically */
@@ -276,7 +306,18 @@ main > div:first-child {
   .arf-card-light {
     background: var(--surface-raised);
     border: 1px solid var(--hairline);
-    @apply rounded-2xl shadow-[0_16px_34px_-28px_rgba(25,24,22,0.4)];
+    @apply rounded-2xl shadow-[0_16px_34px_-28px_rgba(25,24,22,0.4)] transition duration-200;
+  }
+  /* Lighter than -substantial's lift (-2px, shadow color-shift): this tier
+     stays in its own register (exploratory/secondary), just no longer dead
+     on hover. */
+  .arf-card-light:hover {
+    transform: translateY(-1.5px);
+    border-color: color-mix(
+      in oklch,
+      var(--color-arf-blue) 30%,
+      var(--hairline)
+    );
   }
   .arf-card-anchored {
     background: var(--color-arf-dark);
@@ -290,30 +331,38 @@ main > div:first-child {
   }
 
   .arf-gradient-text {
-    background: linear-gradient(100deg, var(--color-arf-blue), var(--color-arf-purple));
+    background: linear-gradient(
+      100deg,
+      var(--color-arf-blue),
+      var(--color-arf-purple)
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
   .arf-btn-primary {
-    background: linear-gradient(135deg, var(--color-arf-blue), var(--color-arf-purple));
+    background: linear-gradient(
+      135deg,
+      var(--color-arf-blue),
+      var(--color-arf-purple)
+    );
     @apply inline-flex items-center gap-2 rounded-[10px] px-6 py-[15px] text-[15.5px] font-semibold text-white
-           shadow-[0_16px_34px_-16px_rgba(51,88,232,0.75)] transition hover:brightness-110;
+           shadow-[0_16px_34px_-16px_rgba(51,88,232,0.75)] transition hover:brightness-110 active:scale-[0.97] active:brightness-95;
   }
   .arf-btn-secondary {
     background: var(--surface-raised);
     border: 1px solid var(--hairline);
     color: var(--text-primary);
     @apply inline-flex items-center gap-2 rounded-[10px] px-6 py-[15px] text-[15.5px] font-semibold
-           shadow-[0_8px_22px_-14px_rgba(25,24,22,0.4)] transition hover:border-[color:var(--color-arf-blue)];
+           shadow-[0_8px_22px_-14px_rgba(25,24,22,0.4)] transition hover:border-[color:var(--color-arf-blue)] active:scale-[0.97];
   }
   /* Sign In: outlined, WorkOS-style — reads as "log in", not "request access" */
   .arf-btn-ghost {
     border: 1px solid var(--hairline);
     color: var(--text-primary);
     @apply inline-flex items-center gap-2 rounded-lg px-4 py-[9px] text-sm font-semibold transition
-           hover:border-[color:var(--color-arf-blue)];
+           hover:border-[color:var(--color-arf-blue)] active:scale-[0.96];
   }
 
   .arf-input {
@@ -332,18 +381,42 @@ main > div:first-child {
   /* Hero wash — the ONLY page-level gradient */
   .arf-hero-wash {
     background-image:
-      radial-gradient(1100px 560px at 18% -10%, rgba(51, 88, 232, 0.16), transparent 66%),
-      radial-gradient(760px 460px at 92% 20%, rgba(122, 75, 224, 0.14), transparent 70%);
+      radial-gradient(
+        1100px 560px at 18% -10%,
+        rgba(51, 88, 232, 0.16),
+        transparent 66%
+      ),
+      radial-gradient(
+        760px 460px at 92% 20%,
+        rgba(122, 75, 224, 0.14),
+        transparent 70%
+      );
   }
   .dark .arf-hero-wash {
     background-image:
-      radial-gradient(1100px 560px at 18% -10%, rgba(51, 88, 232, 0.26), transparent 66%),
-      radial-gradient(760px 460px at 92% 20%, rgba(122, 75, 224, 0.22), transparent 70%);
+      radial-gradient(
+        1100px 560px at 18% -10%,
+        rgba(51, 88, 232, 0.26),
+        transparent 66%
+      ),
+      radial-gradient(
+        760px 460px at 92% 20%,
+        rgba(122, 75, 224, 0.22),
+        transparent 70%
+      );
   }
   .arf-dark-wash {
     background-image:
-      radial-gradient(900px 420px at 16% 0%, rgba(51, 88, 232, 0.32), transparent 70%),
-      radial-gradient(680px 380px at 92% 100%, rgba(122, 75, 224, 0.28), transparent 72%);
+      radial-gradient(
+        900px 420px at 16% 0%,
+        rgba(51, 88, 232, 0.32),
+        transparent 70%
+      ),
+      radial-gradient(
+        680px 380px at 92% 100%,
+        rgba(122, 75, 224, 0.28),
+        transparent 72%
+      );
   }
 
   /* Scroll reveal — subtle rise, disabled under prefers-reduced-motion */
@@ -352,6 +425,15 @@ main > div:first-child {
   }
   .arf-reveal-in {
     @apply opacity-100 translate-y-0;
+  }
+  /* Governance is the one section DESIGN_RATIONALE.md names explicitly as
+     carrying "most visual weight" -- a slightly larger rise and slower,
+     more deliberate ease-out gives its reveal a heavier feel than the
+     default, instead of every section using the identical motion. Applied
+     alongside .arf-reveal, not instead of it -- only overrides distance and
+     timing. */
+  .arf-reveal-deliberate {
+    @apply translate-y-5 transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)];
   }
 
   /* --------------------------------------------------------------------
@@ -376,7 +458,9 @@ main > div:first-child {
   .arf-pipeline-node {
     background: var(--surface-sunken);
     border: 1px solid var(--hairline);
-    transition: transform 200ms ease, border-color 200ms ease;
+    transition:
+      transform 200ms ease,
+      border-color 200ms ease;
     @apply relative flex flex-1 flex-col items-center gap-1.5 rounded-xl px-4 py-5 text-center;
   }
   .arf-pipeline-node:hover {
@@ -391,7 +475,7 @@ main > div:first-child {
     @apply relative mb-1 flex h-9 w-9 items-center justify-center rounded-full;
   }
   .arf-pipeline-node-ring::before {
-    content: '';
+    content: "";
     border: 1.5px solid var(--color-arf-blue);
     animation: arf-pipe-ripple 3.2s ease-out infinite paused;
     animation-delay: calc(var(--i, 0) * 0.3s);
@@ -424,8 +508,14 @@ main > div:first-child {
     @apply my-1.5 h-5 lg:h-[2px] lg:w-5;
   }
   .arf-pipeline-wire::after {
-    content: '';
-    background: linear-gradient(180deg, transparent, var(--color-arf-blue), var(--color-arf-purple), transparent);
+    content: "";
+    background: linear-gradient(
+      180deg,
+      transparent,
+      var(--color-arf-blue),
+      var(--color-arf-purple),
+      transparent
+    );
     animation: arf-pipe-sweep-v 2.4s ease-in-out infinite paused;
     @apply absolute inset-x-0 -top-full h-full;
   }
@@ -434,7 +524,13 @@ main > div:first-child {
   }
   @media (min-width: 1024px) {
     .arf-pipeline-wire::after {
-      background: linear-gradient(90deg, transparent, var(--color-arf-blue), var(--color-arf-purple), transparent);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--color-arf-blue),
+        var(--color-arf-purple),
+        transparent
+      );
       animation-name: arf-pipe-sweep-h;
       @apply inset-y-0 -left-full top-0 h-full w-full;
     }
@@ -458,33 +554,57 @@ main > div:first-child {
 }
 
 @keyframes arf-slide-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .animate-slide-up {
   animation: arf-slide-up 0.24s ease-out both;
 }
 
 @keyframes arf-pipe-ripple {
-  0% { transform: scale(0.85); opacity: 0.55; }
-  70% { transform: scale(1.55); opacity: 0; }
-  100% { opacity: 0; }
+  0% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 @keyframes arf-pipe-sweep-h {
-  0% { transform: translateX(-10%); }
-  100% { transform: translateX(210%); }
+  0% {
+    transform: translateX(-10%);
+  }
+  100% {
+    transform: translateX(210%);
+  }
 }
 @keyframes arf-pipe-sweep-v {
-  0% { transform: translateY(-10%); }
-  100% { transform: translateY(210%); }
+  0% {
+    transform: translateY(-10%);
+  }
+  100% {
+    transform: translateY(210%);
+  }
 }
 @keyframes arf-pipe-cluster-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 transparent;
     border-color: var(--hairline);
   }
   50% {
-    box-shadow: 0 0 32px -6px color-mix(in oklch, var(--color-arf-purple) 45%, transparent);
+    box-shadow: 0 0 32px -6px
+      color-mix(in oklch, var(--color-arf-purple) 45%, transparent);
     border-color: color-mix(in oklch, var(--color-arf-blue) 45%, transparent);
   }
 }
@@ -492,11 +612,48 @@ main > div:first-child {
 /* Dashboard StatusBadge -- pulse reserved for the "critical" state only,
    so it actually signals urgency instead of every badge quietly buzzing. */
 @keyframes arf-status-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(179, 57, 42, 0.45); }
-  50% { box-shadow: 0 0 0 6px rgba(179, 57, 42, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(179, 57, 42, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(179, 57, 42, 0);
+  }
 }
 .arf-status-pulse {
   animation: arf-status-pulse 2s ease-in-out infinite;
+}
+
+/* Route transitions (RouteTransition.tsx). Two independent mechanisms:
+   native View Transitions where supported, retuned off the browser's
+   default cross-fade timing; a CSS keyframe fallback everywhere else. The
+   pseudo-elements below live in the browser's own view-transition tree, not
+   the normal DOM -- the global `*` reduced-motion override earlier in this
+   file does not reach them, so they need their own explicit rule. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+@keyframes arf-route-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.arf-route-fade {
+  animation: arf-route-in 260ms ease-out;
 }
 
 /* Print isolation for PrintableReportModal -- printing the compliance

@@ -1,4 +1,4 @@
-import { Check, Copy, Rocket } from 'lucide-react';
+import { Check, Copy, Loader2, Rocket } from "lucide-react";
 
 export function SandboxCard({
   curlCommand,
@@ -19,7 +19,9 @@ export function SandboxCard({
 }) {
   return (
     <div className="arf-card-light flex flex-col p-7">
-      <p className="mb-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.13em] text-arf-blue">API</p>
+      <p className="mb-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.13em] text-arf-blue">
+        API
+      </p>
       <h3 className="mb-2 text-h3 font-semibold">Evaluation endpoint</h3>
       <p className="mb-4.5 text-small text-[color:var(--text-secondary)]">
         Send an incident, get a governed decision back.
@@ -32,10 +34,12 @@ export function SandboxCard({
           type="button"
           onClick={onTryLive}
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-[9px] bg-gradient-to-br from-arf-blue to-arf-purple px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-[9px] bg-gradient-to-br from-arf-blue to-arf-purple px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 active:scale-[0.96] disabled:opacity-50 disabled:active:scale-100"
         >
           {loading ? (
-            <>Evaluating…</>
+            <>
+              <Loader2 size={16} className="animate-spin" /> Evaluating…
+            </>
           ) : (
             <>
               <Rocket size={16} /> Try it live
@@ -45,11 +49,15 @@ export function SandboxCard({
         <button
           type="button"
           onClick={onCopy}
-          className="inline-flex items-center gap-2 rounded-[9px] border border-[color:var(--hairline)] px-4 py-2.5 text-sm font-semibold transition hover:border-arf-blue"
+          className="inline-flex items-center gap-2 rounded-[9px] border border-[color:var(--hairline)] px-4 py-2.5 text-sm font-semibold transition hover:border-arf-blue active:scale-[0.96]"
           aria-label="Copy curl command"
         >
-          {copied ? <Check size={16} className="text-arf-blue" /> : <Copy size={16} />}
-          {copied ? 'Copied' : 'Copy curl'}
+          {copied ? (
+            <Check size={16} className="text-arf-blue" />
+          ) : (
+            <Copy size={16} />
+          )}
+          {copied ? "Copied" : "Copy curl"}
         </button>
       </div>
       {response && (
@@ -57,7 +65,11 @@ export function SandboxCard({
           {JSON.stringify(response, null, 2)}
         </pre>
       )}
-      {error && <p className="mt-3 text-sm text-[#b0453a]">Failed to reach sandbox: {error}</p>}
+      {error && (
+        <p className="mt-3 text-sm text-[#b0453a]">
+          Failed to reach sandbox: {error}
+        </p>
+      )}
     </div>
   );
 }

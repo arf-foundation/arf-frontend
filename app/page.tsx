@@ -21,6 +21,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useInView } from "./hooks/useInView";
+import { useCountUp } from "./hooks/useCountUp";
 import ArchitecturePipeline from "../components/ArchitecturePipeline";
 import {
   CapabilityCard,
@@ -180,6 +181,12 @@ const SPECS = [
   "API Control Plane",
   "Enterprise Layer",
   "Enterprise Specification",
+] as const;
+
+const PILOT_STATS = [
+  { to: 100, suffix: "%", label: "of autonomous actions gated and recorded" },
+  { to: 42, suffix: "ms", label: "median policy evaluation overhead" },
+  { to: 0, suffix: "", label: "silent overrides — every exception is signed" },
 ] as const;
 
 const TIERS = [
@@ -365,6 +372,18 @@ export default function LandingPage() {
     threshold: 0.15,
     once: true,
   });
+  const { ref: whoRef, inView: whoInView } = useInView({
+    threshold: 0.15,
+    once: true,
+  });
+  const { ref: industriesRef, inView: industriesInView } = useInView({
+    threshold: 0.15,
+    once: true,
+  });
+  const { ref: quoteRef, inView: quoteInView } = useInView({
+    threshold: 0.4,
+    once: true,
+  });
 
   return (
     <div className="arf-page-root">
@@ -496,7 +515,7 @@ export default function LandingPage() {
           weight system (exploratory/secondary), sitting between the Problem/
           Solution/Outcome trio and Why ARF? so "is this me" resolves before
           "why this approach". See DESIGN_RATIONALE.md §3/§6/§9. ────────────── */}
-      <section className="arf-shell pb-24">
+      <section ref={whoRef} className="arf-shell pb-24">
         <div className="mb-10 grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <p className="arf-eyebrow mb-3.5">Audience</p>
@@ -508,8 +527,12 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="grid gap-[22px] md:grid-cols-3">
-          {WHO_FOR.map((item) => (
-            <div key={item.title} className="arf-card-light p-8">
+          {WHO_FOR.map((item, idx) => (
+            <div
+              key={item.title}
+              className={`arf-card-light arf-reveal p-8 ${whoInView ? "arf-reveal-in" : ""}`}
+              style={{ transitionDelay: whoInView ? `${idx * 90}ms` : "0ms" }}
+            >
               <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-[11px] bg-gradient-to-br from-arf-blue to-arf-purple">
                 <item.icon className="h-5 w-5 text-white" strokeWidth={1.75} />
               </div>
@@ -567,7 +590,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Industries ──────────────────────────────────────────────────────── */}
-      <section className="arf-shell pb-[120px]">
+      <section ref={industriesRef} className="arf-shell pb-[120px]">
         <div className="mb-7 flex flex-wrap items-baseline justify-between gap-6">
           <h2 className="text-[27px] font-semibold tracking-[-0.022em]">
             Built for regulated enterprises
@@ -577,10 +600,13 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2.5">
-          {INDUSTRIES.map((ind) => (
+          {INDUSTRIES.map((ind, idx) => (
             <div
               key={ind.name}
-              className="flex items-center gap-3 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-raised)] px-5 py-3 shadow-[0_10px_24px_-22px_rgba(25,24,22,0.5)]"
+              className={`arf-reveal flex items-center gap-3 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-raised)] px-5 py-3 shadow-[0_10px_24px_-22px_rgba(25,24,22,0.5)] ${industriesInView ? "arf-reveal-in" : ""}`}
+              style={{
+                transitionDelay: industriesInView ? `${idx * 60}ms` : "0ms",
+              }}
             >
               <ind.icon className="h-4 w-4 text-arf-blue" strokeWidth={1.75} />
               <span className="text-sm font-semibold tracking-[-0.01em]">
@@ -601,11 +627,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Enterprise capabilities ─────────────────────────────────────────── */}
-      <section
-        id="capabilities"
-        ref={capsRef}
-        className={`arf-shell pb-[120px] arf-reveal ${capsInView ? "arf-reveal-in" : ""}`}
-      >
+      <section id="capabilities" ref={capsRef} className="arf-shell pb-[120px]">
         <div className="mb-10 grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <p className="arf-eyebrow mb-3.5">Product</p>
@@ -617,8 +639,14 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="grid gap-[22px] md:grid-cols-2">
-          {CAPABILITIES.map((cap) => (
-            <CapabilityCard key={cap.n} {...cap} />
+          {CAPABILITIES.map((cap, idx) => (
+            <div
+              key={cap.n}
+              className={`arf-reveal ${capsInView ? "arf-reveal-in" : ""}`}
+              style={{ transitionDelay: capsInView ? `${idx * 90}ms` : "0ms" }}
+            >
+              <CapabilityCard {...cap} />
+            </div>
           ))}
         </div>
       </section>
@@ -626,9 +654,7 @@ export default function LandingPage() {
       {/* ─── Enterprise-grade governance — the proof section, most visual weight ─ */}
       <section
         ref={govRef}
-        className={`border-y border-[color:var(--hairline)] bg-[color:var(--surface-raised)] py-[104px] arf-reveal ${
-          govInView ? "arf-reveal-in" : ""
-        }`}
+        className="border-y border-[color:var(--hairline)] bg-[color:var(--surface-raised)] py-[104px]"
       >
         <div className="arf-shell">
           <div className="mb-11 grid gap-16 lg:grid-cols-[0.85fr_1.15fr]">
@@ -641,10 +667,13 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="grid gap-[22px] md:grid-cols-3">
-            {GOVERNANCE.map((item) => (
+            {GOVERNANCE.map((item, idx) => (
               <div
                 key={item.title}
-                className="arf-card-substantial bg-[color:var(--surface-canvas)] p-9"
+                className={`arf-card-substantial arf-reveal arf-reveal-deliberate bg-[color:var(--surface-canvas)] p-9 ${govInView ? "arf-reveal-in" : ""}`}
+                style={{
+                  transitionDelay: govInView ? `${idx * 110}ms` : "0ms",
+                }}
               >
                 <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-[11px] bg-gradient-to-br from-arf-blue to-arf-purple">
                   <item.icon
@@ -665,7 +694,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Case study / testimonial band ───────────────────────────────────── */}
-      <section className="arf-dark-wash bg-arf-dark py-[104px]">
+      <section ref={quoteRef} className="arf-dark-wash bg-arf-dark py-[104px]">
         <div className="arf-shell grid items-center gap-16 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
             <p className="mb-6 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-white/60">
@@ -696,23 +725,17 @@ export default function LandingPage() {
               Pilot outcome · illustrative
             </p>
             <dl className="flex flex-col gap-5">
-              {[
-                {
-                  value: "100%",
-                  label: "of autonomous actions gated and recorded",
-                },
-                { value: "42ms", label: "median policy evaluation overhead" },
-                {
-                  value: "0",
-                  label: "silent overrides — every exception is signed",
-                },
-              ].map((stat, idx) => (
+              {PILOT_STATS.map((stat, idx) => (
                 <div
-                  key={stat.value}
+                  key={stat.label}
                   className={idx > 0 ? "border-t border-white/15 pt-5" : ""}
                 >
-                  <dt className="mb-1 text-[32px] font-semibold leading-none tracking-[-0.028em] text-white">
-                    {stat.value}
+                  <dt className="mb-1 text-[32px] font-semibold leading-none tracking-[-0.028em] text-white tabular-nums">
+                    <PilotStat
+                      to={stat.to}
+                      suffix={stat.suffix}
+                      start={quoteInView}
+                    />
                   </dt>
                   <dd className="text-[13.5px] leading-[1.5] text-white/70">
                     {stat.label}
@@ -725,11 +748,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Access models ───────────────────────────────────────────────────── */}
-      <section
-        id="pricing"
-        ref={pricingRef}
-        className={`arf-shell py-[112px] arf-reveal ${pricingInView ? "arf-reveal-in" : ""}`}
-      >
+      <section id="pricing" ref={pricingRef} className="arf-shell py-[112px]">
         <div className="mb-11 grid gap-16 lg:grid-cols-[0.9fr_1.1fr]">
           <h2 className="max-w-[12ch] text-h2 font-semibold">Access models</h2>
           <p className="max-w-[56ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
@@ -739,22 +758,30 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="grid items-start gap-[22px] md:grid-cols-3">
-          {TIERS.map((tier) =>
-            tier.dominant ? (
+          {TIERS.map((tier, idx) => {
+            const delay = {
+              transitionDelay: pricingInView ? `${idx * 90}ms` : "0ms",
+            };
+            return tier.dominant ? (
               <div
                 key={tier.name}
-                className="rounded-2xl bg-gradient-to-br from-arf-blue to-arf-purple p-0.5 shadow-[0_30px_60px_-30px_rgba(51,88,232,0.6)]"
+                className={`arf-reveal rounded-2xl bg-gradient-to-br from-arf-blue to-arf-purple p-0.5 shadow-[0_30px_60px_-30px_rgba(51,88,232,0.6)] ${pricingInView ? "arf-reveal-in" : ""}`}
+                style={delay}
               >
                 <div className="rounded-[14px] bg-[color:var(--surface-raised)] p-9">
                   <TierBody {...tier} renderLink={Link} />
                 </div>
               </div>
             ) : (
-              <div key={tier.name} className="arf-card-light p-8">
+              <div
+                key={tier.name}
+                className={`arf-card-light arf-reveal p-8 ${pricingInView ? "arf-reveal-in" : ""}`}
+                style={delay}
+              >
                 <TierBody {...tier} renderLink={Link} />
               </div>
-            ),
-          )}
+            );
+          })}
         </div>
       </section>
 
@@ -881,3 +908,24 @@ export default function LandingPage() {
 }
 
 /* ============================ Sub-components ============================== */
+
+/* Hooks can't be called inside .map() -- this exists so each pilot stat gets
+   its own useCountUp() call, one per mounted instance, instead of trying to
+   call the hook three times from a loop. */
+function PilotStat({
+  to,
+  suffix,
+  start,
+}: {
+  to: number;
+  suffix: string;
+  start: boolean;
+}) {
+  const value = useCountUp(to, { start });
+  return (
+    <>
+      {value}
+      {suffix}
+    </>
+  );
+}

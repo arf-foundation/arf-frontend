@@ -1,8 +1,13 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { ArrowRight, Menu, Moon, Sun, X } from 'lucide-react';
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { ArrowRight, Menu, Moon, Sun, X } from "lucide-react";
+
+/* Matches the transition-[grid-template-rows] duration below -- keeping the
+   unmount delay and the CSS duration in the same place so they can't drift
+   apart. */
+const MOBILE_MENU_MS = 260;
 
 /* ----------------------------------------------------------------------------
    NavBar — 8 links + CTA reduced to 4 primary links + two buttons.
@@ -15,13 +20,13 @@ import { ArrowRight, Menu, Moon, Sun, X } from 'lucide-react';
 --------------------------------------------------------------------------- */
 
 const PRIMARY_LINKS = [
-  { label: 'Product', href: '/#capabilities' },
-  { label: 'Docs', href: '/faq' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Console', href: '/dashboard' },
+  { label: "Product", href: "/#capabilities" },
+  { label: "Docs", href: "/faq" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Console", href: "/dashboard" },
 ] as const;
 
-type Theme = 'light' | 'dark';
+type Theme = "light" | "dark";
 
 export default function NavBar() {
   // Lazy initializer instead of an effect: layout.tsx's blocking inline
@@ -31,9 +36,35 @@ export default function NavBar() {
   // DOM state, not a guess to correct later — no set-state-in-effect, and no
   // one-frame icon flash while an effect would otherwise catch up.
   const [theme, setTheme] = useState<Theme>(() =>
-    typeof document !== 'undefined' && document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light",
   );
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Menu used to unmount instantly on close ({mobileOpen && (...)}), so it
+  // just snapped. Keeping it mounted through the closing transition (mount
+  // immediately on open, unmount MOBILE_MENU_MS after close) lets
+  // grid-template-rows actually animate both directions instead of only
+  // ever appearing pre-opened.
+  const [menuMounted, setMenuMounted] = useState(false);
+  const [menuShown, setMenuShown] = useState(false);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      // Mount-then-animate needs this: the transition can't play unless the
+      // 0fr state actually paints before the next frame flips it to 1fr,
+      // which needs a real render in between -- not derivable from mobileOpen
+      // alone. Same accepted pattern as app/history, /dashboard, /signup.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setMenuMounted(true);
+      const id = requestAnimationFrame(() => setMenuShown(true));
+      return () => cancelAnimationFrame(id);
+    }
+    setMenuShown(false);
+    const timeout = setTimeout(() => setMenuMounted(false), MOBILE_MENU_MS);
+    return () => clearTimeout(timeout);
+  }, [mobileOpen]);
 
   const toggleTheme = () => {
     // Decide from the real DOM class, not the `theme` state variable. If
@@ -45,11 +76,13 @@ export default function NavBar() {
     // `theme` that finally matches reality, does the intended toggle. Sourcing
     // the decision from the DOM itself removes the possibility of that
     // divergence entirely; `theme` still drives the icon, nothing else.
-    const next: Theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-    document.documentElement.classList.toggle('dark', next === 'dark');
+    const next: Theme = document.documentElement.classList.contains("dark")
+      ? "light"
+      : "dark";
+    document.documentElement.classList.toggle("dark", next === "dark");
     setTheme(next);
     try {
-      window.localStorage.setItem('arf-theme', next);
+      window.localStorage.setItem("arf-theme", next);
     } catch {
       /* storage unavailable — the toggle still works for this session */
     }
@@ -58,14 +91,20 @@ export default function NavBar() {
   return (
     <header className="arf-page-root sticky top-0 z-40 border-b border-[color:var(--hairline)] bg-[color:var(--surface-canvas)]/85 backdrop-blur-md">
       <div className="arf-shell flex h-[74px] items-center justify-between gap-8">
-        <Link href="/" className="flex items-center gap-3" aria-label="ARF AI home">
+        <Link
+          href="/"
+          className="flex items-center gap-3"
+          aria-label="ARF AI home"
+        >
           <span className="h-[22px] w-[22px] rounded-md bg-gradient-to-br from-arf-blue to-arf-purple" />
-          <span className="text-base font-semibold tracking-[-0.02em]">ARF AI</span>
+          <span className="text-base font-semibold tracking-[-0.02em]">
+            ARF AI
+          </span>
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
           {PRIMARY_LINKS.map((link) =>
-            'external' in link && link.external ? (
+            "external" in link && link.external ? (
               <a
                 key={link.href}
                 href={link.href}
@@ -83,7 +122,7 @@ export default function NavBar() {
               >
                 {link.label}
               </Link>
-            )
+            ),
           )}
         </nav>
 
@@ -91,20 +130,32 @@ export default function NavBar() {
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)]"
+            aria-label={
+              theme === "dark"
+                ? "Switch to light theme"
+                : "Switch to dark theme"
+            }
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)] active:scale-90"
           >
-            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
           </button>
 
           {/* Placeholder for WorkOS AuthKit — swap href for the hosted login URL */}
-          <Link href="/signup" className="arf-btn-ghost hidden sm:inline-flex" data-workos="authkit-signin">
+          <Link
+            href="/signup"
+            className="arf-btn-ghost hidden sm:inline-flex"
+            data-workos="authkit-signin"
+          >
             Sign In
           </Link>
 
           <Link
             href="/signup"
-            className="hidden items-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-[17px] py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(51,88,232,0.7)] transition hover:brightness-110 sm:inline-flex"
+            className="hidden items-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-[17px] py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(51,88,232,0.7)] transition hover:brightness-110 active:scale-[0.97] sm:inline-flex"
           >
             Request Pilot Access
           </Link>
@@ -112,52 +163,64 @@ export default function NavBar() {
           <button
             type="button"
             onClick={() => setMobileOpen((v) => !v)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav-menu"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] md:hidden"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] transition active:scale-90 md:hidden"
           >
-            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            {mobileOpen ? (
+              <X className="h-4 w-4" />
+            ) : (
+              <Menu className="h-4 w-4" />
+            )}
           </button>
         </div>
       </div>
 
-      {mobileOpen && (
-        <div id="mobile-nav-menu" className="border-t border-[color:var(--hairline)] bg-[color:var(--surface-canvas)] md:hidden">
-          <div className="arf-shell flex flex-col gap-1 py-4">
-            {PRIMARY_LINKS.map((link) =>
-              'external' in link && link.external ? (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-2 py-3 text-base font-medium text-[color:var(--text-secondary)]"
-                >
-                  {link.label}
-                </a>
-              ) : (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-2 py-3 text-base font-medium text-[color:var(--text-secondary)]"
-                >
-                  {link.label}
+      {menuMounted && (
+        <div
+          id="mobile-nav-menu"
+          aria-hidden={!menuShown}
+          inert={!menuShown ? true : undefined}
+          className="grid border-t border-[color:var(--hairline)] bg-[color:var(--surface-canvas)] transition-[grid-template-rows] duration-[260ms] ease-out md:hidden"
+          style={{ gridTemplateRows: menuShown ? "1fr" : "0fr" }}
+        >
+          <div className="overflow-hidden">
+            <div className="arf-shell flex flex-col gap-1 py-4">
+              {PRIMARY_LINKS.map((link) =>
+                "external" in link && link.external ? (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-2 py-3 text-base font-medium text-[color:var(--text-secondary)] transition active:scale-[0.98]"
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-2 py-3 text-base font-medium text-[color:var(--text-secondary)] transition active:scale-[0.98]"
+                  >
+                    {link.label}
+                  </Link>
+                ),
+              )}
+              <div className="mt-2 flex flex-col gap-2.5">
+                <Link href="/signup" className="arf-btn-ghost justify-center">
+                  Sign In
                 </Link>
-              )
-            )}
-            <div className="mt-2 flex flex-col gap-2.5">
-              <Link href="/signup" className="arf-btn-ghost justify-center">
-                Sign In
-              </Link>
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-5 py-3 text-sm font-semibold text-white"
-              >
-                Request Pilot Access <ArrowRight size={16} />
-              </Link>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.97]"
+                >
+                  Request Pilot Access <ArrowRight size={16} />
+                </Link>
+              </div>
             </div>
           </div>
         </div>

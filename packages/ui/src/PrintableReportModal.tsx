@@ -1,5 +1,5 @@
-import { useEffect, useRef, type ReactNode } from 'react';
-import { Printer, X } from 'lucide-react';
+import { useEffect, useRef, type ReactNode } from "react";
+import { Printer, X } from "lucide-react";
 
 export function PrintableReportModal({
   open,
@@ -27,16 +27,16 @@ export function PrintableReportModal({
     previouslyFocused.current = document.activeElement as HTMLElement | null;
     dialogRef.current?.focus();
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
         return;
       }
-      if (e.key === 'Tab') {
+      if (e.key === "Tab") {
         const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
         );
         if (!focusables || focusables.length === 0) return;
         const first = focusables[0];
@@ -50,9 +50,9 @@ export function PrintableReportModal({
         }
       }
     };
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
       previouslyFocused.current?.focus();
     };
@@ -62,7 +62,11 @@ export function PrintableReportModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="arf-no-print absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
+      <div
+        className="arf-no-print absolute inset-0 bg-black/50"
+        onClick={onClose}
+        aria-hidden="true"
+      />
       <div
         id="arf-printable-report"
         ref={dialogRef}
@@ -77,18 +81,24 @@ export function PrintableReportModal({
             <h2 id="arf-report-title" className="text-h3 font-semibold">
               {title}
             </h2>
-            <p className="mt-1 text-xs text-[color:var(--text-muted)]">Generated {generatedAt}</p>
+            <p className="mt-1 text-xs text-[color:var(--text-muted)]">
+              Generated {generatedAt}
+            </p>
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">
             {actions}
-            <button type="button" onClick={() => window.print()} className="arf-btn-secondary">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="arf-btn-secondary"
+            >
               <Printer size={16} /> Print
             </button>
             <button
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="rounded-lg border border-[color:var(--hairline)] p-1.5 transition hover:border-arf-blue"
+              className="rounded-lg border border-[color:var(--hairline)] p-1.5 transition hover:border-arf-blue active:scale-90"
             >
               <X className="h-4 w-4" />
             </button>
@@ -98,7 +108,9 @@ export function PrintableReportModal({
         {/* Print-only header -- the screen header above is hidden when printing (arf-no-print) */}
         <div className="hidden text-center print:block">
           <h2 className="text-h3 font-semibold">{title}</h2>
-          <p className="mt-1 text-xs text-[color:var(--text-muted)]">Generated {generatedAt}</p>
+          <p className="mt-1 text-xs text-[color:var(--text-muted)]">
+            Generated {generatedAt}
+          </p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 print:overflow-visible">

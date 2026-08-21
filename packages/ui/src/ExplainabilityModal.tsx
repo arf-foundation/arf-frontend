@@ -1,5 +1,5 @@
-import { useEffect, useRef, type ReactNode } from 'react';
-import { X } from 'lucide-react';
+import { useEffect, useRef, type ReactNode } from "react";
+import { X } from "lucide-react";
 
 export interface ExplainabilitySection {
   heading: string;
@@ -29,16 +29,16 @@ export function ExplainabilityModal({
     previouslyFocused.current = document.activeElement as HTMLElement | null;
     dialogRef.current?.focus();
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
         return;
       }
-      if (e.key === 'Tab') {
+      if (e.key === "Tab") {
         const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
         );
         if (!focusables || focusables.length === 0) return;
         const first = focusables[0];
@@ -52,9 +52,9 @@ export function ExplainabilityModal({
         }
       }
     };
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
       previouslyFocused.current?.focus();
     };
@@ -64,7 +64,11 @@ export function ExplainabilityModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
+      <div
+        className="absolute inset-0 bg-black/50"
+        onClick={onClose}
+        aria-hidden="true"
+      />
       <div
         ref={dialogRef}
         role="dialog"
@@ -81,7 +85,7 @@ export function ExplainabilityModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex-shrink-0 rounded-lg border border-[color:var(--hairline)] p-1.5 transition hover:border-arf-blue"
+            className="flex-shrink-0 rounded-lg border border-[color:var(--hairline)] p-1.5 transition hover:border-arf-blue active:scale-90"
           >
             <X className="h-4 w-4" />
           </button>
@@ -96,7 +100,9 @@ export function ExplainabilityModal({
             {sections.map((section) => (
               <div key={section.heading}>
                 <p className="arf-eyebrow mb-2">{section.heading}</p>
-                <div className="text-sm leading-[1.6] text-[color:var(--text-secondary)]">{section.body}</div>
+                <div className="text-sm leading-[1.6] text-[color:var(--text-secondary)]">
+                  {section.body}
+                </div>
               </div>
             ))}
           </div>

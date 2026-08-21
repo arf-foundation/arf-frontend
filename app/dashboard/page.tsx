@@ -1,9 +1,22 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
-import { ArrowRight, RefreshCw, Network, Shield, Lock, FileText, AlertTriangle, Clock, Printer, ChevronRight, Download } from 'lucide-react';
-import DashboardBottomNav from '../../components/DashboardBottomNav';
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { useAnimatedNumber } from "../hooks/useAnimatedNumber";
+import {
+  ArrowRight,
+  RefreshCw,
+  Network,
+  Shield,
+  Lock,
+  FileText,
+  AlertTriangle,
+  Clock,
+  Printer,
+  ChevronRight,
+  Download,
+} from "lucide-react";
+import DashboardBottomNav from "../../components/DashboardBottomNav";
 import {
   DashboardMetricCard,
   RiskGauge,
@@ -13,7 +26,7 @@ import {
   ExplainabilityModal,
   type ExplainabilitySection,
   PrintableReportModal,
-} from '@arf/ui';
+} from "@arf/ui";
 
 /* ============================================================================
    Design-migration pass (P3, enterprise-refresh audit). Structure and mock
@@ -49,7 +62,7 @@ interface RiskWeights {
 
 interface RiskData {
   risk: number;
-  status: 'critical' | 'warning' | 'safe';
+  status: "critical" | "warning" | "safe";
   breakdown: RiskBreakdown;
   weights: RiskWeights;
   variance: number;
@@ -68,14 +81,14 @@ interface Incident {
   metric: string;
   value: string;
   risk: number;
-  action: 'APPROVE' | 'DENY' | 'ESCALATE';
+  action: "APPROVE" | "DENY" | "ESCALATE";
 }
 
 interface PolicyViolation {
   id: string;
   policy: string;
   component: string;
-  severity: 'low' | 'medium' | 'high';
+  severity: "low" | "medium" | "high";
   timestamp: string;
 }
 
@@ -83,7 +96,7 @@ interface CooldownEntry {
   id: string;
   component: string;
   policy: string;
-  kind: 'cooldown' | 'rate_limit';
+  kind: "cooldown" | "rate_limit";
   status: string;
 }
 
@@ -108,9 +121,9 @@ const generateMockRisk = (): RiskData => {
     return min + r * (max - min);
   };
   const risk = random(0.2, 0.95);
-  let status: RiskData['status'] = 'warning';
-  if (risk > 0.7) status = 'critical';
-  else if (risk < 0.4) status = 'safe';
+  let status: RiskData["status"] = "warning";
+  if (risk > 0.7) status = "critical";
+  else if (risk < 0.4) status = "safe";
 
   const conjWeight = random(0.3, 0.7);
   const hmcWeight = random(0.1, 0.4);
@@ -129,38 +142,148 @@ const generateMockRisk = (): RiskData => {
 };
 
 const MOCK_INCIDENTS: Incident[] = [
-  { id: 1, timestamp: '2026-05-14 10:23:45', service: 'payment-api', metric: 'latency', value: '450ms', risk: 0.82, action: 'ESCALATE' },
-  { id: 2, timestamp: '2026-05-14 09:15:22', service: 'auth-service', metric: 'error_rate', value: '12%', risk: 0.45, action: 'APPROVE' },
-  { id: 3, timestamp: '2026-05-13 22:10:05', service: 'database', metric: 'cpu_usage', value: '92%', risk: 0.71, action: 'ESCALATE' },
-  { id: 4, timestamp: '2026-05-13 18:30:19', service: 'cache', metric: 'hit_rate', value: '34%', risk: 0.38, action: 'APPROVE' },
-  { id: 5, timestamp: '2026-05-13 14:45:03', service: 'message-queue', metric: 'backlog', value: '1250', risk: 0.63, action: 'DENY' },
+  {
+    id: 1,
+    timestamp: "2026-05-14 10:23:45",
+    service: "payment-api",
+    metric: "latency",
+    value: "450ms",
+    risk: 0.82,
+    action: "ESCALATE",
+  },
+  {
+    id: 2,
+    timestamp: "2026-05-14 09:15:22",
+    service: "auth-service",
+    metric: "error_rate",
+    value: "12%",
+    risk: 0.45,
+    action: "APPROVE",
+  },
+  {
+    id: 3,
+    timestamp: "2026-05-13 22:10:05",
+    service: "database",
+    metric: "cpu_usage",
+    value: "92%",
+    risk: 0.71,
+    action: "ESCALATE",
+  },
+  {
+    id: 4,
+    timestamp: "2026-05-13 18:30:19",
+    service: "cache",
+    metric: "hit_rate",
+    value: "34%",
+    risk: 0.38,
+    action: "APPROVE",
+  },
+  {
+    id: 5,
+    timestamp: "2026-05-13 14:45:03",
+    service: "message-queue",
+    metric: "backlog",
+    value: "1250",
+    risk: 0.63,
+    action: "DENY",
+  },
 ];
 
 const MOCK_POLICY_VIOLATIONS: PolicyViolation[] = [
-  { id: 'v1', policy: 'RegionAllowedPolicy', component: 'payment-api', severity: 'high', timestamp: '2026-05-14 11:02:33' },
-  { id: 'v2', policy: 'CostThresholdPolicy', component: 'database', severity: 'medium', timestamp: '2026-05-14 10:15:22' },
-  { id: 'v3', policy: 'MaxPermissionLevelPolicy', component: 'auth-service', severity: 'low', timestamp: '2026-05-13 23:45:01' },
+  {
+    id: "v1",
+    policy: "RegionAllowedPolicy",
+    component: "payment-api",
+    severity: "high",
+    timestamp: "2026-05-14 11:02:33",
+  },
+  {
+    id: "v2",
+    policy: "CostThresholdPolicy",
+    component: "database",
+    severity: "medium",
+    timestamp: "2026-05-14 10:15:22",
+  },
+  {
+    id: "v3",
+    policy: "MaxPermissionLevelPolicy",
+    component: "auth-service",
+    severity: "low",
+    timestamp: "2026-05-13 23:45:01",
+  },
 ];
 
 // Same two rows as before, just as data instead of hand-duplicated JSX --
 // values unchanged, needed to give each row its own explain trigger.
 const MOCK_COOLDOWNS: CooldownEntry[] = [
-  { id: 'cd1', component: 'payment-api', policy: 'latency_gt_100', kind: 'cooldown', status: 'Cooldown: 45s remaining' },
-  { id: 'cd2', component: 'database', policy: 'cpu_high', kind: 'rate_limit', status: 'Rate limit: 2/5 per hour' },
+  {
+    id: "cd1",
+    component: "payment-api",
+    policy: "latency_gt_100",
+    kind: "cooldown",
+    status: "Cooldown: 45s remaining",
+  },
+  {
+    id: "cd2",
+    component: "database",
+    policy: "cpu_high",
+    kind: "rate_limit",
+    status: "Rate limit: 2/5 per hour",
+  },
 ];
 
 const MOCK_AUDIT_LOGS: AuditLogEntry[] = [
-  { id: 'a1', action: 'ProvisionResource', component: 'payment-api', riskScore: 0.82, decision: 'ESCALATE', timestamp: '2026-05-14 10:23:45', user: 'system' },
-  { id: 'a2', action: 'GrantAccess', component: 'auth-service', riskScore: 0.45, decision: 'APPROVE', timestamp: '2026-05-14 09:15:22', user: 'admin@example.com' },
-  { id: 'a3', action: 'DeployConfig', component: 'database', riskScore: 0.71, decision: 'ESCALATE', timestamp: '2026-05-13 22:10:05', user: 'devops@example.com' },
-  { id: 'a4', action: 'ScaleOut', component: 'cache', riskScore: 0.38, decision: 'APPROVE', timestamp: '2026-05-13 18:30:19', user: 'system' },
-  { id: 'a5', action: 'Rollback', component: 'message-queue', riskScore: 0.63, decision: 'DENY', timestamp: '2026-05-13 14:45:03', user: 'sre@example.com' },
+  {
+    id: "a1",
+    action: "ProvisionResource",
+    component: "payment-api",
+    riskScore: 0.82,
+    decision: "ESCALATE",
+    timestamp: "2026-05-14 10:23:45",
+    user: "system",
+  },
+  {
+    id: "a2",
+    action: "GrantAccess",
+    component: "auth-service",
+    riskScore: 0.45,
+    decision: "APPROVE",
+    timestamp: "2026-05-14 09:15:22",
+    user: "admin@example.com",
+  },
+  {
+    id: "a3",
+    action: "DeployConfig",
+    component: "database",
+    riskScore: 0.71,
+    decision: "ESCALATE",
+    timestamp: "2026-05-13 22:10:05",
+    user: "devops@example.com",
+  },
+  {
+    id: "a4",
+    action: "ScaleOut",
+    component: "cache",
+    riskScore: 0.38,
+    decision: "APPROVE",
+    timestamp: "2026-05-13 18:30:19",
+    user: "system",
+  },
+  {
+    id: "a5",
+    action: "Rollback",
+    component: "message-queue",
+    riskScore: 0.63,
+    decision: "DENY",
+    timestamp: "2026-05-13 14:45:03",
+    user: "sre@example.com",
+  },
 ];
 
 const mockMemoryStats = {
   similar_incidents: 3,
   rag_similarity: 0.78,
-  memory_usage: 'FAISS IndexFlatL2 (384 dim)',
+  memory_usage: "FAISS IndexFlatL2 (384 dim)",
   cache_hits: 124,
 };
 
@@ -185,10 +308,20 @@ function auditLogExplanation(log: AuditLogEntry): {
   sections: ExplainabilitySection[];
   footer: string;
 } {
-  const riskBand = log.riskScore >= 0.7 ? 'high' : log.riskScore >= 0.4 ? 'moderate' : 'low';
+  const riskBand =
+    log.riskScore >= 0.7 ? "high" : log.riskScore >= 0.4 ? "moderate" : "low";
   const outcome =
-    log.decision === 'ESCALATE' ? 'escalated for review' : log.decision === 'DENY' ? 'blocked' : 'approved automatically';
-  const altAction = log.decision === 'APPROVE' ? 'denied' : log.decision === 'DENY' ? 'approved' : 'auto-approved without escalation';
+    log.decision === "ESCALATE"
+      ? "escalated for review"
+      : log.decision === "DENY"
+        ? "blocked"
+        : "approved automatically";
+  const altAction =
+    log.decision === "APPROVE"
+      ? "denied"
+      : log.decision === "DENY"
+        ? "approved"
+        : "auto-approved without escalation";
   // Illustrative, derived from the mock risk score -- not a live estimate.
   const illustrativeDelta = Math.round(log.riskScore * 28);
 
@@ -197,35 +330,40 @@ function auditLogExplanation(log: AuditLogEntry): {
     summary: `This ${log.action} on ${log.component} was ${outcome} because the risk model scored it in the ${riskBand} band (${(log.riskScore * 100).toFixed(0)}%). The decision record below is immutable once created.`,
     sections: [
       {
-        heading: 'Risk assessment',
+        heading: "Risk assessment",
         body: (
           <>
-            Risk score {log.riskScore.toFixed(2)}{' '}
-            comes from ARF&rsquo;s Bayesian fusion model: a fast per-category
-            conjugate prior, an offline Hamiltonian Monte Carlo model over contextual features, and hierarchical
-            shrinkage across categories, combined by weight of evidence. Posterior variance — the model&rsquo;s own
-            uncertainty in this score — shrinks as more real outcomes are observed for {log.component}.
+            Risk score {log.riskScore.toFixed(2)} comes from ARF&rsquo;s
+            Bayesian fusion model: a fast per-category conjugate prior, an
+            offline Hamiltonian Monte Carlo model over contextual features, and
+            hierarchical shrinkage across categories, combined by weight of
+            evidence. Posterior variance — the model&rsquo;s own uncertainty in
+            this score — shrinks as more real outcomes are observed for{" "}
+            {log.component}.
           </>
         ),
       },
       {
-        heading: 'Counterfactual',
+        heading: "Counterfactual",
         body: (
           <>
-            If this had been {altAction}{' '}
-            instead, ARF&rsquo;s doubly-robust causal effect estimator projects success
-            probability would have shifted by roughly {illustrativeDelta}% (illustrative for this sandbox — the real
-            estimator combines inverse-probability weighting with outcome regression, reports a bootstrap confidence
-            interval, and includes an E-value check for how much unmeasured confounding would overturn the result).
+            If this had been {altAction} instead, ARF&rsquo;s doubly-robust
+            causal effect estimator projects success probability would have
+            shifted by roughly {illustrativeDelta}% (illustrative for this
+            sandbox — the real estimator combines inverse-probability weighting
+            with outcome regression, reports a bootstrap confidence interval,
+            and includes an E-value check for how much unmeasured confounding
+            would overturn the result).
           </>
         ),
       },
       {
-        heading: 'Record integrity',
+        heading: "Record integrity",
         body: (
           <>
-            Decision records are deep-frozen at creation — every field becomes immutable — and can be signed with
-            RSA-SHA256 for tamper detection. Attributed to <span className="font-mono">{log.user}</span> at{' '}
+            Decision records are deep-frozen at creation — every field becomes
+            immutable — and can be signed with RSA-SHA256 for tamper detection.
+            Attributed to <span className="font-mono">{log.user}</span> at{" "}
             {log.timestamp}.
           </>
         ),
@@ -242,40 +380,47 @@ function systemRiskExplanation(risk: RiskData): {
   footer: string;
 } {
   return {
-    title: 'System Risk — how this score is computed',
+    title: "System Risk — how this score is computed",
     summary: `This request scored ${(risk.risk * 100).toFixed(0)}% (${risk.status}). ARF combines three independent estimates into one risk score, weighted by how much evidence backs each.`,
     sections: [
       {
-        heading: 'Model architecture',
+        heading: "Model architecture",
         body: (
           <>
-            A fast-updating conjugate Beta prior tracks outcomes per category from day one. An offline Hamiltonian
-            Monte Carlo model adds contextual/time-based signal once enough history exists. Hierarchical shrinkage
-            pulls sparse categories toward a shared trend across categories. The three are combined by weight of
-            evidence — categories with little history lean on the conjugate prior; well-observed categories lean
-            more on the trained models.
+            A fast-updating conjugate Beta prior tracks outcomes per category
+            from day one. An offline Hamiltonian Monte Carlo model adds
+            contextual/time-based signal once enough history exists.
+            Hierarchical shrinkage pulls sparse categories toward a shared trend
+            across categories. The three are combined by weight of evidence —
+            categories with little history lean on the conjugate prior;
+            well-observed categories lean more on the trained models.
           </>
         ),
       },
       {
-        heading: 'Uncertainty',
+        heading: "Uncertainty",
         body: (
           <>
-            Posterior variance ({risk.variance.toFixed(4)}) is the analytic variance of the model&rsquo;s own Beta
-            distribution — real Bayesian uncertainty, not a guess, and it shrinks as more real outcomes are
-            observed. The confidence interval shown above is an illustrative band derived from that variance for
-            this sandbox; it is not necessarily the same construction production deployments use.
+            Posterior variance ({risk.variance.toFixed(4)}) is the analytic
+            variance of the model&rsquo;s own Beta distribution — real Bayesian
+            uncertainty, not a guess, and it shrinks as more real outcomes are
+            observed. The confidence interval shown above is an illustrative
+            band derived from that variance for this sandbox; it is not
+            necessarily the same construction production deployments use.
           </>
         ),
       },
       {
-        heading: 'Fusion weights',
+        heading: "Fusion weights",
         body: (
           <>
-            This score currently weights conjugate {risk.weights.conjugate.toFixed(2)}, HMC{' '}
-            {risk.weights.hmc.toFixed(2)}, hyperprior {risk.weights.hyperprior.toFixed(2)}. HMC and hyperprior are
-            optional refinements — if either model isn&rsquo;t trained yet for a category, weight shifts back to
-            the always-available conjugate prior rather than failing.
+            This score currently weights conjugate{" "}
+            {risk.weights.conjugate.toFixed(2)}, HMC{" "}
+            {risk.weights.hmc.toFixed(2)}, hyperprior{" "}
+            {risk.weights.hyperprior.toFixed(2)}. HMC and hyperprior are
+            optional refinements — if either model isn&rsquo;t trained yet for a
+            category, weight shifts back to the always-available conjugate prior
+            rather than failing.
           </>
         ),
       },
@@ -291,15 +436,17 @@ function semanticMemoryExplanation(stats: typeof mockMemoryStats): {
   footer: string;
 } {
   return {
-    title: 'Semantic Memory — how similar incidents are found',
+    title: "Semantic Memory — how similar incidents are found",
     summary: `ARF found ${stats.similar_incidents} related past incidents for this request, with a top similarity score of ${stats.rag_similarity.toFixed(2)}.`,
     sections: [
       {
-        heading: 'Retrieval method',
+        heading: "Retrieval method",
         body: (
           <>
-            Incidents are indexed in a FAISS nearest-neighbor index ({stats.memory_usage}) and ranked by similarity
-            s = 1 / (1 + distance) between the current incident&rsquo;s fingerprint and each stored one.
+            Incidents are indexed in a FAISS nearest-neighbor index (
+            {stats.memory_usage}) and ranked by similarity s = 1 / (1 +
+            distance) between the current incident&rsquo;s fingerprint and each
+            stored one.
           </>
         ),
       },
@@ -307,19 +454,21 @@ function semanticMemoryExplanation(stats: typeof mockMemoryStats): {
         heading: 'What "similar" means',
         body: (
           <>
-            In the open-source/sandbox tier, incident fingerprints are built from structured metrics — component,
-            metric type, error rate, latency — not natural-language understanding. Two incidents are similar
-            because their operational signature matches, not because a language model read and compared their
-            descriptions.
+            In the open-source/sandbox tier, incident fingerprints are built
+            from structured metrics — component, metric type, error rate,
+            latency — not natural-language understanding. Two incidents are
+            similar because their operational signature matches, not because a
+            language model read and compared their descriptions.
           </>
         ),
       },
       {
-        heading: 'Why it matters for this decision',
+        heading: "Why it matters for this decision",
         body: (
           <>
-            Retrieved incidents feed a weighted success-rate estimate that adjusts for each action&rsquo;s own
-            causal effect, so a policy that &ldquo;worked&rdquo; several times isn&rsquo;t credited for outcomes
+            Retrieved incidents feed a weighted success-rate estimate that
+            adjusts for each action&rsquo;s own causal effect, so a policy that
+            &ldquo;worked&rdquo; several times isn&rsquo;t credited for outcomes
             that would have happened anyway.
           </>
         ),
@@ -336,36 +485,43 @@ function policyViolationExplanation(v: PolicyViolation): {
   footer: string;
 } {
   const severityNote =
-    v.severity === 'high'
-      ? 'high-severity violations block the action outright'
-      : v.severity === 'medium'
-        ? 'medium-severity violations are logged and typically escalated for review'
-        : 'low-severity violations are logged for audit without blocking';
+    v.severity === "high"
+      ? "high-severity violations block the action outright"
+      : v.severity === "medium"
+        ? "medium-severity violations are logged and typically escalated for review"
+        : "low-severity violations are logged for audit without blocking";
 
   return {
     title: `${v.policy} — ${v.component}`,
     summary: `${v.policy} flagged ${v.component} as a ${v.severity}-severity violation. Policies are evaluated deterministically, before any action reaches infrastructure.`,
     sections: [
       {
-        heading: 'How policies are structured',
+        heading: "How policies are structured",
         body: (
           <>
-            ARF policies compose from simple boolean building blocks (AND / OR / NOT) into rules like this one,
-            formally specified so their behavior is provable rather than only tested by example.
+            ARF policies compose from simple boolean building blocks (AND / OR /
+            NOT) into rules like this one, formally specified so their behavior
+            is provable rather than only tested by example.
           </>
         ),
       },
       {
-        heading: 'Severity',
-        body: <>Severity ({v.severity}) reflects how directly this violation could affect production safety or compliance — {severityNote}.</>,
-      },
-      {
-        heading: 'Enforcement',
+        heading: "Severity",
         body: (
           <>
-            Policy evaluation runs mechanically before infrastructure access is granted — not as an advisory
-            suggestion a human can silently skip. In production, a secondary evaluator cross-checks results and
-            logs any disagreement for investigation.
+            Severity ({v.severity}) reflects how directly this violation could
+            affect production safety or compliance — {severityNote}.
+          </>
+        ),
+      },
+      {
+        heading: "Enforcement",
+        body: (
+          <>
+            Policy evaluation runs mechanically before infrastructure access is
+            granted — not as an advisory suggestion a human can silently skip.
+            In production, a secondary evaluator cross-checks results and logs
+            any disagreement for investigation.
           </>
         ),
       },
@@ -380,33 +536,35 @@ function cooldownExplanation(c: CooldownEntry): {
   sections: ExplainabilitySection[];
   footer: string;
 } {
-  const metricHint = c.policy.includes('latency')
-    ? 'response latency'
-    : c.policy.includes('cpu')
-      ? 'CPU utilization'
-      : 'a monitored metric';
+  const metricHint = c.policy.includes("latency")
+    ? "response latency"
+    : c.policy.includes("cpu")
+      ? "CPU utilization"
+      : "a monitored metric";
 
   return {
     title: `${c.component} — ${c.policy}`,
-    summary: `${c.component} is currently under a ${c.kind === 'cooldown' ? 'cooldown' : 'rate limit'} from policy ${c.policy}: ${c.status}.`,
+    summary: `${c.component} is currently under a ${c.kind === "cooldown" ? "cooldown" : "rate limit"} from policy ${c.policy}: ${c.status}.`,
     sections: [
       {
-        heading: 'Why rate limits exist',
+        heading: "Why rate limits exist",
         body: (
           <>
-            Healing policies define not just when to act, but how often — a cooldown window after an action fires,
-            and a maximum executions-per-hour cap — so an unstable signal can&rsquo;t trigger a runaway loop of
-            automated responses.
+            Healing policies define not just when to act, but how often — a
+            cooldown window after an action fires, and a maximum
+            executions-per-hour cap — so an unstable signal can&rsquo;t trigger
+            a runaway loop of automated responses.
           </>
         ),
       },
       {
-        heading: 'This policy',
+        heading: "This policy",
         body: (
           <>
-            Policy <span className="font-mono">{c.policy}</span> conditions on {metricHint}. Once triggered, it
-            enters a {c.kind === 'cooldown' ? 'cooldown' : 'rate-limit'} state before it can fire again on this
-            component.
+            Policy <span className="font-mono">{c.policy}</span> conditions on{" "}
+            {metricHint}. Once triggered, it enters a{" "}
+            {c.kind === "cooldown" ? "cooldown" : "rate-limit"} state before it
+            can fire again on this component.
           </>
         ),
       },
@@ -420,45 +578,71 @@ function cooldownExplanation(c: CooldownEntry): {
 // ----------------------------------------------------------------------
 const TrustBadges = () => (
   <div className="my-6 flex flex-wrap justify-center gap-3">
-    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs"><Shield className="h-3.5 w-3.5 text-arf-blue" /> SOC2 Type II (Audit ready)</div>
-    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs"><Shield className="h-3.5 w-3.5 text-arf-blue" /> ISO 27001 (Compliant)</div>
-    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs"><Shield className="h-3.5 w-3.5 text-arf-purple" /> GDPR Ready</div>
+    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs">
+      <Shield className="h-3.5 w-3.5 text-arf-blue" /> SOC2 Type II (Audit
+      ready)
+    </div>
+    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs">
+      <Shield className="h-3.5 w-3.5 text-arf-blue" /> ISO 27001 (Compliant)
+    </div>
+    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs">
+      <Shield className="h-3.5 w-3.5 text-arf-purple" /> GDPR Ready
+    </div>
   </div>
 );
 
 const Testimonial = () => (
   <div className="my-6 rounded-xl border-l-4 border-arf-blue bg-[color:var(--surface-sunken)] p-5 font-serif italic text-[color:var(--text-secondary)]">
-    “ARF caught a misconfiguration that would have exposed customer data. The audit trail saved us hours of investigation.”<br/>
-    <span className="mt-2 block font-sans font-medium not-italic text-[color:var(--text-primary)]">— CISO, Fortune 500 (pilot customer)</span>
+    “ARF caught a misconfiguration that would have exposed customer data. The
+    audit trail saved us hours of investigation.”
+    <br />
+    <span className="mt-2 block font-sans font-medium not-italic text-[color:var(--text-primary)]">
+      — CISO, Fortune 500 (pilot customer)
+    </span>
   </div>
 );
 
 const LegalFooter = () => (
   <div className="mt-8 flex flex-wrap justify-center gap-4 border-t border-[color:var(--hairline)] pt-6 text-center text-xs text-[color:var(--text-muted)]">
-    <Link href="/terms" className="hover:text-[color:var(--text-primary)]">Terms of Service</Link>
-    <Link href="/privacy" className="hover:text-[color:var(--text-primary)]">Privacy Policy</Link>
+    <Link href="/terms" className="hover:text-[color:var(--text-primary)]">
+      Terms of Service
+    </Link>
+    <Link href="/privacy" className="hover:text-[color:var(--text-primary)]">
+      Privacy Policy
+    </Link>
     {/* Imprint link removed: pointed at /legal/imprint, which doesn't exist
         anywhere in this app. Not repointing it at /terms or /privacy --
         an Impressum covers different legal content (company registration,
         address) that isn't safe to fabricate or imply from either page. */}
-    <a href="mailto:juan@arf-ai.com" className="hover:text-[color:var(--text-primary)]">Contact</a>
+    <a
+      href="mailto:juan@arf-ai.com"
+      className="hover:text-[color:var(--text-primary)]"
+    >
+      Contact
+    </a>
   </div>
 );
 
 // ----------------------------------------------------------------------
 // Main Dashboard Component
 // ----------------------------------------------------------------------
-type TabType = 'risk' | 'governance' | 'compliance';
+type TabType = "risk" | "governance" | "compliance";
 
 const TABS: { id: TabType; label: string }[] = [
-  { id: 'risk', label: 'Risk Intelligence' },
-  { id: 'governance', label: 'Governance Operations' },
-  { id: 'compliance', label: 'Compliance' },
+  { id: "risk", label: "Risk Intelligence" },
+  { id: "governance", label: "Governance Operations" },
+  { id: "compliance", label: "Compliance" },
 ];
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState<TabType>('risk');
+  const [activeTab, setActiveTab] = useState<TabType>("risk");
   const [riskData, setRiskData] = useState<RiskData | null>(null);
+  // Before any early return -- hooks can't follow a conditional return.
+  // Falls back to 0 while riskData is still null (pre-first-load); the tween
+  // then plays for real the moment the first real value lands.
+  const displayedRiskPct = useAnimatedNumber(
+    riskData ? riskData.risk * 100 : 0,
+  );
   const [quota, setQuota] = useState<QuotaData | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -466,14 +650,21 @@ export default function Dashboard() {
   const [explainLog, setExplainLog] = useState<AuditLogEntry | null>(null);
   const [showRiskExplain, setShowRiskExplain] = useState(false);
   const [showMemoryExplain, setShowMemoryExplain] = useState(false);
-  const [explainViolation, setExplainViolation] = useState<PolicyViolation | null>(null);
-  const [explainCooldown, setExplainCooldown] = useState<CooldownEntry | null>(null);
-  const [reportGeneratedAt, setReportGeneratedAt] = useState<string | null>(null);
+  const [explainViolation, setExplainViolation] =
+    useState<PolicyViolation | null>(null);
+  const [explainCooldown, setExplainCooldown] = useState<CooldownEntry | null>(
+    null,
+  );
+  const [reportGeneratedAt, setReportGeneratedAt] = useState<string | null>(
+    null,
+  );
   const [downloadingReport, setDownloadingReport] = useState(false);
-  const [reportDownloadError, setReportDownloadError] = useState<string | null>(null);
+  const [reportDownloadError, setReportDownloadError] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
+    if (typeof window !== "undefined" && window.location.protocol === "http:") {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsHttpWarning(true);
     }
@@ -484,13 +675,13 @@ export default function Dashboard() {
   const handleTabListKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const currentIndex = TABS.findIndex((t) => t.id === activeTab);
     let nextIndex: number;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
       nextIndex = (currentIndex + 1) % TABS.length;
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
       nextIndex = (currentIndex - 1 + TABS.length) % TABS.length;
-    } else if (e.key === 'Home') {
+    } else if (e.key === "Home") {
       nextIndex = 0;
-    } else if (e.key === 'End') {
+    } else if (e.key === "End") {
       nextIndex = TABS.length - 1;
     } else {
       return;
@@ -507,7 +698,7 @@ export default function Dashboard() {
       const newRisk = generateMockRisk();
       setRiskData(newRisk);
       setQuota({
-        tier: 'pro',
+        tier: "pro",
         remaining: Math.floor(Math.random() * 500) + 100,
         limit: 1000,
       });
@@ -523,26 +714,33 @@ export default function Dashboard() {
       // Matches lib/governanceMockData's fixed mock timestamp range -- this
       // report has no date-range picker (yet), so it always requests the
       // full range the mock data actually spans.
-      const res = await fetch('/api/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ startDate: '2026-05-13', endDate: '2026-05-14' }),
+      const res = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          startDate: "2026-05-13",
+          endDate: "2026-05-14",
+        }),
       });
       if (!res.ok) {
-        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        const data = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
         throw new Error(data?.error || `HTTP ${res.status}`);
       }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = 'arf-compliance-report.pdf';
+      a.download = "arf-compliance-report.pdf";
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
     } catch (err) {
-      setReportDownloadError(err instanceof Error ? err.message : 'Failed to generate report');
+      setReportDownloadError(
+        err instanceof Error ? err.message : "Failed to generate report",
+      );
     } finally {
       setDownloadingReport(false);
     }
@@ -570,14 +768,31 @@ export default function Dashboard() {
           {/* HTTP Warning (unchanged logic) */}
           {isHttpWarning && (
             <div className="rounded-lg border border-[#b3392a]/30 bg-[#b3392a]/10 p-3 text-center">
-              <p className="text-sm text-[#b3392a]">⚠️ Security warning: You are viewing this page over HTTP. Sensitive data (simulated) could be intercepted. <a href={window.location.href.replace('http:', 'https:')} className="ml-2 font-semibold underline hover:opacity-80">Switch to HTTPS</a></p>
+              <p className="text-sm text-[#b3392a]">
+                ⚠️ Security warning: You are viewing this page over HTTP.
+                Sensitive data (simulated) could be intercepted.{" "}
+                <a
+                  href={window.location.href.replace("http:", "https:")}
+                  className="ml-2 font-semibold underline hover:opacity-80"
+                >
+                  Switch to HTTPS
+                </a>
+              </p>
             </div>
           )}
 
           {/* Sandbox Disclaimer */}
           <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-arf-blue/25 bg-arf-blue/10 p-3 text-center">
-            <p className="flex-1 text-sm text-[color:var(--text-secondary)]">🔍 Public sandbox – all data is simulated. Production governance requires a pilot agreement.</p>
-            <Link href="/signup" className="whitespace-nowrap text-sm font-medium text-arf-blue underline hover:opacity-80">Request pilot access →</Link>
+            <p className="flex-1 text-sm text-[color:var(--text-secondary)]">
+              🔍 Public sandbox – all data is simulated. Production governance
+              requires a pilot agreement.
+            </p>
+            <Link
+              href="/signup"
+              className="whitespace-nowrap text-sm font-medium text-arf-blue underline hover:opacity-80"
+            >
+              Request pilot access →
+            </Link>
           </div>
 
           {/* Page heading + tab switcher. Previously the only heading was an
@@ -589,7 +804,12 @@ export default function Dashboard() {
               visible tablist and a persistent page heading. */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-h2 font-semibold">Governance Console</h1>
-            <div role="tablist" aria-label="Dashboard sections" onKeyDown={handleTabListKeyDown} className="hidden gap-2 md:flex">
+            <div
+              role="tablist"
+              aria-label="Dashboard sections"
+              onKeyDown={handleTabListKeyDown}
+              className="hidden gap-2 md:flex"
+            >
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -601,8 +821,8 @@ export default function Dashboard() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
                     activeTab === tab.id
-                      ? 'bg-gradient-to-br from-arf-blue to-arf-purple text-white'
-                      : 'bg-[color:var(--surface-sunken)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]'
+                      ? "bg-gradient-to-br from-arf-blue to-arf-purple text-white"
+                      : "bg-[color:var(--surface-sunken)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
                   }`}
                 >
                   {tab.label}
@@ -612,8 +832,14 @@ export default function Dashboard() {
           </div>
 
           {/* Risk Tab Content */}
-          {activeTab === 'risk' && (
-            <div className="space-y-6" role="tabpanel" id="tabpanel-risk" aria-labelledby="tab-risk" tabIndex={0}>
+          {activeTab === "risk" && (
+            <div
+              className="space-y-6"
+              role="tabpanel"
+              id="tabpanel-risk"
+              aria-labelledby="tab-risk"
+              tabIndex={0}
+            >
               <DashboardMetricCard
                 title="System Risk"
                 action={
@@ -623,21 +849,73 @@ export default function Dashboard() {
                     aria-label="Refresh data"
                     className="rounded-lg border border-[color:var(--hairline)] p-2 transition hover:border-arf-blue disabled:opacity-50"
                   >
-                    <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
+                    <RefreshCw
+                      size={18}
+                      className={isRefreshing ? "animate-spin" : ""}
+                    />
                   </button>
                 }
-                footer={lastUpdated && `Last updated: ${lastUpdated.toLocaleTimeString()}`}
+                footer={
+                  lastUpdated &&
+                  `Last updated: ${lastUpdated.toLocaleTimeString()}`
+                }
               >
                 <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-                  <div className="flex-shrink-0"><RiskGauge risk={riskData.risk} size={180} /></div>
+                  <div className="flex-shrink-0">
+                    <RiskGauge risk={riskData.risk} size={180} />
+                  </div>
                   <div className="flex-1 space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                      <div><div className="text-sm text-[color:var(--text-muted)]">Risk Score</div><div className="text-3xl font-bold transition-colors duration-500" style={{ color: riskColor(riskData.risk) }}>{(riskData.risk * 100).toFixed(0)}%</div></div>
-                      <div><div className="text-sm text-[color:var(--text-muted)]">Status</div><StatusBadge status={riskData.status} /></div>
-                      <div><div className="text-sm text-[color:var(--text-muted)]">Posterior Variance</div><div className="font-mono text-lg">{riskData.variance.toFixed(4)}</div></div>
-                      <div><div className="text-sm text-[color:var(--text-muted)]">Confidence Interval (90%)</div><div className="font-mono text-sm">[{Math.max(0, riskData.risk - 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}, {Math.min(1, riskData.risk + 1.645 * Math.sqrt(riskData.variance)).toFixed(2)}]</div></div>
+                      <div>
+                        <div className="text-sm text-[color:var(--text-muted)]">
+                          Risk Score
+                        </div>
+                        <div
+                          className="text-3xl font-bold tabular-nums transition-colors duration-500"
+                          style={{ color: riskColor(riskData.risk) }}
+                        >
+                          {displayedRiskPct.toFixed(0)}%
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-[color:var(--text-muted)]">
+                          Status
+                        </div>
+                        <StatusBadge status={riskData.status} />
+                      </div>
+                      <div>
+                        <div className="text-sm text-[color:var(--text-muted)]">
+                          Posterior Variance
+                        </div>
+                        <div className="font-mono text-lg">
+                          {riskData.variance.toFixed(4)}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-[color:var(--text-muted)]">
+                          Confidence Interval (90%)
+                        </div>
+                        <div className="font-mono text-sm">
+                          [
+                          {Math.max(
+                            0,
+                            riskData.risk -
+                              1.645 * Math.sqrt(riskData.variance),
+                          ).toFixed(2)}
+                          ,{" "}
+                          {Math.min(
+                            1,
+                            riskData.risk +
+                              1.645 * Math.sqrt(riskData.variance),
+                          ).toFixed(2)}
+                          ]
+                        </div>
+                      </div>
                     </div>
-                    <RiskFactorBreakdown breakdown={riskData.breakdown} weights={riskData.weights} />
+                    <RiskFactorBreakdown
+                      breakdown={riskData.breakdown}
+                      weights={riskData.weights}
+                    />
                     <button
                       type="button"
                       onClick={() => setShowRiskExplain(true)}
@@ -651,25 +929,91 @@ export default function Dashboard() {
               </DashboardMetricCard>
 
               {showRiskExplain && (
-                <ExplainabilityModal open={showRiskExplain} onClose={() => setShowRiskExplain(false)} {...systemRiskExplanation(riskData)} />
+                <ExplainabilityModal
+                  open={showRiskExplain}
+                  onClose={() => setShowRiskExplain(false)}
+                  {...systemRiskExplanation(riskData)}
+                />
               )}
 
               <TrustBadges />
 
               {quota && (
                 <div className="arf-card-substantial p-6">
-                  <div className="mb-4 flex items-start justify-between"><h2 className="text-h3 font-semibold">Plan (Sandbox)</h2><span className="rounded-full bg-gradient-to-br from-arf-blue to-arf-purple px-3 py-1 text-xs font-medium text-white">{quota.tier.toUpperCase()}</span></div>
-                  <div className="mb-4"><div className="mb-1 flex justify-between text-sm"><span className="text-[color:var(--text-secondary)]">Remaining evaluations this month</span><span className="font-mono font-medium">{quota.remaining.toLocaleString()}</span></div><div className="h-2 w-full rounded-full bg-[color:var(--surface-sunken)]"><div className="h-2 rounded-full bg-arf-blue" style={{ width: `${(quota.remaining / quota.limit) * 100}%` }} /></div><p className="mt-2 text-xs text-[color:var(--text-muted)]">Limit: {quota.limit.toLocaleString()} evaluations/month (simulated)</p></div>
-                  <Link href="/pricing" className="inline-flex items-center gap-2 text-sm font-medium text-arf-blue hover:opacity-80">View access models → <ArrowRight size={14} /></Link>
+                  <div className="mb-4 flex items-start justify-between">
+                    <h2 className="text-h3 font-semibold">Plan (Sandbox)</h2>
+                    <span className="rounded-full bg-gradient-to-br from-arf-blue to-arf-purple px-3 py-1 text-xs font-medium text-white">
+                      {quota.tier.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="mb-4">
+                    <div className="mb-1 flex justify-between text-sm">
+                      <span className="text-[color:var(--text-secondary)]">
+                        Remaining evaluations this month
+                      </span>
+                      <span className="font-mono font-medium">
+                        {quota.remaining.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-[color:var(--surface-sunken)]">
+                      <div
+                        className="h-2 rounded-full bg-arf-blue"
+                        style={{
+                          width: `${(quota.remaining / quota.limit) * 100}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="mt-2 text-xs text-[color:var(--text-muted)]">
+                      Limit: {quota.limit.toLocaleString()} evaluations/month
+                      (simulated)
+                    </p>
+                  </div>
+                  <Link
+                    href="/pricing"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-arf-blue hover:opacity-80"
+                  >
+                    View access models → <ArrowRight size={14} />
+                  </Link>
                 </div>
               )}
 
-              <DashboardMetricCard title="Semantic Memory (Sandbox)" icon={Network}>
+              <DashboardMetricCard
+                title="Semantic Memory (Sandbox)"
+                icon={Network}
+              >
                 <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-4">
-                  <div><div className="text-2xl font-bold text-arf-blue">{mockMemoryStats.similar_incidents}</div><div className="text-xs text-[color:var(--text-muted)]">Similar Incidents</div></div>
-                  <div><div className="text-2xl font-bold text-arf-purple">{mockMemoryStats.rag_similarity.toFixed(2)}</div><div className="text-xs text-[color:var(--text-muted)]">RAG Similarity</div></div>
-                  <div><div className="text-2xl font-bold text-[#a66a1e]">{mockMemoryStats.cache_hits}</div><div className="text-xs text-[color:var(--text-muted)]">Cache Hits</div></div>
-                  <div><div className="break-words font-mono text-xs text-[color:var(--text-secondary)]">{mockMemoryStats.memory_usage}</div><div className="text-xs text-[color:var(--text-muted)]">Index Type</div></div>
+                  <div>
+                    <div className="text-2xl font-bold text-arf-blue">
+                      {mockMemoryStats.similar_incidents}
+                    </div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Similar Incidents
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-arf-purple">
+                      {mockMemoryStats.rag_similarity.toFixed(2)}
+                    </div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      RAG Similarity
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-[#a66a1e]">
+                      {mockMemoryStats.cache_hits}
+                    </div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Cache Hits
+                    </div>
+                  </div>
+                  <div>
+                    <div className="break-words font-mono text-xs text-[color:var(--text-secondary)]">
+                      {mockMemoryStats.memory_usage}
+                    </div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Index Type
+                    </div>
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -690,7 +1034,9 @@ export default function Dashboard() {
               )}
 
               <div className="arf-card-substantial p-6">
-                <h2 className="mb-4 text-h3 font-semibold">Recent Incidents (Sandbox)</h2>
+                <h2 className="mb-4 text-h3 font-semibold">
+                  Recent Incidents (Sandbox)
+                </h2>
                 <div className="hidden overflow-x-auto sm:block">
                   <table className="w-full text-sm">
                     <thead>
@@ -705,14 +1051,29 @@ export default function Dashboard() {
                     </thead>
                     <tbody>
                       {MOCK_INCIDENTS.map((inc) => (
-                        <tr key={inc.id} className="border-b border-[color:var(--hairline)]">
-                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">{inc.timestamp}</td>
-                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">{inc.service}</td>
-                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">{inc.metric}</td>
-                          <td className="px-2 py-2 text-right font-mono text-[color:var(--text-secondary)]">{inc.value}</td>
-                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">{inc.risk.toFixed(2)}</td>
+                        <tr
+                          key={inc.id}
+                          className="border-b border-[color:var(--hairline)]"
+                        >
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                            {inc.timestamp}
+                          </td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                            {inc.service}
+                          </td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                            {inc.metric}
+                          </td>
+                          <td className="px-2 py-2 text-right font-mono text-[color:var(--text-secondary)]">
+                            {inc.value}
+                          </td>
+                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">
+                            {inc.risk.toFixed(2)}
+                          </td>
                           <td className="px-2 py-2 text-right">
-                            <span className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === 'ESCALATE' ? 'bg-[#b3392a]' : inc.action === 'DENY' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]'}`}>
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === "ESCALATE" ? "bg-[#b3392a]" : inc.action === "DENY" ? "bg-[#a66a1e]" : "bg-[#3f7a5c]"}`}
+                            >
                               {inc.action}
                             </span>
                           </td>
@@ -728,24 +1089,43 @@ export default function Dashboard() {
                     scrolls; same row data, same values. */}
                 <div className="flex flex-col gap-2.5 sm:hidden">
                   {MOCK_INCIDENTS.map((inc) => (
-                    <div key={inc.id} className="rounded-lg bg-[color:var(--surface-sunken)] p-3">
+                    <div
+                      key={inc.id}
+                      className="rounded-lg bg-[color:var(--surface-sunken)] p-3"
+                    >
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-sm">{inc.service}</p>
-                          <p className="text-xs text-[color:var(--text-muted)]">{inc.timestamp}</p>
+                          <p className="text-xs text-[color:var(--text-muted)]">
+                            {inc.timestamp}
+                          </p>
                         </div>
-                        <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === 'ESCALATE' ? 'bg-[#b3392a]' : inc.action === 'DENY' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]'}`}>
+                        <span
+                          className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === "ESCALATE" ? "bg-[#b3392a]" : inc.action === "DENY" ? "bg-[#a66a1e]" : "bg-[#3f7a5c]"}`}
+                        >
                           {inc.action}
                         </span>
                       </div>
                       <div className="mt-2 flex items-center justify-between text-xs text-[color:var(--text-muted)]">
-                        <span>{inc.metric}: <span className="font-mono text-[color:var(--text-secondary)]">{inc.value}</span></span>
-                        <span>Risk: <span className="font-mono text-[#a66a1e]">{inc.risk.toFixed(2)}</span></span>
+                        <span>
+                          {inc.metric}:{" "}
+                          <span className="font-mono text-[color:var(--text-secondary)]">
+                            {inc.value}
+                          </span>
+                        </span>
+                        <span>
+                          Risk:{" "}
+                          <span className="font-mono text-[#a66a1e]">
+                            {inc.risk.toFixed(2)}
+                          </span>
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
-                <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">Simulated data for demonstration purposes only.</p>
+                <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">
+                  Simulated data for demonstration purposes only.
+                </p>
               </div>
 
               <Testimonial />
@@ -753,8 +1133,14 @@ export default function Dashboard() {
           )}
 
           {/* Governance Tab Content */}
-          {activeTab === 'governance' && (
-            <div className="space-y-6" role="tabpanel" id="tabpanel-governance" aria-labelledby="tab-governance" tabIndex={0}>
+          {activeTab === "governance" && (
+            <div
+              className="space-y-6"
+              role="tabpanel"
+              id="tabpanel-governance"
+              aria-labelledby="tab-governance"
+              tabIndex={0}
+            >
               <DashboardMetricCard
                 title="Policy Violations (Last 7 days)"
                 icon={AlertTriangle}
@@ -771,10 +1157,21 @@ export default function Dashboard() {
                       aria-label={`Explain ${v.policy} on ${v.component}`}
                       className="flex w-full flex-col gap-1 rounded-lg bg-[color:var(--surface-sunken)] p-3 text-left transition hover:bg-[color:var(--hairline)] sm:flex-row sm:items-center sm:justify-between sm:gap-0"
                     >
-                      <div><span className="font-mono text-sm">{v.policy}</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">on {v.component}</span></div>
+                      <div>
+                        <span className="font-mono text-sm">{v.policy}</span>
+                        <span className="ml-2 text-xs text-[color:var(--text-muted)]">
+                          on {v.component}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-3">
-                        <span className={`rounded-full px-2 py-0.5 text-xs text-white ${v.severity === 'high' ? 'bg-[#b3392a]' : v.severity === 'medium' ? 'bg-[#a66a1e]' : 'bg-arf-blue'}`}>{v.severity.toUpperCase()}</span>
-                        <span className="text-xs text-[color:var(--text-muted)]">{v.timestamp}</span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs text-white ${v.severity === "high" ? "bg-[#b3392a]" : v.severity === "medium" ? "bg-[#a66a1e]" : "bg-arf-blue"}`}
+                        >
+                          {v.severity.toUpperCase()}
+                        </span>
+                        <span className="text-xs text-[color:var(--text-muted)]">
+                          {v.timestamp}
+                        </span>
                         <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
                       </div>
                     </button>
@@ -816,12 +1213,28 @@ export default function Dashboard() {
                           key={log.id}
                           className="border-b border-[color:var(--hairline)] transition hover:bg-[color:var(--surface-sunken)]"
                         >
-                          <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">{log.timestamp}</td>
-                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.component}</td>
-                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.action}</td>
-                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">{log.riskScore.toFixed(2)}</td>
-                          <td className="px-2 py-2 text-right"><span className={`rounded-full px-2 py-0.5 text-xs text-white ${log.decision === 'ESCALATE' ? 'bg-[#b3392a]' : log.decision === 'DENY' ? 'bg-[#a66a1e]' : 'bg-[#3f7a5c]'}`}>{log.decision}</span></td>
-                          <td className="px-2 py-2 text-[color:var(--text-muted)]">{log.user}</td>
+                          <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">
+                            {log.timestamp}
+                          </td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                            {log.component}
+                          </td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                            {log.action}
+                          </td>
+                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">
+                            {log.riskScore.toFixed(2)}
+                          </td>
+                          <td className="px-2 py-2 text-right">
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-xs text-white ${log.decision === "ESCALATE" ? "bg-[#b3392a]" : log.decision === "DENY" ? "bg-[#a66a1e]" : "bg-[#3f7a5c]"}`}
+                            >
+                              {log.decision}
+                            </span>
+                          </td>
+                          <td className="px-2 py-2 text-[color:var(--text-muted)]">
+                            {log.user}
+                          </td>
                           <td className="px-2 py-2 text-right">
                             <button
                               type="button"
@@ -841,10 +1254,18 @@ export default function Dashboard() {
               </DashboardMetricCard>
 
               {explainLog && (
-                <ExplainabilityModal open={!!explainLog} onClose={() => setExplainLog(null)} {...auditLogExplanation(explainLog)} />
+                <ExplainabilityModal
+                  open={!!explainLog}
+                  onClose={() => setExplainLog(null)}
+                  {...auditLogExplanation(explainLog)}
+                />
               )}
 
-              <DashboardMetricCard title="Cooldown & Rate Limits (Sandbox)" icon={Clock} iconClassName="text-[#a66a1e]">
+              <DashboardMetricCard
+                title="Cooldown & Rate Limits (Sandbox)"
+                icon={Clock}
+                iconClassName="text-[#a66a1e]"
+              >
                 <div className="space-y-3">
                   {MOCK_COOLDOWNS.map((c) => (
                     <button
@@ -855,9 +1276,16 @@ export default function Dashboard() {
                       aria-label={`Explain ${c.policy} on ${c.component}`}
                       className="flex w-full items-center justify-between rounded-lg bg-[color:var(--surface-sunken)] p-3 text-left transition hover:bg-[color:var(--hairline)]"
                     >
-                      <div><span className="font-mono text-sm">{c.component}</span><span className="ml-2 text-xs text-[color:var(--text-muted)]">(policy: {c.policy})</span></div>
+                      <div>
+                        <span className="font-mono text-sm">{c.component}</span>
+                        <span className="ml-2 text-xs text-[color:var(--text-muted)]">
+                          (policy: {c.policy})
+                        </span>
+                      </div>
                       <div className="flex items-center gap-3">
-                        <span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">{c.status}</span>
+                        <span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">
+                          {c.status}
+                        </span>
                         <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
                       </div>
                     </button>
@@ -874,51 +1302,103 @@ export default function Dashboard() {
               )}
 
               <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-6 text-center">
-                <h2 className="mb-2 text-h3 font-semibold">Take full control of governance</h2>
-                <p className="mb-4 text-[color:var(--text-secondary)]">Policy enforcement, audit trails, and compliance reporting are available in the real engine.</p>
-                <Link href="/signup" className="arf-btn-primary">Request Pilot Access <ArrowRight size={16} /></Link>
+                <h2 className="mb-2 text-h3 font-semibold">
+                  Take full control of governance
+                </h2>
+                <p className="mb-4 text-[color:var(--text-secondary)]">
+                  Policy enforcement, audit trails, and compliance reporting are
+                  available in the real engine.
+                </p>
+                <Link href="/signup" className="arf-btn-primary">
+                  Request Pilot Access <ArrowRight size={16} />
+                </Link>
               </div>
             </div>
           )}
 
           {/* Compliance Tab Content */}
-          {activeTab === 'compliance' && (
-            <div className="space-y-6" role="tabpanel" id="tabpanel-compliance" aria-labelledby="tab-compliance" tabIndex={0}>
+          {activeTab === "compliance" && (
+            <div
+              className="space-y-6"
+              role="tabpanel"
+              id="tabpanel-compliance"
+              aria-labelledby="tab-compliance"
+              tabIndex={0}
+            >
               <div className="arf-card-substantial p-6">
-                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><Shield className="h-5 w-5 text-[#3f7a5c]" /> Compliance & Certifications</h2>
+                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold">
+                  <Shield className="h-5 w-5 text-[#3f7a5c]" /> Compliance &
+                  Certifications
+                </h2>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center"><div className="text-2xl font-bold text-[#3f7a5c]">✓</div><div className="text-sm">SOC2 Type II</div><div className="text-xs text-[color:var(--text-muted)]">Audit ready</div></div>
-                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center"><div className="text-2xl font-bold text-arf-blue">✓</div><div className="text-sm">ISO 27001</div><div className="text-xs text-[color:var(--text-muted)]">Compliant</div></div>
-                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center"><div className="text-2xl font-bold text-arf-purple">✓</div><div className="text-sm">GDPR</div><div className="text-xs text-[color:var(--text-muted)]">Ready</div></div>
+                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center">
+                    <div className="text-2xl font-bold text-[#3f7a5c]">✓</div>
+                    <div className="text-sm">SOC2 Type II</div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Audit ready
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center">
+                    <div className="text-2xl font-bold text-arf-blue">✓</div>
+                    <div className="text-sm">ISO 27001</div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Compliant
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center">
+                    <div className="text-2xl font-bold text-arf-purple">✓</div>
+                    <div className="text-sm">GDPR</div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Ready
+                    </div>
+                  </div>
                 </div>
-                <p className="mt-4 text-xs text-[color:var(--text-muted)]">The real engine provides evidence packages for auditors.</p>
+                <p className="mt-4 text-xs text-[color:var(--text-muted)]">
+                  The real engine provides evidence packages for auditors.
+                </p>
               </div>
 
               <div className="arf-card-substantial p-6">
-                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold"><Lock className="h-5 w-5 text-arf-blue" /> Data Retention & Privacy</h2>
+                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold">
+                  <Lock className="h-5 w-5 text-arf-blue" /> Data Retention &
+                  Privacy
+                </h2>
                 <ul className="list-inside list-disc space-y-2 text-sm text-[color:var(--text-secondary)]">
                   <li>Sandbox logs retained for 30 days</li>
                   <li>Pilot/Enterprise logs retained up to 12 months</li>
-                  <li>No raw customer data stored – only anonymised risk metrics</li>
+                  <li>
+                    No raw customer data stored – only anonymised risk metrics
+                  </li>
                   <li>Encryption at rest (AES-256) and in transit (TLS 1.3)</li>
                   <li>Right to deletion and data portability supported</li>
                 </ul>
               </div>
 
               <div className="arf-card-substantial p-6 text-center">
-                <h2 className="mb-2 text-h3 font-semibold">Export Compliance Report</h2>
-                <p className="mb-4 text-[color:var(--text-secondary)]">Generate a summary report of governance decisions, policy violations, and system status for auditors.</p>
+                <h2 className="mb-2 text-h3 font-semibold">
+                  Export Compliance Report
+                </h2>
+                <p className="mb-4 text-[color:var(--text-secondary)]">
+                  Generate a summary report of governance decisions, policy
+                  violations, and system status for auditors.
+                </p>
                 <button
                   onClick={() =>
                     setReportGeneratedAt(
-                      new Date().toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })
+                      new Date().toLocaleString("en-US", {
+                        dateStyle: "long",
+                        timeStyle: "short",
+                      }),
                     )
                   }
                   className="arf-btn-secondary"
                 >
                   <Printer size={16} /> Generate report
                 </button>
-                <p className="mt-3 text-xs text-[color:var(--text-muted)]">Report data is simulated — production deployments generate this automatically from live, immutable governance records.</p>
+                <p className="mt-3 text-xs text-[color:var(--text-muted)]">
+                  Report data is simulated — production deployments generate
+                  this automatically from live, immutable governance records.
+                </p>
               </div>
 
               {reportGeneratedAt && (
@@ -935,7 +1415,8 @@ export default function Dashboard() {
                       disabled={downloadingReport}
                       className="arf-btn-primary disabled:opacity-60"
                     >
-                      <Download size={16} /> {downloadingReport ? 'Generating PDF…' : 'Download PDF'}
+                      <Download size={16} />{" "}
+                      {downloadingReport ? "Generating PDF…" : "Download PDF"}
                     </button>
                   }
                 >
@@ -943,29 +1424,46 @@ export default function Dashboard() {
                     🔍 Simulated sandbox report — reporting period: last 7 days.
                   </div>
                   {reportDownloadError && (
-                    <p className="text-center text-sm text-[#b3392a]">Couldn&rsquo;t generate the PDF: {reportDownloadError}</p>
+                    <p className="text-center text-sm text-[#b3392a]">
+                      Couldn&rsquo;t generate the PDF: {reportDownloadError}
+                    </p>
                   )}
 
                   <section>
                     <h3 className="arf-eyebrow mb-3">System status</h3>
                     <div className="grid grid-cols-2 gap-4 rounded-lg border border-[color:var(--hairline)] p-4 sm:grid-cols-4">
                       <div>
-                        <div className="text-xs text-[color:var(--text-muted)]">Current risk</div>
-                        <div className="text-lg font-bold" style={{ color: riskColor(riskData.risk) }}>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Current risk
+                        </div>
+                        <div
+                          className="text-lg font-bold"
+                          style={{ color: riskColor(riskData.risk) }}
+                        >
                           {(riskData.risk * 100).toFixed(0)}%
                         </div>
                       </div>
                       <div>
-                        <div className="text-xs text-[color:var(--text-muted)]">Status</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Status
+                        </div>
                         <StatusBadge status={riskData.status} />
                       </div>
                       <div>
-                        <div className="text-xs text-[color:var(--text-muted)]">Policy violations (7d)</div>
-                        <div className="text-lg font-bold">{MOCK_POLICY_VIOLATIONS.length}</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Policy violations (7d)
+                        </div>
+                        <div className="text-lg font-bold">
+                          {MOCK_POLICY_VIOLATIONS.length}
+                        </div>
                       </div>
                       <div>
-                        <div className="text-xs text-[color:var(--text-muted)]">Decisions logged</div>
-                        <div className="text-lg font-bold">{MOCK_AUDIT_LOGS.length}</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Decisions logged
+                        </div>
+                        <div className="text-lg font-bold">
+                          {MOCK_AUDIT_LOGS.length}
+                        </div>
                       </div>
                     </div>
                   </section>
@@ -983,11 +1481,22 @@ export default function Dashboard() {
                       </thead>
                       <tbody>
                         {MOCK_POLICY_VIOLATIONS.map((v) => (
-                          <tr key={v.id} className="border-b border-[color:var(--hairline)]">
-                            <td className="px-2 py-2 font-mono text-xs">{v.policy}</td>
-                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">{v.component}</td>
-                            <td className="px-2 py-2 capitalize text-[color:var(--text-secondary)]">{v.severity}</td>
-                            <td className="px-2 py-2 text-[color:var(--text-muted)]">{v.timestamp}</td>
+                          <tr
+                            key={v.id}
+                            className="border-b border-[color:var(--hairline)]"
+                          >
+                            <td className="px-2 py-2 font-mono text-xs">
+                              {v.policy}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                              {v.component}
+                            </td>
+                            <td className="px-2 py-2 capitalize text-[color:var(--text-secondary)]">
+                              {v.severity}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-muted)]">
+                              {v.timestamp}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -1009,13 +1518,28 @@ export default function Dashboard() {
                       </thead>
                       <tbody>
                         {MOCK_AUDIT_LOGS.map((log) => (
-                          <tr key={log.id} className="border-b border-[color:var(--hairline)]">
-                            <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">{log.timestamp}</td>
-                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.component}</td>
-                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.action}</td>
-                            <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">{log.riskScore.toFixed(2)}</td>
-                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">{log.decision}</td>
-                            <td className="px-2 py-2 text-[color:var(--text-muted)]">{log.user}</td>
+                          <tr
+                            key={log.id}
+                            className="border-b border-[color:var(--hairline)]"
+                          >
+                            <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">
+                              {log.timestamp}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                              {log.component}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                              {log.action}
+                            </td>
+                            <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">
+                              {log.riskScore.toFixed(2)}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                              {log.decision}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-muted)]">
+                              {log.user}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -1023,19 +1547,27 @@ export default function Dashboard() {
                   </section>
 
                   <section>
-                    <h3 className="arf-eyebrow mb-3">Compliance certifications</h3>
+                    <h3 className="arf-eyebrow mb-3">
+                      Compliance certifications
+                    </h3>
                     <div className="grid grid-cols-3 gap-3 text-center text-sm">
                       <div className="rounded-lg border border-[color:var(--hairline)] p-3">
                         <div className="font-semibold">SOC 2 Type II</div>
-                        <div className="text-xs text-[color:var(--text-muted)]">Audit ready</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Audit ready
+                        </div>
                       </div>
                       <div className="rounded-lg border border-[color:var(--hairline)] p-3">
                         <div className="font-semibold">ISO 27001</div>
-                        <div className="text-xs text-[color:var(--text-muted)]">Compliant</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Compliant
+                        </div>
                       </div>
                       <div className="rounded-lg border border-[color:var(--hairline)] p-3">
                         <div className="font-semibold">GDPR</div>
-                        <div className="text-xs text-[color:var(--text-muted)]">Ready</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Ready
+                        </div>
                       </div>
                     </div>
                   </section>
@@ -1043,9 +1575,16 @@ export default function Dashboard() {
               )}
 
               <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-6 text-center">
-                <h2 className="mb-2 text-h3 font-semibold">Get audit‑ready with ARF</h2>
-                <p className="mb-4 text-[color:var(--text-secondary)]">Immutable logs, deterministic enforcement, and compliance evidence packages.</p>
-                <Link href="/signup" className="arf-btn-primary">Request Pilot Access <ArrowRight size={16} /></Link>
+                <h2 className="mb-2 text-h3 font-semibold">
+                  Get audit‑ready with ARF
+                </h2>
+                <p className="mb-4 text-[color:var(--text-secondary)]">
+                  Immutable logs, deterministic enforcement, and compliance
+                  evidence packages.
+                </p>
+                <Link href="/signup" className="arf-btn-primary">
+                  Request Pilot Access <ArrowRight size={16} />
+                </Link>
               </div>
             </div>
           )}
