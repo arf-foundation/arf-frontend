@@ -821,14 +821,17 @@ export default function LandingPage() {
             <div>
               <Link href="/" className="mb-4 flex items-center gap-3">
                 <Image
-                  src="/ARF - Transparent Primary Logo.png"
-                  alt="ARF AI"
-                  width={140}
-                  height={50}
-                  className="h-9 w-auto"
+                  src="/arf-icon.png"
+                  alt=""
+                  width={256}
+                  height={256}
+                  className="h-8 w-8"
                 />
+                <span className="text-base font-semibold tracking-[-0.02em] text-white">
+                  ARF AI
+                </span>
               </Link>
-              <p className="mb-6 max-w-[34ch] text-sm leading-[1.65]">
+              <p className="mb-6 max-w-[34ch] text-sm leading-[1.65] text-white/70">
                 The control plane between autonomous AI and enterprise
                 infrastructure.
               </p>
@@ -892,7 +895,7 @@ export default function LandingPage() {
               <Link href="/changelog" className="transition hover:text-white">
                 v4.3.2 — Axiom
               </Link>
-              <span>© 2026 ARF Foundation</span>
+              <span className="text-white/55">© 2026 ARF Foundation</span>
             </div>
           </div>
         </div>

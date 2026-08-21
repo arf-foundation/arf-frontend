@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ArrowRight, Menu, Moon, Sun, X } from "lucide-react";
 
@@ -21,9 +22,14 @@ const MOBILE_MENU_MS = 260;
 
 const PRIMARY_LINKS = [
   { label: "Product", href: "/#capabilities" },
-  { label: "Docs", href: "/faq" },
+  { label: "FAQ", href: "/faq" },
   { label: "Pricing", href: "/pricing" },
   { label: "Console", href: "/dashboard" },
+  {
+    label: "Developers",
+    href: "https://github.com/arf-foundation",
+    external: true,
+  },
 ] as const;
 
 type Theme = "light" | "dark";
@@ -96,7 +102,14 @@ export default function NavBar() {
           className="flex items-center gap-3"
           aria-label="ARF AI home"
         >
-          <span className="h-[22px] w-[22px] rounded-md bg-gradient-to-br from-arf-blue to-arf-purple" />
+          <Image
+            src="/arf-icon.png"
+            alt=""
+            width={256}
+            height={256}
+            className="h-[22px] w-[22px]"
+            priority
+          />
           <span className="text-base font-semibold tracking-[-0.02em]">
             ARF AI
           </span>

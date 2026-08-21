@@ -123,6 +123,15 @@ Access (filled gradient). History, Changelog, FAQ, Spec and the community links
 moved to the footer. "Whitepaper (soon)" is gone — advertising a document that
 does not exist costs credibility with exactly the buyer we want.
 
+Updated 2026-08-21: "Docs" was never a docs page — it linked straight to
+`/faq` the whole time, a label/destination mismatch reported directly.
+Relabeled to **FAQ** (says what it actually is), and a fifth link,
+**Developers** (external, → `github.com/arf-foundation`), was added — the
+technical audience this site never gave a direct path to before. Five
+links is a deliberate exception to the four-link rule above, not a drift
+back toward the old eight: the org existed, the developer entry point to
+it didn't.
+
 **Sign In** is outlined, not filled, and carries `data-workos="authkit-signin"`.
 It currently routes to `/signup`; swapping in the AuthKit hosted URL is a
 one-line change. Outlined-versus-filled is the whole point: it signals "a
@@ -249,6 +258,32 @@ directly rather than animating.
 - PWA (`manifest.json`, `sw.js`) untouched; `manifest` and `themeColor` are
   declared through the App Router `metadata` / `viewport` exports.
 - Icons remain lucide-react. No new icon library.
+- **Brand mark** (2026-08-21): NavBar previously used a plain gradient
+  square, and the footer used `public/ARF - Transparent Primary Logo.png`
+  directly. Checked both real logo assets in `public/` with `sharp` before
+  using either: `ARF - Transparent Primary Logo.png` is mislabeled — it has
+  no alpha channel at all (`hasAlpha: false`), so its baked-in checkerboard
+  "transparency" placeholder renders as a visible artifact on any real
+  background (confirmed in the browser, not just from the metadata). The
+  favicon source (`ARF - 16x16px ARF Favicon logo (Web).png`, despite its
+  name it's the full 1536×1024 source, not a 16px export) does have a real
+  alpha channel. `public/arf-icon.png` is a trimmed, 256×256 export of just
+  that icon mark, generated once via `sharp().trim().resize()` — this is
+  what NavBar and the footer both use now, paired with a live `<span>` for
+  the "ARF AI" wordmark text instead of baking text into the image, so it
+  stays theme-correct in both light and dark without needing a second
+  logo variant.
+- **Footer text-contrast bug**, found while fixing the above: the tagline
+  `<p>` and the `© 2026 ARF Foundation` `<span>` had no color utility of
+  their own, relying on inheriting `text-white/70` from `<footer>`. The
+  `.arf-page-root p/span {color: var(--text-primary)}` rule in §6's
+  "belt-and-suspenders" fix (a direct declaration, not inherited) wins over
+  that inheritance regardless of layer order, so both rendered near-black
+  on the footer's dark background — confirmed nearly illegible in a real
+  browser. Fixed by giving both their own explicit `text-white/70` /
+  `text-white/55` class, the same fix the original belt-and-suspenders
+  comment already prescribes for exactly this failure mode, just not yet
+  applied to these two elements.
 
 ---
 
