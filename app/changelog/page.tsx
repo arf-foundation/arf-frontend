@@ -1,15 +1,26 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Calendar, Tag, Copy, Check, Mail, Sparkles, ArrowRight, Shield, MessageSquare, Rocket } from 'lucide-react';
-import Link from 'next/link';
+import { useEffect, useState } from "react";
+import {
+  Calendar,
+  Tag,
+  Copy,
+  Check,
+  Mail,
+  Sparkles,
+  ArrowRight,
+  Shield,
+  MessageSquare,
+  Rocket,
+} from "lucide-react";
+import Link from "next/link";
 
 // Types for changelog entries
 interface ChangelogEntry {
-  date: string;          // ISO date (YYYY-MM-DD)
+  date: string; // ISO date (YYYY-MM-DD)
   title: string;
   description: string;
-  type: 'public' | 'pilot';
+  type: "public" | "pilot";
   link?: string;
 }
 
@@ -20,47 +31,54 @@ interface ChangelogEntry {
 // to load.
 const DEFAULT_ENTRIES: ChangelogEntry[] = [
   {
-    date: '2026-08-10',
-    title: 'Governance Console: Explainability & Compliance Export',
+    date: "2026-08-29",
+    title: "v4.3.7 — Reversibility Governance & Audit Integrity",
     description:
-      'Every card in the Governance Console is now clickable. System Risk, Semantic Memory, Policy Violations, Audit Trail, and Cooldown & Rate Limits each open a plain-English explanation of the real methodology behind them — Bayesian risk fusion (conjugate prior + Hamiltonian Monte Carlo + hierarchical shrinkage), doubly-robust causal counterfactual estimation, FAISS-based incident retrieval, and immutable, cryptographically-signable decision records. Compliance officers can now generate and download a real PDF audit report — governance decisions, policy violations, and certifications — directly from the console.',
-    type: 'public',
-    link: 'https://github.com/arf-foundation/arf-frontend',
+      "Governance now treats recoverability as a dimension in its own right, separate from risk. Risk asks how likely an action is to be wrong; reversibility asks how much of the prior state can be restored if it is — and the two are independent, so a confident, low-risk action can still be permanent. Actions that cannot be undone now require a higher approval tier rather than being refused outright, so a named human can authorise them on the record instead of the system simply saying no. Recoverability is determined per candidate action by reading the live provider, not inferred from what an action is called: the same deletion with and without a final backup is two genuinely different decisions, and is now treated as such. Approval authority is recorded rather than asserted — where a durable approval ledger is configured, execution proceeds only from a resolved entry naming who approved which intent. Decision records now retain the action that was proposed alongside the one that executed, making substitutions directly queryable, and checks that had no data to evaluate are recorded as abstaining rather than counted as passes, so an audit trail no longer implies findings it does not hold. First storage vertical: Amazon FSx for NetApp ONTAP. The published intent schema now matches the engine’s accepted contract exactly, so a payload that validates is one the engine accepts.",
+    type: "pilot",
   },
   {
-    date: '2026-07-30',
-    title: 'v4.3.2 Axiom — Enterprise Control Plane',
+    date: "2026-08-10",
+    title: "Governance Console: Explainability & Compliance Export",
     description:
-      'The first named ARF AI release. Axiom introduces deterministic replay verification, active cost inference via Bayesian experimental design, a hardened gateway with defense-in-depth, and a fully enterprise-positioned Governance Console. All Dependabot alerts resolved across all repositories.',
-    type: 'public',
+      "Every card in the Governance Console is now clickable. System Risk, Semantic Memory, Policy Violations, Audit Trail, and Cooldown & Rate Limits each open a plain-English explanation of the real methodology behind them — Bayesian risk fusion (conjugate prior + Hamiltonian Monte Carlo + hierarchical shrinkage), doubly-robust causal counterfactual estimation, FAISS-based incident retrieval, and immutable, cryptographically-signable decision records. Compliance officers can now generate and download a real PDF audit report — governance decisions, policy violations, and certifications — directly from the console.",
+    type: "public",
+    link: "https://github.com/arf-foundation/arf-frontend",
   },
   {
-    date: '2026-07-23',
-    title: 'Enterprise Repositioning & Governance Console',
+    date: "2026-07-30",
+    title: "v4.3.2 Axiom — Enterprise Control Plane",
     description:
-      'The ARF AI public presence has been transformed into an enterprise‑grade control plane for autonomous AI. The landing page, navigation, and messaging now speak directly to CTOs, compliance officers, and AI infrastructure buyers. The live demo dashboard is rebranded as the Governance Console with clearer sandbox disclaimers and enterprise‑ready trust signals.',
-    type: 'public',
+      "The first named ARF AI release. Axiom introduces deterministic replay verification, active cost inference via Bayesian experimental design, a hardened gateway with defense-in-depth, and a fully enterprise-positioned Governance Console. All Dependabot alerts resolved across all repositories.",
+    type: "public",
   },
   {
-    date: '2026-07-22',
-    title: 'Dynamic Risk Tracking with Augmented Gaussian Sum Filter (AGSF)',
+    date: "2026-07-23",
+    title: "Enterprise Repositioning & Governance Console",
     description:
-      'Pilot customers can now enable continuous Bayesian risk tracking via the Augmented Gaussian Sum Filter. Operating in log‑odds space, the filter maintains a Gaussian mixture approximation of the posterior failure probability, updating with every decision. It resists covariance inflation and provides sharper risk estimates than the static conjugate prior—all while preserving deterministic replay via intent‑seeded RNG.',
-    type: 'pilot',
+      "The ARF AI public presence has been transformed into an enterprise‑grade control plane for autonomous AI. The landing page, navigation, and messaging now speak directly to CTOs, compliance officers, and AI infrastructure buyers. The live demo dashboard is rebranded as the Governance Console with clearer sandbox disclaimers and enterprise‑ready trust signals.",
+    type: "public",
   },
   {
-    date: '2026-07-22',
-    title: 'Cost Inference Engine (Maximum Entropy IRL)',
+    date: "2026-07-22",
+    title: "Dynamic Risk Tracking with Augmented Gaussian Sum Filter (AGSF)",
     description:
-      'The governance loop now learns operational cost parameters from human overrides using maximum entropy inverse reinforcement learning. With a Bayesian prior and MAP estimation, the engine continuously refines expected‑loss minimisation to better match your organisation’s risk appetite. Available after recording 10+ overrides.',
-    type: 'pilot',
+      "Pilot customers can now enable continuous Bayesian risk tracking via the Augmented Gaussian Sum Filter. Operating in log‑odds space, the filter maintains a Gaussian mixture approximation of the posterior failure probability, updating with every decision. It resists covariance inflation and provides sharper risk estimates than the static conjugate prior—all while preserving deterministic replay via intent‑seeded RNG.",
+    type: "pilot",
   },
   {
-    date: '2026-07-22',
-    title: 'Offline RL Policy Fallback (CQL + Lyapunov Barrier)',
+    date: "2026-07-22",
+    title: "Cost Inference Engine (Maximum Entropy IRL)",
     description:
-      'An optional offline RL policy can now override rule‑based decisions when confidence is high. Trained via Conservative Q‑Learning with a Lyapunov stability constraint, the policy minimises long‑term risk while respecting safety boundaries. This enables adaptive governance that improves with operational history—without online exploration.',
-    type: 'pilot',
+      "The governance loop now learns operational cost parameters from human overrides using maximum entropy inverse reinforcement learning. With a Bayesian prior and MAP estimation, the engine continuously refines expected‑loss minimisation to better match your organisation’s risk appetite. Available after recording 10+ overrides.",
+    type: "pilot",
+  },
+  {
+    date: "2026-07-22",
+    title: "Offline RL Policy Fallback (CQL + Lyapunov Barrier)",
+    description:
+      "An optional offline RL policy can now override rule‑based decisions when confidence is high. Trained via Conservative Q‑Learning with a Lyapunov stability constraint, the policy minimises long‑term risk while respecting safety boundaries. This enables adaptive governance that improves with operational history—without online exploration.",
+    type: "pilot",
   },
 ];
 
@@ -89,7 +107,7 @@ export default function ChangelogPage() {
   useEffect(() => {
     const fetchChangelog = async () => {
       try {
-        const res = await fetch('/data/changelog.json');
+        const res = await fetch("/data/changelog.json");
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const loaded: ChangelogEntry[] = data.entries || [];
@@ -100,14 +118,17 @@ export default function ChangelogPage() {
         // already there.
         const loadedKeys = new Set(loaded.map((e) => `${e.date}|${e.title}`));
         const missingDefaults = DEFAULT_ENTRIES.filter(
-          (e) => !loadedKeys.has(`${e.date}|${e.title}`)
+          (e) => !loadedKeys.has(`${e.date}|${e.title}`),
         );
         const merged = [...missingDefaults, ...loaded].sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
         );
         setEntries(merged.length > 0 ? merged : DEFAULT_ENTRIES);
       } catch (err) {
-        console.warn('Changelog JSON not available, using default entries.', err);
+        console.warn(
+          "Changelog JSON not available, using default entries.",
+          err,
+        );
         setEntries(DEFAULT_ENTRIES);
       } finally {
         setLoading(false);
@@ -117,10 +138,10 @@ export default function ChangelogPage() {
   }, []);
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -149,7 +170,8 @@ export default function ChangelogPage() {
               What’s New in ARF AI
             </h1>
             <p className="mx-auto max-w-2xl text-base text-[color:var(--text-secondary)] sm:text-lg">
-              Updates to the ARF AI Governance Console, public sandbox, and the protected core engine (available to pilot customers).
+              Updates to the ARF AI Governance Console, public sandbox, and the
+              protected core engine (available to pilot customers).
             </p>
           </div>
 
@@ -159,12 +181,12 @@ export default function ChangelogPage() {
               <div
                 key={idx}
                 className={`relative rounded-xl border p-6 transition hover:border-arf-blue/50 hover:shadow-xl ${
-                  entry.type === 'pilot'
-                    ? 'border-arf-purple/40 bg-arf-purple/5'
-                    : 'border-[color:var(--hairline)] bg-[color:var(--surface-raised)]'
+                  entry.type === "pilot"
+                    ? "border-arf-purple/40 bg-arf-purple/5"
+                    : "border-[color:var(--hairline)] bg-[color:var(--surface-raised)]"
                 }`}
               >
-                {entry.type === 'pilot' && (
+                {entry.type === "pilot" && (
                   <div className="absolute right-4 top-0 -translate-y-1/2">
                     <span className="flex items-center gap-1 rounded-full bg-arf-purple px-3 py-1 text-xs font-bold text-white shadow-lg">
                       <Shield size={12} /> PILOT
@@ -174,12 +196,14 @@ export default function ChangelogPage() {
                 <div className="mb-3 flex flex-wrap items-center gap-3">
                   <span
                     className={`rounded-full border px-3 py-1 text-xs font-medium ${
-                      entry.type === 'public'
-                        ? 'border-arf-blue/40 bg-arf-blue/10 text-arf-blue'
-                        : 'border-arf-purple/40 bg-arf-purple/10 text-arf-purple'
+                      entry.type === "public"
+                        ? "border-arf-blue/40 bg-arf-blue/10 text-arf-blue"
+                        : "border-arf-purple/40 bg-arf-purple/10 text-arf-purple"
                     }`}
                   >
-                    {entry.type === 'public' ? '📘 Public Console' : '✈️ Pilot Program'}
+                    {entry.type === "public"
+                      ? "📘 Public Console"
+                      : "✈️ Pilot Program"}
                   </span>
                   <span className="flex items-center gap-1 text-sm text-[color:var(--text-muted)]">
                     <Calendar size={14} />
@@ -196,9 +220,13 @@ export default function ChangelogPage() {
                     </a>
                   )}
                 </div>
-                <h3 className="mb-2 text-xl font-bold text-[color:var(--text-primary)]">{entry.title}</h3>
-                <p className="leading-relaxed text-[color:var(--text-secondary)]">{entry.description}</p>
-                {entry.type === 'pilot' && (
+                <h3 className="mb-2 text-xl font-bold text-[color:var(--text-primary)]">
+                  {entry.title}
+                </h3>
+                <p className="leading-relaxed text-[color:var(--text-secondary)]">
+                  {entry.description}
+                </p>
+                {entry.type === "pilot" && (
                   <div className="mt-4 flex items-center gap-2">
                     <Sparkles size={16} className="text-arf-purple" />
                     <Link
@@ -216,9 +244,12 @@ export default function ChangelogPage() {
           {/* Newsletter – lead capture placeholder */}
           <div className="arf-card mb-12 p-8 text-center">
             <Mail className="mx-auto mb-3 h-8 w-8 text-arf-blue" />
-            <h2 className="mb-2 text-2xl font-bold">Stay ahead of autonomous AI governance</h2>
+            <h2 className="mb-2 text-2xl font-bold">
+              Stay ahead of autonomous AI governance
+            </h2>
             <p className="mx-auto mb-6 max-w-md text-[color:var(--text-muted)]">
-              Newsletter signup is coming soon. For now, join our Slack community to get early updates and discuss ARF with the team.
+              Newsletter signup is coming soon. For now, join our Slack
+              community to get early updates and discuss ARF with the team.
             </p>
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
               <a
@@ -236,7 +267,9 @@ export default function ChangelogPage() {
                 Request Pilot Access <ArrowRight size={16} />
               </Link>
             </div>
-            <p className="mt-4 text-xs text-[color:var(--text-muted)]">No spam. Unsubscribe anytime once the newsletter launches.</p>
+            <p className="mt-4 text-xs text-[color:var(--text-muted)]">
+              No spam. Unsubscribe anytime once the newsletter launches.
+            </p>
           </div>
 
           {/* Sandbox API section */}
@@ -247,18 +280,29 @@ export default function ChangelogPage() {
             </h2>
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2 rounded-lg bg-[color:var(--surface-sunken)] p-4">
-                <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm text-green-500">{CURL_COMMAND}</pre>
+                <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm text-green-500">
+                  {CURL_COMMAND}
+                </pre>
                 <button
                   onClick={() => copyCode(CURL_COMMAND)}
                   className="shrink-0 rounded-lg border border-[color:var(--hairline)] p-2 transition hover:border-[color:var(--color-arf-blue)]"
                   aria-label="Copy curl command"
                 >
-                  {copiedCode ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 text-[color:var(--text-secondary)]" />}
+                  {copiedCode ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4 text-[color:var(--text-secondary)]" />
+                  )}
                 </button>
               </div>
               <p className="text-sm text-amber-500">
-                ⚠️ This is a simulated evaluation endpoint. It does <strong>not</strong> use the protected core engine. For pilot access,{' '}
-                <Link href="/signup" className="underline hover:brightness-110">request here</Link>.
+                ⚠️ This is a simulated evaluation endpoint. It does{" "}
+                <strong>not</strong> use the protected core engine. For pilot
+                access,{" "}
+                <Link href="/signup" className="underline hover:brightness-110">
+                  request here
+                </Link>
+                .
               </p>
             </div>
           </div>

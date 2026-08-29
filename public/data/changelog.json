@@ -1,6 +1,12 @@
 {
   "entries": [
     {
+      "date": "2026-08-29",
+      "title": "v4.3.7 — Reversibility Governance & Audit Integrity",
+      "description": "Governance now treats recoverability as a dimension in its own right, separate from risk. Risk asks how likely an action is to be wrong; reversibility asks how much of the prior state can be restored if it is — and the two are independent, so a confident, low-risk action can still be permanent. Actions that cannot be undone now require a higher approval tier rather than being refused outright, so a named human can authorise them on the record instead of the system simply saying no. Recoverability is determined per candidate action by reading the live provider, not inferred from what an action is called: the same deletion with and without a final backup is two genuinely different decisions, and is now treated as such. Approval authority is recorded rather than asserted — where a durable approval ledger is configured, execution proceeds only from a resolved entry naming who approved which intent. Decision records now retain the action that was proposed alongside the one that executed, making substitutions directly queryable, and checks that had no data to evaluate are recorded as abstaining rather than counted as passes, so an audit trail no longer implies findings it does not hold. First storage vertical: Amazon FSx for NetApp ONTAP. The published intent schema now matches the engine’s accepted contract exactly, so a payload that validates is one the engine accepts.",
+      "type": "pilot"
+    },
+    {
       "date": "2026-08-10",
       "title": "Governance Console: Explainability & Compliance Export",
       "description": "Every card in the Governance Console is now clickable. System Risk, Semantic Memory, Policy Violations, Audit Trail, and Cooldown & Rate Limits each open a plain-English explanation of the real methodology behind them — Bayesian risk fusion (conjugate prior + Hamiltonian Monte Carlo + hierarchical shrinkage), doubly-robust causal counterfactual estimation, FAISS-based incident retrieval, and immutable, cryptographically-signable decision records. Compliance officers can now generate and download a real PDF audit report — governance decisions, policy violations, and certifications — directly from the console.",
