@@ -64,7 +64,10 @@ export default function NavBar() {
 
   useEffect(() => {
     const root = document.documentElement;
-    const nextTheme = root.classList.contains('dark') ? 'dark' : 'light';
+    const nextTheme = root.classList.contains("dark") ? "dark" : "light";
+    // Hydration-safe initialization: the server renders a neutral default and
+    // this client-only effect syncs the real theme state once mounted.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(nextTheme);
     setIsHydrated(true);
   }, []);
@@ -230,6 +233,7 @@ export default function NavBar() {
                   {theme === "dark" ? "Light theme" : "Dark theme"}
                 </button>
               </div>
+            </div>
           </div>
         </div>
       )}

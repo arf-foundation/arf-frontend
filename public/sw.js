@@ -1,5 +1,5 @@
 // public/sw.js – corrected
-self.addEventListener('install', (_event) => {
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 

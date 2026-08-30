@@ -544,7 +544,7 @@
     return kids.map((b, j) => {
       const k = kidKeys ? kidKeys[j] : j;
       const out = b(vals, ctx, k);
-      return kidKeys != null && typeof out === "string" ? h(getReact().Fragment, { key: k }, out) : out;
+      return out;
     });
   }
   function walk(node, host) {
@@ -601,7 +601,7 @@
           );
         }
         if (getReact().isValidElement(v) || Array.isArray(v)) {
-          return h(getReact().Fragment, { key: i }, v);
+          return h(getReact().Fragment, { key: i }, ...(Array.isArray(v) ? v : [v]));
         }
         if (v === null || typeof v === "boolean") return null;
         return h("span", { key: i, className: "sc-interp" }, String(v));
