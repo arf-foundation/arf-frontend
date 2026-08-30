@@ -35,18 +35,8 @@ const PRIMARY_LINKS = [
 type Theme = "light" | "dark";
 
 export default function NavBar() {
-  // Lazy initializer instead of an effect: layout.tsx's blocking inline
-  // script already applies `.dark` to <html> before this component hydrates
-  // (CSP here allows 'unsafe-inline', so that script can run pre-paint), so
-  // reading the class back here is a synchronous read of already-settled
-  // DOM state, not a guess to correct later — no set-state-in-effect, and no
-  // one-frame icon flash while an effect would otherwise catch up.
-  const [theme, setTheme] = useState<Theme>(() =>
-    typeof document !== "undefined" &&
-    document.documentElement.classList.contains("dark")
-      ? "dark"
-      : "light",
-  );
+  const [theme, setTheme] = useState<Theme>("light");
+  const [isHydrated, setIsHydrated] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   // Menu used to unmount instantly on close ({mobileOpen && (...)}), so it
   // just snapped. Keeping it mounted through the closing transition (mount
@@ -72,16 +62,14 @@ export default function NavBar() {
     return () => clearTimeout(timeout);
   }, [mobileOpen]);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const nextTheme = root.classList.contains('dark') ? 'dark' : 'light';
+    setTheme(nextTheme);
+    setIsHydrated(true);
+  }, []);
+
   const toggleTheme = () => {
-    // Decide from the real DOM class, not the `theme` state variable. If
-    // React's initial read of that class (in the lazy initializer above)
-    // ever raced the pre-hydration blocking script and landed on the wrong
-    // value, deciding from `theme` would make the first click "correct" the
-    // mismatch instead of doing what was clicked — the class flips, but not
-    // to where the user expects — and only the second click, now reading a
-    // `theme` that finally matches reality, does the intended toggle. Sourcing
-    // the decision from the DOM itself removes the possibility of that
-    // divergence entirely; `theme` still drives the icon, nothing else.
     const next: Theme = document.documentElement.classList.contains("dark")
       ? "light"
       : "dark";
@@ -149,12 +137,10 @@ export default function NavBar() {
                 : "Switch to dark theme"
             }
             className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)] active:scale-90"
+            suppressHydrationWarning
           >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
+            {isHydrated && (theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />)}
+            {!isHydrated && <Moon className="h-4 w-4 opacity-70" />}
           </button>
 
           {/* Placeholder for WorkOS AuthKit — swap href for the hosted login URL */}
@@ -233,8 +219,17 @@ export default function NavBar() {
                 >
                   Request Pilot Access <ArrowRight size={16} />
                 </Link>
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[color:var(--hairline)] px-5 py-3 text-sm font-semibold"
+                  suppressHydrationWarning
+                >
+                  {isHydrated && (theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />)}
+                  {!isHydrated && <Moon className="h-4 w-4 opacity-70" />}
+                  {theme === "dark" ? "Light theme" : "Dark theme"}
+                </button>
               </div>
-            </div>
           </div>
         </div>
       )}
