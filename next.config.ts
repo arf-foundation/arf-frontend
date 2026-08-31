@@ -6,6 +6,7 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: `
       default-src 'self';
+      manifest-src 'self' https://vercel.com;
       script-src 'self' https://cdn.plot.ly https://platform.linkedin.com https://www.youtube.com https://api.github.com https://challenges.cloudflare.com 'unsafe-inline';
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: https://api.qrserver.com https://*.licdn.com https://*.ytimg.com https://*.githubusercontent.com https://*.vercel.app;
