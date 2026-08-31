@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
 /* startViewTransition isn't yet in the lib.dom.d.ts this project ships --
@@ -37,9 +37,13 @@ export default function RouteTransition({
   // Synchronously check View Transitions support after hydration to avoid
   // rendering different DOM structures on server vs. client. The wrapper div
   // is always present; we only conditionally apply View Transitions logic.
-  useEffect(() => {
+  // useLayoutEffect ensures this runs synchronously before paint, preventing
+  // hydration mismatch. The setState is intentional and only runs once after
+  // hydration, so the set-state-in-effect rule is suppressed.
+  useLayoutEffect(() => {
     const hasViewTransitions =
       typeof document !== "undefined" && "startViewTransition" in document;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSupportsViewTransitions(hasViewTransitions);
   }, []);
 
@@ -81,7 +85,7 @@ export default function RouteTransition({
     transition?.ready.catch(() => {});
     transition?.updateCallbackDone.catch(() => {});
     transition?.finished.catch(() => {});
-  }, [pathname, displayChildren, supportsViewTransitions]);
+  }, [pathname, children, supportsViewTransitions]);
 
   // Always render the wrapper div on both server and client. The View
   // Transitions logic applies inside the div without changing its presence.
