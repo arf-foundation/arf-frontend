@@ -30,11 +30,18 @@ export default function RouteTransition({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [supportsViewTransitions] = useState(
-    () => typeof document !== "undefined" && "startViewTransition" in document,
-  );
+  const [supportsViewTransitions, setSupportsViewTransitions] = useState(false);
   const [displayChildren, setDisplayChildren] = useState(children);
   const prevPathname = useRef(pathname);
+
+  // Synchronously check View Transitions support after hydration to avoid
+  // rendering different DOM structures on server vs. client. The wrapper div
+  // is always present; we only conditionally apply View Transitions logic.
+  useEffect(() => {
+    const hasViewTransitions =
+      typeof document !== "undefined" && "startViewTransition" in document;
+    setSupportsViewTransitions(hasViewTransitions);
+  }, []);
 
   useEffect(() => {
     // Without View Transitions, the CSS-fallback render path below uses
@@ -74,14 +81,14 @@ export default function RouteTransition({
     transition?.ready.catch(() => {});
     transition?.updateCallbackDone.catch(() => {});
     transition?.finished.catch(() => {});
-  }, [pathname, children, supportsViewTransitions]);
+  }, [pathname, displayChildren, supportsViewTransitions]);
 
-  if (supportsViewTransitions) {
-    return <>{displayChildren}</>;
-  }
+  // Always render the wrapper div on both server and client. The View
+  // Transitions logic applies inside the div without changing its presence.
+  // This ensures hydration consistency.
   return (
     <div key={pathname} className="arf-route-fade">
-      {children}
+      {displayChildren}
     </div>
   );
 }
