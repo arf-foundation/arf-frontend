@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { ConnectError, getToken } from '@vercel/connect';
 import Anthropic from '@anthropic-ai/sdk';
+import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,24 +36,14 @@ const PROMPT_HASH = createHash('sha256').update(SYSTEM_PROMPT).digest('hex').sli
 const CONNECTOR = 'api.anthropic.com/arf-frontend';
 const MODEL: Anthropic.Model = 'claude-haiku-4-5-20251001';
 
-/* Best-effort rate limiting only. /agent is public and unauthenticated, and
-   every request now costs real money against a metered connector, so some
-   limit beats none -- but this is an in-memory Map scoped to one warm
-   serverless instance. A cold start, a redeploy, or a different region gets
-   a fresh Map, so this bounds abuse from a single hot instance rather than
-   guaranteeing a hard global cap. Reach for Vercel KV / Upstash if this
-   route sees real traffic and the soft limit isn't enough. */
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX_REQUESTS = 5;
-const requestTimestamps = new Map<string, number[]>();
-
-function isRateLimited(key: string): boolean {
-  const now = Date.now();
-  const recent = (requestTimestamps.get(key) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
-  recent.push(now);
-  requestTimestamps.set(key, recent);
-  return recent.length > RATE_LIMIT_MAX_REQUESTS;
-}
+// /agent is public and unauthenticated, and every request costs real money
+// against a metered connector -- see lib/rate-limit.ts for what backs this
+// and why the in-memory fallback is soft.
+const isRateLimited = createRateLimiter({
+  prefix: 'chat',
+  windowMs: 10 * 60 * 1000,
+  maxRequests: 5,
+});
 
 /* prompt.txt says "Return only the JSON object. No markdown." but smaller/
    faster models (Haiku included) frequently wrap structured output in
@@ -76,8 +67,8 @@ function extractJson(text: string): unknown {
 }
 
 export async function POST(req: Request) {
-  const clientKey = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  if (isRateLimited(clientKey)) {
+  const clientKey = clientKeyFromRequest(req);
+  if (await isRateLimited(clientKey)) {
     return NextResponse.json(
       { error: 'Too many requests. Please wait a few minutes and try again.' },
       { status: 429 },

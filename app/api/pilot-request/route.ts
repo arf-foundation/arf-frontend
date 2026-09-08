@@ -1,5 +1,6 @@
 import { Client } from '@notionhq/client';
 import { NextResponse } from 'next/server';
+import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
 
 function cleanSelect(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -10,27 +11,18 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_FIELD_LENGTH = 500;
 
 /* Public, unauthenticated endpoint writing directly to a real Notion
-   database on every request -- had no rate limiting, no email format
-   check, and no field length limits. Same shape of best-effort, in-memory
-   per-IP limiter as app/api/chat/route.ts (see that file's comment on why
-   it's soft, not a hard guarantee across serverless instances). A lead-gen
-   form's legitimate usage is "submit once, maybe retry" -- a generous
-   window still catches sustained abuse without blocking a real user. */
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX_REQUESTS = 5;
-const requestTimestamps = new Map<string, number[]>();
-
-function isRateLimited(key: string): boolean {
-  const now = Date.now();
-  const recent = (requestTimestamps.get(key) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
-  recent.push(now);
-  requestTimestamps.set(key, recent);
-  return recent.length > RATE_LIMIT_MAX_REQUESTS;
-}
+   database on every request. A lead-gen form's legitimate usage is "submit
+   once, maybe retry" -- a generous window still catches sustained abuse
+   without blocking a real user. See lib/rate-limit.ts. */
+const isRateLimited = createRateLimiter({
+  prefix: 'pilot-request',
+  windowMs: 10 * 60 * 1000,
+  maxRequests: 5,
+});
 
 export async function POST(request: Request) {
-  const clientKey = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  if (isRateLimited(clientKey)) {
+  const clientKey = clientKeyFromRequest(request);
+  if (await isRateLimited(clientKey)) {
     return NextResponse.json(
       { error: 'Too many requests. Please wait a few minutes and try again.' },
       { status: 429 },

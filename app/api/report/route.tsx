@@ -2,23 +2,16 @@ import { NextResponse } from 'next/server';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { CompliancePdfDocument } from './pdf-template';
 import { MOCK_AUDIT_LOGS, MOCK_POLICY_VIOLATIONS, withinRange } from '../../../lib/governanceMockData';
+import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
 
-// Real PDF generation from real (mock) data on every request -- same
-// best-effort, in-memory per-IP limiter as app/api/pilot-request/route.ts;
-// see that file's comment on why it's soft, not a hard guarantee across
-// serverless instances. A dashboard export button's legitimate usage is a
-// handful of requests per session, not a sustained stream.
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX_REQUESTS = 15;
-const requestTimestamps = new Map<string, number[]>();
-
-function isRateLimited(key: string): boolean {
-  const now = Date.now();
-  const recent = (requestTimestamps.get(key) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
-  recent.push(now);
-  requestTimestamps.set(key, recent);
-  return recent.length > RATE_LIMIT_MAX_REQUESTS;
-}
+// Real PDF generation from real (mock) data on every request. A dashboard
+// export button's legitimate usage is a handful of requests per session,
+// not a sustained stream. See lib/rate-limit.ts.
+const isRateLimited = createRateLimiter({
+  prefix: 'report',
+  windowMs: 10 * 60 * 1000,
+  maxRequests: 15,
+});
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 // Mock data spans this window; returned so a client can default/clamp to it.
@@ -26,8 +19,8 @@ const MOCK_DATA_MIN = '2026-05-13';
 const MOCK_DATA_MAX = '2026-05-14';
 
 export async function POST(request: Request) {
-  const clientKey = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  if (isRateLimited(clientKey)) {
+  const clientKey = clientKeyFromRequest(request);
+  if (await isRateLimited(clientKey)) {
     return NextResponse.json({ error: 'Too many requests. Please wait a few minutes and try again.' }, { status: 429 });
   }
 

@@ -48,6 +48,14 @@ Two API routes need credentials to work in production, and are inert (or error) 
 | `POST /api/pilot-request` | `NOTION_API_KEY`, `NOTION_DATABASE_ID` | Writes pilot signup submissions to Notion |
 | `POST /api/chat` (used by the `/agent` page) | Vercel Connect connector (`VERCEL_OIDC_TOKEN`, injected automatically on Vercel deploys) | Calls Claude for the public Institutional Memory Agent demo |
 
+`POST /api/chat`, `POST /api/pilot-request`, and `POST /api/report` are all
+public and unauthenticated, and are rate-limited (see `lib/rate-limit.ts`).
+Optionally set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (a
+free Upstash Redis database) for a real cap enforced across every
+serverless instance; without them, rate limiting falls back to an
+in-memory counter scoped to one warm instance — soft, not a hard guarantee,
+but not broken either.
+
 ### Run the development server
 
 ```bash
