@@ -579,14 +579,13 @@ function cooldownExplanation(c: CooldownEntry): {
 const TrustBadges = () => (
   <div className="my-6 flex flex-wrap justify-center gap-3">
     <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs">
-      <Shield className="h-3.5 w-3.5 text-arf-blue" /> SOC2 Type II (Audit
-      ready)
+      <Shield className="h-3.5 w-3.5 text-arf-blue" /> SOC2 Type II (Roadmap)
     </div>
     <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs">
-      <Shield className="h-3.5 w-3.5 text-arf-blue" /> ISO 27001 (Compliant)
+      <Shield className="h-3.5 w-3.5 text-arf-blue" /> ISO 27001 (Roadmap)
     </div>
     <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs">
-      <Shield className="h-3.5 w-3.5 text-arf-purple" /> GDPR Ready
+      <Shield className="h-3.5 w-3.5 text-arf-purple" /> GDPR-aligned (design goal)
     </div>
   </div>
 );
@@ -1332,24 +1331,24 @@ export default function Dashboard() {
                 </h2>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                   <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center">
-                    <div className="text-2xl font-bold text-[#3f7a5c]">✓</div>
+                    <div className="text-2xl font-bold text-[color:var(--text-muted)]">○</div>
                     <div className="text-sm">SOC2 Type II</div>
                     <div className="text-xs text-[color:var(--text-muted)]">
-                      Audit ready
+                      Roadmap
                     </div>
                   </div>
                   <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center">
-                    <div className="text-2xl font-bold text-arf-blue">✓</div>
+                    <div className="text-2xl font-bold text-[color:var(--text-muted)]">○</div>
                     <div className="text-sm">ISO 27001</div>
                     <div className="text-xs text-[color:var(--text-muted)]">
-                      Compliant
+                      Roadmap
                     </div>
                   </div>
                   <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center">
-                    <div className="text-2xl font-bold text-arf-purple">✓</div>
+                    <div className="text-2xl font-bold text-[color:var(--text-muted)]">○</div>
                     <div className="text-sm">GDPR</div>
                     <div className="text-xs text-[color:var(--text-muted)]">
-                      Ready
+                      Design goal
                     </div>
                   </div>
                 </div>
@@ -1369,7 +1368,7 @@ export default function Dashboard() {
                   <li>
                     No raw customer data stored – only anonymised risk metrics
                   </li>
-                  <li>Encryption at rest (AES-256) and in transit (TLS 1.3)</li>
+                  <li>Production deployments encrypt at rest (AES-256) and in transit (TLS 1.3)</li>
                   <li>Right to deletion and data portability supported</li>
                 </ul>
               </div>
@@ -1554,19 +1553,19 @@ export default function Dashboard() {
                       <div className="rounded-lg border border-[color:var(--hairline)] p-3">
                         <div className="font-semibold">SOC 2 Type II</div>
                         <div className="text-xs text-[color:var(--text-muted)]">
-                          Audit ready
+                          Roadmap
                         </div>
                       </div>
                       <div className="rounded-lg border border-[color:var(--hairline)] p-3">
                         <div className="font-semibold">ISO 27001</div>
                         <div className="text-xs text-[color:var(--text-muted)]">
-                          Compliant
+                          Roadmap
                         </div>
                       </div>
                       <div className="rounded-lg border border-[color:var(--hairline)] p-3">
                         <div className="font-semibold">GDPR</div>
                         <div className="text-xs text-[color:var(--text-muted)]">
-                          Ready
+                          Design goal
                         </div>
                       </div>
                     </div>
