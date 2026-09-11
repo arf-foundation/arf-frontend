@@ -1371,6 +1371,9 @@ export default function Dashboard() {
                   <li>Production deployments encrypt at rest (AES-256) and in transit (TLS 1.3)</li>
                   <li>Right to deletion and data portability supported</li>
                 </ul>
+                <p className="mt-4 text-xs text-[color:var(--text-muted)]">
+                  Production security commitments – targeted for pilot rollout, not yet independently audited.
+                </p>
               </div>
 
               <div className="arf-card-substantial p-6 text-center">
