@@ -220,9 +220,9 @@ export default function ChangelogPage() {
                     </a>
                   )}
                 </div>
-                <h3 className="mb-2 text-xl font-bold text-[color:var(--text-primary)]">
+                <h2 className="mb-2 text-xl font-bold text-[color:var(--text-primary)]">
                   {entry.title}
-                </h3>
+                </h2>
                 <p className="leading-relaxed text-[color:var(--text-secondary)]">
                   {entry.description}
                 </p>
