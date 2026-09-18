@@ -187,11 +187,11 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="arf-page-root min-h-screen px-4 py-8 sm:py-16">
+    <div className="arf-page-root min-h-screen px-4 pb-16 pt-6 sm:pt-8">
       <div className="mx-auto max-w-2xl">
-        <div className="mb-6 text-center sm:mb-8">
+        <div className="mb-4 text-center sm:mb-5">
           <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Request Pilot Access</h1>
-          <p className="mb-4 text-sm text-[color:var(--text-muted)] sm:text-base">
+          <p className="mb-3 text-sm text-[color:var(--text-muted)] sm:text-base">
             Pilot programs are offered to qualified organizations where ARF is a strong fit.
             Fill out this form to start a conversation with our founder – no commitment required.
           </p>
@@ -203,9 +203,9 @@ export default function SignupPage() {
           </div>
         </div>
 
-        <div className="arf-card p-5 sm:p-6 md:p-8">
+        <div className="arf-card p-5">
           {/* Progress bar */}
-          <div className="mb-6">
+          <div className="mb-3">
             <div className="mb-1 flex justify-between text-xs text-[color:var(--text-muted)]">
               <span>Step {step} of {totalSteps}</span>
               <span>{progressPercent}% complete</span>
@@ -220,7 +220,7 @@ export default function SignupPage() {
 
           {/* Step indicator */}
           <div
-            className="mb-6 flex justify-between"
+            className="mb-3 flex justify-between"
             role="progressbar"
             aria-valuenow={step}
             aria-valuemin={1}
@@ -241,27 +241,53 @@ export default function SignupPage() {
             ))}
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-            {/* Step 1: Personal & Company (unchanged) */}
+          <form onSubmit={handleSubmit} className="space-y-3">
+            {/* Step 1: Personal & Company */}
             {step === 1 && (
               <>
-                <div>
-                  <label htmlFor="fullName" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Full name *</label>
-                  <input
-                    type="text"
-                    id="fullName"
-                    name="fullName"
-                    required
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    ref={el => { inputRefs.current.fullName = el; }}
-                    aria-invalid={!!fieldErrors.fullName}
-                    aria-describedby={fieldErrors.fullName ? 'fullName-error' : undefined}
-                    className={`arf-input ${fieldErrors.fullName ? 'arf-input-error' : ''}`}
-                  />
-                  {fieldErrors.fullName && (
-                    <p id="fullName-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.fullName}</p>
-                  )}
+                {/* Full name + Company share a row (sm+), same for Industry +
+                    Job role below -- at 5 stacked fields this step's Next
+                    button rendered ~250px below the fold on a 1280x720
+                    viewport. Pairing the two short-label pairs into two rows
+                    cuts the step to 3 rows instead of 5 without dropping any
+                    field, which spacing tweaks alone couldn't close. */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="fullName" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Full name *</label>
+                    <input
+                      type="text"
+                      id="fullName"
+                      name="fullName"
+                      required
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      ref={el => { inputRefs.current.fullName = el; }}
+                      aria-invalid={!!fieldErrors.fullName}
+                      aria-describedby={fieldErrors.fullName ? 'fullName-error' : undefined}
+                      className={`arf-input ${fieldErrors.fullName ? 'arf-input-error' : ''}`}
+                    />
+                    {fieldErrors.fullName && (
+                      <p id="fullName-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.fullName}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="company" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Company / Organisation *</label>
+                    <input
+                      type="text"
+                      id="company"
+                      name="company"
+                      required
+                      value={formData.company}
+                      onChange={handleChange}
+                      ref={el => { inputRefs.current.company = el; }}
+                      aria-invalid={!!fieldErrors.company}
+                      aria-describedby={fieldErrors.company ? 'company-error' : undefined}
+                      className={`arf-input ${fieldErrors.company ? 'arf-input-error' : ''}`}
+                    />
+                    {fieldErrors.company && (
+                      <p id="company-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.company}</p>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label htmlFor="email" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Work email *</label>
@@ -282,82 +308,66 @@ export default function SignupPage() {
                   )}
                   <p className="mt-1 text-xs text-[color:var(--text-muted)]">We’ll only use this for pilot coordination – no mailing lists, no spam.</p>
                 </div>
-                <div>
-                  <label htmlFor="company" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Company / Organisation *</label>
-                  <input
-                    type="text"
-                    id="company"
-                    name="company"
-                    required
-                    value={formData.company}
-                    onChange={handleChange}
-                    ref={el => { inputRefs.current.company = el; }}
-                    aria-invalid={!!fieldErrors.company}
-                    aria-describedby={fieldErrors.company ? 'company-error' : undefined}
-                    className={`arf-input ${fieldErrors.company ? 'arf-input-error' : ''}`}
-                  />
-                  {fieldErrors.company && (
-                    <p id="company-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.company}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="industry" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Industry *</label>
-                  <select
-                    id="industry"
-                    name="industry"
-                    required
-                    value={formData.industry}
-                    onChange={handleChange}
-                    ref={el => { inputRefs.current.industry = el; }}
-                    aria-invalid={!!fieldErrors.industry}
-                    aria-describedby={fieldErrors.industry ? 'industry-error' : undefined}
-                    className={`arf-input ${fieldErrors.industry ? 'arf-input-error' : ''}`}
-                  >
-                    <option value="">Select industry</option>
-                    <option value="Fintech / Banking">Fintech / Banking</option>
-                    <option value="Healthcare / Life Sciences">Healthcare / Life Sciences</option>
-                    <option value="Cloud Infrastructure / DevOps">Cloud Infrastructure / DevOps</option>
-                    <option value="E‑commerce / Retail">E‑commerce / Retail</option>
-                    <option value="Manufacturing / IoT">Manufacturing / IoT</option>
-                    <option value="Government / Defense">Government / Defense</option>
-                    <option value="Consulting / Services">Consulting / Services</option>
-                    <option value="Other">Other</option>
-                  </select>
-                  {fieldErrors.industry && (
-                    <p id="industry-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.industry}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="jobRole" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Job role / title *</label>
-                  <select
-                    id="jobRole"
-                    name="jobRole"
-                    required
-                    value={formData.jobRole}
-                    onChange={handleChange}
-                    ref={el => { inputRefs.current.jobRole = el; }}
-                    aria-invalid={!!fieldErrors.jobRole}
-                    aria-describedby={fieldErrors.jobRole ? 'jobRole-error' : undefined}
-                    className={`arf-input ${fieldErrors.jobRole ? 'arf-input-error' : ''}`}
-                  >
-                    <option value="">Select role</option>
-                    <option value="CTO / VP Engineering">CTO / VP Engineering</option>
-                    <option value="Director of AI / ML">Director of AI / ML</option>
-                    <option value="Platform / SRE Lead">Platform / SRE Lead</option>
-                    <option value="Solutions Architect">Solutions Architect</option>
-                    <option value="ML / AI Engineer">ML / AI Engineer</option>
-                    <option value="Security / Compliance Lead">Security / Compliance Lead</option>
-                    <option value="Consultant / Advisor">Consultant / Advisor</option>
-                    <option value="Other">Other</option>
-                  </select>
-                  {fieldErrors.jobRole && (
-                    <p id="jobRole-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.jobRole}</p>
-                  )}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="industry" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Industry *</label>
+                    <select
+                      id="industry"
+                      name="industry"
+                      required
+                      value={formData.industry}
+                      onChange={handleChange}
+                      ref={el => { inputRefs.current.industry = el; }}
+                      aria-invalid={!!fieldErrors.industry}
+                      aria-describedby={fieldErrors.industry ? 'industry-error' : undefined}
+                      className={`arf-input ${fieldErrors.industry ? 'arf-input-error' : ''}`}
+                    >
+                      <option value="">Select industry</option>
+                      <option value="Fintech / Banking">Fintech / Banking</option>
+                      <option value="Healthcare / Life Sciences">Healthcare / Life Sciences</option>
+                      <option value="Cloud Infrastructure / DevOps">Cloud Infrastructure / DevOps</option>
+                      <option value="E‑commerce / Retail">E‑commerce / Retail</option>
+                      <option value="Manufacturing / IoT">Manufacturing / IoT</option>
+                      <option value="Government / Defense">Government / Defense</option>
+                      <option value="Consulting / Services">Consulting / Services</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    {fieldErrors.industry && (
+                      <p id="industry-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.industry}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="jobRole" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Job role / title *</label>
+                    <select
+                      id="jobRole"
+                      name="jobRole"
+                      required
+                      value={formData.jobRole}
+                      onChange={handleChange}
+                      ref={el => { inputRefs.current.jobRole = el; }}
+                      aria-invalid={!!fieldErrors.jobRole}
+                      aria-describedby={fieldErrors.jobRole ? 'jobRole-error' : undefined}
+                      className={`arf-input ${fieldErrors.jobRole ? 'arf-input-error' : ''}`}
+                    >
+                      <option value="">Select role</option>
+                      <option value="CTO / VP Engineering">CTO / VP Engineering</option>
+                      <option value="Director of AI / ML">Director of AI / ML</option>
+                      <option value="Platform / SRE Lead">Platform / SRE Lead</option>
+                      <option value="Solutions Architect">Solutions Architect</option>
+                      <option value="ML / AI Engineer">ML / AI Engineer</option>
+                      <option value="Security / Compliance Lead">Security / Compliance Lead</option>
+                      <option value="Consultant / Advisor">Consultant / Advisor</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    {fieldErrors.jobRole && (
+                      <p id="jobRole-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.jobRole}</p>
+                    )}
+                  </div>
                 </div>
               </>
             )}
 
-            {/* Step 2: Use Case & Technical Details (unchanged) */}
+            {/* Step 2: Use Case & Technical Details */}
             {step === 2 && (
               <>
                 <div>
@@ -365,7 +375,7 @@ export default function SignupPage() {
                   <textarea
                     id="useCase"
                     name="useCase"
-                    rows={3}
+                    rows={2}
                     required
                     value={formData.useCase}
                     onChange={handleChange}
@@ -379,52 +389,56 @@ export default function SignupPage() {
                     <p id="useCase-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.useCase}</p>
                   )}
                 </div>
-                <div>
-                  <label htmlFor="expectedVolume" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Expected monthly evaluations *</label>
-                  <select
-                    id="expectedVolume"
-                    name="expectedVolume"
-                    required
-                    value={formData.expectedVolume}
-                    onChange={handleChange}
-                    ref={el => { inputRefs.current.expectedVolume = el; }}
-                    aria-invalid={!!fieldErrors.expectedVolume}
-                    aria-describedby={fieldErrors.expectedVolume ? 'expectedVolume-error' : undefined}
-                    className={`arf-input ${fieldErrors.expectedVolume ? 'arf-input-error' : ''}`}
-                  >
-                    <option value="">Select volume</option>
-                    <option value="< 1,000">&lt; 1,000</option>
-                    <option value="1,000–10,000">1,000 – 10,000</option>
-                    <option value="10,000–100,000">10,000 – 100,000</option>
-                    <option value="> 100,000">&gt; 100,000</option>
-                  </select>
-                  {fieldErrors.expectedVolume && (
-                    <p id="expectedVolume-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.expectedVolume}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="cloudEnvironment" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Cloud environment *</label>
-                  <select
-                    id="cloudEnvironment"
-                    name="cloudEnvironment"
-                    required
-                    value={formData.cloudEnvironment}
-                    onChange={handleChange}
-                    ref={el => { inputRefs.current.cloudEnvironment = el; }}
-                    aria-invalid={!!fieldErrors.cloudEnvironment}
-                    aria-describedby={fieldErrors.cloudEnvironment ? 'cloudEnvironment-error' : undefined}
-                    className={`arf-input ${fieldErrors.cloudEnvironment ? 'arf-input-error' : ''}`}
-                  >
-                    <option value="">Select cloud</option>
-                    <option value="AWS">AWS</option>
-                    <option value="Azure">Azure</option>
-                    <option value="GCP">GCP</option>
-                    <option value="On‑premises">On‑premises / Private cloud</option>
-                    <option value="Multi‑cloud">Multi‑cloud</option>
-                  </select>
-                  {fieldErrors.cloudEnvironment && (
-                    <p id="cloudEnvironment-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.cloudEnvironment}</p>
-                  )}
+                {/* Paired for the same reason as step 1's fields -- see the
+                    comment there. */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="expectedVolume" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Expected monthly evaluations *</label>
+                    <select
+                      id="expectedVolume"
+                      name="expectedVolume"
+                      required
+                      value={formData.expectedVolume}
+                      onChange={handleChange}
+                      ref={el => { inputRefs.current.expectedVolume = el; }}
+                      aria-invalid={!!fieldErrors.expectedVolume}
+                      aria-describedby={fieldErrors.expectedVolume ? 'expectedVolume-error' : undefined}
+                      className={`arf-input ${fieldErrors.expectedVolume ? 'arf-input-error' : ''}`}
+                    >
+                      <option value="">Select volume</option>
+                      <option value="< 1,000">&lt; 1,000</option>
+                      <option value="1,000–10,000">1,000 – 10,000</option>
+                      <option value="10,000–100,000">10,000 – 100,000</option>
+                      <option value="> 100,000">&gt; 100,000</option>
+                    </select>
+                    {fieldErrors.expectedVolume && (
+                      <p id="expectedVolume-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.expectedVolume}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="cloudEnvironment" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Cloud environment *</label>
+                    <select
+                      id="cloudEnvironment"
+                      name="cloudEnvironment"
+                      required
+                      value={formData.cloudEnvironment}
+                      onChange={handleChange}
+                      ref={el => { inputRefs.current.cloudEnvironment = el; }}
+                      aria-invalid={!!fieldErrors.cloudEnvironment}
+                      aria-describedby={fieldErrors.cloudEnvironment ? 'cloudEnvironment-error' : undefined}
+                      className={`arf-input ${fieldErrors.cloudEnvironment ? 'arf-input-error' : ''}`}
+                    >
+                      <option value="">Select cloud</option>
+                      <option value="AWS">AWS</option>
+                      <option value="Azure">Azure</option>
+                      <option value="GCP">GCP</option>
+                      <option value="On‑premises">On‑premises / Private cloud</option>
+                      <option value="Multi‑cloud">Multi‑cloud</option>
+                    </select>
+                    {fieldErrors.cloudEnvironment && (
+                      <p id="cloudEnvironment-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.cloudEnvironment}</p>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label htmlFor="aiMaturity" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Current AI maturity *</label>
@@ -455,7 +469,7 @@ export default function SignupPage() {
             {/* Step 3: Budget, Timeline & Terms */}
             {step === 3 && (
               <>
-                <div className="mb-4 rounded-lg border border-arf-blue/30 bg-arf-blue/10 p-4 text-sm text-[color:var(--text-secondary)]">
+                <div className="mb-3 rounded-lg border border-arf-blue/30 bg-arf-blue/10 p-3 text-sm text-[color:var(--text-secondary)]">
                   <div className="flex items-start gap-2">
                     <Shield size={18} className="mt-0.5 flex-shrink-0 text-arf-blue" />
                     <div>
@@ -469,46 +483,49 @@ export default function SignupPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label htmlFor="budgetApproved" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">
-                    Do you have an approved budget for AI governance? <span className="text-[color:var(--text-muted)]">(optional)</span>
-                  </label>
-                  <select
-                    id="budgetApproved"
-                    name="budgetApproved"
-                    value={formData.budgetApproved}
-                    onChange={handleChange}
-                    className="arf-input"
-                  >
-                    <option value="">Prefer not to say</option>
-                    <option value="Yes, approved">Yes, approved</option>
-                    <option value="In discussion">In discussion</option>
-                    <option value="Not yet">Not yet</option>
-                  </select>
-                  <p className="mt-1 text-xs text-[color:var(--text-muted)]">This helps us understand your procurement timeline. No budget is required to apply.</p>
-                </div>
-                <div>
-                  <label htmlFor="timeline" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Planned deployment timeline *</label>
-                  <select
-                    id="timeline"
-                    name="timeline"
-                    required
-                    value={formData.timeline}
-                    onChange={handleChange}
-                    ref={el => { inputRefs.current.timeline = el; }}
-                    aria-invalid={!!fieldErrors.timeline}
-                    aria-describedby={fieldErrors.timeline ? 'timeline-error' : undefined}
-                    className={`arf-input ${fieldErrors.timeline ? 'arf-input-error' : ''}`}
-                  >
-                    <option value="">Select timeline</option>
-                    <option value="Immediate (< 1 month)">Immediate (&lt; 1 month)</option>
-                    <option value="1–3 months">1–3 months</option>
-                    <option value="3–6 months">3–6 months</option>
-                    <option value="> 6 months / exploratory">&gt; 6 months / exploratory</option>
-                  </select>
-                  {fieldErrors.timeline && (
-                    <p id="timeline-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.timeline}</p>
-                  )}
+                {/* Paired for the same reason as steps 1/2's fields -- see
+                    the comment on step 1. */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="budgetApproved" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">
+                      Approved budget? <span className="text-[color:var(--text-muted)]">(optional)</span>
+                    </label>
+                    <select
+                      id="budgetApproved"
+                      name="budgetApproved"
+                      value={formData.budgetApproved}
+                      onChange={handleChange}
+                      className="arf-input"
+                    >
+                      <option value="">Prefer not to say</option>
+                      <option value="Yes, approved">Yes, approved</option>
+                      <option value="In discussion">In discussion</option>
+                      <option value="Not yet">Not yet</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="timeline" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Planned deployment timeline *</label>
+                    <select
+                      id="timeline"
+                      name="timeline"
+                      required
+                      value={formData.timeline}
+                      onChange={handleChange}
+                      ref={el => { inputRefs.current.timeline = el; }}
+                      aria-invalid={!!fieldErrors.timeline}
+                      aria-describedby={fieldErrors.timeline ? 'timeline-error' : undefined}
+                      className={`arf-input ${fieldErrors.timeline ? 'arf-input-error' : ''}`}
+                    >
+                      <option value="">Select timeline</option>
+                      <option value="Immediate (< 1 month)">Immediate (&lt; 1 month)</option>
+                      <option value="1–3 months">1–3 months</option>
+                      <option value="3–6 months">3–6 months</option>
+                      <option value="> 6 months / exploratory">&gt; 6 months / exploratory</option>
+                    </select>
+                    {fieldErrors.timeline && (
+                      <p id="timeline-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.timeline}</p>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <input
@@ -533,10 +550,7 @@ export default function SignupPage() {
                 {fieldErrors.agreeToTerms && (
                   <p id="agreeToTerms-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.agreeToTerms}</p>
                 )}
-                <p className="text-xs italic text-[color:var(--text-muted)]">
-                  Every ungoverned AI decision is a liability. Turn your AI operations into an auditable asset.
-                </p>
-                <div className="flex justify-between pt-4">
+                <div className="flex justify-between pt-3">
                   <button
                     type="button"
                     onClick={prevStep}
@@ -566,7 +580,7 @@ export default function SignupPage() {
 
             {/* Navigation for steps 1 and 2 */}
             {step < 3 && (
-              <div className="flex justify-end pt-4">
+              <div className="flex justify-end pt-3">
                 {step > 1 && (
                   <button
                     type="button"
