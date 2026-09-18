@@ -84,7 +84,7 @@ export default function HistoryPage() {
           <div className="rounded-lg border border-arf-blue/30 bg-arf-blue/10 p-3 text-center">
             <p className="text-sm text-[color:var(--text-secondary)]">
               📊 This is a <strong>simulated demo</strong> using mock data. The real ARF engine requires pilot access.
-              <Link href="/signup" className="ml-2 font-semibold text-arf-blue underline hover:brightness-110">Request pilot access →</Link>
+              <Link href="/signup" className="ml-2 font-semibold text-arf-blue underline hover:brightness-110">Request Pilot Access →</Link>
             </p>
           </div>
 

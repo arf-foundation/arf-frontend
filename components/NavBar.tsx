@@ -20,13 +20,20 @@ const MOBILE_MENU_MS = 260;
 
 --------------------------------------------------------------------------- */
 
+/* Labels here must match their counterparts in components/Footer.tsx and
+   wherever else the same destination is linked (app/page.tsx's hero/feature
+   CTAs, packages/ui/src/ConsoleCard.tsx) -- WCAG 3.2.4 Consistent
+   Identification requires the same accessible name for the same function
+   everywhere it appears, and Replay QA caught several of these drifting
+   ("Product" vs "Capabilities", "Console" vs "Open Governance Console" vs
+   "Open console", "Developers" vs "GitHub" vs "Specification"). */
 const PRIMARY_LINKS = [
-  { label: "Product", href: "/#capabilities" },
+  { label: "Capabilities", href: "/#capabilities" },
   { label: "FAQ", href: "/faq" },
   { label: "Pricing", href: "/pricing" },
   { label: "Console", href: "/dashboard" },
   {
-    label: "Developers",
+    label: "GitHub",
     href: "https://github.com/arf-foundation",
     external: true,
   },

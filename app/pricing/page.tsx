@@ -57,7 +57,7 @@ const TIERS = [
       'Founder-led onboarding',
       'Outcome-based or retainer after pilot',
     ],
-    cta: { label: 'Request pilot access', href: '/signup' },
+    cta: { label: 'Request Pilot Access', href: '/signup' },
     dominant: false,
   },
   {

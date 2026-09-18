@@ -14,22 +14,19 @@ declare global {
    Terms of Service / Privacy Policy from anywhere but home. Extracted so
    layout.tsx can render it once, site-wide. */
 
-const SPEC_LINK = "https://github.com/arf-foundation";
-
 const FOOTER_COLUMNS = [
   {
     title: "Product",
     links: [
       { label: "Capabilities", href: "/#capabilities" },
       { label: "Architecture", href: "/#architecture" },
-      { label: "Governance Console", href: "/dashboard" },
-      { label: "Access Models", href: "/pricing" },
+      { label: "Console", href: "/dashboard" },
+      { label: "Pricing", href: "/pricing" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Specification", href: SPEC_LINK },
       { label: "Changelog", href: "/changelog" },
       { label: "History", href: "/history" },
       { label: "FAQ", href: "/faq" },

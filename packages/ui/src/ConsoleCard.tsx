@@ -33,7 +33,7 @@ export function ConsoleCard({
         </div>
       </div>
       <LinkTag href={href} className="mt-auto inline-flex items-center gap-2 text-[14.5px] font-semibold text-arf-blue">
-        Open console <ArrowRight size={16} />
+        Console <ArrowRight size={16} />
       </LinkTag>
     </div>
   );

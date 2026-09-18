@@ -790,7 +790,7 @@ export default function Dashboard() {
               href="/signup"
               className="whitespace-nowrap text-sm font-medium text-arf-blue underline hover:opacity-80"
             >
-              Request pilot access →
+              Request Pilot Access →
             </Link>
           </div>
 
@@ -971,7 +971,7 @@ export default function Dashboard() {
                     href="/pricing"
                     className="inline-flex items-center gap-2 text-sm font-medium text-arf-blue hover:opacity-80"
                   >
-                    View access models → <ArrowRight size={14} />
+                    Pricing <ArrowRight size={14} />
                   </Link>
                 </div>
               )}

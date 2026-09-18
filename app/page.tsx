@@ -204,7 +204,7 @@ const TIERS = [
       "Outcome-based or retainer after pilot",
       "Founder-led onboarding",
     ],
-    cta: { label: "Request pilot access", href: "/signup" },
+    cta: { label: "Request Pilot Access", href: "/signup" },
     dominant: false,
   },
   {
@@ -359,7 +359,7 @@ export default function LandingPage() {
                 Request Pilot Access <ArrowRight size={18} />
               </Link>
               <Link href="/dashboard" className="arf-btn-secondary">
-                Open Governance Console
+                Console
               </Link>
             </div>
           </div>

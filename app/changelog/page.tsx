@@ -280,7 +280,7 @@ export default function ChangelogPage() {
             </h2>
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2 rounded-lg bg-[color:var(--surface-sunken)] p-4">
-                <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm text-green-500">
+                <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm text-green-800 dark:text-green-400">
                   {CURL_COMMAND}
                 </pre>
                 <button
@@ -295,7 +295,7 @@ export default function ChangelogPage() {
                   )}
                 </button>
               </div>
-              <p className="text-sm text-amber-500">
+              <p className="text-sm text-amber-700 dark:text-amber-400">
                 ⚠️ This is a simulated evaluation endpoint. It does{" "}
                 <strong>not</strong> use the protected core engine. For pilot
                 access,{" "}
