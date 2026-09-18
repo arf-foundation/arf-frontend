@@ -77,11 +77,13 @@ export default function Footer() {
         <div className="grid gap-11 border-b border-white/12 pb-[52px] lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div>
             <Link href="/" className="mb-4 flex items-center gap-3">
+              {/* See the same fix in NavBar.tsx -- declared size must match
+                  the rendered 32px box, not the source file's resolution. */}
               <Image
                 src="/arf-icon.png"
                 alt=""
-                width={256}
-                height={256}
+                width={32}
+                height={32}
                 className="h-8 w-8"
               />
               <span className="text-base font-semibold tracking-[-0.02em] text-white">

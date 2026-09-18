@@ -107,11 +107,17 @@ export default function NavBar() {
           className="flex items-center gap-3"
           aria-label="ARF AI home"
         >
+          {/* width/height must match the rendered 22px box, not the source
+              file's native resolution -- Next/Image treats the declared
+              size as the SOURCE size, not a max, so 256x256 here was
+              serving a 256px WebP (26.8KB) into a 22px box on every load.
+              At 22 Next's own srcset step logic already covers 2x/3x DPR
+              (rounds up to its next configured breakpoint, w=48). */}
           <Image
             src="/arf-icon.png"
             alt=""
-            width={256}
-            height={256}
+            width={22}
+            height={22}
             className="h-[22px] w-[22px]"
             priority
           />
