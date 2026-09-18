@@ -27,6 +27,7 @@ export const metadata: Metadata = {
   title: 'Access models',
   description:
     'A fixed deployment fee, plus either outcome-based pricing or a monthly retainer. Pilot access is time-limited and free for qualified organisations.',
+  alternates: { canonical: '/pricing' },
 };
 
 const TIERS = [

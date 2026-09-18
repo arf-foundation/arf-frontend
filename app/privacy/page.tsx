@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "How ARF AI collects, uses, and protects data across the public sandbox API, demo website, and pilot signup process.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

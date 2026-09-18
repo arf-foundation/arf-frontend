@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -30,12 +29,6 @@ import {
   ConsoleCard,
   SpecsCard,
 } from "@arf/ui";
-
-declare global {
-  interface Window {
-    gtag?: (...args: unknown[]) => void;
-  }
-}
 
 /* ============================================================================
    DESIGN NOTES (full write-up in design_handoff_arf_enterprise_refresh/DESIGN_RATIONALE.md)
@@ -229,60 +222,6 @@ const TIERS = [
   },
 ] as const;
 
-/* Docs/Specification have no dedicated internal route in this repo (no
-   /spec page) — both point at the same external GitHub org the previous
-   nav's "Spec" link used, matching NavBar's decision for the same gap. */
-const SPEC_LINK = "https://github.com/arf-foundation";
-
-const FOOTER_COLUMNS = [
-  {
-    title: "Product",
-    links: [
-      { label: "Capabilities", href: "/#capabilities" },
-      { label: "Architecture", href: "/#architecture" },
-      { label: "Governance Console", href: "/dashboard" },
-      { label: "Access Models", href: "/pricing" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { label: "Specification", href: SPEC_LINK },
-      { label: "Changelog", href: "/changelog" },
-      { label: "History", href: "/history" },
-      { label: "FAQ", href: "/faq" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "Request Pilot Access", href: "/signup" },
-      { label: "Book a call", href: "https://calendly.com/petter2025us/30min" },
-      {
-        label: "LinkedIn",
-        href: "https://www.linkedin.com/company/agentic-reliability",
-      },
-      { label: "Terms of Service", href: "/terms" },
-      { label: "Privacy Policy", href: "/privacy" },
-    ],
-  },
-  {
-    title: "Community",
-    links: [
-      {
-        label: "Slack",
-        href: "https://join.slack.com/t/arf-vmt3923/shared_invite/zt-3xnjkuas4-LG9pW2bMz94vGzeeKwAclg",
-      },
-      { label: "GitHub", href: "https://github.com/arf-foundation" },
-      { label: "Hugging Face", href: "https://huggingface.co/ARF-AI" },
-      {
-        label: "Risk demo",
-        href: "https://arf-foundation.github.io/arf-risk-demo/",
-      },
-    ],
-  },
-] as const;
-
 export default function LandingPage() {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
@@ -349,14 +288,6 @@ export default function LandingPage() {
       if (isMounted.current) setSandboxError(message);
     } finally {
       if (isMounted.current) setSandboxLoading(false);
-    }
-  };
-
-  const trackSlackClick = () => {
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "slack_invite_click", {
-        event_category: "engagement",
-      });
     }
   };
 
@@ -813,93 +744,6 @@ export default function LandingPage() {
           <SpecsCard specs={SPECS} href="/signup" renderLink={Link} />
         </div>
       </section>
-
-      {/* ─── Footer — dense but organised; community + version badge live here ── */}
-      <footer className="bg-arf-dark px-0 pb-8 pt-[72px] text-white/70">
-        <div className="arf-shell">
-          <div className="grid gap-11 border-b border-white/12 pb-[52px] lg:grid-cols-[1.4fr_repeat(4,1fr)]">
-            <div>
-              <Link href="/" className="mb-4 flex items-center gap-3">
-                <Image
-                  src="/arf-icon.png"
-                  alt=""
-                  width={256}
-                  height={256}
-                  className="h-8 w-8"
-                />
-                <span className="text-base font-semibold tracking-[-0.02em] text-white">
-                  ARF AI
-                </span>
-              </Link>
-              <p className="mb-6 max-w-[34ch] text-sm leading-[1.65] text-white/70">
-                The control plane between autonomous AI and enterprise
-                infrastructure.
-              </p>
-              <a
-                href="mailto:juan@arf-ai.com"
-                className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:border-white/50"
-              >
-                juan@arf-ai.com
-              </a>
-            </div>
-            {FOOTER_COLUMNS.map((col) => (
-              <div key={col.title}>
-                <p className="mb-4 font-mono text-[10.5px] font-medium uppercase tracking-[0.13em] text-white/55">
-                  {col.title}
-                </p>
-                <div className="flex flex-col gap-3">
-                  {col.links.map((link) =>
-                    link.href.startsWith("http") ? (
-                      <a
-                        key={link.label}
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={
-                          link.label === "Slack" ? trackSlackClick : undefined
-                        }
-                        className="text-sm text-white/70 transition hover:text-white"
-                      >
-                        {link.label}
-                      </a>
-                    ) : (
-                      <Link
-                        key={link.label}
-                        href={link.href}
-                        className="text-sm text-white/70 transition hover:text-white"
-                      >
-                        {link.label}
-                      </Link>
-                    ),
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-wrap items-center justify-between gap-8 pt-7">
-            <a
-              href="https://github.com/arf-foundation"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="opacity-80"
-            >
-              <Image
-                src="/GitHub_Lockup_White.svg"
-                alt="GitHub Enterprise"
-                width={120}
-                height={34}
-                className="h-8 w-auto"
-              />
-            </a>
-            <div className="flex items-center gap-5 font-mono text-[12.5px] text-white/55">
-              <Link href="/changelog" className="transition hover:text-white">
-                v4.3.2 — Axiom
-              </Link>
-              <span className="text-white/55">© 2026 ARF Foundation</span>
-            </div>
-          </div>
-        </div>
-      </footer>
 
       {copyError && (
         <div className="animate-slide-up fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg bg-[#b0453a] px-4 py-2 text-sm text-white shadow-lg">

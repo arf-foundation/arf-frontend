@@ -5,6 +5,7 @@ import { Shield, Calendar, Mail } from 'lucide-react';
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description: 'The terms governing use of the ARF AI public sandbox API, demo dashboard, and pilot signup process.',
+  alternates: { canonical: '/terms' },
 };
 
 export default function TermsPage() {

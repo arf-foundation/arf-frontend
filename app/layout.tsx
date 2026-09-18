@@ -3,6 +3,7 @@ import { Instrument_Sans, JetBrains_Mono, Newsreader } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
 import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
 import ChatWidget from "../components/ChatWidget";
 import RouteTransition from "../components/RouteTransition";
 import "./globals.css";
@@ -38,13 +39,19 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://arf-ai.com"),
+  /* www.arf-ai.com is the canonical host -- next-sitemap.config.js's siteUrl
+     agrees, and the apex domain 307s to it. metadataBase must match, or every
+     relative canonical/OG URL Next.js resolves from it points at a URL that
+     redirects instead of the canonical one -- a problem for crawlers/scrapers
+     that don't follow redirects when reading OG tags. */
+  metadataBase: new URL("https://www.arf-ai.com"),
   title: {
     default: "ARF AI – Enterprise infrastructure for autonomous AI",
     template: "%s | ARF AI",
   },
   description:
     "Safely deploy autonomous AI in production with deterministic governance, continuous reliability, and enterprise-grade auditability.",
+  alternates: { canonical: "/" },
   keywords: [
     "AI governance",
     "enterprise AI infrastructure",
@@ -66,7 +73,7 @@ export const metadata: Metadata = {
     title: "ARF AI – Enterprise infrastructure for autonomous AI",
     description:
       "Safely deploy autonomous AI in production with deterministic governance, continuous reliability, and enterprise-grade auditability.",
-    url: "https://arf-ai.com",
+    url: "https://www.arf-ai.com",
     siteName: "ARF AI",
     images: [
       {
@@ -205,6 +212,7 @@ export default function RootLayout({
         <main id="main">
           <RouteTransition>{children}</RouteTransition>
         </main>
+        <Footer />
         <ChatWidget />
         <Analytics />
         <ServiceWorkerRegister />
