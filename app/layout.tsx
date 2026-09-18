@@ -1,99 +1,221 @@
-import type { Metadata, Viewport } from 'next';
-import Link from 'next/link';
-import { Analytics } from '@vercel/analytics/next';
-import './globals.css';
+import type { Metadata, Viewport } from "next";
+import { Instrument_Sans, JetBrains_Mono, Newsreader } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
+import ChatWidget from "../components/ChatWidget";
+import RouteTransition from "../components/RouteTransition";
+import "./globals.css";
+
+/* ----------------------------------------------------------------------------
+   Type system — three families, one job each.
+   Instrument Sans : all UI + headlines (holds tight tracking at display sizes)
+   Newsreader      : the pull quote only — one editorial moment, not decoration
+   JetBrains Mono  : eyebrows, labels, code — technical signal without a dark UI
+   next/font self-hosts these, so no external font origin is needed and the
+   CSP's font-src stays untouched.
+--------------------------------------------------------------------------- */
+const instrumentSans = Instrument_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-instrument-sans",
+  display: "swap",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: ["300", "400"],
+  style: ["italic"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://arf-frontend-sandy.vercel.app'),
+  /* www.arf-ai.com is the canonical host -- next-sitemap.config.js's siteUrl
+     agrees, and the apex domain 307s to it. metadataBase must match, or every
+     relative canonical/OG URL Next.js resolves from it points at a URL that
+     redirects instead of the canonical one -- a problem for crawlers/scrapers
+     that don't follow redirects when reading OG tags. */
+  metadataBase: new URL("https://www.arf-ai.com"),
   title: {
-    default: 'Agentic Reliability Framework (ARF) – AI Reliability & Self‑Healing Control Plane',
-    template: '%s | ARF',
+    default: "ARF AI – Enterprise infrastructure for autonomous AI",
+    template: "%s | ARF AI",
   },
-  description: 'Turn probabilistic AI into deterministic, auditable action. Reduce MTTR by up to 85% with self‑healing systems powered by Bayesian governance.',
-  keywords: ['AI reliability', 'self-healing systems', 'AI governance', 'agent orchestration', 'production AI', 'SRE automation', 'Bayesian inference', 'cloud governance'],
-  authors: [{ name: 'Juan Petter', url: 'https://www.linkedin.com/in/juan-petter' }],
-  creator: 'ARF Foundation',
-  publisher: 'ARF Foundation',
-  robots: 'index, follow',
+  description:
+    "Safely deploy autonomous AI in production with deterministic governance, continuous reliability, and enterprise-grade auditability.",
+  alternates: { canonical: "/" },
+  keywords: [
+    "AI governance",
+    "enterprise AI infrastructure",
+    "autonomous AI control plane",
+    "deterministic policy enforcement",
+    "AI reliability",
+    "decision governance",
+    "audit trails",
+    "risk management",
+    "AI operations",
+  ],
+  authors: [
+    { name: "Juan Petter", url: "https://www.linkedin.com/in/juan-petter" },
+  ],
+  creator: "ARF Foundation",
+  publisher: "ARF Foundation",
+  robots: "index, follow",
   openGraph: {
-    title: 'ARF – Agentic Reliability Framework',
-    description: 'Auditable cloud governance powered by Bayesian intelligence.',
-    url: 'https://arf-frontend-sandy.vercel.app',
-    siteName: 'ARF',
+    title: "ARF AI – Enterprise infrastructure for autonomous AI",
+    description:
+      "Safely deploy autonomous AI in production with deterministic governance, continuous reliability, and enterprise-grade auditability.",
+    url: "https://www.arf-ai.com",
+    siteName: "ARF AI",
     images: [
       {
-        url: '/og-image.png',
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: 'ARF Dashboard Preview',
+        alt: "ARF AI Governance Console",
       },
     ],
-    locale: 'en_US',
-    type: 'website',
+    locale: "en_US",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'ARF – Agentic Reliability Framework',
-    description: 'Bayesian governance for cloud infrastructure.',
-    creator: '@arf_foundation',
-    images: ['/og-image.png'],
+    card: "summary_large_image",
+    title: "ARF AI – Enterprise infrastructure for autonomous AI",
+    description:
+      "Deterministic governance for autonomous AI. Enterprise‑grade auditability.",
+    creator: "@arf_foundation",
+    images: ["/og-image.png"],
   },
-  manifest: '/manifest.json',
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'ARF',
+    statusBarStyle: "black-translucent",
+    title: "ARF AI",
   },
-  formatDetection: {
-    telephone: false,
-  },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#3b82f6',
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#faf9f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e0d12" },
+  ],
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${instrumentSans.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
+    >
       <head>
-        {/* Favicon links generated by RealFaviconGenerator */}
-        <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function makeSafe(original, methodName) {
+                  return function() {
+                    if (window === window.parent) {
+                      return original ? original.apply(this, arguments) : Promise.reject(new Error(methodName + ' not available'));
+                    } else {
+                      return Promise.reject(new DOMException(
+                        methodName + ' is only allowed in top-level browsing contexts',
+                        'InvalidStateError'
+                      ));
+                    }
+                  };
+                }
+
+                if (typeof navigator !== 'undefined') {
+                  if (navigator.getInstalledRelatedApps) {
+                    navigator.getInstalledRelatedApps = makeSafe(navigator.getInstalledRelatedApps, 'getInstalledRelatedApps');
+                  } else {
+                    navigator.getInstalledRelatedApps = makeSafe(null, 'getInstalledRelatedApps');
+                  }
+
+                  if (navigator.getInstalledApps) {
+                    navigator.getInstalledApps = makeSafe(navigator.getInstalledApps, 'getInstalledApps');
+                  } else {
+                    navigator.getInstalledApps = makeSafe(null, 'getInstalledApps');
+                  }
+                }
+
+                window.addEventListener('unhandledrejection', function(event) {
+                  if (event.reason && event.reason.message && (
+                    event.reason.message.includes('getInstalledRelatedApps') ||
+                    event.reason.message.includes('getInstalledApps')
+                  )) {
+                    event.preventDefault();
+                    console.debug('Ignored ' + event.reason.message);
+                  }
+                });
+
+                // Blocking theme init — CSP allows 'unsafe-inline' for scripts
+                // here, so this runs before first paint and removes the
+                // one-frame flash of the wrong theme that a client-effect-only
+                // toggle (NavBar) would otherwise cause on load.
+                try {
+                  var stored = localStorage.getItem('arf-theme');
+                  var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (dark) document.documentElement.classList.add('dark');
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          href="/favicon-96x96.png"
+          sizes="96x96"
+        />
+        {/* No favicon.svg source exists -- was a broken reference (removed
+            rather than left pointing at nothing); the PNG and .ico below
+            cover every real browser target already. */}
         <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
         <link rel="manifest" href="/manifest.json" />
-        {/* Additional PWA meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
+        />
       </head>
-      <body className="min-h-screen bg-gray-100">
-        <nav className="bg-gray-800 text-white shadow-md" aria-label="Main navigation">
-          <div className="container mx-auto flex items-center gap-6 p-4">
-            <Link href="/" className="font-bold hover:underline">ARF</Link>
-            <Link href="/dashboard" className="hover:underline">Dashboard</Link>
-            <Link href="/history" className="hover:underline">History</Link>
-            <Link href="/changelog" className="hover:underline">Changelog</Link>
-            <Link href="/faq" className="hover:underline">FAQ</Link>
-            <a
-              href="https://arf-foundation.github.io/arf-spec/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline ml-auto"
-            >
-              Documentation
-            </a>
-          </div>
-        </nav>
-        <main>{children}</main>
+      <body className="min-h-screen antialiased">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-arf-dark focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+        >
+          Skip to content
+        </a>
+        <NavBar />
+        <main id="main">
+          <RouteTransition>{children}</RouteTransition>
+        </main>
+        <Footer />
+        <ChatWidget />
         <Analytics />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

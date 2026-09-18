@@ -1,0 +1,21 @@
+{
+  "name": "@arf/ui",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "lucide-react": "^1.16.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

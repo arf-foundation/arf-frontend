@@ -1,0 +1,9 @@
+{
+  "projectId": "bf4f4f3e-8a76-4f3c-acc0-5faa45dfc368",
+  "shape": "package",
+  "pkg": "@arf/ui",
+  "globalName": "ArfUI",
+  "buildCmd": "yarn build",
+  "cssEntry": "dist/chunks/styles.css",
+  "readmeHeader": ".design-sync/conventions.md"
+}

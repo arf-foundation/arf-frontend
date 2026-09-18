@@ -1,157 +1,778 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { z } from 'zod';
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import {
+  ArrowRight,
+  Brain,
+  Building2,
+  Compass,
+  Cpu,
+  Factory,
+  FileText,
+  Globe,
+  HeartPulse,
+  Landmark,
+  Lock,
+  Network,
+  Server,
+  Shield,
+  ShieldCheck,
+} from "lucide-react";
+import { useInView } from "./hooks/useInView";
+import { useCountUp } from "./hooks/useCountUp";
+import ArchitecturePipeline from "../components/ArchitecturePipeline";
+import {
+  CapabilityCard,
+  TierBody,
+  SandboxCard,
+  ConsoleCard,
+  SpecsCard,
+} from "@arf/ui";
 
-// Schema for risk API response
-const RiskDataSchema = z.object({
-  system_risk: z.number().min(0).max(1),
-  status: z.enum(['critical', 'warning', 'safe']).catch('warning'),
-});
+/* ============================================================================
+   DESIGN NOTES (full write-up in design_handoff_arf_enterprise_refresh/DESIGN_RATIONALE.md)
 
-type RiskData = z.infer<typeof RiskDataSchema>;
+   Spacing rhythm — deliberately uneven, replacing the old uniform py-20:
+     hero 88/104 → trust strip 46 (tight, scannable) → logo row 64/88 →
+     problem 112 → why 96 → why-now 112 → industries 120 → capabilities 120 →
+     governance 104 on its own surface → quote band 104 → pricing 112 →
+     explore 104 → footer 72.
+   The eye accelerates through the scannable bands and slows on the two proof
+   sections (governance, quote), which is where enterprise buyers stop.
 
-export default function Home() {
-  const [risk, setRisk] = useState<RiskData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
+   Card weights — three, not one:
+     .arf-card-substantial  capabilities + governance (soft shadow, hover lift)
+     .arf-card-light        explore/demo cards (lighter, exploratory)
+     .arf-card-anchored     dark trust strip, quote band
+   ========================================================================= */
+
+// arf-ai-... not a-r-f-...: the HF org renamed A-R-F -> ARF-AI and the old
+// domain 404s directly (verified against HF's api/spaces endpoint), even
+// though HF still lists it as a "READY" mapping.
+const CURL_COMMAND = `curl -X POST https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate \\
+  -H "Content-Type: application/json" \\
+  -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
+
+const CAPABILITIES = [
+  {
+    n: "01",
+    title: "Policy Enforcement",
+    description: "Deterministic policy gates that cannot be bypassed.",
+    icon: Shield,
+    items: [
+      "Deterministic execution gates",
+      "Approval workflows",
+      "Regional policy controls",
+      "Cost guardrails",
+    ],
+  },
+  {
+    n: "02",
+    title: "Decision Governance",
+    description: "Tamper-evident records with cryptographic signing.",
+    icon: FileText,
+    items: [
+      "Full audit trail",
+      "Cryptographic attestation",
+      "Attribution & accountability",
+      "Regulatory-ready logs",
+    ],
+  },
+  {
+    n: "03",
+    title: "Continuous Reliability",
+    description:
+      "Proactive monitoring, predictive foresight, and automated recovery.",
+    icon: Cpu,
+    items: [
+      "Anomaly detection",
+      "Predictive health scoring",
+      "Control-theoretic stability monitoring",
+      "Self-stabilising responses",
+    ],
+  },
+  {
+    n: "04",
+    title: "Operational Transparency",
+    description:
+      "Explainable risk scoring, causal reasoning, and real-time observability.",
+    icon: Network,
+    items: [
+      "Explainable risk scores",
+      "Counterfactual what-if analysis",
+      "Real-time dashboards",
+      "Causal attribution",
+    ],
+  },
+] as const;
+
+const TRUST = [
+  {
+    icon: Shield,
+    title: "Architected for SOC 2 readiness",
+    body: "Controls and evidence collection designed against the trust services criteria from day one.",
+  },
+  {
+    icon: Lock,
+    title: "Deterministic enforcement",
+    body: "Policy gates execute mechanically before an action reaches infrastructure. Not advisory.",
+  },
+  {
+    icon: FileText,
+    title: "Cryptographic audit trail",
+    body: "Every decision signed, timestamped and attributed — tamper-evident by construction.",
+  },
+] as const;
+
+const GOVERNANCE = [
+  {
+    icon: FileText,
+    title: "Tamper-evident audit trail",
+    body: "Every decision is recorded, timestamped, and attributed. Logs are designed for regulatory review, forensic analysis, and compliance preparation — no exceptions, no gaps.",
+  },
+  {
+    icon: Lock,
+    title: "Mechanical enforcement",
+    body: "Policy gates that cannot be bypassed or silently overridden. Every override is logged. Enforcement is deterministic — not advisory.",
+  },
+  {
+    icon: Brain,
+    title: "Explainable reasoning",
+    body: "Every risk score is backed by transparent logic — never a black box. Suitable for executive briefings, regulator inquiries, and third-party audits.",
+  },
+] as const;
+
+const WHO_FOR = [
+  {
+    icon: Server,
+    title: "Platform & SRE leads",
+    body: "You decide what AI-assisted tooling is allowed to do in production, and you need that decision enforced, not just documented.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Security & compliance leaders",
+    body: "You need a defensible, tamper-evident record of every AI-assisted operational decision — before an auditor asks, not after.",
+  },
+  {
+    icon: Compass,
+    title: "Teams adopting AI-driven operations",
+    body: "You want the speed of autonomous AI without losing the ability to explain, in writing, what happened and why.",
+  },
+] as const;
+
+const INDUSTRIES = [
+  { name: "Financial Services", icon: Building2 },
+  { name: "Healthcare", icon: HeartPulse },
+  { name: "Government & Defence", icon: Landmark },
+  { name: "Critical Infrastructure", icon: Factory },
+  { name: "Enterprise AI Platforms", icon: Globe },
+] as const;
+
+const SPECS = [
+  "Core Governance Engine",
+  "API Control Plane",
+  "Enterprise Layer",
+  "Enterprise Specification",
+] as const;
+
+const PILOT_STATS = [
+  { to: 100, suffix: "%", label: "of autonomous actions gated and recorded" },
+  { to: 42, suffix: "ms", label: "median policy evaluation overhead" },
+  { to: 0, suffix: "", label: "silent overrides — every exception is signed" },
+] as const;
+
+const TIERS = [
+  {
+    name: "Sandbox",
+    meta: "Simulation only",
+    price: "Free",
+    items: [
+      "1,000 evaluations / month",
+      "Mock responses — not production",
+      "Community support",
+    ],
+    cta: { label: "Try the sandbox", href: "#explore" },
+    dominant: false,
+  },
+  {
+    name: "Pilot",
+    meta: "Time-limited · free",
+    price: "By review",
+    items: [
+      "Protected core access",
+      "Outcome-based or retainer after pilot",
+      "Founder-led onboarding",
+    ],
+    cta: { label: "Request Pilot Access", href: "/signup" },
+    dominant: false,
+  },
+  {
+    name: "Enterprise",
+    meta: "Commercial · custom",
+    price: "Custom",
+    items: [
+      "Custom deployment fee",
+      "Outcome-based or retainer maintenance",
+      "SSO, multi-tenancy, SLA",
+      "Full enforcement + audit trails",
+    ],
+    cta: { label: "Talk to us", href: "/signup" },
+    dominant: true,
+  },
+] as const;
+
+export default function LandingPage() {
+  const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState<string | null>(null);
+  const [sandboxLoading, setSandboxLoading] = useState(false);
+  const [sandboxResponse, setSandboxResponse] = useState<Record<
+    string,
+    unknown
+  > | null>(null);
+  const [sandboxError, setSandboxError] = useState<string | null>(null);
+
   const isMounted = useRef(true);
-
-  const fetchRisk = useCallback(async () => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/get_risk`, {
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        if (response.status === 401) throw new Error('Unauthorized – check API credentials');
-        if (response.status === 404) throw new Error('Risk endpoint not found');
-        if (response.status >= 500) throw new Error('Server error – please try later');
-        throw new Error(`HTTP error ${response.status}`);
-      }
-
-      const rawData = await response.json();
-      
-      // Validate response schema
-      const validatedData = RiskDataSchema.parse(rawData);
-
-      if (isMounted.current) {
-        setRisk(validatedData);
-        setFetchedAt(new Date());
-        setError(null);
-      }
-    } catch (err: unknown) {
-      if (isMounted.current) {
-        if (err instanceof Error && err.name === 'AbortError') {
-          setError('Request timed out – please check your connection');
-        } else if (err instanceof z.ZodError) {
-          setError('Unable to parse risk data – invalid format from server');
-        } else if (err instanceof Error) {
-          setError(err.message || 'Failed to load risk data');
-        } else {
-          setError('Failed to load risk data');
-        }
-      }
-    } finally {
-      if (isMounted.current) {
-        setLoading(false);
-      }
-    }
-  }, []);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
     isMounted.current = true;
-    fetchRisk();
-
+    const pending = timers.current;
     return () => {
       isMounted.current = false;
+      pending.forEach(clearTimeout);
     };
-  }, [fetchRisk]);
+  }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl" role="status" aria-label="Loading">
-          <div className="animate-pulse">Loading risk data...</div>
-        </div>
-      </div>
-    );
-  }
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(CURL_COMMAND);
+      setCopied(true);
+      timers.current.push(
+        setTimeout(() => isMounted.current && setCopied(false), 2000),
+      );
+    } catch (err) {
+      console.warn("Clipboard copy failed:", err);
+      setCopyError("Could not copy the curl command");
+      timers.current.push(
+        setTimeout(() => isMounted.current && setCopyError(null), 2000),
+      );
+    }
+  };
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-          <div role="alert" className="text-red-600 mb-6">
-            <p className="font-bold mb-2">Error</p>
-            <p>{error}</p>
-          </div>
-          <button
-            onClick={() => {
-              setLoading(true);
-              fetchRisk();
-            }}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const fetchSandboxResponse = async () => {
+    setSandboxLoading(true);
+    setSandboxError(null);
+    try {
+      // Relative path through next.config.ts's rewrite (/api/v1/:path* ->
+      // the sandbox API), not the absolute URL: the CSP's connect-src does
+      // not allowlist the sandbox's own domain, so a direct browser fetch
+      // to it is silently blocked. The displayed CURL_COMMAND above keeps
+      // the real external URL -- that's accurate for someone running curl
+      // from their own machine, unaffected by this page's CSP.
+      const res = await fetch("/api/v1/evaluate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_name: "api",
+          event_type: "latency",
+          severity: "high",
+          metrics: { latency_ms: 450 },
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = (await res.json()) as Record<string, unknown>;
+      if (isMounted.current) setSandboxResponse(data);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (isMounted.current) setSandboxError(message);
+    } finally {
+      if (isMounted.current) setSandboxLoading(false);
+    }
+  };
 
-  if (!risk) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        No risk data available
-      </div>
-    );
-  }
-
-  const statusColor = 
-    risk.status === 'critical' ? 'bg-red-600' :
-    risk.status === 'warning' ? 'bg-yellow-500' :
-    'bg-green-500';
+  const { ref: capsRef, inView: capsInView } = useInView({
+    threshold: 0.15,
+    once: true,
+  });
+  const { ref: govRef, inView: govInView } = useInView({
+    threshold: 0.15,
+    once: true,
+  });
+  const { ref: pricingRef, inView: pricingInView } = useInView({
+    threshold: 0.15,
+    once: true,
+  });
+  const { ref: whoRef, inView: whoInView } = useInView({
+    threshold: 0.15,
+    once: true,
+  });
+  const { ref: industriesRef, inView: industriesInView } = useInView({
+    threshold: 0.15,
+    once: true,
+  });
+  const { ref: quoteRef, inView: quoteInView } = useInView({
+    threshold: 0.4,
+    once: true,
+  });
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">ARF System Risk</h1>
-        
-        <div className="mb-6">
-          <div className="flex justify-between mb-2">
-            <span className="text-gray-600 text-sm font-medium">Risk Score</span>
-            <span className="font-mono text-2xl font-bold text-gray-900">
-              {(risk.system_risk * 100).toFixed(0)}%
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded h-2">
-            <div
-              className={`h-2 rounded transition-all ${statusColor}`}
-              style={{ width: `${risk.system_risk * 100}%` }}
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-gray-600">Status</span>
-          <span className={`px-3 py-1 rounded-full text-white font-medium text-sm ${statusColor}`}>
-            {risk.status.toUpperCase()}
+    <div className="arf-page-root">
+      {/* ─── Hero: badge, headline, ONE subheadline, two CTAs ──────────────────
+          No longer paired with a decision-path visual here -- that content
+          duplicated the Architecture section's pipeline one scroll down.
+          Single canonical version now lives there (components/ArchitecturePipeline). */}
+      {/* ─── "What's new" strip — surfaces recent shipped capability to
+          first-time visitors (ICPs evaluating trust/maturity) without
+          adding a 5th item to NavBar's deliberately-curated 4-link set. */}
+      <div className="border-b border-[color:var(--hairline)] bg-[color:var(--surface-raised)] py-2.5 text-center text-sm">
+        <Link
+          href="/changelog"
+          className="inline-flex items-center gap-2 text-[color:var(--text-secondary)] transition hover:text-arf-blue"
+        >
+          <span className="rounded-full bg-gradient-to-br from-arf-blue to-arf-purple px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.05em] text-white">
+            New
           </span>
-        </div>
-
-        {fetchedAt && (
-          <p className="text-xs text-gray-500 text-center">
-            Last updated: {fetchedAt.toLocaleTimeString()}
-          </p>
-        )}
+          Explainable governance decisions + real PDF compliance export
+          <ArrowRight size={13} />
+        </Link>
       </div>
+
+      <section className="arf-hero-wash">
+        <div className="arf-shell py-[88px] pb-[104px]">
+          <div className="mx-auto max-w-[680px] text-center">
+            <p className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-arf-blue/25 bg-[color:var(--surface-raised)]/75 px-3 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-arf-blue">
+              <span className="h-1.5 w-1.5 rounded-full bg-arf-blue" />
+              Control plane for autonomous AI
+            </p>
+            <h1 className="mx-auto mb-6 max-w-[20ch] text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[1.03] tracking-[-0.033em] text-pretty">
+              Enterprise infrastructure for{" "}
+              <span className="arf-gradient-text">autonomous AI</span>
+            </h1>
+            <p className="mx-auto mb-9 max-w-[52ch] text-[18.5px] leading-[1.6] text-[color:var(--text-secondary)] text-pretty">
+              Safely deploy autonomous AI in production with deterministic
+              governance, continuous reliability, and enterprise-grade
+              auditability.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Link href="/signup" className="arf-btn-primary">
+                Request Pilot Access <ArrowRight size={18} />
+              </Link>
+              <Link href="/dashboard" className="arf-btn-secondary">
+                Console
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Trust & compliance strip: the 3-second social-proof bar ─────────── */}
+      <section className="bg-arf-dark py-[46px]">
+        <div className="arf-shell grid gap-10 md:grid-cols-3">
+          {TRUST.map((item) => (
+            <div key={item.title} className="flex gap-4">
+              <item.icon
+                className="mt-0.5 h-6 w-6 flex-shrink-0 text-[#7fa0ff]"
+                strokeWidth={1.5}
+              />
+              <div>
+                <h2 className="mb-1.5 text-[15.5px] font-semibold tracking-[-0.012em] text-white">
+                  {item.title}
+                </h2>
+                <p className="text-[13.5px] leading-[1.55] text-white/70">
+                  {item.body}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Trusted-by row (placeholder marks until real logos land) ────────── */}
+      <section className="arf-shell pb-[88px] pt-16 text-center">
+        <p className="arf-eyebrow mb-6">Deployed and evaluated with</p>
+        <div className="flex flex-wrap items-center justify-center gap-12">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              aria-hidden
+              className="h-6 w-[104px] rounded-[3px] bg-[repeating-linear-gradient(135deg,rgba(25,24,22,0.15)_0_2px,transparent_2px_7px)] dark:bg-[repeating-linear-gradient(135deg,rgba(250,249,247,0.18)_0_2px,transparent_2px_7px)]"
+            />
+          ))}
+        </div>
+        <p className="mt-3.5 font-mono text-[9.5px] uppercase tracking-[0.1em] text-[color:var(--text-muted)]">
+          logo placeholders
+        </p>
+      </section>
+
+      {/* ─── Problem / Solution / Outcome ────────────────────────────────────── */}
+      <section className="arf-shell pb-[112px]">
+        <div className="arf-card grid md:grid-cols-3">
+          {[
+            {
+              label: "Problem",
+              tone: "text-[#b0453a]",
+              body: "AI agents make autonomous decisions that are difficult to govern, audit, and control.",
+            },
+            {
+              label: "Solution",
+              tone: "text-arf-blue",
+              body: "ARF applies deterministic policy enforcement before every autonomous action.",
+            },
+            {
+              label: "Outcome",
+              tone: "text-arf-purple",
+              body: "Every decision becomes explainable, auditable, and operationally trustworthy.",
+            },
+          ].map((item, idx) => (
+            <div
+              key={item.label}
+              className={`p-10 ${idx < 2 ? "border-b border-[color:var(--hairline)] md:border-b-0 md:border-r" : ""}`}
+            >
+              <p
+                className={`mb-3.5 font-mono text-[11px] font-medium uppercase tracking-[0.14em] ${item.tone}`}
+              >
+                {item.label}
+              </p>
+              <p className="text-[17px] leading-[1.55] text-pretty">
+                {item.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Who ARF is for — audience, not proof; arf-card-light per the card-
+          weight system (exploratory/secondary), sitting between the Problem/
+          Solution/Outcome trio and Why ARF? so "is this me" resolves before
+          "why this approach". See DESIGN_RATIONALE.md §3/§6/§9. ────────────── */}
+      <section ref={whoRef} className="arf-shell pb-24">
+        <div className="mb-10 grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="arf-eyebrow mb-3.5">Audience</p>
+            <h2 className="text-h2 font-semibold">Who ARF is for</h2>
+          </div>
+          <p className="max-w-[56ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
+            Built for the moment AI agents stop recommending and start acting on
+            production infrastructure.
+          </p>
+        </div>
+        <div className="grid gap-[22px] md:grid-cols-3">
+          {WHO_FOR.map((item, idx) => (
+            <div
+              key={item.title}
+              className={`arf-card-light arf-reveal p-8 ${whoInView ? "arf-reveal-in" : ""}`}
+              style={{ transitionDelay: whoInView ? `${idx * 90}ms` : "0ms" }}
+            >
+              <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-[11px] bg-gradient-to-br from-arf-blue to-arf-purple">
+                <item.icon className="h-5 w-5 text-white" strokeWidth={1.75} />
+              </div>
+              <h3 className="mb-3 text-[19px] font-semibold tracking-[-0.016em]">
+                {item.title}
+              </h3>
+              <p className="text-[15px] leading-[1.6] text-[color:var(--text-secondary)]">
+                {item.body}
+              </p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-8 text-[13.5px] text-[color:var(--text-muted)]">
+          Not there yet? The sandbox below is exactly for that — ARF is built
+          for the step after evaluation, not instead of it.
+        </p>
+      </section>
+
+      {/* ─── Why ARF? ────────────────────────────────────────────────────────── */}
+      <section className="arf-shell grid gap-16 pb-24 lg:grid-cols-[0.9fr_1.1fr]">
+        <h2 className="max-w-[12ch] text-h2 font-semibold">Why ARF?</h2>
+        <div>
+          <p className="mb-5 text-[21px] font-semibold leading-[1.45] tracking-[-0.014em] text-pretty">
+            Foundation models are probabilistic. Enterprise operations require
+            deterministic control. ARF bridges that gap.
+          </p>
+          <p className="text-body text-[color:var(--text-secondary)] text-pretty">
+            Autonomous AI promises unprecedented speed and scale, but without
+            governance it introduces unacceptable operational risk. ARF provides
+            the missing control plane — translating probabilistic model outputs
+            into verifiable, auditable actions that align with your business
+            policies.
+          </p>
+        </div>
+      </section>
+
+      {/* ─── Why Now? ────────────────────────────────────────────────────────── */}
+      <section className="arf-shell pb-[112px]">
+        <div className="grid gap-16 rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 px-14 py-[60px] lg:grid-cols-[0.9fr_1.1fr]">
+          <h2 className="max-w-[12ch] text-h2 font-semibold">Why now?</h2>
+          <div>
+            <p className="mb-4.5 text-body text-[color:var(--text-primary)]/85 text-pretty">
+              Autonomous AI is moving from copilots to autonomous workflows. As
+              AI gains the ability to act — not just recommend — organisations
+              need infrastructure that governs execution, manages operational
+              risk, and provides auditability by design.
+            </p>
+            <p className="text-body text-[color:var(--text-secondary)] text-pretty">
+              ARF AI delivers that control plane. Built for the era where AI
+              doesn&rsquo;t just answer questions — it deploys code, modifies
+              infrastructure, and makes decisions that affect business outcomes.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Industries ──────────────────────────────────────────────────────── */}
+      <section ref={industriesRef} className="arf-shell pb-[120px]">
+        <div className="mb-7 flex flex-wrap items-baseline justify-between gap-6">
+          <h2 className="text-[27px] font-semibold tracking-[-0.022em]">
+            Built for regulated enterprises
+          </h2>
+          <p className="text-sm text-[color:var(--text-muted)]">
+            Compliance, safety, and accountability are non-negotiable.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2.5">
+          {INDUSTRIES.map((ind, idx) => (
+            <div
+              key={ind.name}
+              className={`arf-reveal flex items-center gap-3 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-raised)] px-5 py-3 shadow-[0_10px_24px_-22px_rgba(25,24,22,0.5)] ${industriesInView ? "arf-reveal-in" : ""}`}
+              style={{
+                transitionDelay: industriesInView ? `${idx * 60}ms` : "0ms",
+              }}
+            >
+              <ind.icon className="h-4 w-4 text-arf-blue" strokeWidth={1.75} />
+              <span className="text-sm font-semibold tracking-[-0.01em]">
+                {ind.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Architecture — one animated pipeline, no restated copies ─────────── */}
+      <section id="architecture" className="arf-shell pb-[120px]">
+        <p className="arf-eyebrow mb-3.5">Architecture</p>
+        <h2 className="mb-11 text-h2 font-semibold">How ARF works</h2>
+        <div className="arf-card p-5 sm:p-8 lg:p-11">
+          <ArchitecturePipeline />
+        </div>
+      </section>
+
+      {/* ─── Enterprise capabilities ─────────────────────────────────────────── */}
+      <section id="capabilities" ref={capsRef} className="arf-shell pb-[120px]">
+        <div className="mb-10 grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="arf-eyebrow mb-3.5">Product</p>
+            <h2 className="text-h2 font-semibold">Enterprise capabilities</h2>
+          </div>
+          <p className="max-w-[56ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
+            Four subsystems, one control plane. Every capability is observable
+            from the Governance Console and enforceable from the API.
+          </p>
+        </div>
+        <div className="grid gap-[22px] md:grid-cols-2">
+          {CAPABILITIES.map((cap, idx) => (
+            <div
+              key={cap.n}
+              className={`arf-reveal ${capsInView ? "arf-reveal-in" : ""}`}
+              style={{ transitionDelay: capsInView ? `${idx * 90}ms` : "0ms" }}
+            >
+              <CapabilityCard {...cap} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Enterprise-grade governance — the proof section, most visual weight ─ */}
+      <section
+        ref={govRef}
+        className="border-y border-[color:var(--hairline)] bg-[color:var(--surface-raised)] py-[104px]"
+      >
+        <div className="arf-shell">
+          <div className="mb-11 grid gap-16 lg:grid-cols-[0.85fr_1.15fr]">
+            <h2 className="max-w-[14ch] text-h2-lg font-semibold">
+              Enterprise-grade governance
+            </h2>
+            <p className="max-w-[52ch] self-end text-body text-[color:var(--text-secondary)] text-pretty">
+              The three properties a compliance officer will ask about in the
+              first meeting. Each one is a mechanism, not a policy document.
+            </p>
+          </div>
+          <div className="grid gap-[22px] md:grid-cols-3">
+            {GOVERNANCE.map((item, idx) => (
+              <div
+                key={item.title}
+                className={`arf-card-substantial arf-reveal arf-reveal-deliberate bg-[color:var(--surface-canvas)] p-9 ${govInView ? "arf-reveal-in" : ""}`}
+                style={{
+                  transitionDelay: govInView ? `${idx * 110}ms` : "0ms",
+                }}
+              >
+                <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-[11px] bg-gradient-to-br from-arf-blue to-arf-purple">
+                  <item.icon
+                    className="h-5 w-5 text-white"
+                    strokeWidth={1.75}
+                  />
+                </div>
+                <h3 className="mb-3 text-[19px] font-semibold tracking-[-0.016em]">
+                  {item.title}
+                </h3>
+                <p className="text-[15px] leading-[1.6] text-[color:var(--text-secondary)]">
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Case study / testimonial band ───────────────────────────────────── */}
+      <section ref={quoteRef} className="arf-dark-wash bg-arf-dark py-[104px]">
+        <div className="arf-shell grid items-center gap-16 lg:grid-cols-[1.15fr_0.85fr]">
+          <div>
+            <p className="mb-6 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-white/60">
+              Pilot feedback · placeholder quote
+            </p>
+            <blockquote className="mb-7 font-serif text-[clamp(1.75rem,3vw,2.125rem)] font-light italic leading-[1.35] tracking-[-0.01em] text-white text-pretty">
+              &ldquo;We could not put agents anywhere near production until
+              every action had a gate in front of it and a record behind it. ARF
+              gave our risk committee something they could actually read.&rdquo;
+            </blockquote>
+            <div className="flex items-center gap-3.5">
+              <div
+                aria-hidden
+                className="h-[38px] w-[38px] rounded-full bg-[repeating-linear-gradient(135deg,rgba(250,249,247,0.22)_0_2px,transparent_2px_7px)]"
+              />
+              <div>
+                <p className="text-[14.5px] font-semibold text-white">
+                  Head of AI Platform
+                </p>
+                <p className="text-[13.5px] text-white/65">
+                  Tier-1 financial services · pilot organisation
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-white/15 bg-white/[0.06] p-8">
+            <p className="mb-6 font-mono text-[10.5px] font-medium uppercase tracking-[0.13em] text-white/60">
+              Pilot outcome · illustrative
+            </p>
+            <dl className="flex flex-col gap-5">
+              {PILOT_STATS.map((stat, idx) => (
+                <div
+                  key={stat.label}
+                  className={idx > 0 ? "border-t border-white/15 pt-5" : ""}
+                >
+                  <dt className="mb-1 text-[32px] font-semibold leading-none tracking-[-0.028em] text-white tabular-nums">
+                    <PilotStat
+                      to={stat.to}
+                      suffix={stat.suffix}
+                      start={quoteInView}
+                    />
+                  </dt>
+                  <dd className="text-[13.5px] leading-[1.5] text-white/70">
+                    {stat.label}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Access models ───────────────────────────────────────────────────── */}
+      <section id="pricing" ref={pricingRef} className="arf-shell py-[112px]">
+        <div className="mb-11 grid gap-16 lg:grid-cols-[0.9fr_1.1fr]">
+          <h2 className="max-w-[12ch] text-h2 font-semibold">Access models</h2>
+          <p className="max-w-[56ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
+            A fixed deployment fee, plus either outcome-based pricing or a
+            monthly retainer. Pilot access is time-limited and free for
+            qualified organisations — no commitment required.
+          </p>
+        </div>
+        <div className="grid items-start gap-[22px] md:grid-cols-3">
+          {TIERS.map((tier, idx) => {
+            const delay = {
+              transitionDelay: pricingInView ? `${idx * 90}ms` : "0ms",
+            };
+            return tier.dominant ? (
+              <div
+                key={tier.name}
+                className={`arf-reveal rounded-2xl bg-gradient-to-br from-arf-blue to-arf-purple p-0.5 shadow-[0_30px_60px_-30px_rgba(51,88,232,0.6)] ${pricingInView ? "arf-reveal-in" : ""}`}
+                style={delay}
+              >
+                <div className="rounded-[14px] bg-[color:var(--surface-raised)] p-9">
+                  <TierBody {...tier} renderLink={Link} />
+                </div>
+              </div>
+            ) : (
+              <div
+                key={tier.name}
+                className={`arf-card-light arf-reveal p-8 ${pricingInView ? "arf-reveal-in" : ""}`}
+                style={delay}
+              >
+                <TierBody {...tier} renderLink={Link} />
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ─── Explore ARF — API / Console / Specs, one sandbox notice ─────────── */}
+      <section id="explore" className="arf-shell pb-[104px]">
+        <div className="mb-8 flex flex-wrap items-baseline justify-between gap-8">
+          <h2 className="text-h2 font-semibold">Explore ARF</h2>
+          <p className="max-w-[50ch] text-[13.5px] leading-[1.6] text-[color:var(--text-secondary)] lg:text-right">
+            The public sandbox returns simulated responses only. Real
+            enforcement and confidence guarantees require a pilot agreement.
+          </p>
+        </div>
+        <div className="grid gap-[22px] lg:grid-cols-[1.2fr_0.9fr_0.9fr]">
+          {/* API */}
+          <SandboxCard
+            curlCommand={CURL_COMMAND}
+            loading={sandboxLoading}
+            response={sandboxResponse}
+            error={sandboxError}
+            copied={copied}
+            onTryLive={fetchSandboxResponse}
+            onCopy={handleCopy}
+          />
+
+          {/* Console */}
+          <ConsoleCard href="/dashboard" renderLink={Link} />
+
+          {/* Specs */}
+          <SpecsCard specs={SPECS} href="/signup" renderLink={Link} />
+        </div>
+      </section>
+
+      {copyError && (
+        <div className="animate-slide-up fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg bg-[#b0453a] px-4 py-2 text-sm text-white shadow-lg">
+          {copyError}
+        </div>
+      )}
     </div>
+  );
+}
+
+/* ============================ Sub-components ============================== */
+
+/* Hooks can't be called inside .map() -- this exists so each pilot stat gets
+   its own useCountUp() call, one per mounted instance, instead of trying to
+   call the hook three times from a loop. */
+function PilotStat({
+  to,
+  suffix,
+  start,
+}: {
+  to: number;
+  suffix: string;
+  start: boolean;
+}) {
+  const value = useCountUp(to, { start });
+  return (
+    <>
+      {value}
+      {suffix}
+    </>
   );
 }

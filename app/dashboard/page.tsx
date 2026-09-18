@@ -1,223 +1,1600 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useCallback } from 'react';
-import Link from 'next/link';
-import { RiskData, Decision, HistoryDataPoint } from '../types';
-import EvaluateForm from './EvaluateForm';
-import MemoryStats from './MemoryStats';
-import RecentDecisions from './RecentDecisions';
-import RiskChart from './RiskChart';
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { useAnimatedNumber } from "../hooks/useAnimatedNumber";
+import {
+  ArrowRight,
+  RefreshCw,
+  Network,
+  Shield,
+  Lock,
+  FileText,
+  AlertTriangle,
+  Clock,
+  Printer,
+  ChevronRight,
+  Download,
+} from "lucide-react";
+import DashboardBottomNav from "../../components/DashboardBottomNav";
+import {
+  DashboardMetricCard,
+  RiskGauge,
+  RiskFactorBreakdown,
+  StatusBadge,
+  riskColor,
+  ExplainabilityModal,
+  type ExplainabilitySection,
+  PrintableReportModal,
+} from "@arf/ui";
 
-export default function DashboardPage() {
-  const [risk, setRisk] = useState<RiskData | null>(null);
-  const [history, setHistory] = useState<HistoryDataPoint[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+/* ============================================================================
+   Design-migration pass (P3, enterprise-refresh audit). Structure and mock
+   data are unchanged -- this re-skins the page onto the token system
+   app/page.tsx and app/pricing/page.tsx already use: arf-page-root,
+   .arf-card-substantial in place of the single repeated bg-gray-800/90
+   backdrop-blur rounded-2xl border pattern (13 instances before this),
+   the gradient-tint panel pattern for the two CTA bands, and CSS custom
+   properties (--surface-*, --text-*, --hairline) everywhere a color was
+   previously a flat gray-N shade, so the page now actually respects the
+   site's light/dark toggle instead of always being dark.
+
+   Kept deliberately theme-invariant: the APPROVE/DENY/ESCALATE and
+   severity badges. These are semantic status color, not the brand accent,
+   and stay as dark chips regardless of page theme -- the same choice
+   .arf-card-anchored already makes elsewhere in this design system.
+   ========================================================================= */
+
+// ----------------------------------------------------------------------
+// Type definitions (unchanged)
+// ----------------------------------------------------------------------
+interface RiskBreakdown {
+  conjugate: number;
+  hmc: number;
+  hyperprior: number;
+}
+
+interface RiskWeights {
+  conjugate: number;
+  hmc: number;
+  hyperprior: number;
+}
+
+interface RiskData {
+  risk: number;
+  status: "critical" | "warning" | "safe";
+  breakdown: RiskBreakdown;
+  weights: RiskWeights;
+  variance: number;
+}
+
+interface QuotaData {
+  tier: string;
+  remaining: number;
+  limit: number;
+}
+
+interface Incident {
+  id: number;
+  timestamp: string;
+  service: string;
+  metric: string;
+  value: string;
+  risk: number;
+  action: "APPROVE" | "DENY" | "ESCALATE";
+}
+
+interface PolicyViolation {
+  id: string;
+  policy: string;
+  component: string;
+  severity: "low" | "medium" | "high";
+  timestamp: string;
+}
+
+interface CooldownEntry {
+  id: string;
+  component: string;
+  policy: string;
+  kind: "cooldown" | "rate_limit";
+  status: string;
+}
+
+interface AuditLogEntry {
+  id: string;
+  action: string;
+  component: string;
+  riskScore: number;
+  decision: string;
+  timestamp: string;
+  user: string;
+}
+
+// ----------------------------------------------------------------------
+// Helper: generate deterministic mock risk data (unchanged)
+// ----------------------------------------------------------------------
+const generateMockRisk = (): RiskData => {
+  const seed = Math.floor(Date.now() / 10000);
+  const random = (min: number, max: number) => {
+    const x = Math.sin(seed) * 10000;
+    const r = x - Math.floor(x);
+    return min + r * (max - min);
+  };
+  const risk = random(0.2, 0.95);
+  let status: RiskData["status"] = "warning";
+  if (risk > 0.7) status = "critical";
+  else if (risk < 0.4) status = "safe";
+
+  const conjWeight = random(0.3, 0.7);
+  const hmcWeight = random(0.1, 0.4);
+  const hyperWeight = 1 - conjWeight - hmcWeight;
+  return {
+    risk,
+    status,
+    breakdown: {
+      conjugate: conjWeight * risk,
+      hmc: hmcWeight * risk,
+      hyperprior: hyperWeight * risk,
+    },
+    weights: { conjugate: conjWeight, hmc: hmcWeight, hyperprior: hyperWeight },
+    variance: random(0.01, 0.1),
+  };
+};
+
+const MOCK_INCIDENTS: Incident[] = [
+  {
+    id: 1,
+    timestamp: "2026-05-14 10:23:45",
+    service: "payment-api",
+    metric: "latency",
+    value: "450ms",
+    risk: 0.82,
+    action: "ESCALATE",
+  },
+  {
+    id: 2,
+    timestamp: "2026-05-14 09:15:22",
+    service: "auth-service",
+    metric: "error_rate",
+    value: "12%",
+    risk: 0.45,
+    action: "APPROVE",
+  },
+  {
+    id: 3,
+    timestamp: "2026-05-13 22:10:05",
+    service: "database",
+    metric: "cpu_usage",
+    value: "92%",
+    risk: 0.71,
+    action: "ESCALATE",
+  },
+  {
+    id: 4,
+    timestamp: "2026-05-13 18:30:19",
+    service: "cache",
+    metric: "hit_rate",
+    value: "34%",
+    risk: 0.38,
+    action: "APPROVE",
+  },
+  {
+    id: 5,
+    timestamp: "2026-05-13 14:45:03",
+    service: "message-queue",
+    metric: "backlog",
+    value: "1250",
+    risk: 0.63,
+    action: "DENY",
+  },
+];
+
+const MOCK_POLICY_VIOLATIONS: PolicyViolation[] = [
+  {
+    id: "v1",
+    policy: "RegionAllowedPolicy",
+    component: "payment-api",
+    severity: "high",
+    timestamp: "2026-05-14 11:02:33",
+  },
+  {
+    id: "v2",
+    policy: "CostThresholdPolicy",
+    component: "database",
+    severity: "medium",
+    timestamp: "2026-05-14 10:15:22",
+  },
+  {
+    id: "v3",
+    policy: "MaxPermissionLevelPolicy",
+    component: "auth-service",
+    severity: "low",
+    timestamp: "2026-05-13 23:45:01",
+  },
+];
+
+// Same two rows as before, just as data instead of hand-duplicated JSX --
+// values unchanged, needed to give each row its own explain trigger.
+const MOCK_COOLDOWNS: CooldownEntry[] = [
+  {
+    id: "cd1",
+    component: "payment-api",
+    policy: "latency_gt_100",
+    kind: "cooldown",
+    status: "Cooldown: 45s remaining",
+  },
+  {
+    id: "cd2",
+    component: "database",
+    policy: "cpu_high",
+    kind: "rate_limit",
+    status: "Rate limit: 2/5 per hour",
+  },
+];
+
+const MOCK_AUDIT_LOGS: AuditLogEntry[] = [
+  {
+    id: "a1",
+    action: "ProvisionResource",
+    component: "payment-api",
+    riskScore: 0.82,
+    decision: "ESCALATE",
+    timestamp: "2026-05-14 10:23:45",
+    user: "system",
+  },
+  {
+    id: "a2",
+    action: "GrantAccess",
+    component: "auth-service",
+    riskScore: 0.45,
+    decision: "APPROVE",
+    timestamp: "2026-05-14 09:15:22",
+    user: "admin@example.com",
+  },
+  {
+    id: "a3",
+    action: "DeployConfig",
+    component: "database",
+    riskScore: 0.71,
+    decision: "ESCALATE",
+    timestamp: "2026-05-13 22:10:05",
+    user: "devops@example.com",
+  },
+  {
+    id: "a4",
+    action: "ScaleOut",
+    component: "cache",
+    riskScore: 0.38,
+    decision: "APPROVE",
+    timestamp: "2026-05-13 18:30:19",
+    user: "system",
+  },
+  {
+    id: "a5",
+    action: "Rollback",
+    component: "message-queue",
+    riskScore: 0.63,
+    decision: "DENY",
+    timestamp: "2026-05-13 14:45:03",
+    user: "sre@example.com",
+  },
+];
+
+const mockMemoryStats = {
+  similar_incidents: 3,
+  rag_similarity: 0.78,
+  memory_usage: "FAISS IndexFlatL2 (384 dim)",
+  cache_hits: 124,
+};
+
+// ----------------------------------------------------------------------
+// Audit Trail explainability -- one decision record's provenance.
+//
+// This describes the REAL ARF engine's methodology (Bayesian risk fusion,
+// doubly-robust causal counterfactual estimation, immutable+signable
+// records) applied to this simulated row. Two things are deliberately
+// NOT claimed, because they aren't true of the OSS/sandbox path:
+//   - that this specific number was computed live by that engine (it's a
+//     illustrative derivation from the mock riskScore, labeled as such)
+//   - that "similar past incidents" retrieval is semantic/NLP similarity
+//     (it's metric-fingerprint similarity -- see the Semantic Memory card)
+// ----------------------------------------------------------------------
+const SANDBOX_FOOTER =
+  "Sandbox illustration — this reflects the real ARF engine's methodology applied to simulated inputs, not a live production evaluation.";
+
+function auditLogExplanation(log: AuditLogEntry): {
+  title: string;
+  summary: string;
+  sections: ExplainabilitySection[];
+  footer: string;
+} {
+  const riskBand =
+    log.riskScore >= 0.7 ? "high" : log.riskScore >= 0.4 ? "moderate" : "low";
+  const outcome =
+    log.decision === "ESCALATE"
+      ? "escalated for review"
+      : log.decision === "DENY"
+        ? "blocked"
+        : "approved automatically";
+  const altAction =
+    log.decision === "APPROVE"
+      ? "denied"
+      : log.decision === "DENY"
+        ? "approved"
+        : "auto-approved without escalation";
+  // Illustrative, derived from the mock risk score -- not a live estimate.
+  const illustrativeDelta = Math.round(log.riskScore * 28);
+
+  return {
+    title: `${log.action} — ${log.component}`,
+    summary: `This ${log.action} on ${log.component} was ${outcome} because the risk model scored it in the ${riskBand} band (${(log.riskScore * 100).toFixed(0)}%). The decision record below is immutable once created.`,
+    sections: [
+      {
+        heading: "Risk assessment",
+        body: (
+          <>
+            Risk score {log.riskScore.toFixed(2)} comes from ARF&rsquo;s
+            Bayesian fusion model: a fast per-category conjugate prior, an
+            offline Hamiltonian Monte Carlo model over contextual features, and
+            hierarchical shrinkage across categories, combined by weight of
+            evidence. Posterior variance — the model&rsquo;s own uncertainty in
+            this score — shrinks as more real outcomes are observed for{" "}
+            {log.component}.
+          </>
+        ),
+      },
+      {
+        heading: "Counterfactual",
+        body: (
+          <>
+            If this had been {altAction} instead, ARF&rsquo;s doubly-robust
+            causal effect estimator projects success probability would have
+            shifted by roughly {illustrativeDelta}% (illustrative for this
+            sandbox — the real estimator combines inverse-probability weighting
+            with outcome regression, reports a bootstrap confidence interval,
+            and includes an E-value check for how much unmeasured confounding
+            would overturn the result).
+          </>
+        ),
+      },
+      {
+        heading: "Record integrity",
+        body: (
+          <>
+            Decision records are deep-frozen at creation — every field becomes
+            immutable — and can be signed with RSA-SHA256 for tamper detection.
+            Attributed to <span className="font-mono">{log.user}</span> at{" "}
+            {log.timestamp}.
+          </>
+        ),
+      },
+    ],
+    footer: SANDBOX_FOOTER,
+  };
+}
+
+function systemRiskExplanation(risk: RiskData): {
+  title: string;
+  summary: string;
+  sections: ExplainabilitySection[];
+  footer: string;
+} {
+  return {
+    title: "System Risk — how this score is computed",
+    summary: `This request scored ${(risk.risk * 100).toFixed(0)}% (${risk.status}). ARF combines three independent estimates into one risk score, weighted by how much evidence backs each.`,
+    sections: [
+      {
+        heading: "Model architecture",
+        body: (
+          <>
+            A fast-updating conjugate Beta prior tracks outcomes per category
+            from day one. An offline Hamiltonian Monte Carlo model adds
+            contextual/time-based signal once enough history exists.
+            Hierarchical shrinkage pulls sparse categories toward a shared trend
+            across categories. The three are combined by weight of evidence —
+            categories with little history lean on the conjugate prior;
+            well-observed categories lean more on the trained models.
+          </>
+        ),
+      },
+      {
+        heading: "Uncertainty",
+        body: (
+          <>
+            Posterior variance ({risk.variance.toFixed(4)}) is the analytic
+            variance of the model&rsquo;s own Beta distribution — real Bayesian
+            uncertainty, not a guess, and it shrinks as more real outcomes are
+            observed. The confidence interval shown above is an illustrative
+            band derived from that variance for this sandbox; it is not
+            necessarily the same construction production deployments use.
+          </>
+        ),
+      },
+      {
+        heading: "Fusion weights",
+        body: (
+          <>
+            This score currently weights conjugate{" "}
+            {risk.weights.conjugate.toFixed(2)}, HMC{" "}
+            {risk.weights.hmc.toFixed(2)}, hyperprior{" "}
+            {risk.weights.hyperprior.toFixed(2)}. HMC and hyperprior are
+            optional refinements — if either model isn&rsquo;t trained yet for a
+            category, weight shifts back to the always-available conjugate prior
+            rather than failing.
+          </>
+        ),
+      },
+    ],
+    footer: SANDBOX_FOOTER,
+  };
+}
+
+function semanticMemoryExplanation(stats: typeof mockMemoryStats): {
+  title: string;
+  summary: string;
+  sections: ExplainabilitySection[];
+  footer: string;
+} {
+  return {
+    title: "Semantic Memory — how similar incidents are found",
+    summary: `ARF found ${stats.similar_incidents} related past incidents for this request, with a top similarity score of ${stats.rag_similarity.toFixed(2)}.`,
+    sections: [
+      {
+        heading: "Retrieval method",
+        body: (
+          <>
+            Incidents are indexed in a FAISS nearest-neighbor index (
+            {stats.memory_usage}) and ranked by similarity s = 1 / (1 +
+            distance) between the current incident&rsquo;s fingerprint and each
+            stored one.
+          </>
+        ),
+      },
+      {
+        heading: 'What "similar" means',
+        body: (
+          <>
+            In the open-source/sandbox tier, incident fingerprints are built
+            from structured metrics — component, metric type, error rate,
+            latency — not natural-language understanding. Two incidents are
+            similar because their operational signature matches, not because a
+            language model read and compared their descriptions.
+          </>
+        ),
+      },
+      {
+        heading: "Why it matters for this decision",
+        body: (
+          <>
+            Retrieved incidents feed a weighted success-rate estimate that
+            adjusts for each action&rsquo;s own causal effect, so a policy that
+            &ldquo;worked&rdquo; several times isn&rsquo;t credited for outcomes
+            that would have happened anyway.
+          </>
+        ),
+      },
+    ],
+    footer: SANDBOX_FOOTER,
+  };
+}
+
+function policyViolationExplanation(v: PolicyViolation): {
+  title: string;
+  summary: string;
+  sections: ExplainabilitySection[];
+  footer: string;
+} {
+  const severityNote =
+    v.severity === "high"
+      ? "high-severity violations block the action outright"
+      : v.severity === "medium"
+        ? "medium-severity violations are logged and typically escalated for review"
+        : "low-severity violations are logged for audit without blocking";
+
+  return {
+    title: `${v.policy} — ${v.component}`,
+    summary: `${v.policy} flagged ${v.component} as a ${v.severity}-severity violation. Policies are evaluated deterministically, before any action reaches infrastructure.`,
+    sections: [
+      {
+        heading: "How policies are structured",
+        body: (
+          <>
+            ARF policies compose from simple boolean building blocks (AND / OR /
+            NOT) into rules like this one, formally specified so their behavior
+            is provable rather than only tested by example.
+          </>
+        ),
+      },
+      {
+        heading: "Severity",
+        body: (
+          <>
+            Severity ({v.severity}) reflects how directly this violation could
+            affect production safety or compliance — {severityNote}.
+          </>
+        ),
+      },
+      {
+        heading: "Enforcement",
+        body: (
+          <>
+            Policy evaluation runs mechanically before infrastructure access is
+            granted — not as an advisory suggestion a human can silently skip.
+            In production, a secondary evaluator cross-checks results and logs
+            any disagreement for investigation.
+          </>
+        ),
+      },
+    ],
+    footer: SANDBOX_FOOTER,
+  };
+}
+
+function cooldownExplanation(c: CooldownEntry): {
+  title: string;
+  summary: string;
+  sections: ExplainabilitySection[];
+  footer: string;
+} {
+  const metricHint = c.policy.includes("latency")
+    ? "response latency"
+    : c.policy.includes("cpu")
+      ? "CPU utilization"
+      : "a monitored metric";
+
+  return {
+    title: `${c.component} — ${c.policy}`,
+    summary: `${c.component} is currently under a ${c.kind === "cooldown" ? "cooldown" : "rate limit"} from policy ${c.policy}: ${c.status}.`,
+    sections: [
+      {
+        heading: "Why rate limits exist",
+        body: (
+          <>
+            Healing policies define not just when to act, but how often — a
+            cooldown window after an action fires, and a maximum
+            executions-per-hour cap — so an unstable signal can&rsquo;t trigger
+            a runaway loop of automated responses.
+          </>
+        ),
+      },
+      {
+        heading: "This policy",
+        body: (
+          <>
+            Policy <span className="font-mono">{c.policy}</span> conditions on{" "}
+            {metricHint}. Once triggered, it enters a{" "}
+            {c.kind === "cooldown" ? "cooldown" : "rate-limit"} state before it
+            can fire again on this component.
+          </>
+        ),
+      },
+    ],
+    footer: SANDBOX_FOOTER,
+  };
+}
+
+// ----------------------------------------------------------------------
+// Reusable components
+// ----------------------------------------------------------------------
+const TrustBadges = () => (
+  <div className="my-6 flex flex-wrap justify-center gap-3">
+    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs">
+      <Shield className="h-3.5 w-3.5 text-arf-blue" /> SOC2 Type II (Roadmap)
+    </div>
+    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs">
+      <Shield className="h-3.5 w-3.5 text-arf-blue" /> ISO 27001 (Roadmap)
+    </div>
+    <div className="flex items-center gap-1.5 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] px-3 py-1.5 text-xs">
+      <Shield className="h-3.5 w-3.5 text-arf-purple" /> GDPR-aligned (design goal)
+    </div>
+  </div>
+);
+
+const Testimonial = () => (
+  <div className="my-6 rounded-xl border-l-4 border-arf-blue bg-[color:var(--surface-sunken)] p-5 font-serif italic text-[color:var(--text-secondary)]">
+    “ARF caught a misconfiguration that would have exposed customer data. The
+    audit trail saved us hours of investigation.”
+    <br />
+    <span className="mt-2 block font-sans font-medium not-italic text-[color:var(--text-primary)]">
+      — CISO, Fortune 500 (pilot customer)
+    </span>
+  </div>
+);
+
+const LegalFooter = () => (
+  <div className="mt-8 flex flex-wrap justify-center gap-4 border-t border-[color:var(--hairline)] pt-6 text-center text-xs text-[color:var(--text-muted)]">
+    <Link href="/terms" className="hover:text-[color:var(--text-primary)]">
+      Terms of Service
+    </Link>
+    <Link href="/privacy" className="hover:text-[color:var(--text-primary)]">
+      Privacy Policy
+    </Link>
+    {/* Imprint link removed: pointed at /legal/imprint, which doesn't exist
+        anywhere in this app. Not repointing it at /terms or /privacy --
+        an Impressum covers different legal content (company registration,
+        address) that isn't safe to fabricate or imply from either page. */}
+    <a
+      href="mailto:juan@arf-ai.com"
+      className="hover:text-[color:var(--text-primary)]"
+    >
+      Contact
+    </a>
+  </div>
+);
+
+// ----------------------------------------------------------------------
+// Main Dashboard Component
+// ----------------------------------------------------------------------
+type TabType = "risk" | "governance" | "compliance";
+
+const TABS: { id: TabType; label: string }[] = [
+  { id: "risk", label: "Risk Intelligence" },
+  { id: "governance", label: "Governance Operations" },
+  { id: "compliance", label: "Compliance" },
+];
+
+export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState<TabType>("risk");
+  const [riskData, setRiskData] = useState<RiskData | null>(null);
+  // Before any early return -- hooks can't follow a conditional return.
+  // Falls back to 0 while riskData is still null (pre-first-load); the tween
+  // then plays for real the moment the first real value lands.
+  const displayedRiskPct = useAnimatedNumber(
+    riskData ? riskData.risk * 100 : 0,
+  );
+  const [quota, setQuota] = useState<QuotaData | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isHttpWarning, setIsHttpWarning] = useState(false);
+  const [explainLog, setExplainLog] = useState<AuditLogEntry | null>(null);
+  const [showRiskExplain, setShowRiskExplain] = useState(false);
+  const [showMemoryExplain, setShowMemoryExplain] = useState(false);
+  const [explainViolation, setExplainViolation] =
+    useState<PolicyViolation | null>(null);
+  const [explainCooldown, setExplainCooldown] = useState<CooldownEntry | null>(
+    null,
+  );
+  const [reportGeneratedAt, setReportGeneratedAt] = useState<string | null>(
+    null,
+  );
+  const [downloadingReport, setDownloadingReport] = useState(false);
+  const [reportDownloadError, setReportDownloadError] = useState<string | null>(
+    null,
+  );
 
-  const fetchData = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    try {
-      const riskRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/get_risk`, {
-        headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.protocol === "http:") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsHttpWarning(true);
+    }
+  }, []);
+
+  // Roving-tabindex arrow-key navigation for the desktop tablist (WAI-ARIA
+  // tabs pattern): Left/Right (and Home/End) move selection + focus.
+  const handleTabListKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const currentIndex = TABS.findIndex((t) => t.id === activeTab);
+    let nextIndex: number;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % TABS.length;
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + TABS.length) % TABS.length;
+    } else if (e.key === "Home") {
+      nextIndex = 0;
+    } else if (e.key === "End") {
+      nextIndex = TABS.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    const nextId = TABS[nextIndex].id;
+    setActiveTab(nextId);
+    document.getElementById(`tab-${nextId}`)?.focus();
+  };
+
+  const refreshData = useCallback(() => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      const newRisk = generateMockRisk();
+      setRiskData(newRisk);
+      setQuota({
+        tier: "pro",
+        remaining: Math.floor(Math.random() * 500) + 100,
+        limit: 1000,
       });
-      if (!riskRes.ok) throw new Error(`Risk API error: ${riskRes.status}`);
-      const riskData: RiskData = await riskRes.json();
-      setRisk(riskData);
-
-      const historyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/history`, {
-        headers: { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '' }
-      });
-      if (historyRes.ok) {
-        const historyData: Decision[] = await historyRes.json();
-        const formatted: HistoryDataPoint[] = historyData.map((item) => ({
-          timestamp: item.timestamp,
-          risk: item.risk_score ?? 0,
-        }));
-        setHistory(formatted);
-      } else {
-        console.warn('History API not available');
-      }
-
       setLastUpdated(new Date());
+      setIsRefreshing(false);
+    }, 500);
+  }, []);
+
+  const downloadComplianceReport = useCallback(async () => {
+    setDownloadingReport(true);
+    setReportDownloadError(null);
+    try {
+      // Matches lib/governanceMockData's fixed mock timestamp range -- this
+      // report has no date-range picker (yet), so it always requests the
+      // full range the mock data actually spans.
+      const res = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          startDate: "2026-05-13",
+          endDate: "2026-05-14",
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        throw new Error(data?.error || `HTTP ${res.status}`);
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "arf-compliance-report.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to connect to API. Please check that the backend is running.');
+      setReportDownloadError(
+        err instanceof Error ? err.message : "Failed to generate report",
+      );
     } finally {
-      if (isRefresh) setRefreshing(false);
-      else setLoading(false);
+      setDownloadingReport(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refreshData();
+    const interval = setInterval(refreshData, 30000);
+    return () => clearInterval(interval);
+  }, [refreshData]);
 
-  const formatLastUpdated = () => {
-    if (!lastUpdated) return '';
-    return lastUpdated.toLocaleTimeString();
-  };
-
-  if (loading) {
+  if (!riskData) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
-        <div className="text-xl">Loading dashboard...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex flex-col items-center justify-center p-4">
-        <div className="bg-gray-800/80 border border-red-500/30 p-6 rounded-lg shadow-lg max-w-md text-center">
-          <h2 className="text-2xl font-bold mb-2 text-red-400">Connection Error</h2>
-          <p className="mb-4 text-gray-300">{error}</p>
-          <p className="text-sm text-gray-400">
-            Make sure the ARF API is running at: {process.env.NEXT_PUBLIC_API_URL}
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-          >
-            Retry
-          </button>
-        </div>
+      <div className="arf-page-root flex min-h-screen items-center justify-center p-4">
+        <div className="animate-pulse text-xl">Loading simulation...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              ARF Dashboard
-            </h1>
+    <div className="arf-page-root min-h-screen">
+      <div className="arf-shell py-8 pb-24 sm:py-10 md:pb-10">
+        <div className="space-y-6">
+          {/* HTTP Warning (unchanged logic) */}
+          {isHttpWarning && (
+            <div className="rounded-lg border border-[#b3392a]/30 bg-[#b3392a]/10 p-3 text-center">
+              <p className="text-sm text-[#b3392a]">
+                ⚠️ Security warning: You are viewing this page over HTTP.
+                Sensitive data (simulated) could be intercepted.{" "}
+                <a
+                  href={window.location.href.replace("http:", "https:")}
+                  className="ml-2 font-semibold underline hover:opacity-80"
+                >
+                  Switch to HTTPS
+                </a>
+              </p>
+            </div>
+          )}
+
+          {/* Sandbox Disclaimer */}
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-arf-blue/25 bg-arf-blue/10 p-3 text-center">
+            <p className="flex-1 text-sm text-[color:var(--text-secondary)]">
+              🔍 Public sandbox – all data is simulated. Production governance
+              requires a pilot agreement.
+            </p>
             <Link
-              href="/changelog"
-              className="text-sm bg-gray-800/60 text-blue-300 px-2 py-1 rounded-full hover:bg-gray-700 transition border border-blue-500/30"
+              href="/signup"
+              className="whitespace-nowrap text-sm font-medium text-arf-blue underline hover:opacity-80"
             >
-              v4.2.0
+              Request Pilot Access →
             </Link>
           </div>
-          <div className="flex items-center gap-4">
-            {lastUpdated && (
-              <span className="text-sm text-gray-400">
-                Last updated: {formatLastUpdated()}
-              </span>
-            )}
-            <button
-              onClick={() => fetchData(true)}
-              disabled={refreshing}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-800/50 transition flex items-center gap-2 shadow-lg shadow-blue-500/20"
-            >
-              {refreshing ? (
-                <>
-                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Refreshing...
-                </>
-              ) : (
-                'Refresh Data'
-              )}
-            </button>
-          </div>
-        </div>
 
-        {/* Top row: current risk + memory stats */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6 hover:border-blue-500/50 transition-all duration-300 shadow-lg">
-            <h2 className="text-lg font-semibold mb-4 text-gray-200">Current System Risk</h2>
-            {risk && (
-              <>
-                <div className="flex items-baseline justify-between mb-2">
-                  <span className="text-gray-400">Risk Score</span>
-                  <span className="text-5xl font-mono font-bold text-blue-400 glow-text">
-                    {risk.system_risk.toFixed(3)}
-                  </span>
+          {/* Page heading + tab switcher. Previously the only heading was an
+              <h1> inside the Risk tab's own card, so Governance and
+              Compliance had no <h1> anywhere on the page. Also: the only
+              control that ever called setActiveTab was DashboardBottomNav,
+              which is md:hidden -- there was no way to reach Governance or
+              Compliance at all on desktop. This adds both a real, always-
+              visible tablist and a persistent page heading. */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <h1 className="text-h2 font-semibold">Governance Console</h1>
+            <div
+              role="tablist"
+              aria-label="Dashboard sections"
+              onKeyDown={handleTabListKeyDown}
+              className="hidden gap-2 md:flex"
+            >
+              {TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  id={`tab-${tab.id}`}
+                  aria-selected={activeTab === tab.id}
+                  aria-controls={`tabpanel-${tab.id}`}
+                  tabIndex={activeTab === tab.id ? 0 : -1}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                    activeTab === tab.id
+                      ? "bg-gradient-to-br from-arf-blue to-arf-purple text-white"
+                      : "bg-[color:var(--surface-sunken)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Risk Tab Content */}
+          {activeTab === "risk" && (
+            <div
+              className="space-y-6"
+              role="tabpanel"
+              id="tabpanel-risk"
+              aria-labelledby="tab-risk"
+              tabIndex={0}
+            >
+              <DashboardMetricCard
+                title="System Risk"
+                action={
+                  <button
+                    onClick={refreshData}
+                    disabled={isRefreshing}
+                    aria-label="Refresh data"
+                    className="rounded-lg border border-[color:var(--hairline)] p-2 transition hover:border-arf-blue disabled:opacity-50"
+                  >
+                    <RefreshCw
+                      size={18}
+                      className={isRefreshing ? "animate-spin" : ""}
+                    />
+                  </button>
+                }
+                footer={
+                  lastUpdated &&
+                  `Last updated: ${lastUpdated.toLocaleTimeString()}`
+                }
+              >
+                <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
+                  <div className="flex-shrink-0">
+                    <RiskGauge risk={riskData.risk} size={180} />
+                  </div>
+                  <div className="flex-1 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-sm text-[color:var(--text-muted)]">
+                          Risk Score
+                        </div>
+                        <div
+                          className="text-3xl font-bold tabular-nums transition-colors duration-500"
+                          style={{ color: riskColor(riskData.risk) }}
+                        >
+                          {displayedRiskPct.toFixed(0)}%
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-[color:var(--text-muted)]">
+                          Status
+                        </div>
+                        <StatusBadge status={riskData.status} />
+                      </div>
+                      <div>
+                        <div className="text-sm text-[color:var(--text-muted)]">
+                          Posterior Variance
+                        </div>
+                        <div className="font-mono text-lg">
+                          {riskData.variance.toFixed(4)}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-[color:var(--text-muted)]">
+                          Confidence Interval (90%)
+                        </div>
+                        <div className="font-mono text-sm">
+                          [
+                          {Math.max(
+                            0,
+                            riskData.risk -
+                              1.645 * Math.sqrt(riskData.variance),
+                          ).toFixed(2)}
+                          ,{" "}
+                          {Math.min(
+                            1,
+                            riskData.risk +
+                              1.645 * Math.sqrt(riskData.variance),
+                          ).toFixed(2)}
+                          ]
+                        </div>
+                      </div>
+                    </div>
+                    <RiskFactorBreakdown
+                      breakdown={riskData.breakdown}
+                      weights={riskData.weights}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowRiskExplain(true)}
+                      aria-haspopup="dialog"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-arf-blue hover:opacity-80"
+                    >
+                      Why this score? <ArrowRight size={14} />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-baseline justify-between">
-                  <span className="text-gray-400">Status</span>
-                  <span className={`px-3 py-1 rounded-full text-white font-medium ${
-                    risk.status === 'critical' ? 'bg-red-600' : 'bg-yellow-600'
-                  }`}>
-                    {risk.status.toUpperCase()}
-                  </span>
-                </div>
-                {risk.confidence_interval && (
-                  <div className="mt-4">
-                    <div className="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-blue-500 rounded-full" 
-                        style={{ 
-                          width: `${(risk.confidence_interval[1] - risk.confidence_interval[0]) * 100}%`,
-                          marginLeft: `${risk.confidence_interval[0] * 100}%`
+              </DashboardMetricCard>
+
+              {showRiskExplain && (
+                <ExplainabilityModal
+                  open={showRiskExplain}
+                  onClose={() => setShowRiskExplain(false)}
+                  {...systemRiskExplanation(riskData)}
+                />
+              )}
+
+              <TrustBadges />
+
+              {quota && (
+                <div className="arf-card-substantial p-6">
+                  <div className="mb-4 flex items-start justify-between">
+                    <h2 className="text-h3 font-semibold">Plan (Sandbox)</h2>
+                    <span className="rounded-full bg-gradient-to-br from-arf-blue to-arf-purple px-3 py-1 text-xs font-medium text-white">
+                      {quota.tier.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="mb-4">
+                    <div className="mb-1 flex justify-between text-sm">
+                      <span className="text-[color:var(--text-secondary)]">
+                        Remaining evaluations this month
+                      </span>
+                      <span className="font-mono font-medium">
+                        {quota.remaining.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-[color:var(--surface-sunken)]">
+                      <div
+                        className="h-2 rounded-full bg-arf-blue"
+                        style={{
+                          width: `${(quota.remaining / quota.limit) * 100}%`,
                         }}
                       />
                     </div>
-                    <div className="flex justify-between text-xs text-gray-400 mt-1">
-                      <span>{risk.confidence_interval[0].toFixed(3)}</span>
-                      <span>90% CI</span>
-                      <span>{risk.confidence_interval[1].toFixed(3)}</span>
+                    <p className="mt-2 text-xs text-[color:var(--text-muted)]">
+                      Limit: {quota.limit.toLocaleString()} evaluations/month
+                      (simulated)
+                    </p>
+                  </div>
+                  <Link
+                    href="/pricing"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-arf-blue hover:opacity-80"
+                  >
+                    Pricing <ArrowRight size={14} />
+                  </Link>
+                </div>
+              )}
+
+              <DashboardMetricCard
+                title="Semantic Memory (Sandbox)"
+                icon={Network}
+              >
+                <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-4">
+                  <div>
+                    <div className="text-2xl font-bold text-arf-blue">
+                      {mockMemoryStats.similar_incidents}
+                    </div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Similar Incidents
                     </div>
                   </div>
-                )}
-              </>
-            )}
-          </div>
+                  <div>
+                    <div className="text-2xl font-bold text-arf-purple">
+                      {mockMemoryStats.rag_similarity.toFixed(2)}
+                    </div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      RAG Similarity
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-[#a66a1e]">
+                      {mockMemoryStats.cache_hits}
+                    </div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Cache Hits
+                    </div>
+                  </div>
+                  <div>
+                    <div className="break-words font-mono text-xs text-[color:var(--text-secondary)]">
+                      {mockMemoryStats.memory_usage}
+                    </div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Index Type
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowMemoryExplain(true)}
+                  aria-haspopup="dialog"
+                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-arf-blue hover:opacity-80"
+                >
+                  How this works <ArrowRight size={14} />
+                </button>
+              </DashboardMetricCard>
 
-          <MemoryStats />
-        </div>
+              {showMemoryExplain && (
+                <ExplainabilityModal
+                  open={showMemoryExplain}
+                  onClose={() => setShowMemoryExplain(false)}
+                  {...semanticMemoryExplanation(mockMemoryStats)}
+                />
+              )}
 
-        {/* Risk History Chart */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6 mb-8 hover:border-blue-500/50 transition-all duration-300 shadow-lg">
-          <h2 className="text-lg font-semibold mb-4 text-gray-200">Risk History (Last 24h)</h2>
-          <RiskChart data={history} />
-        </div>
+              <div className="arf-card-substantial p-6">
+                <h2 className="mb-4 text-h3 font-semibold">
+                  Recent Incidents (Sandbox)
+                </h2>
+                <div className="hidden overflow-x-auto sm:block">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-[color:var(--hairline)]">
+                        <th className="px-2 py-2 text-left">Time</th>
+                        <th className="px-2 py-2 text-left">Service</th>
+                        <th className="px-2 py-2 text-left">Metric</th>
+                        <th className="px-2 py-2 text-right">Value</th>
+                        <th className="px-2 py-2 text-right">Risk</th>
+                        <th className="px-2 py-2 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {MOCK_INCIDENTS.map((inc) => (
+                        <tr
+                          key={inc.id}
+                          className="border-b border-[color:var(--hairline)]"
+                        >
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                            {inc.timestamp}
+                          </td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                            {inc.service}
+                          </td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                            {inc.metric}
+                          </td>
+                          <td className="px-2 py-2 text-right font-mono text-[color:var(--text-secondary)]">
+                            {inc.value}
+                          </td>
+                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">
+                            {inc.risk.toFixed(2)}
+                          </td>
+                          <td className="px-2 py-2 text-right">
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === "ESCALATE" ? "bg-[#b3392a]" : inc.action === "DENY" ? "bg-[#a66a1e]" : "bg-[#3f7a5c]"}`}
+                            >
+                              {inc.action}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {/* The table above is hidden below sm with no prior fallback --
+                    was invisible on every phone. Stacked cards instead of just
+                    letting the table scroll, since 6 columns of dense numeric
+                    data doesn't reflow to a narrow screen as readably as it
+                    scrolls; same row data, same values. */}
+                <div className="flex flex-col gap-2.5 sm:hidden">
+                  {MOCK_INCIDENTS.map((inc) => (
+                    <div
+                      key={inc.id}
+                      className="rounded-lg bg-[color:var(--surface-sunken)] p-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm">{inc.service}</p>
+                          <p className="text-xs text-[color:var(--text-muted)]">
+                            {inc.timestamp}
+                          </p>
+                        </div>
+                        <span
+                          className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === "ESCALATE" ? "bg-[#b3392a]" : inc.action === "DENY" ? "bg-[#a66a1e]" : "bg-[#3f7a5c]"}`}
+                        >
+                          {inc.action}
+                        </span>
+                      </div>
+                      <div className="mt-2 flex items-center justify-between text-xs text-[color:var(--text-muted)]">
+                        <span>
+                          {inc.metric}:{" "}
+                          <span className="font-mono text-[color:var(--text-secondary)]">
+                            {inc.value}
+                          </span>
+                        </span>
+                        <span>
+                          Risk:{" "}
+                          <span className="font-mono text-[#a66a1e]">
+                            {inc.risk.toFixed(2)}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 text-center text-xs text-[color:var(--text-muted)]">
+                  Simulated data for demonstration purposes only.
+                </p>
+              </div>
 
-        {/* Evaluate Form (enhanced) */}
-        <div className="mb-8">
-          <EvaluateForm />
-        </div>
+              <Testimonial />
+            </div>
+          )}
 
-        {/* Recent Decisions (enhanced) */}
-        <div className="mb-8">
-          <RecentDecisions />
-        </div>
-
-        {/* Additional Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6 hover:border-blue-500/50 transition-all duration-300 shadow-lg">
-            <h3 className="text-lg font-semibold mb-2 text-blue-400">🤗 Explore the Stack</h3>
-            <p className="text-gray-300 mb-3">
-              Discover complementary tools for AI reliability, forecasting, and incident triage.
-            </p>
-            <a
-              href="https://huggingface.co/collections/petter2025/reliable-ai-systems-stack"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-blue-400 hover:text-blue-300 transition"
+          {/* Governance Tab Content */}
+          {activeTab === "governance" && (
+            <div
+              className="space-y-6"
+              role="tabpanel"
+              id="tabpanel-governance"
+              aria-labelledby="tab-governance"
+              tabIndex={0}
             >
-              Visit Reliable AI Systems Stack →
-            </a>
-          </div>
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6 hover:border-blue-500/50 transition-all duration-300 shadow-lg">
-            <h3 className="text-lg font-semibold mb-2 text-blue-400">📢 What&apos;s New in v4.2.0</h3>
-            <p className="text-gray-300 mb-3">
-              Full risk factor decomposition, traceable governance loop, and improved API docs.
-            </p>
-            <Link
-              href="/changelog"
-              className="inline-flex items-center text-blue-400 hover:text-blue-300 transition"
+              <DashboardMetricCard
+                title="Policy Violations (Last 7 days)"
+                icon={AlertTriangle}
+                iconClassName="text-[#a66a1e]"
+                footer="Simulated data – real engine provides live policy enforcement. Click a violation to see why it fired."
+              >
+                <div className="space-y-3">
+                  {MOCK_POLICY_VIOLATIONS.map((v) => (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => setExplainViolation(v)}
+                      aria-haspopup="dialog"
+                      aria-label={`Explain ${v.policy} on ${v.component}`}
+                      className="flex w-full flex-col gap-1 rounded-lg bg-[color:var(--surface-sunken)] p-3 text-left transition hover:bg-[color:var(--hairline)] sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+                    >
+                      <div>
+                        <span className="font-mono text-sm">{v.policy}</span>
+                        <span className="ml-2 text-xs text-[color:var(--text-muted)]">
+                          on {v.component}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs text-white ${v.severity === "high" ? "bg-[#b3392a]" : v.severity === "medium" ? "bg-[#a66a1e]" : "bg-arf-blue"}`}
+                        >
+                          {v.severity.toUpperCase()}
+                        </span>
+                        <span className="text-xs text-[color:var(--text-muted)]">
+                          {v.timestamp}
+                        </span>
+                        <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </DashboardMetricCard>
+
+              {explainViolation && (
+                <ExplainabilityModal
+                  open={!!explainViolation}
+                  onClose={() => setExplainViolation(null)}
+                  {...policyViolationExplanation(explainViolation)}
+                />
+              )}
+
+              <DashboardMetricCard
+                title="Audit Trail (Recent decisions)"
+                icon={FileText}
+                footer="Audit logs are immutable and cryptographically signable in production. Click a row to see how a decision was reached."
+              >
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-[color:var(--hairline)]">
+                        <th className="px-2 py-2 text-left">Timestamp</th>
+                        <th className="px-2 py-2 text-left">Component</th>
+                        <th className="px-2 py-2 text-left">Action</th>
+                        <th className="px-2 py-2 text-right">Risk</th>
+                        <th className="px-2 py-2 text-right">Decision</th>
+                        <th className="px-2 py-2 text-left">User</th>
+                        <th className="px-2 py-2 text-right">
+                          <span className="sr-only">Explain</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {MOCK_AUDIT_LOGS.map((log) => (
+                        <tr
+                          key={log.id}
+                          className="border-b border-[color:var(--hairline)] transition hover:bg-[color:var(--surface-sunken)]"
+                        >
+                          <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">
+                            {log.timestamp}
+                          </td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                            {log.component}
+                          </td>
+                          <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                            {log.action}
+                          </td>
+                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">
+                            {log.riskScore.toFixed(2)}
+                          </td>
+                          <td className="px-2 py-2 text-right">
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-xs text-white ${log.decision === "ESCALATE" ? "bg-[#b3392a]" : log.decision === "DENY" ? "bg-[#a66a1e]" : "bg-[#3f7a5c]"}`}
+                            >
+                              {log.decision}
+                            </span>
+                          </td>
+                          <td className="px-2 py-2 text-[color:var(--text-muted)]">
+                            {log.user}
+                          </td>
+                          <td className="px-2 py-2 text-right">
+                            <button
+                              type="button"
+                              onClick={() => setExplainLog(log)}
+                              aria-label={`Explain ${log.action} on ${log.component}`}
+                              aria-haspopup="dialog"
+                              className="inline-flex items-center justify-center rounded-lg p-1"
+                            >
+                              <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </DashboardMetricCard>
+
+              {explainLog && (
+                <ExplainabilityModal
+                  open={!!explainLog}
+                  onClose={() => setExplainLog(null)}
+                  {...auditLogExplanation(explainLog)}
+                />
+              )}
+
+              <DashboardMetricCard
+                title="Cooldown & Rate Limits (Sandbox)"
+                icon={Clock}
+                iconClassName="text-[#a66a1e]"
+              >
+                <div className="space-y-3">
+                  {MOCK_COOLDOWNS.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setExplainCooldown(c)}
+                      aria-haspopup="dialog"
+                      aria-label={`Explain ${c.policy} on ${c.component}`}
+                      className="flex w-full items-center justify-between rounded-lg bg-[color:var(--surface-sunken)] p-3 text-left transition hover:bg-[color:var(--hairline)]"
+                    >
+                      <div>
+                        <span className="font-mono text-sm">{c.component}</span>
+                        <span className="ml-2 text-xs text-[color:var(--text-muted)]">
+                          (policy: {c.policy})
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">
+                          {c.status}
+                        </span>
+                        <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </DashboardMetricCard>
+
+              {explainCooldown && (
+                <ExplainabilityModal
+                  open={!!explainCooldown}
+                  onClose={() => setExplainCooldown(null)}
+                  {...cooldownExplanation(explainCooldown)}
+                />
+              )}
+
+              <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-6 text-center">
+                <h2 className="mb-2 text-h3 font-semibold">
+                  Take full control of governance
+                </h2>
+                <p className="mb-4 text-[color:var(--text-secondary)]">
+                  Policy enforcement, audit trails, and compliance reporting are
+                  available in the real engine.
+                </p>
+                <Link href="/signup" className="arf-btn-primary">
+                  Request Pilot Access <ArrowRight size={16} />
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Compliance Tab Content */}
+          {activeTab === "compliance" && (
+            <div
+              className="space-y-6"
+              role="tabpanel"
+              id="tabpanel-compliance"
+              aria-labelledby="tab-compliance"
+              tabIndex={0}
             >
-              Read the changelog →
-            </Link>
-          </div>
+              <div className="arf-card-substantial p-6">
+                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold">
+                  <Shield className="h-5 w-5 text-[#3f7a5c]" /> Compliance &
+                  Certifications
+                </h2>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center">
+                    <div className="text-2xl font-bold text-[color:var(--text-muted)]">○</div>
+                    <div className="text-sm">SOC2 Type II</div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Roadmap
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center">
+                    <div className="text-2xl font-bold text-[color:var(--text-muted)]">○</div>
+                    <div className="text-sm">ISO 27001</div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Roadmap
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-[color:var(--surface-sunken)] p-3 text-center">
+                    <div className="text-2xl font-bold text-[color:var(--text-muted)]">○</div>
+                    <div className="text-sm">GDPR</div>
+                    <div className="text-xs text-[color:var(--text-muted)]">
+                      Design goal
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-4 text-xs text-[color:var(--text-muted)]">
+                  The real engine provides evidence packages for auditors.
+                </p>
+              </div>
+
+              <div className="arf-card-substantial p-6">
+                <h2 className="mb-4 flex items-center gap-2 text-h3 font-semibold">
+                  <Lock className="h-5 w-5 text-arf-blue" /> Data Retention &
+                  Privacy
+                </h2>
+                <ul className="list-inside list-disc space-y-2 text-sm text-[color:var(--text-secondary)]">
+                  <li>Sandbox logs retained for 30 days</li>
+                  <li>Pilot/Enterprise logs retained up to 12 months</li>
+                  <li>
+                    No raw customer data stored – only anonymised risk metrics
+                  </li>
+                  <li>Production deployments encrypt at rest (AES-256) and in transit (TLS 1.3)</li>
+                  <li>Right to deletion and data portability supported</li>
+                </ul>
+                <p className="mt-4 text-xs text-[color:var(--text-muted)]">
+                  Production security commitments – targeted for pilot rollout, not yet independently audited.
+                </p>
+              </div>
+
+              <div className="arf-card-substantial p-6 text-center">
+                <h2 className="mb-2 text-h3 font-semibold">
+                  Export Compliance Report
+                </h2>
+                <p className="mb-4 text-[color:var(--text-secondary)]">
+                  Generate a summary report of governance decisions, policy
+                  violations, and system status for auditors.
+                </p>
+                <button
+                  onClick={() =>
+                    setReportGeneratedAt(
+                      new Date().toLocaleString("en-US", {
+                        dateStyle: "long",
+                        timeStyle: "short",
+                      }),
+                    )
+                  }
+                  className="arf-btn-secondary"
+                >
+                  <Printer size={16} /> Generate report
+                </button>
+                <p className="mt-3 text-xs text-[color:var(--text-muted)]">
+                  Report data is simulated — production deployments generate
+                  this automatically from live, immutable governance records.
+                </p>
+              </div>
+
+              {reportGeneratedAt && (
+                <PrintableReportModal
+                  open={!!reportGeneratedAt}
+                  onClose={() => setReportGeneratedAt(null)}
+                  title="ARF Governance Compliance Report"
+                  generatedAt={reportGeneratedAt}
+                  footer="Simulated report — generated from public sandbox data, not a live production audit export. The real engine produces this automatically from immutable, signable decision records."
+                  actions={
+                    <button
+                      type="button"
+                      onClick={downloadComplianceReport}
+                      disabled={downloadingReport}
+                      className="arf-btn-primary disabled:opacity-60"
+                    >
+                      <Download size={16} />{" "}
+                      {downloadingReport ? "Generating PDF…" : "Download PDF"}
+                    </button>
+                  }
+                >
+                  <div className="rounded-lg border border-arf-blue/25 bg-arf-blue/10 p-3 text-center text-sm text-[color:var(--text-secondary)]">
+                    🔍 Simulated sandbox report — reporting period: last 7 days.
+                  </div>
+                  {reportDownloadError && (
+                    <p className="text-center text-sm text-[#b3392a]">
+                      Couldn&rsquo;t generate the PDF: {reportDownloadError}
+                    </p>
+                  )}
+
+                  <section>
+                    <h3 className="arf-eyebrow mb-3">System status</h3>
+                    <div className="grid grid-cols-2 gap-4 rounded-lg border border-[color:var(--hairline)] p-4 sm:grid-cols-4">
+                      <div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Current risk
+                        </div>
+                        <div
+                          className="text-lg font-bold"
+                          style={{ color: riskColor(riskData.risk) }}
+                        >
+                          {(riskData.risk * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Status
+                        </div>
+                        <StatusBadge status={riskData.status} />
+                      </div>
+                      <div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Policy violations (7d)
+                        </div>
+                        <div className="text-lg font-bold">
+                          {MOCK_POLICY_VIOLATIONS.length}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Decisions logged
+                        </div>
+                        <div className="text-lg font-bold">
+                          {MOCK_AUDIT_LOGS.length}
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="arf-eyebrow mb-3">Policy violations</h3>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-[color:var(--hairline)]">
+                          <th className="px-2 py-2 text-left">Policy</th>
+                          <th className="px-2 py-2 text-left">Component</th>
+                          <th className="px-2 py-2 text-left">Severity</th>
+                          <th className="px-2 py-2 text-left">Timestamp</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {MOCK_POLICY_VIOLATIONS.map((v) => (
+                          <tr
+                            key={v.id}
+                            className="border-b border-[color:var(--hairline)]"
+                          >
+                            <td className="px-2 py-2 font-mono text-xs">
+                              {v.policy}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                              {v.component}
+                            </td>
+                            <td className="px-2 py-2 capitalize text-[color:var(--text-secondary)]">
+                              {v.severity}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-muted)]">
+                              {v.timestamp}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </section>
+
+                  <section>
+                    <h3 className="arf-eyebrow mb-3">Governance decisions</h3>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-[color:var(--hairline)]">
+                          <th className="px-2 py-2 text-left">Timestamp</th>
+                          <th className="px-2 py-2 text-left">Component</th>
+                          <th className="px-2 py-2 text-left">Action</th>
+                          <th className="px-2 py-2 text-right">Risk</th>
+                          <th className="px-2 py-2 text-left">Decision</th>
+                          <th className="px-2 py-2 text-left">User</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {MOCK_AUDIT_LOGS.map((log) => (
+                          <tr
+                            key={log.id}
+                            className="border-b border-[color:var(--hairline)]"
+                          >
+                            <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">
+                              {log.timestamp}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                              {log.component}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                              {log.action}
+                            </td>
+                            <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">
+                              {log.riskScore.toFixed(2)}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-secondary)]">
+                              {log.decision}
+                            </td>
+                            <td className="px-2 py-2 text-[color:var(--text-muted)]">
+                              {log.user}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </section>
+
+                  <section>
+                    <h3 className="arf-eyebrow mb-3">
+                      Compliance certifications
+                    </h3>
+                    <div className="grid grid-cols-3 gap-3 text-center text-sm">
+                      <div className="rounded-lg border border-[color:var(--hairline)] p-3">
+                        <div className="font-semibold">SOC 2 Type II</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Roadmap
+                        </div>
+                      </div>
+                      <div className="rounded-lg border border-[color:var(--hairline)] p-3">
+                        <div className="font-semibold">ISO 27001</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Roadmap
+                        </div>
+                      </div>
+                      <div className="rounded-lg border border-[color:var(--hairline)] p-3">
+                        <div className="font-semibold">GDPR</div>
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          Design goal
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </PrintableReportModal>
+              )}
+
+              <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-6 text-center">
+                <h2 className="mb-2 text-h3 font-semibold">
+                  Get audit‑ready with ARF
+                </h2>
+                <p className="mb-4 text-[color:var(--text-secondary)]">
+                  Immutable logs, deterministic enforcement, and compliance
+                  evidence packages.
+                </p>
+                <Link href="/signup" className="arf-btn-primary">
+                  Request Pilot Access <ArrowRight size={16} />
+                </Link>
+              </div>
+            </div>
+          )}
+
+          <LegalFooter />
         </div>
       </div>
+      <DashboardBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 }

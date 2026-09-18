@@ -1,64 +1,698 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/* Registers the `prose`/`prose-invert` utilities app/privacy and app/terms
+   already use -- the plugin was never installed, so those classes were
+   complete no-ops: every heading/list/paragraph on both legal pages
+   rendered with zero typographic hierarchy. */
+@plugin "@tailwindcss/typography";
+/* Tailwind v4's `dark:` variant defaults to @media (prefers-color-scheme),
+   not this site's actual dark-mode mechanism (a `.dark` class NavBar's
+   toggle adds/removes on <html>, independent of OS preference). Without
+   this, any `dark:`-prefixed utility anywhere in the app would silently
+   follow OS preference instead of the site's own toggle -- confirmed this
+   was already live and wrong on the landing page's trusted-by placeholder
+   stripes (dark:bg-[...]), and would have repeated on every dark:prose-invert
+   this migration needs. Root-cause fix once, here, instead of working
+   around it per class site-wide. Doesn't touch the separate CSS-custom-
+   property token system (--surface-canvas etc.) below, which was already
+   correctly scoped to the `.dark` class directly. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* Existing animations */
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slide-up {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-fade-in {
   animation: fade-in 1s ease-out;
 }
+/* .animate-slide-up is (re)defined below, in the ARF token layer — its only
+   consumer was the old app/page.tsx, now replaced; the redesign's copy-error
+   toast (app/page.tsx) uses the token layer's faster, subtler version. */
 
-.animate-slide-up {
-  animation: slide-up 0.8s ease-out;
-}
-
-/* New animations for deep‑tech vibes */
 @keyframes glow {
-  0%, 100% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-  50% { text-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
+  0%,
+  100% {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 40px rgba(139, 92, 246, 0.8);
+  }
 }
-
 .glow-text {
   animation: glow 3s ease-in-out infinite;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
-
 .float-icon {
   animation: float 4s ease-in-out infinite;
+}
+
+/* ============================================
+   STABLE DIMENSIONS – PREVENT FLICKERING & JUMPS
+   ============================================ */
+.feature-card {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-card .details-expanded {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.feature-card .details-content {
+  transition: max-height 0.2s ease-out;
+}
+
+/* ============================================
+   FORCE SOLID CARD BACKGROUNDS – NO GRID BLEED‑THROUGH
+   ============================================ */
+.bg-gray-800\/90,
+.bg-gray-800\/80,
+.bg-gray-800\/70,
+.bg-gray-800\/60,
+.bg-gray-800\/50,
+.bg-gray-700\/30,
+.bg-gray-700\/50 {
+  background-color: rgb(31 41 55) !important; /* solid gray-800 */
+}
+
+/* Remove old overlay rule – now redundant */
+.relative.z-10.bg-gray-900\/80 {
+  background-color: transparent !important;
+}
+
+/* Optional: make all text containers even more readable */
+main > div:first-child {
+  background-color: transparent;
+}
+
+/* ============================================================================
+   ARF AI — design tokens (enterprise refresh: landing + pricing + NavBar)
+   Appended, not replacing the rules above: the unlayered `body {...}` block
+   near the top of this file (dark gradient background, Arial) is still relied
+   on by /dashboard, /changelog, /history, /privacy, /signup, /terms and
+   LinkedInEmbed, none of which are part of this pass. Cascade layers (below)
+   are always lower-priority than that unlayered rule, so `.arf-page-root`
+   sets background/color/font-family directly on each new page's own root
+   element instead of on `body` — a direct declaration on an element always
+   wins over what it would otherwise have inherited, regardless of layers.
+
+   Light is the primary experience; dark is an equal-parity option.
+   Rationale: warm grays, never pure black on pure white. The recognisable
+   blue→purple gradient survives as a single accent, used sparingly.
+   ========================================================================= */
+
+@theme {
+  /* Type */
+  --font-sans:
+    var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), Georgia, serif;
+  --font-mono:
+    var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Brand accents (unchanged hue family from the previous site, retuned for light) */
+  --color-arf-blue: #3358e8;
+  --color-arf-blue-deep: #2743c4;
+  --color-arf-purple: #7a4be0;
+
+  /* Warm neutral ramp */
+  --color-arf-canvas: #faf9f7;
+  --color-arf-surface: #ffffff;
+  --color-arf-raised: #f5f4f1;
+  --color-arf-ink: #191816;
+  --color-arf-ink-2: #3f3d38;
+  --color-arf-ink-3: #56534d; /* 7.3:1 on canvas — small mono labels */
+  --color-arf-muted: #605c54; /* ~6.3:1 on canvas — eyebrows, secondary; darkened from the
+                                    original #6b6862 (~5.3:1 computed, closest-to-floor token
+                                    in the ramp, sitting directly beside headings site-wide as
+                                    eyebrow labels) after a reported light-mode contrast issue
+                                    with no visual tooling available to pinpoint the exact
+                                    element -- this was the most likely single-token fix. */
+  --color-arf-line: rgba(25, 24, 22, 0.09);
+  --color-arf-dark: #131218;
+
+  /* Type scale — one deliberate ramp, no ad-hoc sizes */
+  --text-display: 3.5rem; /* 56px hero */
+  --text-display--line-height: 1.03;
+  --text-display--letter-spacing: -0.033em;
+  --text-h2: 2.25rem; /* 36px section head */
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.026em;
+  --text-h2-lg: 2.625rem; /* 42px — governance section only */
+  --text-h2-lg--line-height: 1.06;
+  --text-h2-lg--letter-spacing: -0.03em;
+  --text-h3: 1.3125rem; /* 21px card title */
+  --text-h3--line-height: 1.25;
+  --text-h3--letter-spacing: -0.018em;
+  --text-lead: 1.15rem; /* 18.5px hero sub */
+  --text-lead--line-height: 1.6;
+  --text-body: 1.0625rem; /* 17px body */
+  --text-body--line-height: 1.65;
+  --text-small: 0.90625rem; /* 14.5px */
+  --text-small--line-height: 1.6;
+  --text-eyebrow: 0.6875rem; /* 11px mono */
+
+  /* Vertical rhythm — varied on purpose (see DESIGN_RATIONALE.md) */
+  --spacing-section-tight: 4.5rem; /* 72px  — trust strip, logo row */
+  --spacing-section: 6.5rem; /* 104px — default content section */
+  --spacing-section-airy: 7.5rem; /* 120px — capabilities, architecture */
+}
+
+/* --------------------------------------------------------------------------
+   Theme surfaces. Light by default; .dark on <html> flips the ramp.
+   Only surfaces and ink invert — the accent gradient is identical in both.
+   ----------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+  --surface-canvas: var(--color-arf-canvas);
+  --surface-raised: var(--color-arf-surface);
+  --surface-sunken: var(--color-arf-raised);
+  --text-primary: var(--color-arf-ink);
+  --text-secondary: var(--color-arf-ink-3);
+  --text-muted: var(--color-arf-muted);
+  --hairline: var(--color-arf-line);
+  --card-shadow:
+    0 2px 4px rgba(25, 24, 22, 0.03), 0 20px 44px -28px rgba(25, 24, 22, 0.42);
+  --card-shadow-hover:
+    0 4px 8px rgba(25, 24, 22, 0.05), 0 30px 60px -30px rgba(51, 88, 232, 0.5);
+}
+
+/* Was `<html style={{ colorScheme: 'light dark' }}>`, static and unconditional
+   in layout.tsx -- that tells the browser "either scheme is valid, follow the
+   OS," which makes Chromium/Edge apply their own auto-dark-mode colour
+   heuristics on top of the page's actual CSS whenever the OS preference
+   disagrees with which theme the site is *actually* showing (its `.dark`
+   class, driven by the NavBar toggle + localStorage, not the OS). Reported
+   symptom: light theme unreadable while Windows was set to dark, then the
+   same mismatch flipped to the dark theme once Windows switched to light --
+   classic browser-level colour-scheme fighting the page's own theme, not a
+   CSS contrast bug (computed styles were already correct in both cases,
+   confirmed via a real browser). Scoping color-scheme to whichever theme is
+   actually active removes the OS as a variable entirely. */
+.dark {
+  color-scheme: dark;
+  --surface-canvas: #0e0d12;
+  --surface-raised: #17161d;
+  --surface-sunken: #1d1c25;
+  --text-primary: #faf9f7;
+  --text-secondary: rgba(250, 249, 247, 0.72);
+  --text-muted: rgba(250, 249, 247, 0.56);
+  --hairline: rgba(250, 249, 247, 0.12);
+  --card-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 44px -28px rgba(0, 0, 0, 0.8);
+  --card-shadow-hover:
+    0 4px 8px rgba(0, 0, 0, 0.5), 0 30px 60px -30px rgba(51, 88, 232, 0.55);
+}
+
+/* Chromium bug, confirmed live: an element whose `color` (etc.) is set via
+   `var(--text-*)` and is also in a `transition` utility's transition-property
+   list gets stuck rendering the PREVIOUS theme's resolved color forever after
+   the *first* .dark toggle post-load, because the change is only visible via
+   an ancestor's inherited custom property, not a direct rule change on the
+   element itself -- the transition machinery never registers a new "after"
+   value to animate toward. Reproduced on header nav links, FAQ accordion
+   questions, pricing plan titles, etc. (every `text-[color:var(--text-*)]`
+   user). NavBar's toggleTheme applies this class for one frame around the
+   `.dark` swap to suppress transitions and force a real recalc; only a
+   `!important` unlayered rule reliably beats the `transition` utility. */
+.theme-transition-off,
+.theme-transition-off * {
+  transition: none !important;
+}
+
+@layer base {
+  ::selection {
+    background: color-mix(in oklch, var(--color-arf-blue) 22%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-arf-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Root wrapper for the redesigned pages/NavBar — see note above on why this
+     exists instead of styling `body` directly. */
+  .arf-page-root {
+    background: var(--surface-canvas);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+  /* Belt-and-suspenders: headings/paragraphs in the redesigned pages were
+     reported as low-contrast in light mode despite inheriting color from
+     .arf-page-root, which traces correctly through every layer/selector
+     check done against the actual compiled CSS (no competing rule targets
+     these elements, no layer-order issue found). Rather than keep guessing
+     at a mechanism that isn't reproducible without a browser, apply color
+     directly to these elements instead of relying on inheritance at all --
+     eliminates the failure mode regardless of its actual cause. Elements
+     with their own explicit color utility (text-white on dark bands, etc.)
+     are unaffected: utilities is a higher-priority layer than components.
+     */
+  .arf-page-root h1,
+  .arf-page-root h2,
+  .arf-page-root h3,
+  .arf-page-root h4,
+  .arf-page-root p,
+  .arf-page-root span,
+  .arf-page-root li,
+  .arf-page-root th,
+  .arf-page-root td {
+    color: var(--text-primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .arf-page-root {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* Page shell — one gutter value everywhere, so sections align optically */
+  .arf-shell {
+    @apply mx-auto w-full max-w-[1180px] px-6 sm:px-10 lg:px-[76px];
+  }
+
+  /* --- Card weights -------------------------------------------------------
+     Three distinct weights replace the single bg-gray-800 pattern:
+     substantial (capabilities/governance), light (demo/explore),
+     anchored (dark trust + quote bands).
+     --------------------------------------------------------------------- */
+  .arf-card {
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline);
+    box-shadow: var(--card-shadow);
+    @apply rounded-2xl;
+  }
+  .arf-card-substantial {
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline);
+    box-shadow: var(--card-shadow);
+    @apply rounded-2xl transition duration-300;
+  }
+  .arf-card-substantial:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+  }
+  .arf-card-light {
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline);
+    @apply rounded-2xl shadow-[0_16px_34px_-28px_rgba(25,24,22,0.4)] transition duration-200;
+  }
+  /* Lighter than -substantial's lift (-2px, shadow color-shift): this tier
+     stays in its own register (exploratory/secondary), just no longer dead
+     on hover. */
+  .arf-card-light:hover {
+    transform: translateY(-1.5px);
+    border-color: color-mix(
+      in oklch,
+      var(--color-arf-blue) 30%,
+      var(--hairline)
+    );
+  }
+  .arf-card-anchored {
+    background: var(--color-arf-dark);
+    @apply rounded-2xl;
+  }
+
+  .arf-eyebrow {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    @apply text-[11px] leading-none uppercase tracking-[0.14em] font-medium;
+  }
+
+  .arf-gradient-text {
+    background: linear-gradient(
+      100deg,
+      var(--color-arf-blue),
+      var(--color-arf-purple)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .arf-btn-primary {
+    background: linear-gradient(
+      135deg,
+      var(--color-arf-blue),
+      var(--color-arf-purple)
+    );
+    @apply inline-flex items-center gap-2 rounded-[10px] px-6 py-[15px] text-[15.5px] font-semibold text-white
+           shadow-[0_16px_34px_-16px_rgba(51,88,232,0.75)] transition hover:brightness-110 active:scale-[0.97] active:brightness-95;
+  }
+  .arf-btn-secondary {
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline);
+    color: var(--text-primary);
+    @apply inline-flex items-center gap-2 rounded-[10px] px-6 py-[15px] text-[15.5px] font-semibold
+           shadow-[0_8px_22px_-14px_rgba(25,24,22,0.4)] transition hover:border-[color:var(--color-arf-blue)] active:scale-[0.97];
+  }
+  /* Sign In: outlined, WorkOS-style — reads as "log in", not "request access" */
+  .arf-btn-ghost {
+    border: 1px solid var(--hairline);
+    color: var(--text-primary);
+    @apply inline-flex items-center gap-2 rounded-lg px-4 py-[9px] text-sm font-semibold transition
+           hover:border-[color:var(--color-arf-blue)] active:scale-[0.96];
+  }
+
+  .arf-input {
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    color: var(--text-primary);
+    @apply w-full rounded-lg px-4 py-2 transition outline-none;
+  }
+  .arf-input:focus {
+    border-color: var(--color-arf-blue);
+  }
+  .arf-input-error {
+    border-color: #b3392a;
+  }
+
+  /* Hero wash — the ONLY page-level gradient */
+  .arf-hero-wash {
+    background-image:
+      radial-gradient(
+        1100px 560px at 18% -10%,
+        rgba(51, 88, 232, 0.16),
+        transparent 66%
+      ),
+      radial-gradient(
+        760px 460px at 92% 20%,
+        rgba(122, 75, 224, 0.14),
+        transparent 70%
+      );
+  }
+  .dark .arf-hero-wash {
+    background-image:
+      radial-gradient(
+        1100px 560px at 18% -10%,
+        rgba(51, 88, 232, 0.26),
+        transparent 66%
+      ),
+      radial-gradient(
+        760px 460px at 92% 20%,
+        rgba(122, 75, 224, 0.22),
+        transparent 70%
+      );
+  }
+  .arf-dark-wash {
+    background-image:
+      radial-gradient(
+        900px 420px at 16% 0%,
+        rgba(51, 88, 232, 0.32),
+        transparent 70%
+      ),
+      radial-gradient(
+        680px 380px at 92% 100%,
+        rgba(122, 75, 224, 0.28),
+        transparent 72%
+      );
+  }
+
+  /* Scroll reveal — subtle rise, disabled under prefers-reduced-motion */
+  .arf-reveal {
+    @apply opacity-0 translate-y-3 transition-all duration-700 ease-out;
+  }
+  .arf-reveal-in {
+    @apply opacity-100 translate-y-0;
+  }
+  /* Governance is the one section DESIGN_RATIONALE.md names explicitly as
+     carrying "most visual weight" -- a slightly larger rise and slower,
+     more deliberate ease-out gives its reveal a heavier feel than the
+     default, instead of every section using the identical motion. Applied
+     alongside .arf-reveal, not instead of it -- only overrides distance and
+     timing. */
+  .arf-reveal-deliberate {
+    @apply translate-y-5 transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)];
+  }
+
+  /* --------------------------------------------------------------------
+     Architecture pipeline — a single animated diagram replaces what used
+     to be the same 7-stage flow rendered three times (styled grid, plain
+     arrow-text line, Mermaid diagram + its own sr-only caption). The
+     accessible description now lives once, in ArchitecturePipeline.tsx's
+     sr-only <ol>; everything below is aria-hidden decoration.
+     -------------------------------------------------------------------- */
+  .arf-pipeline {
+    @apply opacity-0 translate-y-3 transition-all duration-700 ease-out;
+  }
+  .arf-pipeline-in {
+    @apply opacity-100 translate-y-0;
+  }
+  .arf-pipeline-track {
+    @apply flex flex-col items-stretch gap-2 lg:flex-row lg:items-center lg:gap-0;
+  }
+  .arf-pipeline-item {
+    @apply flex flex-1 flex-col items-stretch lg:flex-row lg:items-center;
+  }
+  .arf-pipeline-node {
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    transition:
+      transform 200ms ease,
+      border-color 200ms ease;
+    @apply relative flex flex-1 flex-col items-center gap-1.5 rounded-xl px-4 py-5 text-center;
+  }
+  .arf-pipeline-node:hover {
+    border-color: var(--color-arf-blue);
+    transform: translateY(-3px);
+  }
+  .arf-pipeline-node-compact {
+    @apply px-3 py-3.5;
+  }
+  .arf-pipeline-node-ring {
+    background: color-mix(in oklch, var(--color-arf-blue) 12%, transparent);
+    @apply relative mb-1 flex h-9 w-9 items-center justify-center rounded-full;
+  }
+  .arf-pipeline-node-ring::before {
+    content: "";
+    border: 1.5px solid var(--color-arf-blue);
+    animation: arf-pipe-ripple 3.2s ease-out infinite paused;
+    animation-delay: calc(var(--i, 0) * 0.3s);
+    @apply absolute -inset-1 rounded-full opacity-0;
+  }
+  .arf-pipeline-in .arf-pipeline-node-ring::before {
+    animation-play-state: running;
+  }
+  .arf-pipeline-node-icon {
+    color: var(--color-arf-blue);
+    @apply h-4 w-4;
+  }
+  .arf-pipeline-node-n {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    @apply absolute right-2.5 top-2.5 text-[9.5px] tracking-[0.08em];
+  }
+  .arf-pipeline-node-label {
+    @apply text-[13.5px] font-semibold tracking-[-0.01em];
+  }
+  .arf-pipeline-node-meta {
+    color: var(--text-muted);
+    @apply text-[11.5px] leading-[1.35];
+  }
+  .arf-pipeline-wire {
+    background: var(--hairline);
+    @apply relative mx-1 my-2 h-8 w-[2px] self-center overflow-hidden rounded-full lg:my-0 lg:h-[2px] lg:w-8 lg:flex-shrink-0;
+  }
+  .arf-pipeline-wire-compact {
+    @apply my-1.5 h-5 lg:h-[2px] lg:w-5;
+  }
+  .arf-pipeline-wire::after {
+    content: "";
+    background: linear-gradient(
+      180deg,
+      transparent,
+      var(--color-arf-blue),
+      var(--color-arf-purple),
+      transparent
+    );
+    animation: arf-pipe-sweep-v 2.4s ease-in-out infinite paused;
+    @apply absolute inset-x-0 -top-full h-full;
+  }
+  .arf-pipeline-in .arf-pipeline-wire::after {
+    animation-play-state: running;
+  }
+  @media (min-width: 1024px) {
+    .arf-pipeline-wire::after {
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--color-arf-blue),
+        var(--color-arf-purple),
+        transparent
+      );
+      animation-name: arf-pipe-sweep-h;
+      @apply inset-y-0 -left-full top-0 h-full w-full;
+    }
+  }
+  .arf-pipeline-cluster {
+    border: 1px solid var(--hairline);
+    animation: arf-pipe-cluster-glow 3.2s ease-in-out infinite paused;
+    @apply flex flex-[2.2] flex-col gap-3 rounded-2xl p-4;
+  }
+  .arf-pipeline-in .arf-pipeline-cluster {
+    animation-play-state: running;
+  }
+  .arf-pipeline-cluster-label {
+    font-family: var(--font-mono);
+    color: var(--color-arf-blue);
+    @apply text-[10.5px] font-medium uppercase tracking-[0.13em];
+  }
+  .arf-pipeline-cluster-track {
+    @apply flex flex-col items-stretch gap-1.5 lg:flex-row lg:items-center;
+  }
+}
+
+@keyframes arf-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slide-up {
+  animation: arf-slide-up 0.24s ease-out both;
+}
+
+@keyframes arf-pipe-ripple {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes arf-pipe-sweep-h {
+  0% {
+    transform: translateX(-10%);
+  }
+  100% {
+    transform: translateX(210%);
+  }
+}
+@keyframes arf-pipe-sweep-v {
+  0% {
+    transform: translateY(-10%);
+  }
+  100% {
+    transform: translateY(210%);
+  }
+}
+@keyframes arf-pipe-cluster-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+    border-color: var(--hairline);
+  }
+  50% {
+    box-shadow: 0 0 32px -6px
+      color-mix(in oklch, var(--color-arf-purple) 45%, transparent);
+    border-color: color-mix(in oklch, var(--color-arf-blue) 45%, transparent);
+  }
+}
+
+/* Dashboard StatusBadge -- pulse reserved for the "critical" state only,
+   so it actually signals urgency instead of every badge quietly buzzing. */
+@keyframes arf-status-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(179, 57, 42, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(179, 57, 42, 0);
+  }
+}
+.arf-status-pulse {
+  animation: arf-status-pulse 2s ease-in-out infinite;
+}
+
+/* Route transitions (RouteTransition.tsx). Two independent mechanisms:
+   native View Transitions where supported, retuned off the browser's
+   default cross-fade timing; a CSS keyframe fallback everywhere else. The
+   pseudo-elements below live in the browser's own view-transition tree, not
+   the normal DOM -- the global `*` reduced-motion override earlier in this
+   file does not reach them, so they need their own explicit rule. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+@keyframes arf-route-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.arf-route-fade {
+  animation: arf-route-in 260ms ease-out;
+}
+
+/* Print isolation for PrintableReportModal -- printing the compliance
+   report should print the report, not the dashboard page it's floating
+   over. Unlayered so it reliably wins regardless of what else is on the
+   page underneath. .arf-no-print marks in-report chrome (the toolbar,
+   close button) that shouldn't appear in the printed/PDF output. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #arf-printable-report,
+  #arf-printable-report * {
+    visibility: visible;
+  }
+  #arf-printable-report {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-height: none !important;
+  }
+  .arf-no-print {
+    display: none !important;
+  }
 }

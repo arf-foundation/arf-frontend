@@ -1,105 +1,149 @@
 # ARF Frontend
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/arf-foundation/arf-frontend?style=social)](https://github.com/arf-foundation/arf-frontend/stargazers)
-[![Vercel](https://img.shields.io/badge/deployed%20on-Vercel-black)](https://arf-frontend-sandy.vercel.app)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)](https://arf-frontend-sandy.vercel.app)
 
-Interactive frontend for the **Agentic Reliability Framework (ARF)** – a Bayesian‑powered governance system for cloud infrastructure. Visualize risk scores, simulate incidents, and explore governance decisions in real time.
+**Interactive frontend for the Agentic Reliability Framework (ARF)** – a Bayesian‑powered governance system for AI infrastructure. This repository contains a **public, sanitised demo dashboard** that illustrates ARF concepts. The core engine is **access‑controlled** and available only to qualified pilots and enterprise customers.
 
-🔗 **Live demo**: [arf-frontend-sandy.vercel.app](https://arf-frontend-sandy.vercel.app)
-🔗 **Live API**: [a-r-f-agentic-reliability-framework-api.hf.space](https://a-r-f-agentic-reliability-framework-api.hf.space)
-🔗 **API Docs**: [a-r-f-agentic-reliability-framework-api.hf.space/docs](https://a-r-f-agentic-reliability-framework-api.hf.space/docs)
+🔗 **Live demo:** [arf-frontend-sandy.vercel.app](https://arf-frontend-sandy.vercel.app)
+
+> ⚠️ **Important** – The ARF core engine (`agentic_reliability_framework`, `arf-api`) is **not open source**. It is proprietary, access‑controlled, and offered under outcome‑based pricing. This frontend repo contains only public, demo‑grade code.
+
+---
 
 ## Overview
 
-ARF Frontend provides a user‑friendly dashboard to interact with the ARF API. It displays system‑wide risk metrics, memory statistics, recent decisions, and allows users to test incident evaluations with rich explanations, risk contributions, and recommended healing actions.
+ARF Frontend provides a user‑friendly dashboard to **visualise risk metrics, simulate incident evaluations, and explore governance decisions** – all using **demo data or the public sandbox API**. It showcases ARF capabilities without exposing the protected Bayesian inference engine.
 
-## Features
+**Key features**:
+- 📊 Real‑time system risk monitoring (demo data)
+- 🧠 Memory graph statistics (cached demo values)
+- 📈 Historical risk chart (synthetic data)
+- 🧪 Incident evaluation form – calls the **public sandbox API** (sanitised, rate‑limited) and displays risk scores, recommended actions, and explanations.
+- 🤖 **Institutional Memory Agent** (`/agent`) - paste an incident description, get a structured governance evaluation (risk score, execution mode, gating rationale) back from a live Claude-backed endpoint. Public and unauthenticated.
+- 🔗 Links to pilot access request
 
-- 📊 Real‑time system risk monitoring
-- 🧠 Memory graph statistics (incident nodes, cache hit rates)
-- 📈 Historical risk chart
-- 🧪 Incident evaluation with full `HealingIntent` response
-- 🔗 Links to live demos and documentation
-- 💬 Community engagement (Slack, email, LinkedIn)
+---
 
-## Getting Started
+## Getting Started (for local development)
 
 ### Prerequisites
-- Node.js 18+ and yarn/npm
-- ARF API backend (local or deployed)
+- Node.js 18+ and `yarn` / `npm`
 
 ### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/arf-foundation/arf-frontend.git
-   cd arf-frontend
-   ```
-2. **Install dependencies**
-
 ```bash
+git clone https://github.com/arf-foundation/arf-frontend.git
+cd arf-frontend
 yarn install
-# or npm install
 ```
 
-3. **Set up environment variables**
+### Environment Variables
 
-Create a .env.local file in the root directory:
+**No environment variables are required to run the dashboard itself** (`yarn dev`). The sandbox API URL is hardcoded via Next.js rewrites (see next.config.ts). If you wish to change the API target, modify the rewrites section in next.config.ts.
 
-```env
-NEXT_PUBLIC_API_URL=https://a-r-f-agentic-reliability-framework-api.hf.space
-NEXT_PUBLIC_API_KEY=your-api-key   # if required
-```
+Two API routes need credentials to work in production, and are inert (or error) without them locally:
 
-4. **Run the development server**
+| Route | Requires | Purpose |
+|---|---|---|
+| `POST /api/pilot-request` | `NOTION_API_KEY`, `NOTION_DATABASE_ID` | Writes pilot signup submissions to Notion |
+| `POST /api/chat` (used by the `/agent` page) | Vercel Connect connector (`VERCEL_OIDC_TOKEN`, injected automatically on Vercel deploys) | Calls Claude for the public Institutional Memory Agent demo |
+
+`POST /api/chat`, `POST /api/pilot-request`, and `POST /api/report` are all
+public and unauthenticated, and are rate-limited (see `lib/rate-limit.ts`).
+Optionally set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (a
+free Upstash Redis database) for a real cap enforced across every
+serverless instance; without them, rate limiting falls back to an
+in-memory counter scoped to one warm instance — soft, not a hard guarantee,
+but not broken either.
+
+### Run the development server
 
 ```bash
 yarn dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000/) to view the app.
+The dashboard will be available at http://localhost:3000.
 
-Related Projects
-----------------
+## Architecture & Data Flow
 
-ARF is composed of several interoperable components:
+- **Next.js rewrites** – All `/api/v1/*` requests are proxied to the public sandbox API (`https://arf-ai-arf-sandbox-api.hf.space`). No API keys are exposed.
+- **Sandbox API** – Returns a sanitised, mock evaluation (rate‑limited, no real Bayesian inference). The frontend transforms the sandbox response into the `EvaluateResponse` format used by the UI.
+- **Mock data** – Components like `RecentDecisions`, `MemoryStats`, and `RiskChart` use local mock data because the sandbox does not provide history or memory endpoints.
+- **Institutional Memory Agent** (`/agent`) – `POST /api/chat` calls Claude directly via a Vercel Connect connector, using the deterministic evaluation prompt in `app/api/chat/prompt.txt`. This is a real LLM call, separate from the sandbox API and from the protected ARF engine.
 
-*   [**ARF API**](https://github.com/arf-foundation/arf-api) – FastAPI backend serving governance decisions.
-    
-*   [**ARF Core Engine**](https://github.com/arf-foundation/agentic-reliability-framework) – Bayesian inference and memory core.
-    
-*   [**ARF Specification**](https://github.com/arf-foundation/arf-spec) – Canonical documentation and mathematical foundations.
-    
+> The live dashboard **never** calls the protected ARF engine. All data is either from the public sandbox, a direct Claude call (`/agent`), or generated locally.
 
-Deployment
-----------
+## Public vs. Private – What This Repo Is (and Isn’t)
 
-The frontend is optimized for deployment on [Vercel](https://vercel.com/). Simply connect your GitHub repository and set the required environment variables.
+| ✅ **This repo (public)** | ❌ **Not included / private** |
+|---------------------------|-------------------------------|
+| Demo UI components | Core Bayesian inference engine |
+| Sandbox API integration | Real risk scoring logic |
+| Sanitised visualisations | Production control plane |
+| Public specification references | Customer‑specific audit trails |
+| Pilot request form | Outcome‑based pricing implementation |
 
-Contributing
-------------
+## Related Projects (Public Only)
 
-We welcome contributions! Please see our [contributing guidelines](https://contributing.md/) for details.
+| Project | Description | Access |
+|---------|-------------|--------|
+| [`arf-risk-demo`](https://github.com/arf-foundation/arf-risk-demo) | Public, client-side risk-scoring demo | Public (Apache 2.0) |
+| [`pitch-deck`](https://github.com/arf-foundation/pitch-deck) | Public overview and vision | Public |
+| **arf-spec** | Canonical data models, API contracts | **Access‑controlled** – pilot only |
+| **Core Engine** | Bayesian risk scoring, semantic memory | **Access‑controlled** – pilot only |
+| **API Control Plane** | Production FastAPI service | **Access‑controlled** – pilot only |
 
-License
--------
+📌 **For pilot access, please [request here](https://arf-frontend-sandy.vercel.app/signup).**
 
-This project is licensed under the Apache 2.0 License – see the [LICENSE](https://license/) file for details.
+## Contributing (to this public repo only)
 
-Community
----------
+We accept **limited contributions** to this public frontend repository (bug fixes, documentation, demo improvements).  
+**We do not accept pull requests against the private core engine or API.**
 
-*   📬 Email: petter2025us@outlook.com
-    
-*   💬 Slack: [Join our workspace](https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg)
-    
-*   🔗 LinkedIn: [Juan Petter](https://www.linkedin.com/in/petterjuan/)
-    
-*   📅 [Book a call](https://calendly.com/petter2025us/30min)
-    
+1. Open an issue describing your proposed change.
+2. Wait for a maintainer to assign the issue.
+3. Sign a Contributor License Agreement (CLA) if requested.
+4. Submit a pull request referencing the issue.
 
-Acknowledgements
-----------------
+All changes are reviewed and merged at the founder’s discretion.
 
-Built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), and [Lucide icons](https://lucide.dev/). Powered by the ARF open‑source community.
+For questions about pilot access or enterprise licensing, email **petter2025us@outlook.com**.
+
+## Known Limitations & Troubleshooting
+
+### Sandbox API Limitations
+- The public sandbox API is **rate‑limited** and returns **simulated responses only**. It does **not** perform real Bayesian inference or access the protected ARF engine.
+- The sandbox does **not** provide history (`/v1/history`) or memory (`/v1/memory/stats`) endpoints. Consequently, components like `RecentDecisions` and `MemoryStats` use local mock data.
+- Evaluation responses are transformed from the sandbox’s `recommendation` and `justification` fields into the `EvaluateResponse` shape expected by the frontend. The confidence interval and epistemic uncertainty are derived heuristically.
+
+### Build & Deployment Issues
+- **Private repository on Vercel Hobby plan:** Vercel’s free plan does **not** support private repositories owned by an organization. If you encounter deployment failures after making the repo private, either upgrade to Vercel Pro or make the repository public.
+- **Missing environment variables:** The frontend does **not** require `NEXT_PUBLIC_API_URL` or `NEXT_PUBLIC_USE_MOCK_DATA`. These variables are ignored. The API target is hardcoded in `next.config.ts` rewrites.
+- **Service worker errors:** If you see `getInstalledRelatedApps` errors in the console, they are suppressed by an inline script in `layout.tsx` and by disabling PWA in `next.config.ts`. This does not affect functionality.
+
+### Development Workflow
+- After cloning, run `yarn install` and `yarn dev`. No additional configuration is needed.
+- To test the sandbox API integration locally, ensure you have an internet connection – the frontend will call `https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate`.
+- If you need to point to a different API backend, modify the `rewrites` section in `next.config.ts`.
+
+### Reporting Issues
+- For bugs in the public frontend, please open an issue on GitHub.
+- For questions about the protected core engine or pilot access, email **petter2025us@outlook.com**.
+
+## License
+
+This repository (`arf-frontend`) is licensed under the **Apache 2.0 License** – see the [LICENSE](LICENSE) file for details.
+
+> **Note:** The Apache 2.0 license applies **only** to the code in this repository. It does **not** cover the ARF core engine, which is proprietary and access‑controlled.
+
+## Community & Contact
+
+- 📬 **Email:** [petter2025us@outlook.com](mailto:petter2025us@outlook.com)
+- 💬 **Slack:** [Join workspace](https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg)
+- 🔗 **LinkedIn:** [Juan Petter](https://www.linkedin.com/in/petterjuan/)
+- 📅 **Book a call:** [Calendly](https://calendly.com/petter2025us/30min)
+
+## Acknowledgements
+
+Built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), and [Lucide icons](https://lucide.dev/).  
+The ARF core engine is developed by the ARF Foundation and stewarded by the founder.

@@ -23,6 +23,7 @@ jobs:
           git diff --quiet yarn.lock || echo "changed=true" >> $GITHUB_OUTPUT
       - name: Create Pull Request
         if: steps.lockfile-check.outputs.changed == 'true'
+        continue-on-error: true
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.ARF_GITHUB_PAT }}

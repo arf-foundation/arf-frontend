@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
-
-Sitemap: https://arf-frontend-sandy.vercel.app/sitemap.xml
+Disallow: /api/
+Disallow: /private/
+Disallow: /internal/
+Sitemap: https://www.arf-ai.com/sitemap.xml

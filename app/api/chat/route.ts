@@ -1,0 +1,124 @@
+import { NextResponse } from 'next/server';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { join } from 'node:path';
+import { ConnectError, getToken } from '@vercel/connect';
+import Anthropic from '@anthropic-ai/sdk';
+import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
+
+export const dynamic = 'force-dynamic';
+
+/* ============================================================================
+   ARF Institutional Memory Agent — real Claude call.
+
+   Replaces the previous keyword-heuristic mock. prompt.txt (v1.3) is the
+   full spec: deterministic JSON-only output, temperature=0, an enforced
+   output schema. Consumed by the public, unauthenticated /agent page — this
+   route's request/response contract (POST { message } -> ARFAgentOutput |
+   { error }) is unchanged, so app/agent/page.tsx needed no edits.
+
+   Auth: this connector is Vercel Connect's "API key" type (a static
+   credential Vercel stores, not an OAuth grant), so getToken() returns the
+   stored Anthropic key verbatim rather than a Vercel-minted bearer token.
+   Passed straight into the Anthropic SDK's `apiKey` option, which sets the
+   `x-api-key` header itself -- Anthropic's Messages API doesn't accept
+   `Authorization: Bearer`, so this sidesteps needing to hand-roll that
+   header. Requires `VERCEL_OIDC_TOKEN` in the environment; Vercel injects
+   this automatically on deployment. Not runnable from a local dev server
+   without `vercel link && vercel env pull` first.
+   ========================================================================= */
+
+const SYSTEM_PROMPT = readFileSync(join(process.cwd(), 'app/api/chat/prompt.txt'), 'utf-8');
+const PROMPT_VERSION = 'ARF_IMO_v1.3';
+// "Log prompt hash" per prompt.txt's own versioning requirements.
+const PROMPT_HASH = createHash('sha256').update(SYSTEM_PROMPT).digest('hex').slice(0, 16);
+
+const CONNECTOR = 'api.anthropic.com/arf-frontend';
+const MODEL: Anthropic.Model = 'claude-haiku-4-5-20251001';
+
+// /agent is public and unauthenticated, and every request costs real money
+// against a metered connector -- see lib/rate-limit.ts for what backs this
+// and why the in-memory fallback is soft.
+const isRateLimited = createRateLimiter({
+  prefix: 'chat',
+  windowMs: 10 * 60 * 1000,
+  maxRequests: 5,
+});
+
+/* prompt.txt says "Return only the JSON object. No markdown." but smaller/
+   faster models (Haiku included) frequently wrap structured output in
+   ```json fences anyway despite an explicit instruction not to -- confirmed
+   against the live connector: the first real request came back fenced and
+   failed a bare JSON.parse. Strip fences, then fall back to slicing the
+   outermost {...} span before giving up, rather than failing every request
+   with correctly-shaped-but-wrapped output. */
+function extractJson(text: string): unknown {
+  const trimmed = text.trim();
+  const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
+  const candidate = fenced ? fenced[1] : trimmed;
+  try {
+    return JSON.parse(candidate);
+  } catch {
+    const start = candidate.indexOf('{');
+    const end = candidate.lastIndexOf('}');
+    if (start === -1 || end === -1 || end <= start) throw new Error('No JSON object found');
+    return JSON.parse(candidate.slice(start, end + 1));
+  }
+}
+
+export async function POST(req: Request) {
+  const clientKey = clientKeyFromRequest(req);
+  if (await isRateLimited(clientKey)) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please wait a few minutes and try again.' },
+      { status: 429 },
+    );
+  }
+
+  try {
+    const { message } = await req.json();
+    if (!message || typeof message !== 'string') {
+      return NextResponse.json({ error: 'message required' }, { status: 400 });
+    }
+
+    const apiKey = await getToken(CONNECTOR, { subject: { type: 'app' } });
+    const anthropic = new Anthropic({ apiKey });
+
+    const response = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 1024,
+      temperature: 0,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: message }],
+    });
+
+    const textBlock = response.content.find((block) => block.type === 'text');
+    if (!textBlock) {
+      throw new Error('Model returned no text content block');
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = extractJson(textBlock.text);
+    } catch {
+      console.error('ARF agent: model output was not valid JSON', {
+        promptVersion: PROMPT_VERSION,
+        promptHash: PROMPT_HASH,
+        raw: textBlock.text,
+      });
+      return NextResponse.json({ error: 'Agent returned malformed output' }, { status: 502 });
+    }
+
+    // "Log output alongside version" per prompt.txt's versioning requirements.
+    console.log('ARF agent evaluation', { promptVersion: PROMPT_VERSION, promptHash: PROMPT_HASH, output: parsed });
+
+    return NextResponse.json(parsed);
+  } catch (error) {
+    if (error instanceof ConnectError) {
+      console.error('Vercel Connect error:', error.message);
+      return NextResponse.json({ error: 'Agent temporarily unavailable (connector error)' }, { status: 502 });
+    }
+    console.error('Error:', error);
+    return NextResponse.json({ error: 'Agent failed' }, { status: 500 });
+  }
+}
