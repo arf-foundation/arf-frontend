@@ -1,6 +1,47 @@
 import type { NextConfig } from "next";
 import withPWA from "next-pwa";
 
+/* script-src/style-src 'unsafe-inline' — accepted risk, not an oversight.
+   Audited 2026-09-18.
+
+   Why not a nonce: Next.js can only inject a nonce into its own inline
+   hydration/RSC scripts during per-request server rendering -- there's
+   nothing to inject into on a statically-generated page. Every route here
+   builds `○ Static` and is served from Vercel's edge cache. Nonces would
+   force ALL pages to dynamic rendering (confirmed against this exact
+   Next.js version's bundled docs, node_modules/next/dist/docs/.../
+   content-security-policy.md): no more ISR, no CDN caching, real latency
+   and hosting-cost increase -- a bad trade for a Medium defense-in-depth
+   finding on a marketing/pricing site. Hash-based CSP doesn't avoid this
+   either: it only covers Next's own inline scripts when paired with a
+   nonce, so it doesn't get you out of the dynamic-rendering requirement.
+   (Next also offers `experimental.sri` for hashing the external
+   /_next/static/chunks/*.js bundles specifically -- real, static-rendering
+   -compatible supply-chain hardening, but a separate concern from this
+   inline-script question and not yet enabled here.)
+
+   style-src keeps 'unsafe-inline' for a different reason: React's
+   `style={{}}` prop emits inline `style` attributes, and per CSP3 a
+   nonce/hash on style-src stops covering attributes (only <style>
+   elements) -- tightening it would break rendering in hard-to-catch ways
+   for a much narrower attack surface (CSS injection, not script
+   execution) than script-src carries.
+
+   What actually limits the exposure: no 'unsafe-eval'; object-src,
+   base-uri, form-action, and frame-ancestors are all locked down; the
+   only first-party inline script is the fixed, non-user-controllable
+   theme-init snippet in app/layout.tsx. 'unsafe-inline' only becomes
+   exploitable if something else first gets attacker-controlled HTML/script
+   into the page -- so this was audited directly rather than assumed: the
+   three public unauthenticated POST routes (/api/chat, /api/pilot-request,
+   /api/report) all return JSON or a PDF binary, never HTML, and every
+   field their responses feed into the UI renders through plain JSX `{}`
+   interpolation (React-escaped), not dangerouslySetInnerHTML. A full grep
+   across the app for dangerouslySetInnerHTML, .innerHTML =, eval/new
+   Function, outerHTML, document.write, and insertAdjacentHTML turned up
+   nothing else. Re-run that audit before revisiting this decision if any
+   of those routes, or a new one, starts rendering user- or model-supplied
+   content into markup. */
 const securityHeaders = [
   {
     key: "Content-Security-Policy",
