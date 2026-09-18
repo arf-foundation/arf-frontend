@@ -73,10 +73,17 @@ export default function NavBar() {
   }, []);
 
   const toggleTheme = () => {
-    const next: Theme = document.documentElement.classList.contains("dark")
-      ? "light"
-      : "dark";
-    document.documentElement.classList.toggle("dark", next === "dark");
+    const root = document.documentElement;
+    const next: Theme = root.classList.contains("dark") ? "light" : "dark";
+    // See .theme-transition-off in globals.css: without this, elements whose
+    // color comes from an inherited CSS var (--text-primary etc.) and also
+    // sit in a `transition` utility get stuck showing the old theme's color
+    // on the first toggle after page load — a Chromium transition bug, not
+    // a state bug (the --text-* variables themselves update correctly).
+    root.classList.add("theme-transition-off");
+    root.classList.toggle("dark", next === "dark");
+    void root.offsetHeight;
+    requestAnimationFrame(() => root.classList.remove("theme-transition-off"));
     setTheme(next);
     try {
       window.localStorage.setItem("arf-theme", next);

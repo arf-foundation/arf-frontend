@@ -219,6 +219,22 @@ main > div:first-child {
     0 4px 8px rgba(0, 0, 0, 0.5), 0 30px 60px -30px rgba(51, 88, 232, 0.55);
 }
 
+/* Chromium bug, confirmed live: an element whose `color` (etc.) is set via
+   `var(--text-*)` and is also in a `transition` utility's transition-property
+   list gets stuck rendering the PREVIOUS theme's resolved color forever after
+   the *first* .dark toggle post-load, because the change is only visible via
+   an ancestor's inherited custom property, not a direct rule change on the
+   element itself -- the transition machinery never registers a new "after"
+   value to animate toward. Reproduced on header nav links, FAQ accordion
+   questions, pricing plan titles, etc. (every `text-[color:var(--text-*)]`
+   user). NavBar's toggleTheme applies this class for one frame around the
+   `.dark` swap to suppress transitions and force a real recalc; only a
+   `!important` unlayered rule reliably beats the `transition` utility. */
+.theme-transition-off,
+.theme-transition-off * {
+  transition: none !important;
+}
+
 @layer base {
   ::selection {
     background: color-mix(in oklch, var(--color-arf-blue) 22%, transparent);
