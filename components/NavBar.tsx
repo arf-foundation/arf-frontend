@@ -11,12 +11,12 @@ import { ArrowRight, Menu, Moon, Sun, X } from "lucide-react";
 const MOBILE_MENU_MS = 260;
 
 /* ----------------------------------------------------------------------------
-   NavBar — 8 links + CTA reduced to 4 primary links + two buttons.
+   NavBar — 8 links + CTA reduced to 4 primary links + one button.
    Product / Docs / Pricing / Console are the only things a buyer needs before
    they talk to us. History, Changelog, FAQ, Spec and the community links live
    in the footer. "Whitepaper (soon)" is gone — we don't advertise what doesn't
-   exist. Sign In is OUTLINED (a place you log into, WorkOS AuthKit later);
-   Request Pilot Access stays the single filled CTA.
+   exist. Request Pilot Access is the single CTA; there's no separate Sign In
+   until WorkOS AuthKit actually exists (see toggleTheme's neighbor below).
 
 --------------------------------------------------------------------------- */
 
@@ -153,15 +153,12 @@ export default function NavBar() {
             {!isHydrated && <Moon className="h-4 w-4 opacity-70" />}
           </button>
 
-          {/* Placeholder for WorkOS AuthKit — swap href for the hosted login URL */}
-          <Link
-            href="/signup"
-            className="arf-btn-ghost hidden sm:inline-flex"
-            data-workos="authkit-signin"
-          >
-            Sign In
-          </Link>
-
+          {/* No real sign-in flow exists yet (WorkOS AuthKit is planned, not
+              wired up) -- a "Sign In" button that routes to /signup was
+              misleading and, since it was one of several links to that same
+              destination with a different label, a repeated WCAG 3.2.4
+              (Consistent Identification) failure across every page. Re-add
+              once AuthKit lands, pointed at the real login route. */}
           <Link
             href="/signup"
             className="hidden items-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-[17px] py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(51,88,232,0.7)] transition hover:brightness-110 active:scale-[0.97] sm:inline-flex"
@@ -220,9 +217,6 @@ export default function NavBar() {
                 ),
               )}
               <div className="mt-2 flex flex-col gap-2.5">
-                <Link href="/signup" className="arf-btn-ghost justify-center">
-                  Sign In
-                </Link>
                 <Link
                   href="/signup"
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.97]"
