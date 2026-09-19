@@ -97,7 +97,7 @@ Light is primary; dark is equal parity, not an afterthought.
 | Raised surface | `#ffffff`                 | `#17161d`               |
 | Ink            | `#191816` warm near-black | `#faf9f7`               |
 | Secondary      | `#56534d` (7.3:1)         | white/72                |
-| Muted          | `#6b6862` (4.6:1)         | white/56                |
+| Muted          | `#605c54` (6.3:1)         | white/56                |
 | Hairline       | `rgba(25,24,22,.09)`      | `rgba(250,249,247,.12)` |
 | Accent         | `#3358e8 → #7a4be0`       | identical               |
 
@@ -105,6 +105,17 @@ Never pure black on pure white — warm grays read as considered at scale and st
 large text blocks from vibrating. Every muted tier clears WCAG AA at its
 shipping size; the one retained sandbox disclaimer is deliberately _not_ the
 faintest text on the page, because it is compliance-relevant copy.
+
+Updated 2026-09-19: Muted was `#6b6862`, documented here as 4.6:1 but computing
+to ~5.3:1 — the closest-to-floor token in the ramp, and it sits directly beside
+headings as an eyebrow label site-wide. Darkened to `#605c54` after a reported
+light-mode contrast issue.
+
+**Dark bands declare the ink they hand down.** A band that is dark in _both_
+themes (`.arf-card-anchored`, `.arf-dark-wash`) sets light ink on itself, and
+its text descendants inherit it. This is a rule in `globals.css`, not a
+convention to remember per element — see §8 for why the per-element version
+kept failing.
 
 The recognisable blue→purple gradient is **evolved, not discarded**. It survives
 in exactly four places per page: the hero wash, the "autonomous AI" words in the
@@ -284,6 +295,36 @@ directly rather than animating.
   `text-white/55` class, the same fix the original belt-and-suspenders
   comment already prescribes for exactly this failure mode, just not yet
   applied to these two elements.
+- **That per-element fix did not hold** (2026-09-19). The same failure
+  reappeared a third time -- Replay QA found `/history`'s "Get real-time risk
+  history" H2 at **1.05:1**, dark-on-dark in light mode, for exactly the
+  reason above: it relied on inheriting `text-white` from its
+  `.arf-card-anchored` container. Spot-painting each element as it is
+  reported treats the symptom; the rule is silently hostile to the way dark
+  bands are written, so it will keep producing this bug until something
+  changes structurally.
+  Now fixed at the source: `.arf-page-root .arf-card-anchored/.arf-dark-wash`
+  declare light ink, and their `h1..td` descendants take `color: inherit`,
+  which restores the inheritance the blanket rule was defeating. `inherit` can
+  never be worse than the normal inheritance it re-enables -- a `<span>` in a
+  _light_ button nested inside a dark band still inherits that button's dark
+  ink. Elements with their own colour utility are untouched either way, so the
+  two footer fixes above remain valid and unaffected.
+  Scoped under `.arf-page-root` deliberately: `ChatWidget`'s panel is also
+  `.arf-card-anchored` but sits outside every `.arf-page-root` (direct child
+  of `<body>`) and hosts **light** surfaces reading `--surface-canvas` /
+  `--surface-raised`. An unscoped version inverts its transcript and composer
+  to white-on-white.
+  Guarded by a check rather than by vigilance: a Playwright sweep of every
+  text node inside every dark band, 6 pages x 2 themes, went 1 failure -> 0.
+- **Theme switching is now a blocking inline script** (2026-09-19), correcting
+  the bullet above: the CSP was relaxed to allow `unsafe-inline` for scripts,
+  so `layout.tsx` sets the `.dark` class from `localStorage` (falling back to
+  `prefers-color-scheme`) before first paint. The one-frame flash this bullet
+  anticipated is gone. `color-scheme: light dark` on `<html>` was **removed**,
+  not kept -- static and unconditional, it invited Chromium's auto-dark-mode
+  heuristics to fight the page's own theme whenever the OS disagreed with it;
+  `color-scheme` is now scoped to whichever theme is actually active.
 
 ---
 

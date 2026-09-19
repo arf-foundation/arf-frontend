@@ -28,7 +28,7 @@ ARF Frontend provides a user‑friendly dashboard to **visualise risk metrics, s
 ## Getting Started (for local development)
 
 ### Prerequisites
-- Node.js 18+ and `yarn` / `npm`
+- Node.js **20.9+** and `yarn` / `npm` — this is Next.js's own floor (`next` declares `engines.node: ">=20.9.0"`), and what CI installs (`.github/workflows/test.yml` pins `node-version: 20`). Node 18 will fail the documented install step.
 
 ### Installation
 ```bash
@@ -107,7 +107,7 @@ We accept **limited contributions** to this public frontend repository (bug fixe
 
 All changes are reviewed and merged at the founder’s discretion.
 
-For questions about pilot access or enterprise licensing, email **petter2025us@outlook.com**.
+For questions about pilot access or enterprise licensing, email **juan@arf-ai.com**.
 
 ## Known Limitations & Troubleshooting
 
@@ -120,15 +120,38 @@ For questions about pilot access or enterprise licensing, email **petter2025us@o
 - **Private repository on Vercel Hobby plan:** Vercel’s free plan does **not** support private repositories owned by an organization. If you encounter deployment failures after making the repo private, either upgrade to Vercel Pro or make the repository public.
 - **Missing environment variables:** The frontend does **not** require `NEXT_PUBLIC_API_URL` or `NEXT_PUBLIC_USE_MOCK_DATA`. These variables are ignored. The API target is hardcoded in `next.config.ts` rewrites.
 - **Service worker errors:** If you see `getInstalledRelatedApps` errors in the console, they are suppressed by an inline script in `layout.tsx` and by disabling PWA in `next.config.ts`. This does not affect functionality.
+- **`yarn build` fails on Windows.** The script is `yarn workspace @arf/ui build && NEXT_TURBOPACK_BUILD=0 next build`, and yarn runs it through `cmd.exe`, which cannot parse the POSIX env-var prefix:
+
+  ```
+  'NEXT_TURBOPACK_BUILD' is not recognized as an internal or external command
+  ```
+
+  The `@arf/ui` half succeeds first, so it reads as a Next.js problem rather than a shell one. CI and Vercel build on Linux, so this is local-only and not worth changing `package.json` over. Run the two halves by hand in Bash instead:
+
+  ```bash
+  yarn workspace @arf/ui build
+  NEXT_TURBOPACK_BUILD=0 npx next build
+  ```
+
+- **`@arf/ui` changes need that first half.** The app resolves `@arf/ui` through its `main` field (`packages/ui/dist/index.js`), not `src/`, so editing `packages/ui/src/*.tsx` has no effect until `yarn workspace @arf/ui build` runs. `packages/*/dist` is gitignored and regenerated during Vercel's build.
 
 ### Development Workflow
 - After cloning, run `yarn install` and `yarn dev`. No additional configuration is needed.
 - To test the sandbox API integration locally, ensure you have an internet connection – the frontend will call `https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate`.
 - If you need to point to a different API backend, modify the `rewrites` section in `next.config.ts`.
+- **Verifying a visual or contrast change locally.** Screenshots are not enough for contrast work, and a browser-extension automation may refuse to execute JavaScript on `localhost`. `playwright-core` is already a devDependency and can drive the system Chrome with no browser download:
+
+  ```js
+  const { chromium } = require("playwright-core");
+  const browser = await chromium.launch({ channel: "chrome" });
+  ```
+
+  Read `getComputedStyle` values and compute WCAG ratios from them rather than eyeballing a screenshot. Normalise colours through a 1×1 canvas first — computed styles come back as `rgb()`, `rgba()` **and** `oklab(... / a)`, and an `oklab` value silently breaks a naive `rgb`-only parser. Composite any alpha over the nearest opaque ancestor before computing the ratio.
+- **Theme-dependent bugs need both themes.** The theme is `localStorage['arf-theme']`, falling back to `prefers-color-scheme`. A fresh origin (`localhost` vs production) therefore follows the OS, so a bug that only appears in light mode can be invisible locally on a dark-mode machine. Seed it explicitly before load — `addInitScript(() => localStorage.setItem('arf-theme', 'light'))`.
 
 ### Reporting Issues
 - For bugs in the public frontend, please open an issue on GitHub.
-- For questions about the protected core engine or pilot access, email **petter2025us@outlook.com**.
+- For questions about the protected core engine or pilot access, email **juan@arf-ai.com**.
 
 ## License
 
@@ -138,7 +161,7 @@ This repository (`arf-frontend`) is licensed under the **Apache 2.0 License** �
 
 ## Community & Contact
 
-- 📬 **Email:** [petter2025us@outlook.com](mailto:petter2025us@outlook.com)
+- 📬 **Email:** [juan@arf-ai.com](mailto:juan@arf-ai.com)
 - 💬 **Slack:** [Join workspace](https://join.slack.com/t/arf-gnv9451/shared_invite/zt-3t2omlgwg-Zf5_jmy9EIU~b51kMJ8Zdg)
 - 🔗 **LinkedIn:** [Juan Petter](https://www.linkedin.com/in/petterjuan/)
 - 📅 **Book a call:** [Calendly](https://calendly.com/petter2025us/30min)
