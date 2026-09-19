@@ -287,6 +287,35 @@ main > div:first-child {
   .arf-page-root td {
     color: var(--text-primary);
   }
+  /* ...with one exception the rule above cannot express on its own: a dark
+     band. Those carry their own near-black background in BOTH themes, so their
+     contents need light ink in both -- and they got it by putting `text-white`
+     on the container and letting children inherit. Inheritance is exactly what
+     the blanket declaration above defeats: a direct `color` declaration always
+     wins over an inherited value, whatever the specificity, so every heading
+     inside a dark band that had no colour utility of its own was painted
+     --text-primary. In light mode that is #191816 on #131218 -- confirmed live
+     on /history's "Get real-time risk history" H2 at 1.05:1 (WCAG AA needs
+     4.5:1), which is what Replay QA reported.
+
+     Fixed at the source rather than by spot-painting that one H2: a dark
+     surface now declares the light ink it hands down, and its text descendants
+     go back to inheriting it. Elements carrying their own colour utility
+     (text-white/80, text-[#9fe7b8], ...) are untouched either way -- utilities
+     outrank components. Scoped under .arf-page-root on purpose: ChatWidget's
+     panel is also .arf-card-anchored but sits outside every .arf-page-root
+     (it's a direct child of <body>, see layout.tsx) and hosts LIGHT surfaces
+     inside it -- its transcript and composer read --surface-canvas/--surface-
+     raised and would invert to white-on-white if these rules reached them. */
+  .arf-page-root .arf-card-anchored,
+  .arf-page-root .arf-dark-wash {
+    color: var(--color-arf-canvas);
+  }
+  .arf-page-root :is(.arf-card-anchored, .arf-dark-wash)
+    :is(h1, h2, h3, h4, p, span, li, th, td) {
+    color: inherit;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .arf-page-root {
       scroll-behavior: auto;
