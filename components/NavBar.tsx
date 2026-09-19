@@ -174,7 +174,7 @@ export default function NavBar() {
               once AuthKit lands, pointed at the real login route. */}
           <Link
             href="/signup"
-            className="hidden items-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-[17px] py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(51,88,232,0.7)] transition hover:brightness-110 active:scale-[0.97] sm:inline-flex"
+            className="hidden items-center gap-2 rounded-lg bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple px-[17px] py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(51,88,232,0.7)] transition hover:brightness-110 active:scale-[0.97] sm:inline-flex"
           >
             Request Pilot Access
           </Link>
@@ -232,7 +232,7 @@ export default function NavBar() {
               <div className="mt-2 flex flex-col gap-2.5">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.97]"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.97]"
                 >
                   Request Pilot Access <ArrowRight size={16} />
                 </Link>

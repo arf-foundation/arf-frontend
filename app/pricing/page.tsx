@@ -318,7 +318,7 @@ function TierBody({
       {dominant ? (
         <Link
           href={cta.href}
-          className="block rounded-[9px] bg-gradient-to-br from-arf-blue to-arf-purple py-3 text-center text-[14.5px] font-semibold text-white transition hover:brightness-110"
+          className="block rounded-[9px] bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple py-3 text-center text-[14.5px] font-semibold text-white transition hover:brightness-110"
         >
           {cta.label}
         </Link>
