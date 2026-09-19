@@ -186,6 +186,20 @@ main > div:first-child {
   --text-secondary: var(--color-arf-ink-3);
   --text-muted: var(--color-arf-muted);
   --hairline: var(--color-arf-line);
+  /* Literal, not `bg-[color:var(--surface-canvas)]/85`. That utility compiles to
+     `color-mix(in oklab, var(--surface-canvas) 85%, transparent)`, which resolves
+     the surface token through a second, independent mechanism from the one that
+     resolves --text-primary. Replay QA reported the header painted
+     rgba(14,13,18,0.85) (the DARK canvas at 85%) while the wordmark and nav links
+     were still at their LIGHT values -- 1.09:1 and 1.71:1, ratios that reproduce
+     exactly and only under that combination. Not reproducible in Chrome 152, but
+     a literal token puts background and ink on the same resolution path, so they
+     cannot tear apart whatever the mechanism was.
+     KEEP IN SYNC: this is --surface-canvas at 85% written out by hand (light
+     #faf9f7 = --color-arf-canvas, dark #0e0d12 = .dark's --surface-canvas).
+     Repaint the ramp and this has to move with it -- being literal is the whole
+     point, so it cannot follow automatically. */
+  --surface-canvas-85: rgba(250, 249, 247, 0.85);
   --card-shadow:
     0 2px 4px rgba(25, 24, 22, 0.03), 0 20px 44px -28px rgba(25, 24, 22, 0.42);
   --card-shadow-hover:
@@ -213,6 +227,7 @@ main > div:first-child {
   --text-secondary: rgba(250, 249, 247, 0.72);
   --text-muted: rgba(250, 249, 247, 0.56);
   --hairline: rgba(250, 249, 247, 0.12);
+  --surface-canvas-85: rgba(14, 13, 18, 0.85);
   --card-shadow:
     0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 44px -28px rgba(0, 0, 0, 0.8);
   --card-shadow-hover:

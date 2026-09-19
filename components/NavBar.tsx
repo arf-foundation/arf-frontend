@@ -90,7 +90,16 @@ export default function NavBar() {
     root.classList.add("theme-transition-off");
     root.classList.toggle("dark", next === "dark");
     void root.offsetHeight;
-    requestAnimationFrame(() => root.classList.remove("theme-transition-off"));
+    // Two frames, not one. A single rAF callback runs BEFORE the paint it was
+    // scheduled for, so transitions were being re-enabled in the same frame the
+    // new colours were still being committed -- which is the exact window the
+    // Chromium bug above needs to latch the previous theme's resolved colour.
+    // Nesting a second rAF moves the removal to after that paint has actually
+    // landed. Replay QA reported header ink stuck at light-theme values against
+    // a dark-theme header background; this is the half of that we can act on.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => root.classList.remove("theme-transition-off")),
+    );
     setTheme(next);
     try {
       window.localStorage.setItem("arf-theme", next);
@@ -100,7 +109,7 @@ export default function NavBar() {
   };
 
   return (
-    <header className="arf-page-root sticky top-0 z-40 border-b border-[color:var(--hairline)] bg-[color:var(--surface-canvas)]/85 backdrop-blur-md">
+    <header className="arf-page-root sticky top-0 z-40 border-b border-[color:var(--hairline)] bg-[color:var(--surface-canvas-85)] backdrop-blur-md">
       <div className="arf-shell flex h-[74px] items-center justify-between gap-8">
         <Link
           href="/"
