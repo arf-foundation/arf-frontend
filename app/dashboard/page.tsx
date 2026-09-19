@@ -820,7 +820,7 @@ export default function Dashboard() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
                     activeTab === tab.id
-                      ? "bg-gradient-to-br from-arf-blue to-arf-purple text-white"
+                      ? "bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple text-white"
                       : "bg-[color:var(--surface-sunken)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
                   }`}
                 >
@@ -941,7 +941,7 @@ export default function Dashboard() {
                 <div className="arf-card-substantial p-6">
                   <div className="mb-4 flex items-start justify-between">
                     <h2 className="text-h3 font-semibold">Plan (Sandbox)</h2>
-                    <span className="rounded-full bg-gradient-to-br from-arf-blue to-arf-purple px-3 py-1 text-xs font-medium text-white">
+                    <span className="rounded-full bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple px-3 py-1 text-xs font-medium text-white">
                       {quota.tier.toUpperCase()}
                     </span>
                   </div>

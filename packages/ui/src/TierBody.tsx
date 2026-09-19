@@ -54,7 +54,7 @@ export function TierBody({
       {dominant ? (
         <LinkTag
           href={cta.href}
-          className="block rounded-[9px] bg-gradient-to-br from-arf-blue to-arf-purple py-3 text-center text-[14.5px] font-semibold text-white transition hover:brightness-110 active:scale-[0.98]"
+          className="block rounded-[9px] bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple py-3 text-center text-[14.5px] font-semibold text-white transition hover:brightness-110 active:scale-[0.98]"
         >
           {cta.label}
         </LinkTag>

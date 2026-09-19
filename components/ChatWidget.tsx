@@ -192,7 +192,7 @@ export default function ChatWidget() {
         aria-label={open ? 'Close ARF agent chat' : 'Open ARF agent chat'}
         aria-expanded={open}
         aria-controls="arf-chat-panel"
-        className={`fixed right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-arf-blue to-arf-purple text-white shadow-[0_16px_34px_-16px_rgba(51,88,232,0.75)] transition hover:brightness-110 sm:right-6 ${launcherBottomClass}`}
+        className={`fixed right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple text-white shadow-[0_16px_34px_-16px_rgba(51,88,232,0.75)] transition hover:brightness-110 sm:right-6 ${launcherBottomClass}`}
       >
         {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
       </button>
@@ -240,7 +240,7 @@ export default function ChatWidget() {
             <div className="flex flex-col gap-3">
               {messages.map((m, i) =>
                 m.role === 'user' ? (
-                  <div key={i} className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-gradient-to-br from-arf-blue to-arf-purple px-3.5 py-2.5 text-[13.5px] text-white">
+                  <div key={i} className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple px-3.5 py-2.5 text-[13.5px] text-white">
                     {m.text}
                   </div>
                 ) : 'error' in m ? (
@@ -278,7 +278,7 @@ export default function ChatWidget() {
               onClick={send}
               disabled={loading || !input.trim()}
               aria-label="Send"
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-arf-blue to-arf-purple text-white transition hover:brightness-110 disabled:opacity-40"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple text-white transition hover:brightness-110 disabled:opacity-40"
             >
               <Send className="h-4 w-4" />
             </button>

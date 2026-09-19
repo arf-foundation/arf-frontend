@@ -186,6 +186,20 @@ main > div:first-child {
   --text-secondary: var(--color-arf-ink-3);
   --text-muted: var(--color-arf-muted);
   --hairline: var(--color-arf-line);
+  /* Literal, not `bg-[color:var(--surface-canvas)]/85`. That utility compiles to
+     `color-mix(in oklab, var(--surface-canvas) 85%, transparent)`, which resolves
+     the surface token through a second, independent mechanism from the one that
+     resolves --text-primary. Replay QA reported the header painted
+     rgba(14,13,18,0.85) (the DARK canvas at 85%) while the wordmark and nav links
+     were still at their LIGHT values -- 1.09:1 and 1.71:1, ratios that reproduce
+     exactly and only under that combination. Not reproducible in Chrome 152, but
+     a literal token puts background and ink on the same resolution path, so they
+     cannot tear apart whatever the mechanism was.
+     KEEP IN SYNC: this is --surface-canvas at 85% written out by hand (light
+     #faf9f7 = --color-arf-canvas, dark #0e0d12 = .dark's --surface-canvas).
+     Repaint the ramp and this has to move with it -- being literal is the whole
+     point, so it cannot follow automatically. */
+  --surface-canvas-85: rgba(250, 249, 247, 0.85);
   --card-shadow:
     0 2px 4px rgba(25, 24, 22, 0.03), 0 20px 44px -28px rgba(25, 24, 22, 0.42);
   --card-shadow-hover:
@@ -213,6 +227,7 @@ main > div:first-child {
   --text-secondary: rgba(250, 249, 247, 0.72);
   --text-muted: rgba(250, 249, 247, 0.56);
   --hairline: rgba(250, 249, 247, 0.12);
+  --surface-canvas-85: rgba(14, 13, 18, 0.85);
   --card-shadow:
     0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 44px -28px rgba(0, 0, 0, 0.8);
   --card-shadow-hover:
@@ -287,6 +302,35 @@ main > div:first-child {
   .arf-page-root td {
     color: var(--text-primary);
   }
+  /* ...with one exception the rule above cannot express on its own: a dark
+     band. Those carry their own near-black background in BOTH themes, so their
+     contents need light ink in both -- and they got it by putting `text-white`
+     on the container and letting children inherit. Inheritance is exactly what
+     the blanket declaration above defeats: a direct `color` declaration always
+     wins over an inherited value, whatever the specificity, so every heading
+     inside a dark band that had no colour utility of its own was painted
+     --text-primary. In light mode that is #191816 on #131218 -- confirmed live
+     on /history's "Get real-time risk history" H2 at 1.05:1 (WCAG AA needs
+     4.5:1), which is what Replay QA reported.
+
+     Fixed at the source rather than by spot-painting that one H2: a dark
+     surface now declares the light ink it hands down, and its text descendants
+     go back to inheriting it. Elements carrying their own colour utility
+     (text-white/80, text-[#9fe7b8], ...) are untouched either way -- utilities
+     outrank components. Scoped under .arf-page-root on purpose: ChatWidget's
+     panel is also .arf-card-anchored but sits outside every .arf-page-root
+     (it's a direct child of <body>, see layout.tsx) and hosts LIGHT surfaces
+     inside it -- its transcript and composer read --surface-canvas/--surface-
+     raised and would invert to white-on-white if these rules reached them. */
+  .arf-page-root .arf-card-anchored,
+  .arf-page-root .arf-dark-wash {
+    color: var(--color-arf-canvas);
+  }
+  .arf-page-root :is(.arf-card-anchored, .arf-dark-wash)
+    :is(h1, h2, h3, h4, p, span, li, th, td) {
+    color: inherit;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .arf-page-root {
       scroll-behavior: auto;

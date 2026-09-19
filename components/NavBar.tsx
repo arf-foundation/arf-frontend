@@ -90,7 +90,16 @@ export default function NavBar() {
     root.classList.add("theme-transition-off");
     root.classList.toggle("dark", next === "dark");
     void root.offsetHeight;
-    requestAnimationFrame(() => root.classList.remove("theme-transition-off"));
+    // Two frames, not one. A single rAF callback runs BEFORE the paint it was
+    // scheduled for, so transitions were being re-enabled in the same frame the
+    // new colours were still being committed -- which is the exact window the
+    // Chromium bug above needs to latch the previous theme's resolved colour.
+    // Nesting a second rAF moves the removal to after that paint has actually
+    // landed. Replay QA reported header ink stuck at light-theme values against
+    // a dark-theme header background; this is the half of that we can act on.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => root.classList.remove("theme-transition-off")),
+    );
     setTheme(next);
     try {
       window.localStorage.setItem("arf-theme", next);
@@ -100,7 +109,7 @@ export default function NavBar() {
   };
 
   return (
-    <header className="arf-page-root sticky top-0 z-40 border-b border-[color:var(--hairline)] bg-[color:var(--surface-canvas)]/85 backdrop-blur-md">
+    <header className="arf-page-root sticky top-0 z-40 border-b border-[color:var(--hairline)] bg-[color:var(--surface-canvas-85)] backdrop-blur-md">
       <div className="arf-shell flex h-[74px] items-center justify-between gap-8">
         <Link
           href="/"
@@ -174,7 +183,7 @@ export default function NavBar() {
               once AuthKit lands, pointed at the real login route. */}
           <Link
             href="/signup"
-            className="hidden items-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-[17px] py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(51,88,232,0.7)] transition hover:brightness-110 active:scale-[0.97] sm:inline-flex"
+            className="hidden items-center gap-2 rounded-lg bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple px-[17px] py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(51,88,232,0.7)] transition hover:brightness-110 active:scale-[0.97] sm:inline-flex"
           >
             Request Pilot Access
           </Link>
@@ -232,7 +241,7 @@ export default function NavBar() {
               <div className="mt-2 flex flex-col gap-2.5">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-arf-blue to-arf-purple px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.97]"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.97]"
                 >
                   Request Pilot Access <ArrowRight size={16} />
                 </Link>

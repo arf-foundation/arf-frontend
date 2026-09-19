@@ -330,7 +330,7 @@ export default function LandingPage() {
           href="/changelog"
           className="inline-flex items-center gap-2 text-[color:var(--text-secondary)] transition hover:text-arf-blue"
         >
-          <span className="rounded-full bg-gradient-to-br from-arf-blue to-arf-purple px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.05em] text-white">
+          <span className="rounded-full bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.05em] text-white">
             New
           </span>
           Explainable governance decisions + real PDF compliance export
@@ -464,7 +464,7 @@ export default function LandingPage() {
               className={`arf-card-light arf-reveal p-8 ${whoInView ? "arf-reveal-in" : ""}`}
               style={{ transitionDelay: whoInView ? `${idx * 90}ms` : "0ms" }}
             >
-              <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-[11px] bg-gradient-to-br from-arf-blue to-arf-purple">
+              <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-[11px] bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple">
                 <item.icon className="h-5 w-5 text-white" strokeWidth={1.75} />
               </div>
               <h3 className="mb-3 text-[19px] font-semibold tracking-[-0.016em]">
@@ -606,7 +606,7 @@ export default function LandingPage() {
                   transitionDelay: govInView ? `${idx * 110}ms` : "0ms",
                 }}
               >
-                <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-[11px] bg-gradient-to-br from-arf-blue to-arf-purple">
+                <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-[11px] bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple">
                   <item.icon
                     className="h-5 w-5 text-white"
                     strokeWidth={1.75}

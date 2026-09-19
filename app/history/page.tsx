@@ -35,6 +35,36 @@ const generateMockHistory = (): HistoryPoint[] => {
   return data;
 };
 
+/* ---------------------------------------------------------------------------
+   Chart props, hoisted out of the render on purpose.
+
+   Recharts re-renders its whole subtree whenever the tooltip's hovered-axis
+   index changes -- i.e. on every pointer move across the plot. Each of these
+   was an object/array/arrow literal written inline in the JSX, so every one of
+   them was a NEW identity on each of those renders, and all 31 <Dot> fibers
+   (plus the axes, grid and tooltip) re-rendered for a pointer move that changed
+   nothing in the DOM. Replay QA measured that as a main-thread block on hover.
+   Module-level constants are referentially stable, so React can bail out of
+   those subtrees instead. Nothing here reads component state, so there is no
+   reason for any of it to live inside the component.
+   ------------------------------------------------------------------------ */
+const CHART_DOT = { r: 3, fill: '#3358e8' };
+const CHART_ACTIVE_DOT = { r: 6 };
+const CHART_AXIS_TICK = { fontSize: 12 };
+const CHART_Y_DOMAIN: [number, number] = [0, 1];
+const CHART_TOOLTIP_CONTENT_STYLE = {
+  backgroundColor: 'var(--surface-raised)',
+  border: '1px solid var(--hairline)',
+  borderRadius: '0.5rem',
+};
+const CHART_TOOLTIP_LABEL_STYLE = { color: 'var(--text-primary)' };
+
+const formatDate = (isoString: string) =>
+  new Date(isoString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+const formatPercentTick = (value: number) => `${(value * 100).toFixed(0)}%`;
+const formatTooltipValue = (value: number) => `${(value * 100).toFixed(1)}%`;
+const formatTooltipLabel = (label: string) => new Date(label).toLocaleDateString();
+
 const mockDecisions = [
   { id: 1, timestamp: '2026-04-15 10:23:45', service: 'payment-api', risk: 0.82, action: 'ESCALATE' },
   { id: 2, timestamp: '2026-04-15 09:15:22', service: 'auth-service', risk: 0.45, action: 'APPROVE' },
@@ -62,11 +92,6 @@ export default function HistoryPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshData();
   }, []);
-
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  };
 
   if (loading && historyData.length === 0) {
     return (
@@ -119,27 +144,27 @@ export default function HistoryPage() {
                     dataKey="timestamp"
                     tickFormatter={formatDate}
                     stroke="var(--text-muted)"
-                    tick={{ fontSize: 12 }}
+                    tick={CHART_AXIS_TICK}
                   />
                   <YAxis
-                    domain={[0, 1]}
-                    tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
+                    domain={CHART_Y_DOMAIN}
+                    tickFormatter={formatPercentTick}
                     stroke="var(--text-muted)"
-                    tick={{ fontSize: 12 }}
+                    tick={CHART_AXIS_TICK}
                   />
                   <Tooltip
-                    contentStyle={{ backgroundColor: 'var(--surface-raised)', border: '1px solid var(--hairline)', borderRadius: '0.5rem' }}
-                    labelStyle={{ color: 'var(--text-primary)' }}
-                    formatter={(value: number) => `${(value * 100).toFixed(1)}%`}
-                    labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                    contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                    labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                    formatter={formatTooltipValue}
+                    labelFormatter={formatTooltipLabel}
                   />
                   <Line
                     type="monotone"
                     dataKey="risk_score"
                     stroke="#3358e8"
                     strokeWidth={2}
-                    dot={{ r: 3, fill: '#3358e8' }}
-                    activeDot={{ r: 6 }}
+                    dot={CHART_DOT}
+                    activeDot={CHART_ACTIVE_DOT}
                   />
                 </LineChart>
               </ResponsiveContainer>
