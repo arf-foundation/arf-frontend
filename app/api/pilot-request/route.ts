@@ -43,6 +43,9 @@ export async function POST(request: Request) {
       aiMaturity,
       budgetApproved,
       timeline,
+      companySize,
+      headquarters,
+      governanceOwner,
     } = body;
 
     if (!fullName || !email || !company) {
@@ -97,6 +100,18 @@ export async function POST(request: Request) {
         },
         Timeline: {
           select: timeline ? { name: cleanSelect(timeline) } : null,
+        },
+        // The two hard ICP gates a data provider can answer, asked
+        // directly so an inbound request arrives already scoreable.
+        'Company Size': {
+          select: companySize ? { name: cleanSelect(companySize) } : null,
+        },
+        Headquarters: {
+          select: headquarters ? { name: cleanSelect(headquarters) } : null,
+        },
+        // The buying reason itself: the absence of a governance owner.
+        'Governance Owner': {
+          select: governanceOwner ? { name: cleanSelect(governanceOwner) } : null,
         },
       },
     });
