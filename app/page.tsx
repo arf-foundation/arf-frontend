@@ -151,8 +151,8 @@ const WHO_FOR = [
   },
   {
     icon: ShieldCheck,
-    title: "Security & compliance leaders",
-    body: "You need a defensible, tamper-evident record of every AI-assisted operational decision — before an auditor asks, not after.",
+    title: "Founders and CTOs with nobody to delegate this to",
+    body: "A customer's security review asks who governs your agents' actions in production. At thirty people the answer is you — and it has to be something you can show, not describe.",
   },
   {
     icon: Compass,
@@ -524,10 +524,11 @@ export default function LandingPage() {
       <section ref={industriesRef} className="arf-shell pb-[120px]">
         <div className="mb-7 flex flex-wrap items-baseline justify-between gap-6">
           <h2 className="text-[27px] font-semibold tracking-[-0.022em]">
-            Built for regulated enterprises
+            Built for teams answerable to regulated markets
           </h2>
           <p className="text-sm text-[color:var(--text-muted)]">
-            Compliance, safety, and accountability are non-negotiable.
+            You may not be the regulated enterprise — your customer is,
+            and their security review is the deadline.
           </p>
         </div>
         <div className="flex flex-wrap gap-2.5">
