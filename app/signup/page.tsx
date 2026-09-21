@@ -25,6 +25,9 @@ export default function SignupPage() {
     aiMaturity: '',
     budgetApproved: '',
     timeline: '',
+    companySize: '',
+    headquarters: '',
+    governanceOwner: '',
     agreeToTerms: false,
   });
 
@@ -72,8 +75,8 @@ export default function SignupPage() {
 
   const validateStep = (s: number): boolean => {
     const errors: Record<string, string> = {};
-    const step1Fields = ['fullName', 'email', 'company', 'industry', 'jobRole'];
-    const step2Fields = ['useCase', 'expectedVolume', 'cloudEnvironment', 'aiMaturity'];
+    const step1Fields = ['fullName', 'email', 'company', 'industry', 'jobRole', 'companySize', 'headquarters'];
+    const step2Fields = ['useCase', 'expectedVolume', 'cloudEnvironment', 'aiMaturity', 'governanceOwner'];
     const fields = s === 1 ? step1Fields : step2Fields;
     fields.forEach(key => {
       if (!formData[key as keyof typeof formData]) {
@@ -92,7 +95,9 @@ export default function SignupPage() {
     const errors: Record<string, string> = {};
     const required = [
       'fullName', 'email', 'company', 'industry', 'jobRole',
+      'companySize', 'headquarters',
       'useCase', 'expectedVolume', 'cloudEnvironment', 'aiMaturity',
+      'governanceOwner',
       'timeline'
     ];
     required.forEach(key => {
@@ -143,6 +148,9 @@ export default function SignupPage() {
           aiMaturity: formData.aiMaturity,
           budgetApproved: formData.budgetApproved,
           timeline: formData.timeline,
+          companySize: formData.companySize,
+          headquarters: formData.headquarters,
+          governanceOwner: formData.governanceOwner,
         }),
       });
 
@@ -364,6 +372,54 @@ export default function SignupPage() {
                     )}
                   </div>
                 </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="companySize" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Company size *</label>
+                      <select
+                        id="companySize"
+                        name="companySize"
+                        required
+                        value={formData.companySize}
+                        onChange={handleChange}
+                        ref={el => { inputRefs.current.companySize = el; }}
+                        aria-invalid={!!fieldErrors.companySize}
+                        aria-describedby={fieldErrors.companySize ? 'companySize-error' : undefined}
+                        className={`arf-input ${fieldErrors.companySize ? 'arf-input-error' : ''}`}
+                      >
+                        <option value="">Select</option>
+                        <option value="1-9">1-9</option>
+                        <option value="10-50">10-50</option>
+                        <option value="51-200">51-200</option>
+                        <option value="201-1000">201-1000</option>
+                        <option value="1000+">1000+</option>
+                      </select>
+                      {fieldErrors.companySize && (
+                        <p id="companySize-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.companySize}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="headquarters" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Headquarters *</label>
+                      <select
+                        id="headquarters"
+                        name="headquarters"
+                        required
+                        value={formData.headquarters}
+                        onChange={handleChange}
+                        ref={el => { inputRefs.current.headquarters = el; }}
+                        aria-invalid={!!fieldErrors.headquarters}
+                        aria-describedby={fieldErrors.headquarters ? 'headquarters-error' : undefined}
+                        className={`arf-input ${fieldErrors.headquarters ? 'arf-input-error' : ''}`}
+                      >
+                        <option value="">Select</option>
+                        <option value="New York City metro">New York City metro</option>
+                        <option value="Elsewhere in the US">Elsewhere in the US</option>
+                        <option value="Outside the US">Outside the US</option>
+                      </select>
+                      {fieldErrors.headquarters && (
+                        <p id="headquarters-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.headquarters}</p>
+                      )}
+                    </div>
+                </div>
               </>
             )}
 
@@ -463,6 +519,29 @@ export default function SignupPage() {
                     <p id="aiMaturity-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.aiMaturity}</p>
                   )}
                 </div>
+                    <div>
+                      <label htmlFor="governanceOwner" className="mb-1 block text-sm font-medium text-[color:var(--text-secondary)]">Who owns AI governance today? *</label>
+                      <select
+                        id="governanceOwner"
+                        name="governanceOwner"
+                        required
+                        value={formData.governanceOwner}
+                        onChange={handleChange}
+                        ref={el => { inputRefs.current.governanceOwner = el; }}
+                        aria-invalid={!!fieldErrors.governanceOwner}
+                        aria-describedby={fieldErrors.governanceOwner ? 'governanceOwner-error' : undefined}
+                        className={`arf-input ${fieldErrors.governanceOwner ? 'arf-input-error' : ''}`}
+                      >
+                        <option value="">Select</option>
+                        <option value="Nobody yet">Nobody yet</option>
+                        <option value="Part of an existing role">Part of an existing role</option>
+                        <option value="Dedicated person or team">Dedicated person or team</option>
+                      </select>
+                      <p className="mt-1 text-xs text-[color:var(--text-muted)]">There is no wrong answer here. Most teams your size answer &quot;nobody yet&quot;.</p>
+                      {fieldErrors.governanceOwner && (
+                        <p id="governanceOwner-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.governanceOwner}</p>
+                      )}
+                    </div>
               </>
             )}
 
