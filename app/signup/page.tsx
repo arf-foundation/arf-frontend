@@ -462,10 +462,17 @@ export default function SignupPage() {
                       className={`arf-input ${fieldErrors.expectedVolume ? 'arf-input-error' : ''}`}
                     >
                       <option value="">Select volume</option>
-                      <option value="< 1,000">&lt; 1,000</option>
-                      <option value="1,000–10,000">1,000 – 10,000</option>
-                      <option value="10,000–100,000">10,000 – 100,000</option>
-                      <option value="> 100,000">&gt; 100,000</option>
+                      {/* value MUST equal the Notion select option name exactly.
+                          The API route sends it through cleanSelect(), which only
+                          strips commas, and Notion CREATES an unknown option rather
+                          than rejecting it -- so a mismatch silently splits this
+                          field across two options with nothing logged. Commas are
+                          kept out of the values so cleanSelect is a no-op here and
+                          the value is the option name, not a guess at it. */}
+                      <option value="< 1000">&lt; 1,000</option>
+                      <option value="1000 – 10000">1,000 – 10,000</option>
+                      <option value="10000 – 100000">10,000 – 100,000</option>
+                      <option value="> 100000">&gt; 100,000</option>
                     </select>
                     {fieldErrors.expectedVolume && (
                       <p id="expectedVolume-error" role="alert" className="mt-1 text-xs text-red-500">{fieldErrors.expectedVolume}</p>
@@ -488,7 +495,7 @@ export default function SignupPage() {
                       <option value="AWS">AWS</option>
                       <option value="Azure">Azure</option>
                       <option value="GCP">GCP</option>
-                      <option value="On‑premises">On‑premises / Private cloud</option>
+                      <option value="On‑premises / Private cloud">On‑premises / Private cloud</option>
                       <option value="Multi‑cloud">Multi‑cloud</option>
                     </select>
                     {fieldErrors.cloudEnvironment && (
