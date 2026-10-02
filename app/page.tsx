@@ -20,7 +20,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useInView } from "./hooks/useInView";
-import { useCountUp } from "./hooks/useCountUp";
 import ArchitecturePipeline from "../components/ArchitecturePipeline";
 import {
   CapabilityCard,
@@ -176,10 +175,21 @@ const SPECS = [
   "Enterprise Specification",
 ] as const;
 
-const PILOT_STATS = [
-  { to: 100, suffix: "%", label: "of autonomous actions gated and recorded" },
-  { to: 42, suffix: "ms", label: "median policy evaluation overhead" },
-  { to: 0, suffix: "", label: "silent overrides — every exception is signed" },
+/* Each fact is asserted by enterprise tests/test_ontap_mcp_proxy.py and shown
+   in examples/ontap_mcp_proxy_demo.py. No customer numbers until they are real. */
+const BY_DESIGN = [
+  {
+    title: "Recorded before it runs",
+    body: "Every modeled write is committed to the record before it executes, then confirmed by an independent read.",
+  },
+  {
+    title: "Unmodeled writes are refused",
+    body: "A tool ARF cannot model is neither forwarded nor sent for approval — no one is asked to approve what they cannot judge.",
+  },
+  {
+    title: "One approval, one action",
+    body: "An approval admits exactly the call it was given for: not another volume, and not the same call once its recovery path is gone.",
+  },
 ] as const;
 
 const TIERS = [
@@ -385,23 +395,6 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
-      </section>
-
-      {/* ─── Trusted-by row (placeholder marks until real logos land) ────────── */}
-      <section className="arf-shell pb-[88px] pt-16 text-center">
-        <p className="arf-eyebrow mb-6">Deployed and evaluated with</p>
-        <div className="flex flex-wrap items-center justify-center gap-12">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              aria-hidden
-              className="h-6 w-[104px] rounded-[3px] bg-[repeating-linear-gradient(135deg,rgba(25,24,22,0.15)_0_2px,transparent_2px_7px)] dark:bg-[repeating-linear-gradient(135deg,rgba(250,249,247,0.18)_0_2px,transparent_2px_7px)]"
-            />
-          ))}
-        </div>
-        <p className="mt-3.5 font-mono text-[9.5px] uppercase tracking-[0.1em] text-[color:var(--text-muted)]">
-          logo placeholders
-        </p>
       </section>
 
       {/* ─── Problem / Solution / Outcome ────────────────────────────────────── */}
@@ -624,52 +617,39 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Case study / testimonial band ───────────────────────────────────── */}
+      {/* ─── By design — what the demo proves (no placeholder quotes or stats) ── */}
       <section ref={quoteRef} className="arf-dark-wash bg-arf-dark py-[104px]">
         <div className="arf-shell grid items-center gap-16 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
             <p className="mb-6 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-white/60">
-              Pilot feedback · placeholder quote
+              By design · shown on a simulated ONTAP cluster
             </p>
-            <blockquote className="mb-7 font-serif text-[clamp(1.75rem,3vw,2.125rem)] font-light italic leading-[1.35] tracking-[-0.01em] text-white text-pretty">
-              &ldquo;We could not put agents anywhere near production until
-              every action had a gate in front of it and a record behind it. ARF
-              gave our risk committee something they could actually read.&rdquo;
-            </blockquote>
-            <div className="flex items-center gap-3.5">
-              <div
-                aria-hidden
-                className="h-[38px] w-[38px] rounded-full bg-[repeating-linear-gradient(135deg,rgba(250,249,247,0.22)_0_2px,transparent_2px_7px)]"
-              />
-              <div>
-                <p className="text-[14.5px] font-semibold text-white">
-                  Head of AI Platform
-                </p>
-                <p className="text-[13.5px] text-white/65">
-                  Tier-1 financial services · pilot organisation
-                </p>
-              </div>
-            </div>
+            <p className="mb-7 font-serif text-[clamp(1.75rem,3vw,2.125rem)] font-light leading-[1.35] tracking-[-0.01em] text-white text-pretty">
+              Every write your agent makes is checked against whether it can be
+              undone — before it runs, not after.
+            </p>
+            <p className="max-w-[52ch] text-[14.5px] leading-[1.6] text-white/65">
+              These are properties of the engine, demonstrated end to end. No
+              customer quotes or numbers appear here until they are real.
+            </p>
           </div>
-          <div className="rounded-2xl border border-white/15 bg-white/[0.06] p-8">
+          <div
+            className={`arf-reveal rounded-2xl border border-white/15 bg-white/[0.06] p-8 ${quoteInView ? "arf-reveal-in" : ""}`}
+          >
             <p className="mb-6 font-mono text-[10.5px] font-medium uppercase tracking-[0.13em] text-white/60">
-              Pilot outcome · illustrative
+              What the demo proves
             </p>
             <dl className="flex flex-col gap-5">
-              {PILOT_STATS.map((stat, idx) => (
+              {BY_DESIGN.map((fact, idx) => (
                 <div
-                  key={stat.label}
+                  key={fact.title}
                   className={idx > 0 ? "border-t border-white/15 pt-5" : ""}
                 >
-                  <dt className="mb-1 text-[32px] font-semibold leading-none tracking-[-0.028em] text-white tabular-nums">
-                    <PilotStat
-                      to={stat.to}
-                      suffix={stat.suffix}
-                      start={quoteInView}
-                    />
+                  <dt className="mb-1 text-[17px] font-semibold leading-[1.3] tracking-[-0.014em] text-white">
+                    {fact.title}
                   </dt>
                   <dd className="text-[13.5px] leading-[1.5] text-white/70">
-                    {stat.label}
+                    {fact.body}
                   </dd>
                 </div>
               ))}
@@ -752,28 +732,5 @@ export default function LandingPage() {
         </div>
       )}
     </div>
-  );
-}
-
-/* ============================ Sub-components ============================== */
-
-/* Hooks can't be called inside .map() -- this exists so each pilot stat gets
-   its own useCountUp() call, one per mounted instance, instead of trying to
-   call the hook three times from a loop. */
-function PilotStat({
-  to,
-  suffix,
-  start,
-}: {
-  to: number;
-  suffix: string;
-  start: boolean;
-}) {
-  const value = useCountUp(to, { start });
-  return (
-    <>
-      {value}
-      {suffix}
-    </>
   );
 }
