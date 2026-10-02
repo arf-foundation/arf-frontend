@@ -3,7 +3,7 @@
     {
       "date": "2026-09-29",
       "title": "Bounded write access for ONTAP storage agents",
-      "description": "ARF can now sit between an AI agent and NetApp ONTAP's MCP tools. Read tools pass through. Six storage writes are modeled: creating a volume, resizing it or taking it offline, creating a snapshot, and deleting a volume, a snapshot or a SnapMirror relationship. Each is checked against live cluster state, given an approval floor by whether it can be undone, and committed to the decision record before it runs, then confirmed by an independent read. Every other write tool is refused rather than sent for approval, and an approval admits only the exact call it was given for. Demonstrated end to end against a simulated cluster; it has not yet run against a live one.",
+      "description": "ARF can now sit between an AI agent and NetApp ONTAP's MCP tools. Read tools pass through. Six storage writes are modeled: creating a volume, resizing it or taking it offline, creating a snapshot, and deleting a volume, a snapshot or a SnapMirror relationship. Each is checked against live cluster state, given an approval floor by whether it can be undone, and committed to the decision record before it runs, then checked by an independent read. A result that read cannot confirm is reported as unverified, or as unknown when the outcome itself is uncertain. Every other write tool is refused rather than sent for approval, and an approval admits only the exact call it was given for. Demonstrated end to end against a simulated cluster; it has not yet run against a live one.",
       "type": "pilot"
     },
     {

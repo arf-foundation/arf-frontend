@@ -180,7 +180,7 @@ const SPECS = [
 const BY_DESIGN = [
   {
     title: "Recorded before it runs",
-    body: "Every modeled write is committed to the record before it executes, then confirmed by an independent read.",
+    body: "Every modeled write is committed to the record before it executes, then checked by an independent read. A write that read cannot confirm is reported as unverified, not as a success.",
   },
   {
     title: "Unmodeled writes are refused",

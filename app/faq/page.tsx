@@ -19,11 +19,11 @@ export default function FAQPage() {
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
               question="What is ARF?"
-              answer="ARF is a governance layer that evaluates infrastructure decisions through a calibrated risk model. It recommends one of three actions — approve, deny, or escalate — together with a confidence indicator and a full audit trail. The core engine is access‑controlled and available only to qualified pilots."
+              answer="ARF is a governance layer that evaluates infrastructure decisions through a calibrated risk model. It recommends one of three actions — approve, deny, or escalate — together with a confidence indicator, and records each governed decision. The core engine is access‑controlled and available only to qualified pilots."
             />
             <FAQItem
               question="Is ARF publicly available?"
-              answer="No. ARF is proprietary and access‑controlled. All repositories are private, and access to code, specifications, and supporting materials is granted only through approved pilot or enterprise arrangements."
+              answer="No. ARF is proprietary and access‑controlled. The engine and its specifications are private, and access to code, specifications, and supporting materials is granted only through approved pilot or enterprise arrangements."
             />
             <FAQItem
               question="What’s the difference between the demo and the real engine?"
@@ -65,7 +65,7 @@ export default function FAQPage() {
           <div className="space-y-5 sm:space-y-6">
             <FAQItem
               question="How many requests per second can the real engine handle?"
-              answer="Performance depends on deployment scale. For pilot customers, we provide guidance based on your expected volume. Enterprise customers receive SLAs and dedicated capacity."
+              answer="Performance depends on deployment scale. For pilot customers, we provide guidance based on your expected volume. Throughput is measured on your agent’s own write path during an engagement; no SLA is offered today."
             />
             <FAQItem
               question="What data is stored?"
@@ -111,7 +111,7 @@ export default function FAQPage() {
             />
             <FAQItem
               question="Can I use the real engine in a commercial product?"
-              answer="Yes, under a pilot or enterprise agreement. Outcome‑based pricing applies. Contact us for details."
+              answer="Yes, under a written agreement. Start with a free pilot snapshot, then a fixed‑price $4,500 review of one agent; a continuous gate is by invitation and scoped per engagement. Contact us for details."
             />
           </div>
         </section>
