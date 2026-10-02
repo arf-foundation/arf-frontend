@@ -19,8 +19,9 @@ import { ArrowRight } from 'lucide-react';
 
    Commercial claims revised with the founder on 2026-10-02. No SLA, SSO,
    named support engineer, in-perimeter deployment or outcome-based share is
-   offered today, so none is listed. The review is a fixed price per agent,
-   quoted before work starts; the continuous gate is by invitation only.
+   offered today, so none is listed. The review is $4,500 per agent (Petter
+   approved showing it publicly, 2026-10-02); the continuous gate is by
+   invitation only.
    ========================================================================= */
 
 export const metadata: Metadata = {
@@ -62,8 +63,8 @@ const TIERS = [
   {
     name: 'Write-access review',
     meta: 'Fixed price · one agent',
-    price: 'Quoted',
-    note: 'Fixed before work starts; delivery date agreed at scoping',
+    price: '$4,500',
+    note: 'One agent, fixed price; delivery date agreed at scoping',
     items: [
       'Every production write your agent can make',
       'Whether each can be undone, from evidence',
@@ -82,7 +83,7 @@ const COMPARISON = [
   { label: 'Enforcement', sandbox: 'Simulated only', pilot: 'None — analysis only', enterprise: 'None in the review; a gate is by invitation afterwards' },
   { label: 'Deliverable', sandbox: 'API responses', pilot: 'Short written summary', enterprise: 'Report, recoverability map, gap list' },
   { label: 'Support', sandbox: 'Community', pilot: 'Founder-led', enterprise: 'Founder-led' },
-  { label: 'Commercials', sandbox: 'Free', pilot: 'Free, reference agreed in writing', enterprise: 'Fixed price per agent, card or invoice' },
+  { label: 'Commercials', sandbox: 'Free', pilot: 'Free, reference agreed in writing', enterprise: '$4,500 fixed, card or invoice' },
 ] as const;
 
 const MODEL = [
@@ -126,7 +127,7 @@ const FAQ = [
   },
   {
     q: 'How do we pay?',
-    a: 'Card or a simple invoice. The review is a fixed price for one agent, agreed before work starts; a larger scope is quoted after we see the tool list.',
+    a: 'Card or a simple invoice. The review is $4,500 for one agent, fixed before work starts; a larger scope is quoted after we see the tool list.',
   },
 ] as const;
 

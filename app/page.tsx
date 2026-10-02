@@ -210,7 +210,7 @@ const TIERS = [
   {
     name: "Write-access review",
     meta: "Fixed price · one agent",
-    price: "Quoted",
+    price: "$4,500",
     items: [
       "Every production write your agent can make",
       "Unattended vs. approval-required, action by action",
