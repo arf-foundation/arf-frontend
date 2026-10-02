@@ -22,7 +22,7 @@ on:
     branches: [ "main" ]
 
 permissions:
-  # OSV's reusable workflow reads artifacts produced by its scan job.
+  # Required by the reusable workflow's SARIF upload.
   actions: read
   # Require writing security events to upload SARIF file to security tab
   security-events: write
