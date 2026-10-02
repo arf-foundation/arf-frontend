@@ -26,6 +26,10 @@ export default function FAQPage() {
               answer="No. ARF is proprietary and access‑controlled. The engine and its specifications are private, and access to code, specifications, and supporting materials is granted only through approved pilot or enterprise arrangements."
             />
             <FAQItem
+              question="Is the public “agentic-reliability-framework” code on GitHub the ARF engine?"
+              answer="No. It is an early prototype, published in 2025 and early 2026 under a personal account that is no longer maintained. It has known defects and lacks the admission, approval-ledger and audit-verification layers ARF has added since, so please don’t run it; its old PyPI releases are yanked. ARF’s engine is private, and official public material is linked from this site."
+            />
+            <FAQItem
               question="What’s the difference between the demo and the real engine?"
               answer="The demo is illustrative and uses mock or advisory data. It is designed to explain the workflow, not expose the protected engine. The real system is private and available only through pilot or enterprise access."
             />
