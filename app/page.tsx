@@ -57,7 +57,7 @@ const CAPABILITIES = [
   {
     n: "01",
     title: "Policy Enforcement",
-    description: "Deterministic policy gates that cannot be bypassed.",
+    description: "Deterministic policy gates on every governed write.",
     icon: Shield,
     items: [
       "Deterministic execution gates",
@@ -72,23 +72,23 @@ const CAPABILITIES = [
     description: "Tamper-evident records with cryptographic signing.",
     icon: FileText,
     items: [
-      "Full audit trail",
+      "Audit trail of every governed decision",
       "Cryptographic attestation",
       "Attribution & accountability",
-      "Regulatory-ready logs",
+      "PDF audit report export",
     ],
   },
   {
     n: "03",
     title: "Continuous Reliability",
     description:
-      "Proactive monitoring, predictive foresight, and automated recovery.",
+      "Proactive monitoring, predictive foresight, and governed recovery actions.",
     icon: Cpu,
     items: [
       "Anomaly detection",
       "Predictive health scoring",
       "Control-theoretic stability monitoring",
-      "Self-stabilising responses",
+      "Lyapunov-guided stabilising actions",
     ],
   },
   {
@@ -100,7 +100,7 @@ const CAPABILITIES = [
     items: [
       "Explainable risk scores",
       "Counterfactual what-if analysis",
-      "Real-time dashboards",
+      "Live Prometheus metrics",
       "Causal attribution",
     ],
   },
@@ -109,18 +109,18 @@ const CAPABILITIES = [
 const TRUST = [
   {
     icon: Shield,
-    title: "Architected for SOC 2 readiness",
-    body: "Controls and evidence collection designed against the trust services criteria from day one.",
+    title: "Mapped to SOC 2 criteria",
+    body: "Each trust services criterion is mapped to the control and code that address it. Not yet audited.",
   },
   {
     icon: Lock,
     title: "Deterministic enforcement",
-    body: "Policy gates execute mechanically before an action reaches infrastructure. Not advisory.",
+    body: "On a governed path, policy gates run mechanically before an action reaches infrastructure. Not advisory.",
   },
   {
     icon: FileText,
     title: "Cryptographic audit trail",
-    body: "Every decision signed, timestamped and attributed — tamper-evident by construction.",
+    body: "Every governed decision signed, timestamped and attributed. Exported entries can be verified independently.",
   },
 ] as const;
 
@@ -128,17 +128,17 @@ const GOVERNANCE = [
   {
     icon: FileText,
     title: "Tamper-evident audit trail",
-    body: "Every decision is recorded, timestamped, and attributed. Logs are designed for regulatory review, forensic analysis, and compliance preparation — no exceptions, no gaps.",
+    body: "Every governed decision is recorded, timestamped, and attributed — including the action proposed alongside the one that ran. Anyone holding an export can verify its integrity, for forensic review or compliance preparation.",
   },
   {
     icon: Lock,
     title: "Mechanical enforcement",
-    body: "Policy gates that cannot be bypassed or silently overridden. Every override is logged. Enforcement is deterministic — not advisory.",
+    body: "On a governed write path, gates cannot be silently overridden: every override is recorded with its approver. Enforcement is deterministic — not advisory.",
   },
   {
     icon: Brain,
     title: "Explainable reasoning",
-    body: "Every risk score is backed by transparent logic — never a black box. Suitable for executive briefings, regulator inquiries, and third-party audits.",
+    body: "Every risk score comes with its inputs: the prior, the evidence behind it, and the expected loss of allowing, denying or escalating. Never a black box.",
   },
 ] as const;
 
@@ -175,8 +175,8 @@ const SPECS = [
   "Enterprise Specification",
 ] as const;
 
-/* Each fact is asserted by enterprise tests/test_ontap_mcp_proxy.py and shown
-   in examples/ontap_mcp_proxy_demo.py. No customer numbers until they are real. */
+/* Each fact is pinned by a test of the ONTAP gate and shown in its demo.
+   No customer numbers until they are real. */
 const BY_DESIGN = [
   {
     title: "Recorded before it runs",
@@ -222,7 +222,7 @@ const TIERS = [
     meta: "Fixed price · one agent",
     price: "$4,500",
     items: [
-      "Every production write your agent can make",
+      "Every write path in the agreed tool inventory",
       "Unattended vs. approval-required, action by action",
       "Explicit gaps, on an agreed delivery date",
     ],
@@ -342,7 +342,7 @@ export default function LandingPage() {
           <span className="rounded-full bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.05em] text-white">
             New
           </span>
-          Explainable governance decisions + real PDF compliance export
+          Bounded write access for ONTAP storage agents, on a simulated cluster
           <ArrowRight size={13} />
         </Link>
       </div>
@@ -352,16 +352,16 @@ export default function LandingPage() {
           <div className="mx-auto max-w-[680px] text-center">
             <p className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-arf-blue/25 bg-[color:var(--surface-raised)]/75 px-3 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-arf-blue">
               <span className="h-1.5 w-1.5 rounded-full bg-arf-blue" />
-              Control plane for autonomous AI
+              For infrastructure-agent teams
             </p>
             <h1 className="mx-auto mb-6 max-w-[20ch] text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[1.03] tracking-[-0.033em] text-pretty">
-              Enterprise infrastructure for{" "}
-              <span className="arf-gradient-text">autonomous AI</span>
+              Give production changes{" "}
+              <span className="arf-gradient-text">a boundary your customer can inspect</span>
             </h1>
             <p className="mx-auto mb-9 max-w-[52ch] text-[18.5px] leading-[1.6] text-[color:var(--text-secondary)] text-pretty">
-              Safely deploy autonomous AI in production with deterministic
-              governance, continuous reliability, and enterprise-grade
-              auditability.
+              Start with one named write path. Map what the agent can change,
+              whether the action can be undone, when a person must approve,
+              and what record remains. Storage first.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link href="/signup" className="arf-btn-primary">
@@ -409,12 +409,12 @@ export default function LandingPage() {
             {
               label: "Solution",
               tone: "text-arf-blue",
-              body: "ARF applies deterministic policy enforcement before every autonomous action.",
+              body: "ARF applies deterministic policy enforcement before each governed action runs, and refuses the actions it cannot model.",
             },
             {
               label: "Outcome",
               tone: "text-arf-purple",
-              body: "Every decision becomes explainable, auditable, and operationally trustworthy.",
+              body: "Every governed decision becomes explainable, auditable, and operationally trustworthy.",
             },
           ].map((item, idx) => (
             <div
@@ -558,8 +558,9 @@ export default function LandingPage() {
             <h2 className="text-h2 font-semibold">Enterprise capabilities</h2>
           </div>
           <p className="max-w-[56ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
-            Four subsystems, one control plane. Every capability is observable
-            from the Governance Console and enforceable from the API.
+            Four subsystems, one control plane. Explore them on simulated data
+            in the Governance Console; enforcement runs on your agent&rsquo;s own
+            write path, scoped per engagement.
           </p>
         </div>
         <div className="grid gap-[22px] md:grid-cols-2">
@@ -625,8 +626,8 @@ export default function LandingPage() {
               By design · shown on a simulated ONTAP cluster
             </p>
             <p className="mb-7 font-serif text-[clamp(1.75rem,3vw,2.125rem)] font-light leading-[1.35] tracking-[-0.01em] text-white text-pretty">
-              Every write your agent makes is checked against whether it can be
-              undone — before it runs, not after.
+              Every modeled write is checked against whether it can be undone
+              — before it runs, not after.
             </p>
             <p className="max-w-[52ch] text-[14.5px] leading-[1.6] text-white/65">
               These are properties of the engine, demonstrated end to end. No

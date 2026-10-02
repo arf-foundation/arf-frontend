@@ -176,12 +176,12 @@ export default function SignupPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
             <Check className="h-8 w-8 text-green-500" />
           </div>
-          <h1 className="mb-2 text-2xl font-bold">Application received</h1>
+          <h1 className="mb-2 text-2xl font-bold">Request received</h1>
           <p className="mb-4 text-[color:var(--text-secondary)]">
-            You’ve taken the first step to equip your team with audit‑ready AI governance. Our founder will personally review your application.
+            Thank you. The founder reads every request personally.
           </p>
           <p className="mb-6 text-sm text-[color:var(--text-muted)]">
-            If your use case is a fit, you’ll receive a <strong>30‑minute onboarding call</strong> within 3–5 business days. No commitment — outcome‑based pricing only applies after the pilot.
+            If your agent is a fit, you’ll get an email within two business days to book a <strong>30‑minute scoping call</strong>. The pilot snapshot is free; nothing is billed unless you choose the $4,500 review.
           </p>
           <Link
             href="/"
@@ -200,14 +200,14 @@ export default function SignupPage() {
         <div className="mb-4 text-center sm:mb-5">
           <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Request Pilot Access</h1>
           <p className="mb-3 text-sm text-[color:var(--text-muted)] sm:text-base">
-            Pilot programs are offered to qualified organizations where ARF is a strong fit.
-            Fill out this form to start a conversation with our founder – no commitment required.
+            For a free pilot snapshot (three founding slots) or the $4,500 write-access review.
+            Tell us about one agent and the production writes it makes. The founder replies personally, with no commitment required.
           </p>
           {/* Trust bar */}
           <div className="inline-flex items-center gap-4 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-raised)]/50 px-4 py-1 text-xs text-[color:var(--text-muted)]">
-            <span className="flex items-center gap-1"><Shield size={12} /> Deterministic enforcement</span>
-            <span className="flex items-center gap-1"><Eye size={12} /> Full audit trail</span>
-            <span className="flex items-center gap-1"><FileText size={12} /> SOC2‑ready logs</span>
+            <span className="flex items-center gap-1"><Shield size={12} /> Read-only material</span>
+            <span className="flex items-center gap-1"><Eye size={12} /> Founder-led</span>
+            <span className="flex items-center gap-1"><FileText size={12} /> Written findings</span>
           </div>
         </div>
 
@@ -436,7 +436,7 @@ export default function SignupPage() {
                     value={formData.useCase}
                     onChange={handleChange}
                     ref={el => { inputRefs.current.useCase = el; }}
-                    placeholder="What AI systems would you govern with ARF? What risks do you need to mitigate?"
+                    placeholder="Which agent, and which production writes does it make or want to make? Who is asking how it is controlled?"
                     aria-invalid={!!fieldErrors.useCase}
                     aria-describedby={fieldErrors.useCase ? 'useCase-error' : undefined}
                     className={`arf-input ${fieldErrors.useCase ? 'arf-input-error' : ''}`}
@@ -559,11 +559,10 @@ export default function SignupPage() {
                   <div className="flex items-start gap-2">
                     <Shield size={18} className="mt-0.5 flex-shrink-0 text-arf-blue" />
                     <div>
-                      <p className="mb-1 font-semibold text-[color:var(--text-primary)]">Pilot slots are reviewed monthly</p>
+                      <p className="mb-1 font-semibold text-[color:var(--text-primary)]">Three founding snapshot slots</p>
                       <p>
-                        Once submitted, your application will be personally reviewed by the founder.
-                        If qualified, you’ll receive an email to schedule a 30‑minute onboarding call.
-                        Pilot access is time‑limited and free; pricing is outcome‑based after the evaluation period.
+                        The founder reads every request. If your agent is a fit, you’ll get an email to book a 30‑minute scoping call.
+                        The snapshot is free and uses read-only material; the review is $4,500 for one agent, fixed before work starts.
                       </p>
                     </div>
                   </div>
@@ -652,11 +651,11 @@ export default function SignupPage() {
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Applying...
+                        Sending...
                       </>
                     ) : (
                       <>
-                        Apply for Pilot <Send size={16} />
+                        Send request <Send size={16} />
                       </>
                     )}
                   </button>
