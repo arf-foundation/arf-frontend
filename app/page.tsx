@@ -196,26 +196,25 @@ const TIERS = [
     dominant: false,
   },
   {
-    name: "Pilot",
-    meta: "Time-limited · free",
-    price: "By review",
+    name: "Pilot snapshot",
+    meta: "Free · 3 founding slots",
+    price: "Free",
     items: [
-      "Protected core access",
-      "Outcome-based or retainer after pilot",
-      "Founder-led onboarding",
+      "One agent, five named write tools",
+      "Which actions could run unattended",
+      "In exchange for a written reference",
     ],
     cta: { label: "Request Pilot Access", href: "/signup" },
     dominant: false,
   },
   {
-    name: "Enterprise",
-    meta: "Commercial · custom",
-    price: "Custom",
+    name: "Write-access review",
+    meta: "Fixed price · one agent",
+    price: "Quoted",
     items: [
-      "Custom deployment fee",
-      "Outcome-based or retainer maintenance",
-      "SSO, multi-tenancy, SLA",
-      "Full enforcement + audit trails",
+      "Every production write your agent can make",
+      "Unattended vs. approval-required, action by action",
+      "Explicit gaps, on an agreed delivery date",
     ],
     cta: { label: "Talk to us", href: "/signup" },
     dominant: true,
@@ -684,9 +683,9 @@ export default function LandingPage() {
         <div className="mb-11 grid gap-16 lg:grid-cols-[0.9fr_1.1fr]">
           <h2 className="max-w-[12ch] text-h2 font-semibold">Access models</h2>
           <p className="max-w-[56ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
-            A fixed deployment fee, plus either outcome-based pricing or a
-            monthly retainer. Pilot access is time-limited and free for
-            qualified organisations — no commitment required.
+            A free snapshot of five write tools, then a fixed-price review of
+            one agent&rsquo;s production write paths. A continuous gate is
+            available by invitation after a review.
           </p>
         </div>
         <div className="grid items-start gap-[22px] md:grid-cols-3">
@@ -723,7 +722,8 @@ export default function LandingPage() {
           <h2 className="text-h2 font-semibold">Explore ARF</h2>
           <p className="max-w-[50ch] text-[13.5px] leading-[1.6] text-[color:var(--text-secondary)] lg:text-right">
             The public sandbox returns simulated responses only. Real
-            enforcement and confidence guarantees require a pilot agreement.
+            enforcement is scoped per engagement, on your agent&rsquo;s own
+            write path.
           </p>
         </div>
         <div className="grid gap-[22px] lg:grid-cols-[1.2fr_0.9fr_0.9fr]">

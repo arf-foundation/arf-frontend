@@ -17,16 +17,16 @@ import { ArrowRight } from 'lucide-react';
    Enterprise is dominant via a 2px gradient border, not a "Recommended" badge.
    Server component — no hooks needed here.
 
-   Open item (per design_handoff_arf_enterprise_refresh/README.md — not
-   invented here, flag before merging): the SSO row and the outcome-based
-   measurement answer below are inferred commercial claims that need
-   confirmation from the founder before this ships.
+   Commercial claims revised with the founder on 2026-10-02. No SLA, SSO,
+   named support engineer, in-perimeter deployment or outcome-based share is
+   offered today, so none is listed. The review is a fixed price per agent,
+   quoted before work starts; the continuous gate is by invitation only.
    ========================================================================= */
 
 export const metadata: Metadata = {
-  title: 'Access models',
+  title: 'Pricing',
   description:
-    'A fixed deployment fee, plus either outcome-based pricing or a monthly retainer. Pilot access is time-limited and free for qualified organisations.',
+    'A free pilot snapshot of five write tools, then a fixed-price review of one agent\'s production write paths. A continuous gate is available by invitation after a review.',
   alternates: { canonical: '/pricing' },
 };
 
@@ -46,31 +46,29 @@ const TIERS = [
     dominant: false,
   },
   {
-    name: 'Pilot',
-    meta: 'Time-limited · free',
-    price: 'By review',
-    note: 'Every application read by the founder',
+    name: 'Pilot snapshot',
+    meta: 'Free · 3 founding slots',
+    price: 'Free',
+    note: 'In exchange for a written reference',
     items: [
-      'Protected core access',
-      'Real enforcement, not simulation',
-      'Full technical specification',
-      'Founder-led onboarding',
-      'Outcome-based or retainer after pilot',
+      'One agent, five named write tools',
+      'Which actions could run unattended, which need approval',
+      'A short written summary',
+      'Founder-led, from read-only material',
     ],
     cta: { label: 'Request Pilot Access', href: '/signup' },
     dominant: false,
   },
   {
-    name: 'Enterprise',
-    meta: 'Commercial · custom',
-    price: 'Custom',
-    note: 'Deployment fee + outcome or retainer',
+    name: 'Write-access review',
+    meta: 'Fixed price · one agent',
+    price: 'Quoted',
+    note: 'Fixed before work starts; delivery date agreed at scoping',
     items: [
-      'Everything in Pilot',
-      'Custom deployment fee',
-      'SSO, multi-tenancy, SLA',
-      'Full enforcement + audit trails',
-      'Named support engineer',
+      'Every production write your agent can make',
+      'Whether each can be undone, from evidence',
+      'Unattended vs. approval-required, action by action',
+      'Explicit gaps and next steps',
     ],
     cta: { label: 'Talk to us', href: '/signup' },
     dominant: true,
@@ -78,58 +76,57 @@ const TIERS = [
 ] as const;
 
 const COMPARISON = [
-  { label: 'Evaluations', sandbox: '1,000 / month', pilot: 'Scoped to use case', enterprise: 'Contracted volume' },
-  { label: 'Enforcement', sandbox: 'Simulated only', pilot: 'Real, deterministic', enterprise: 'Real, deterministic' },
-  { label: 'Audit trail', sandbox: 'Sample records', pilot: 'Signed, exportable', enterprise: 'Signed + retention policy' },
-  { label: 'Governance Console', sandbox: 'Mock data', pilot: 'Your decisions', enterprise: 'Multi-tenant, RBAC' },
-  { label: 'Technical specification', sandbox: 'Public overview', pilot: 'Full, under NDA', enterprise: 'Full + integration support' },
-  { label: 'SSO', sandbox: '—', pilot: '—', enterprise: 'SAML / OIDC via WorkOS' },
-  { label: 'Support', sandbox: 'Community', pilot: 'Founder-led', enterprise: 'Named engineer + SLA' },
-  { label: 'Commercials', sandbox: 'Free', pilot: 'Free, time-limited', enterprise: 'Deployment fee + outcome or retainer' },
+  { label: 'What you get', sandbox: 'Simulated decisions', pilot: 'A five-tool write-access map', enterprise: 'A full map of one agent\'s write paths' },
+  { label: 'What we need', sandbox: 'Synthetic or redacted payloads', pilot: 'Tool list + representative traces', enterprise: 'Tool definitions + action history' },
+  { label: 'Access to your systems', sandbox: 'None', pilot: 'Read-only material only', enterprise: 'Read-only material only' },
+  { label: 'Enforcement', sandbox: 'Simulated only', pilot: 'None — analysis only', enterprise: 'None in the review; a gate is by invitation afterwards' },
+  { label: 'Deliverable', sandbox: 'API responses', pilot: 'Short written summary', enterprise: 'Report, recoverability map, gap list' },
+  { label: 'Support', sandbox: 'Community', pilot: 'Founder-led', enterprise: 'Founder-led' },
+  { label: 'Commercials', sandbox: 'Free', pilot: 'Free, reference agreed in writing', enterprise: 'Fixed price per agent, card or invoice' },
 ] as const;
 
 const MODEL = [
   {
     n: '01',
-    title: 'Fixed deployment fee',
-    body: 'Integration into your infrastructure, policy authoring, and the initial control-plane configuration. One-time, scoped in writing.',
+    title: 'Start with a snapshot',
+    body: 'Five named write tools, analysed from your tool list and representative traces. Free for three teams, in exchange for a written reference.',
   },
   {
     n: '02',
-    title: 'Outcome-based or retainer',
-    body: 'Then either a share of measured risk reduction, or a flat monthly retainer. You choose which at the end of the pilot.',
+    title: 'Then a fixed-price review',
+    body: 'One agent\'s production write paths, mapped action by action: which can run unattended, which should wait for a human, and what evidence remains when it acts.',
   },
   {
     n: '03',
-    title: 'Pilot costs nothing',
-    body: 'Time-limited and free for qualified organisations. No commitment, no auto-conversion — the commercial conversation happens after.',
+    title: 'A continuous gate, by invitation',
+    body: 'After a review, ARF can gate your agent\'s write path where that path is modeled — demonstrated today for ONTAP storage operations against a simulated cluster. Scoped and priced per engagement.',
   },
 ] as const;
 
 const FAQ = [
   {
-    q: 'Why is the pilot free?',
-    a: 'Governance only proves itself against real decisions. A time-limited pilot lets your risk owners see enforcement and audit evidence on your own traffic before any commercial conversation.',
+    q: 'What does the review deliver?',
+    a: 'A report on one agent: every production write it can make, whether each can be undone, which should run unattended and which should wait for a human, and the gaps between your current controls and that map. Findings cite your agent\'s own tools and history.',
   },
   {
-    q: 'What does outcome-based pricing measure?',
-    a: 'Measured risk reduction against a baseline agreed at the start of the pilot — blocked high-risk actions, resolved exceptions, audit findings closed. If the measurement is contested, you take the retainer instead.',
+    q: 'Do you need write access to our systems?',
+    a: 'Not for a snapshot or a review. Both use read-only material: tool definitions, representative traces or action history, and any existing policy. A continuous gate, if you choose one later, does sit in your agent\'s write path, and is scoped separately.',
   },
   {
-    q: 'Can we run ARF in our own environment?',
-    a: 'Yes. Enterprise deployments run inside your perimeter. The control plane never needs to send decision payloads outside your infrastructure.',
+    q: 'Which agents is this for?',
+    a: 'Teams whose agents are moving from read-only recommendations to production changes — infrastructure and storage operations first. Agents that make other consequential changes, such as customer-facing commitments, can be scoped on a call.',
   },
   {
-    q: 'What happens when the pilot ends?',
-    a: 'Nothing automatic. There is no auto-conversion and no billing surprise — the pilot simply stops enforcing unless you sign an Enterprise agreement.',
+    q: 'What happens after the review?',
+    a: 'Nothing automatic. No subscription starts and nothing else is billed. If you want the decisions enforced rather than recommended, a continuous gate is scoped separately.',
   },
   {
     q: 'Is the sandbox safe to point at production data?',
     a: 'No. The sandbox returns simulated responses and should be treated as a demonstration surface. Use synthetic or redacted payloads.',
   },
   {
-    q: 'How do you handle SSO and provisioning?',
-    a: 'Enterprise plans use SAML or OIDC through WorkOS, with directory sync for provisioning. Sandbox and pilot use a single founder-issued credential.',
+    q: 'How do we pay?',
+    a: 'Card or a simple invoice. The review is a fixed price for one agent, agreed before work starts; a larger scope is quoted after we see the tool list.',
   },
 ] as const;
 
@@ -139,13 +136,13 @@ export default function PricingPage() {
       {/* ─── Page header ─────────────────────────────────────────────────── */}
       <section className="arf-hero-wash">
         <div className="arf-shell pb-[72px] pt-[88px] text-center">
-          <p className="arf-eyebrow mb-5">Access models</p>
+          <p className="arf-eyebrow mb-5">Pricing</p>
           <h1 className="mx-auto mb-[22px] max-w-[19ch] text-[clamp(2.25rem,4.4vw,3.125rem)] font-bold leading-[1.05] tracking-[-0.031em] text-pretty">
-            Priced against <span className="arf-gradient-text">governed outcomes</span>
+            Start with evidence about <span className="arf-gradient-text">your own agent</span>
           </h1>
           <p className="mx-auto max-w-[62ch] text-lg leading-[1.6] text-[color:var(--text-secondary)] text-pretty">
-            A fixed deployment fee, plus either outcome-based pricing or a monthly retainer. Pilot access is
-            time-limited and free for qualified organisations — no commitment required.
+            A free snapshot of five write tools, then a fixed-price review of one agent&rsquo;s production write
+            paths. A continuous gate is available by invitation after a review.
           </p>
         </div>
       </section>
@@ -175,24 +172,24 @@ export default function PricingPage() {
       {/* ─── Comparison ──────────────────────────────────────────────────── */}
       <section className="arf-shell pb-[112px]">
         <div className="mb-9 grid gap-16 lg:grid-cols-[0.85fr_1.15fr]">
-          <h2 className="max-w-[14ch] text-h2 font-semibold">What each model includes</h2>
+          <h2 className="max-w-[14ch] text-h2 font-semibold">What each step includes</h2>
           <p className="max-w-[54ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
-            The difference that matters is enforcement: the sandbox advises, a pilot enforces. Everything else follows
-            from that line.
+            The difference is depth: the snapshot looks at five tools, the review maps every production write your
+            agent can make. Neither needs write access to your systems.
           </p>
         </div>
 
         <div className="arf-card overflow-x-auto">
           <table className="w-full min-w-[720px] border-collapse text-left">
-            <caption className="sr-only">Capabilities available in the Sandbox, Pilot and Enterprise access models</caption>
+            <caption className="sr-only">What the Sandbox, the Pilot snapshot and the Write-access review include</caption>
             <thead>
               <tr className="border-b border-[color:var(--hairline)] bg-[color:var(--surface-sunken)]">
                 <th scope="col" className="px-6 py-4 font-mono text-[10.5px] font-medium uppercase tracking-[0.13em] text-[color:var(--text-secondary)]">
                   Capability
                 </th>
                 <th scope="col" className="px-5 py-4 text-sm font-semibold">Sandbox</th>
-                <th scope="col" className="px-5 py-4 text-sm font-semibold">Pilot</th>
-                <th scope="col" className="px-5 py-4 text-sm font-semibold text-arf-blue">Enterprise</th>
+                <th scope="col" className="px-5 py-4 text-sm font-semibold">Pilot snapshot</th>
+                <th scope="col" className="px-5 py-4 text-sm font-semibold text-arf-blue">Write-access review</th>
               </tr>
             </thead>
             <tbody>
@@ -215,11 +212,11 @@ export default function PricingPage() {
       <section className="arf-shell pb-[112px]">
         <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-14">
           <h2 className="mb-3 text-[30px] font-semibold leading-[1.14] tracking-[-0.024em]">
-            How the commercial model works
+            How it works
           </h2>
           <p className="mb-10 max-w-[66ch] text-base leading-[1.65] text-[color:var(--text-primary)]/85 text-pretty">
-            ARF is not sold per seat. Governance value scales with the volume and consequence of the decisions being
-            governed, so the model has two parts.
+            ARF is not sold per seat. You start with evidence about your own agent, and pay only for the depth you
+            need.
           </p>
           <div className="grid gap-[22px] md:grid-cols-3">
             {MODEL.map((item) => (
@@ -254,11 +251,11 @@ export default function PricingPage() {
         <div className="arf-shell flex flex-wrap items-center justify-between gap-14">
           <div>
             <h2 className="mb-3 max-w-[20ch] text-h2 font-semibold text-white">
-              Start in the sandbox. Convert when the evidence is there.
+              Start in the sandbox. Bring your agent when you are ready.
             </h2>
             <p className="max-w-[56ch] text-base leading-[1.65] text-white/70 text-pretty">
-              Pilot applications include your organisation, use case, and expected evaluation volume. We reply within
-              two business days.
+              Tell us which agent, the production writes it makes or wants to make, and who is asking for controls.
+              We reply within two business days.
             </p>
           </div>
           <div className="flex flex-shrink-0 flex-wrap gap-3">
