@@ -13,7 +13,7 @@
 import fs from 'fs';
 import path from 'path';
 
-type Entry = { date: string; title: string; description?: string };
+type Entry = { date: string; title: string; description?: string; type?: string; link?: string };
 
 const PAGE = path.join(__dirname, 'page.tsx');
 const JSON_PATH = path.join(__dirname, '..', '..', 'public', 'data', 'changelog.json');
@@ -37,11 +37,13 @@ describe('changelog fallback entries match the published JSON', () => {
   });
 
   it.each(fallback.map((e) => [`${e.date} ${e.title}`, e] as const))(
-    '%s says the same thing in both places',
+    '%s is identical in both places (every field the page renders)',
     (_label, entry) => {
       const published = byKey.get(`${entry.date}|${entry.title}`);
       expect(published).toBeDefined();
-      expect(entry.description ?? '').toBe(published?.description ?? '');
+      // Whole-object equality: description, type (public/pilot badge) and link
+      // are all rendered, so a drift in any of them must fail here.
+      expect(entry).toEqual(published);
     },
   );
 });
