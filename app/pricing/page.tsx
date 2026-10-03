@@ -8,20 +8,17 @@ import { ArrowRight } from 'lucide-react';
    Same tokens, same three card weights, same rhythm. Two additions this page
    needs and the landing page does not:
      • a comparison table, because the buying question here is "what changes
-       between tiers", and the honest answer is a single line: the sandbox
-       advises, a pilot enforces.
-     • the commercial-model explainer, because hybrid pricing (deployment fee +
-       outcome or retainer) is unfamiliar and a three-column card grid answers
-       it faster than prose.
+       between steps", and the honest answer is depth: five tools, then every
+       write path in the agreed tool inventory.
+     • the "how it works" explainer, because a snapshot -> review -> gate
+       ladder reads faster as three cards than as prose.
 
    Enterprise is dominant via a 2px gradient border, not a "Recommended" badge.
    Server component — no hooks needed here.
 
-   Commercial claims revised with the founder on 2026-10-02. No SLA, SSO,
-   named support engineer, in-perimeter deployment or outcome-based share is
-   offered today, so none is listed. The review is $4,500 per agent (Petter
-   approved showing it publicly, 2026-10-02); the continuous gate is by
-   invitation only.
+   List only what is offered today. No SLA, SSO, named support engineer,
+   in-perimeter deployment or success-fee pricing is offered, so none appears
+   here. The review is $4,500 per agent; the continuous gate is by invitation.
    ========================================================================= */
 
 export const metadata: Metadata = {
@@ -66,8 +63,9 @@ const TIERS = [
     price: '$4,500',
     note: 'One agent, fixed price; delivery date agreed at scoping',
     items: [
-      'Every production write your agent can make',
+      'Every write path in the agreed tool inventory',
       'Whether each can be undone, from evidence',
+      'Past writes risk-scored, where they map to ARF\'s action model',
       'Unattended vs. approval-required, action by action',
       'Explicit gaps and next steps',
     ],
@@ -77,11 +75,11 @@ const TIERS = [
 ] as const;
 
 const COMPARISON = [
-  { label: 'What you get', sandbox: 'Simulated decisions', pilot: 'A five-tool write-access map', enterprise: 'A full map of one agent\'s write paths' },
+  { label: 'What you get', sandbox: 'Simulated decisions', pilot: 'A five-tool write-access map', enterprise: 'A map of every write path in the agreed tool inventory' },
   { label: 'What we need', sandbox: 'Synthetic or redacted payloads', pilot: 'Tool list + representative traces', enterprise: 'Tool definitions + action history' },
   { label: 'Access to your systems', sandbox: 'None', pilot: 'Read-only material only', enterprise: 'Read-only material only' },
   { label: 'Enforcement', sandbox: 'Simulated only', pilot: 'None — analysis only', enterprise: 'None in the review; a gate is by invitation afterwards' },
-  { label: 'Deliverable', sandbox: 'API responses', pilot: 'Short written summary', enterprise: 'Report, recoverability map, gap list' },
+  { label: 'Deliverable', sandbox: 'API responses', pilot: 'Short written summary', enterprise: 'Report, recoverability map, scored history, gap list' },
   { label: 'Support', sandbox: 'Community', pilot: 'Founder-led', enterprise: 'Founder-led' },
   { label: 'Commercials', sandbox: 'Free', pilot: 'Free, reference agreed in writing', enterprise: '$4,500 fixed, card or invoice' },
 ] as const;
@@ -107,7 +105,7 @@ const MODEL = [
 const FAQ = [
   {
     q: 'What does the review deliver?',
-    a: 'A report on one agent: every production write it can make, whether each can be undone, which should run unattended and which should wait for a human, and the gaps between your current controls and that map. Findings cite your agent\'s own tools and history.',
+    a: 'A report on one agent: every write path in the agreed tool inventory, whether each can be undone, which should run unattended and which should wait for a human, and the gaps between your current controls and that map. Where your action history maps to ARF\'s action model, each past write is risk-scored; writes that do not map are listed, not scored. The review does not certify every possible agent action or install a production gate.',
   },
   {
     q: 'Do you need write access to our systems?',
@@ -175,8 +173,8 @@ export default function PricingPage() {
         <div className="mb-9 grid gap-16 lg:grid-cols-[0.85fr_1.15fr]">
           <h2 className="max-w-[14ch] text-h2 font-semibold">What each step includes</h2>
           <p className="max-w-[54ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
-            The difference is depth: the snapshot looks at five tools, the review maps every production write your
-            agent can make. Neither needs write access to your systems.
+            The difference is depth: the snapshot looks at five tools, the review maps every write path in the
+            agreed tool inventory. Neither needs write access to your systems.
           </p>
         </div>
 

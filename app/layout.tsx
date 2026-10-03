@@ -46,16 +46,18 @@ export const metadata: Metadata = {
      that don't follow redirects when reading OG tags. */
   metadataBase: new URL("https://www.arf-ai.com"),
   title: {
-    default: "ARF AI – Enterprise infrastructure for autonomous AI",
+    default: "ARF AI – Bounded write access for infrastructure agents",
     template: "%s | ARF AI",
   },
   description:
-    "Safely deploy autonomous AI in production with deterministic governance, continuous reliability, and enterprise-grade auditability.",
+    "Map what your infrastructure agent can change in production, whether each change can be undone, and when a person must approve. Storage first.",
   alternates: { canonical: "/" },
   keywords: [
     "AI governance",
-    "enterprise AI infrastructure",
-    "autonomous AI control plane",
+    "infrastructure agents",
+    "bounded write access",
+    "agent approvals",
+    "action reversibility",
     "deterministic policy enforcement",
     "AI reliability",
     "decision governance",
@@ -70,9 +72,9 @@ export const metadata: Metadata = {
   publisher: "ARF Foundation",
   robots: "index, follow",
   openGraph: {
-    title: "ARF AI – Enterprise infrastructure for autonomous AI",
+    title: "ARF AI – Bounded write access for infrastructure agents",
     description:
-      "Safely deploy autonomous AI in production with deterministic governance, continuous reliability, and enterprise-grade auditability.",
+      "Map what your infrastructure agent can change in production, whether each change can be undone, and when a person must approve. Storage first.",
     url: "https://www.arf-ai.com",
     siteName: "ARF AI",
     images: [
@@ -88,9 +90,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ARF AI – Enterprise infrastructure for autonomous AI",
+    title: "ARF AI – Bounded write access for infrastructure agents",
     description:
-      "Deterministic governance for autonomous AI. Enterprise‑grade auditability.",
+      "What your agent may change unattended, what waits for a person, and what record remains.",
     creator: "@arf_foundation",
     images: ["/og-image.png"],
   },

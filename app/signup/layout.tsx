@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
    meant to rank. See app/dashboard/layout.tsx for the same reasoning. */
 export const metadata: Metadata = {
   title: 'Request Pilot Access',
-  description: 'Apply for pilot access to the ARF governance engine.',
+  description: 'Request a free pilot snapshot or the $4,500 write-access review.',
   robots: { index: false, follow: true },
 };
 

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default function TermsPage() {
-  const effectiveDate = "August 10, 2026";
+  const effectiveDate = "October 2, 2026";
 
   return (
     <div className="arf-page-root min-h-screen">
@@ -46,7 +46,7 @@ export default function TermsPage() {
                 <li><strong>Public specification</strong> – shared under written terms, not open source.</li>
               </ul>
               <p>
-                Production‑grade inference, deterministic enforcement, and audit trails are available only under a written Pilot or Enterprise Agreement with outcome‑based pricing.
+                Production‑grade inference, deterministic enforcement, and audit trails are available only under a written Pilot or Enterprise Agreement.
               </p>
 
               <h2>3. User Accounts and API Keys</h2>
