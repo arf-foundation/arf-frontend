@@ -91,7 +91,7 @@ The dashboard will be available at http://localhost:3000.
 | [`arf-pattern-examples`](https://github.com/petter2025us/arf-pattern-examples) | Independent reference code for the propose → decide → record pattern. It contains none of ARF's engine. | Public (Apache 2.0) |
 | ARF engine, enterprise layer, API and specifications | The product | **Private, access‑controlled** |
 
-> Public repositories named `agentic-reliability-framework` and `arf-api-repository` under a personal account that is no longer maintained hold an early prototype. It is **not** ARF's current engine, it has known defects, and it should not be run.
+> Public repositories named `agentic-reliability-framework` and `arf-api-repository` under a personal account that is no longer maintained hold an early prototype. It is **not** ARF's current engine, it has received none of the fixes made since March 2026, and it should not be run.
 
 📌 **For pilot access, please [request here](https://www.arf-ai.com/signup).**
 
