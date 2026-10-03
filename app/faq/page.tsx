@@ -27,7 +27,7 @@ export default function FAQPage() {
             />
             <FAQItem
               question="Is the public “agentic-reliability-framework” code on GitHub the ARF engine?"
-              answer="No. It is an early prototype, published in 2025 and early 2026 under a personal account that is no longer maintained. It has received none of the fixes made since March 2026 and lacks the admission, approval-ledger and audit-verification layers ARF has added since, so please don’t run it; its old PyPI releases are yanked. ARF’s engine is private, and official public material is linked from this site."
+              answer="No. It is an early prototype, published in 2025 and early 2026 under a personal account that is no longer maintained. It has received none of the fixes made since March 2026 and lacks the admission, approval-ledger and audit-verification layers ARF has added since, so please don’t run it; its old PyPI releases have been removed. ARF’s engine is private, and official public material is linked from this site."
             />
             <FAQItem
               question="What’s the difference between the demo and the real engine?"
