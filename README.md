@@ -1,13 +1,13 @@
 # ARF Frontend
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)](https://arf-frontend-sandy.vercel.app)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)](https://www.arf-ai.com)
 
-**Interactive frontend for the Agentic Reliability Framework (ARF)** – a Bayesian‑powered governance system for AI infrastructure. This repository contains a **public, sanitised demo dashboard** that illustrates ARF concepts. The core engine is **access‑controlled** and available only to qualified pilots and enterprise customers.
+**The public website of ARF AI**: bounded write access for infrastructure agents. This repository contains a **public, sanitised demo dashboard** that illustrates ARF concepts. The core engine is **access‑controlled** and available only to qualified pilots and enterprise customers.
 
-🔗 **Live demo:** [arf-frontend-sandy.vercel.app](https://arf-frontend-sandy.vercel.app)
+🔗 **Live site:** [www.arf-ai.com](https://www.arf-ai.com)
 
-> ⚠️ **Important** – The ARF core engine (`agentic_reliability_framework`, `arf-api`) is **not open source**. It is proprietary, access‑controlled, and offered under outcome‑based pricing. This frontend repo contains only public, demo‑grade code.
+> ⚠️ **Important** – The ARF core engine (`agentic_reliability_framework`, `arf-api`) is **not open source**. It is proprietary and access‑controlled; nothing in this repository describes how it works internally. This frontend repo contains only public, demo‑grade code.
 
 ---
 
@@ -81,19 +81,19 @@ The dashboard will be available at http://localhost:3000.
 | Sandbox API integration | Real risk scoring logic |
 | Sanitised visualisations | Production control plane |
 | Public specification references | Customer‑specific audit trails |
-| Pilot request form | Outcome‑based pricing implementation |
+| Pilot request form | The enterprise execution layer and its approvals |
 
 ## Related Projects (Public Only)
 
 | Project | Description | Access |
 |---------|-------------|--------|
-| [`arf-risk-demo`](https://github.com/arf-foundation/arf-risk-demo) | Public, client-side risk-scoring demo | Public (Apache 2.0) |
-| [`pitch-deck`](https://github.com/arf-foundation/pitch-deck) | Public overview and vision | Public |
-| **arf-spec** | Canonical data models, API contracts | **Access‑controlled** – pilot only |
-| **Core Engine** | Bayesian risk scoring, semantic memory | **Access‑controlled** – pilot only |
-| **API Control Plane** | Production FastAPI service | **Access‑controlled** – pilot only |
+| [`pitch-deck`](https://github.com/arf-foundation/pitch-deck) | Investor overview | Public, viewing only under written terms |
+| [`arf-pattern-examples`](https://github.com/petter2025us/arf-pattern-examples) | Independent reference code for the propose → decide → record pattern. It contains none of ARF's engine. | Public (Apache 2.0) |
+| ARF engine, enterprise layer, API and specifications | The product | **Private, access‑controlled** |
 
-📌 **For pilot access, please [request here](https://arf-frontend-sandy.vercel.app/signup).**
+> Public repositories named `agentic-reliability-framework` and `arf-api-repository` under a personal account that is no longer maintained hold an early prototype. It is **not** ARF's current engine, it has known defects, and it should not be run.
+
+📌 **For pilot access, please [request here](https://www.arf-ai.com/signup).**
 
 ## Contributing (to this public repo only)
 
