@@ -1,0 +1,14 @@
+# OSV-Scanner exceptions. Every entry is time-boxed (ignoreUntil, at most ~30
+# days out) and must say why the advisory is not exploitable in this repo, so
+# it is re-reviewed instead of silently lingering.
+
+[[IgnoredVulns]]
+id = "GHSA-vfj7-8cjw-p6xm"
+ignoreUntil = 2026-11-02T00:00:00Z
+reason = """braces <= 3.0.3: stack-exhaustion DoS via deeply nested patterns; the \
+advisory lists no patched version (checked 2026-10-03). `yarn why braces` shows it \
+reached only through build/lint tooling -- fast-glob via next-pwa/globby, \
+@typescript-eslint/typescript-estree and eslint-config-next -- which expand \
+repository-controlled glob patterns at build time. No attacker-supplied pattern \
+reaches it, and it is not part of the deployed runtime. Re-check for a patched \
+release by 2026-11-02."""
