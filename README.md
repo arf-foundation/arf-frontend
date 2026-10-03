@@ -87,7 +87,7 @@ The dashboard will be available at http://localhost:3000.
 
 | Project | Description | Access |
 |---------|-------------|--------|
-| [`pitch-deck`](https://github.com/arf-foundation/pitch-deck) | Investor overview | Public, viewing only under written terms |
+| [`pitch-deck`](https://github.com/arf-foundation/pitch-deck) | Investor overview | Public; viewing and linking unrestricted. Reusing deck content requires permission; renderer code is Apache 2.0. |
 | [`arf-pattern-examples`](https://github.com/petter2025us/arf-pattern-examples) | Independent reference code for the propose → decide → record pattern. It contains none of ARF's engine. | Public (Apache 2.0) |
 | ARF engine, enterprise layer, API and specifications | The product | **Private, access‑controlled** |
 
