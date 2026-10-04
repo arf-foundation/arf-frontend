@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useInView } from "./hooks/useInView";
 import ArchitecturePipeline from "../components/ArchitecturePipeline";
+import HowItWorksVideo from "../components/HowItWorksVideo";
 import {
   CapabilityCard,
   TierBody,
@@ -545,6 +546,9 @@ export default function LandingPage() {
       <section id="architecture" className="arf-shell pb-[120px]">
         <p className="arf-eyebrow mb-3.5">Architecture</p>
         <h2 className="mb-11 text-h2 font-semibold">How ARF works</h2>
+        <div className="mb-10">
+          <HowItWorksVideo />
+        </div>
         <div className="arf-card p-5 sm:p-8 lg:p-11">
           <ArchitecturePipeline />
         </div>
