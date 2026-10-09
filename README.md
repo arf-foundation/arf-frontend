@@ -147,6 +147,13 @@ For questions about pilot access or enterprise licensing, email **juan@arf-ai.co
   ```
 
   Read `getComputedStyle` values and compute WCAG ratios from them rather than eyeballing a screenshot. Normalise colours through a 1×1 canvas first — computed styles come back as `rgb()`, `rgba()` **and** `oklab(... / a)`, and an `oklab` value silently breaks a naive `rgb`-only parser. Composite any alpha over the nearest opaque ancestor before computing the ratio.
+- **End-to-end suite (`yarn e2e`).** Playwright + axe-core against a production build: build first, and the suite starts `next start` on port 3100 itself. It covers every page under `app/` in Chromium, Firefox and WebKit, desktop and phone width:
+  - a 200 response, no console errors, page errors or failed same-origin requests;
+  - internal links;
+  - WCAG 2.1 A/AA in both colour schemes;
+  - no horizontal scroll on phones.
+
+  Third-party hosts are blocked, so a run depends only on this repo. Accessibility violations already on main are listed in `e2e/a11y-known.ts`. A new one fails, and a fixed one must be deleted from that list. CI runs it as the `E2E` workflow. On Windows, install with `yarn install --ignore-platform` (the lockfile carries a linux-x64 Tailwind binary) and run `npx playwright install` once.
 - **Theme-dependent bugs need both themes.** The theme is `localStorage['arf-theme']`, falling back to `prefers-color-scheme`. A fresh origin (`localhost` vs production) therefore follows the OS, so a bug that only appears in light mode can be invisible locally on a dark-mode machine. Seed it explicitly before load — `addInitScript(() => localStorage.setItem('arf-theme', 'light'))`.
 
 ### Reporting Issues
