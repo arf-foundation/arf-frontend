@@ -198,7 +198,7 @@ export default function ChangelogPage() {
                     className={`rounded-full border px-3 py-1 text-xs font-medium ${
                       entry.type === "public"
                         ? "border-arf-blue/40 bg-arf-blue/10 text-arf-blue"
-                        : "border-arf-purple/40 bg-arf-purple/10 text-arf-purple"
+                        : "border-arf-purple/40 bg-arf-purple/10 text-[#6c3fd1] dark:text-[#a68af0]"
                     }`}
                   >
                     {entry.type === "public"

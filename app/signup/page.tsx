@@ -230,6 +230,7 @@ export default function SignupPage() {
           <div
             className="mb-3 flex justify-between"
             role="progressbar"
+            aria-label="Pilot request progress"
             aria-valuenow={step}
             aria-valuemin={1}
             aria-valuemax={totalSteps}
@@ -687,14 +688,14 @@ export default function SignupPage() {
           </form>
 
           {error && (
-            <div className="mt-6 rounded-lg border border-[#b3392a]/50 bg-[#b3392a]/10 p-3 text-sm text-[#b3392a]">
+            <div className="mt-6 rounded-lg border border-[#b3392a]/50 bg-[#b3392a]/10 p-3 text-sm text-[#b3392a] dark:text-[#f08a7a]">
               {error}
             </div>
           )}
 
           <p className="mt-6 text-center text-xs text-[color:var(--text-muted)]">
             Prefer to email? Contact us directly at{' '}
-            <a href="mailto:juan@arf-ai.com" className="text-arf-blue hover:underline">juan@arf-ai.com</a>
+            <a href="mailto:juan@arf-ai.com" className="text-arf-blue underline underline-offset-2">juan@arf-ai.com</a>
           </p>
         </div>
       </div>
