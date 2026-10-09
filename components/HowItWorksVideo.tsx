@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Pause, Play } from "lucide-react";
 
 const REDUCED = "(prefers-reduced-motion: reduce)";
 const subscribeReduced = (onChange: () => void) => {
@@ -8,6 +9,14 @@ const subscribeReduced = (onChange: () => void) => {
   mq.addEventListener("change", onChange);
   return () => mq.removeEventListener("change", onChange);
 };
+// The site's theme is a `dark` class on <html> (set before paint in layout.tsx,
+// toggled by NavBar), not prefers-color-scheme, so follow the class itself.
+const subscribeDark = (onChange: () => void) => {
+  const mo = new MutationObserver(onChange);
+  mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  return () => mo.disconnect();
+};
+const isDark = () => document.documentElement.classList.contains("dark");
 
 /**
  * A 30-second silent loop of one governed write, recorded from a real run of
@@ -17,16 +26,26 @@ const subscribeReduced = (onChange: () => void) => {
  *   IntersectionObserver), so it never competes with the hero for LCP.
  * - A fixed 16:9 box means no layout shift when the video arrives.
  * - With prefers-reduced-motion it shows the poster and a play button instead
- *   of autoplaying.
+ *   of autoplaying. While it plays, a Pause button is always available
+ *   (WCAG 2.2.2: moving content that starts by itself must be stoppable).
+ * - The clip and poster follow the site theme: a light and a dark render of the
+ *   same timeline (scripts/video, ?theme=dark).
  * - The visually hidden transcript carries the same content for screen readers.
  */
 export default function HowItWorksVideo() {
   const boxRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [near, setNear] = useState(false);
-  // Server render assumes motion is allowed; nothing plays before hydration anyway.
+  // Server render assumes motion is allowed and the light theme; nothing plays
+  // before hydration anyway.
   const reduced = useSyncExternalStore(subscribeReduced, () => window.matchMedia(REDUCED).matches, () => false);
+  const dark = useSyncExternalStore(subscribeDark, isDark, () => false);
   const [playing, setPlaying] = useState(false);
+  const [pausedByVisitor, setPausedByVisitor] = useState(false);
+  // What the visitor last asked for, read by the effect below. "auto" follows
+  // reduced motion. A ref, so a click does not re-run the effect's load().
+  const intent = useRef<"auto" | "play" | "pause">("auto");
+  const clip = dark ? "/media/arf-how-it-works-dark" : "/media/arf-how-it-works";
 
   useEffect(() => {
     const el = boxRef.current;
@@ -46,21 +65,30 @@ export default function HowItWorksVideo() {
 
   useEffect(() => {
     const v = videoRef.current;
-    if (!v || !near || reduced) return;
-    v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
-  }, [near, reduced]);
+    if (!v || !near) return;
+    // Changing a <source> src on an element that has already chosen a resource
+    // does nothing until load(): without it, a theme switch keeps the old clip.
+    v.load();
+    const wanted = intent.current === "play" || (intent.current === "auto" && !reduced);
+    if (wanted) v.play().catch(() => {});
+  }, [near, dark, reduced]);
 
   const play = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    intent.current = "play";
+    setPausedByVisitor(false);
+    videoRef.current?.play().catch(() => {});
+  };
+  const pause = () => {
+    intent.current = "pause";
+    setPausedByVisitor(true);
+    videoRef.current?.pause();
   };
 
   return (
     <figure className="m-0">
       <div
         ref={boxRef}
-        className="relative w-full overflow-hidden rounded-[14px] border border-[color:var(--color-arf-line)] bg-[color:var(--color-arf-canvas)]"
+        className="relative w-full overflow-hidden rounded-[14px] border border-[color:var(--hairline)] bg-[color:var(--surface-canvas)]"
         style={{ aspectRatio: "16 / 9" }}
       >
         <video
@@ -70,13 +98,15 @@ export default function HowItWorksVideo() {
           loop
           playsInline
           preload="none"
-          poster="/media/arf-how-it-works-poster.webp"
+          poster={`${clip}-poster.webp`}
           aria-describedby="how-it-works-transcript"
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
         >
-          {near && <source src="/media/arf-how-it-works.webm" type="video/webm" />}
-          {near && <source src="/media/arf-how-it-works.mp4" type="video/mp4" />}
+          {near && <source src={`${clip}.webm`} type="video/webm" />}
+          {near && <source src={`${clip}.mp4`} type="video/mp4" />}
         </video>
-        {reduced && !playing && (
+        {reduced && !playing && !pausedByVisitor && (
           <button
             type="button"
             onClick={play}
@@ -86,8 +116,21 @@ export default function HowItWorksVideo() {
           </button>
         )}
       </div>
-      <figcaption className="mt-3 text-[14.5px] leading-[1.6] text-[color:var(--text-secondary)]">
-        A recorded run against a simulated ONTAP cluster. Every value shown comes from the run&apos;s output.
+      <figcaption className="mt-3 flex flex-wrap items-start justify-between gap-x-6 gap-y-2 text-[14.5px] leading-[1.6] text-[color:var(--text-secondary)]">
+        <span>
+          A recorded run against a simulated ONTAP cluster. Every value shown comes from the run&apos;s output.
+        </span>
+        {near && (
+          <button
+            type="button"
+            onClick={playing ? pause : play}
+            aria-label={playing ? "Pause the walkthrough video" : "Play the walkthrough video"}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--hairline)] px-3 py-1 text-[13px] font-medium text-[color:var(--text-secondary)] transition-colors hover:text-[color:var(--text-primary)]"
+          >
+            {playing ? <Pause className="h-3.5 w-3.5" aria-hidden="true" /> : <Play className="h-3.5 w-3.5" aria-hidden="true" />}
+            {playing ? "Pause" : "Play"}
+          </button>
+        )}
       </figcaption>
       <div id="how-it-works-transcript" className="sr-only">
         An AI agent asks to delete the production volume app_data. ARF records the attempt

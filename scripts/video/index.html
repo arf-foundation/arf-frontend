@@ -7,7 +7,13 @@
 <style>
 /* Site tokens (arf-frontend app/globals.css). Composition is 1600x900, rendered frame by frame. */
 :root{--canvas:#faf9f7;--surface:#fff;--raised:#f5f4f1;--ink:#191816;--muted:#605c54;--line:rgba(25,24,22,.09);--line2:rgba(25,24,22,.16);
-  --blue:#3358e8;--blue-deep:#2743c4;--purple:#7a4be0;--amber:#b7791f;--amber-bg:#fdf6e7;--red:#c2410c;--red-bg:#fdf0ea;--green:#1f7a4d;--green-bg:#ecf7f0}
+  --blue:#3358e8;--blue-deep:#2743c4;--purple:#7a4be0;--amber:#b7791f;--amber-bg:#fdf6e7;--red:#c2410c;--red-bg:#fdf0ea;--green:#1f7a4d;--green-bg:#ecf7f0;
+  --req-fg:#fff;--pend-line:#e8c98a;--ref-line:#f0b8a0;--bad-ring:rgba(194,65,12,.15)}
+/* ?theme=dark renders the variant for the site's .dark theme: its surfaces and text
+   (app/globals.css .dark), with status colours lifted to stay legible on #0e0d12. */
+:root[data-theme=dark]{--canvas:#0e0d12;--surface:#17161d;--raised:#1d1c25;--ink:#faf9f7;--muted:rgba(250,249,247,.64);--line:rgba(250,249,247,.10);--line2:rgba(250,249,247,.18);
+  --blue-deep:#8ea1ff;--amber:#e7b354;--amber-bg:rgba(231,179,84,.14);--red:#f2875b;--red-bg:rgba(242,135,91,.14);--green:#4fc38f;--green-bg:rgba(79,195,143,.14);
+  --req-fg:#0e0d12;--pend-line:rgba(231,179,84,.45);--ref-line:rgba(242,135,91,.45);--bad-ring:rgba(242,135,91,.22)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:1600px;height:900px;overflow:hidden;background:var(--canvas);color:var(--ink);font-family:"Instrument Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
@@ -32,7 +38,7 @@ html,body{width:1600px;height:900px;overflow:hidden;background:var(--canvas);col
 #gate{position:absolute;left:50%;top:-34px;width:8px;height:150px;margin-left:-4px;border-radius:4px;background:linear-gradient(180deg,var(--blue),var(--purple))}
 #gatelbl{position:absolute;left:50%;top:-74px;transform:translateX(-50%);font-size:18px;font-weight:600;color:var(--blue-deep);white-space:nowrap}
 #state{position:absolute;left:50%;top:132px;transform:translateX(-50%);white-space:nowrap;font-size:19px;font-weight:600;padding:8px 16px;border-radius:10px;opacity:0}
-.req{position:absolute;top:56px;height:38px;padding:0 16px;border-radius:19px;display:flex;align-items:center;font-size:17px;white-space:nowrap;background:var(--ink);color:#fff;opacity:0}
+.req{position:absolute;top:56px;height:38px;padding:0 16px;border-radius:19px;display:flex;align-items:center;font-size:17px;white-space:nowrap;background:var(--ink);color:var(--req-fg);opacity:0}
 /* ledger */
 #ledger{position:absolute;left:96px;right:96px;top:590px}
 #ledger .h{font-size:18px;color:var(--muted);margin-bottom:16px;display:flex;justify-content:space-between}
@@ -40,9 +46,9 @@ html,body{width:1600px;height:900px;overflow:hidden;background:var(--canvas);col
 .blk{height:60px;min-width:0;border:1px solid var(--line2);background:var(--surface);border-radius:10px;padding:10px 12px;opacity:0;flex:0 0 auto}
 .blk .n{font-size:13px;color:var(--muted)}
 .blk .e{font-size:14px;margin-top:4px;white-space:nowrap}
-.blk.pend{background:var(--amber-bg);border-color:#e8c98a}
-.blk.ref{background:var(--red-bg);border-color:#f0b8a0}
-.blk.bad{border-color:var(--red);box-shadow:0 0 0 3px rgba(194,65,12,.15)}
+.blk.pend{background:var(--amber-bg);border-color:var(--pend-line)}
+.blk.ref{background:var(--red-bg);border-color:var(--ref-line)}
+.blk.bad{border-color:var(--red);box-shadow:0 0 0 3px var(--bad-ring)}
 .link{width:16px;height:2px;background:var(--line2);flex:0 0 auto;opacity:0}
 #verdict{font-size:18px;font-weight:600}
 /* progress dots: the content is a sequence */
@@ -68,6 +74,7 @@ html,body{width:1600px;height:900px;overflow:hidden;background:var(--canvas);col
 </div>
 <script src="data.js"></script>
 <script>
+document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') === 'dark' ? 'dark' : 'light';
 const A2 = window.RUN.act2, DUR = 30;
 // Ledger order for the run, from proxy.py at c3ed234: every write call is execution_attempted + execution_outcome.
 const LEDGER = [[5.0,'execution_attempted','delete_volume app_data',''],[9.0,'execution_outcome','pending approval','pend'],
