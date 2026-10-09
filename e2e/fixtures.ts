@@ -39,14 +39,20 @@ function onlyThirdPartyUrls(text: string): boolean {
   return urls.length > 0 && urls.every((u) => !isLocal(u));
 }
 
+/* How each engine words a blocked or failed resource load in the console. */
+const LOAD_FAILURE = /Failed to load resource|Loading failed for the <script>|ERR_BLOCKED_BY_CLIENT|blocked by client|NS_ERROR_|net::ERR_FAILED/i;
+
 /* Whether a console error is noise from the suite's own third-party aborts
    (true) or a problem to report (false). `where` is the message's source
    location, empty when the engine gives none. */
 export function isThirdPartyNoise(text: string, where: string): boolean {
-  // Noise from the aborted third-party loads: the error is located at,
-  // or names only, a third-party URL. Anything naming this site counts.
+  // Located at a third-party URL: every third-party load is aborted, so no
+  // third-party code runs here, and the message can only be about that abort.
   if (where && !isLocal(where)) return true;
-  return onlyThirdPartyUrls(text);
+  // Some engines attribute the abort to the page instead. Recognise that by
+  // its wording AND by naming only third-party URLs, never by URLs alone: a
+  // first-party error that merely mentions an outside URL is reported.
+  return LOAD_FAILURE.test(text) && onlyThirdPartyUrls(text);
 }
 
 export const test = base.extend<{ problems: Problems }>({
@@ -71,7 +77,8 @@ export const test = base.extend<{ problems: Problems }>({
     );
     // @vercel/analytics loads /_vercel/insights/script.js, which the Vercel
     // edge serves and `next start` does not; stub it rather than fail every page.
-    await page.route("**/_vercel/**", (route) =>
+    // Only that path: any other /_vercel/ request must still fail visibly.
+    await page.route("**/_vercel/insights/**", (route) =>
       route.fulfill({ status: 200, contentType: "application/javascript", body: "" }),
     );
     page.on("pageerror", (err) => list.push(`pageerror: ${err.message}`));
