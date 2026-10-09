@@ -39,6 +39,16 @@ function onlyThirdPartyUrls(text: string): boolean {
   return urls.length > 0 && urls.every((u) => !isLocal(u));
 }
 
+/* Whether a console error is noise from the suite's own third-party aborts
+   (true) or a problem to report (false). `where` is the message's source
+   location, empty when the engine gives none. */
+export function isThirdPartyNoise(text: string, where: string): boolean {
+  // Noise from the aborted third-party loads: the error is located at,
+  // or names only, a third-party URL. Anything naming this site counts.
+  if (where && !isLocal(where)) return true;
+  return onlyThirdPartyUrls(text);
+}
+
 export const test = base.extend<{ problems: Problems }>({
   problems: [async ({ page }, use) => {
     const list: string[] = [];
@@ -68,10 +78,7 @@ export const test = base.extend<{ problems: Problems }>({
     page.on("console", (msg) => {
       if (msg.type() !== "error") return;
       const where = msg.location().url;
-      // Noise from the aborted third-party loads: the error is located at,
-      // or names only, a third-party URL. Anything naming this site counts.
-      if (where && !isLocal(where)) return;
-      if (onlyThirdPartyUrls(msg.text())) return;
+      if (isThirdPartyNoise(msg.text(), where)) return;
       list.push(`console.error: ${msg.text()}${where ? ` (${where})` : ""}`);
     });
     page.on("requestfailed", (req) => {
