@@ -14,7 +14,12 @@ const SCHEMES = ["light", "dark"] as const;
 for (const route of PUBLIC_ROUTES) {
   for (const scheme of SCHEMES) {
     test(`a11y ${route} (${scheme})`, async ({ page }, testInfo) => {
-      await page.emulateMedia({ colorScheme: scheme });
+      // Reduced motion: the site's own rule cuts every animation and transition
+      // to 0.01ms, so axe measures the colours a page settles on. Without it,
+      // CI's Linux WebKit was sampled mid-fade (the route fade-in, /agent's
+      // animate-fade-in), whenever hydration happened to start one, and every
+      // colour read partly transparent. Colours do not depend on this setting.
+      await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
       await visit(page, route);
       const results = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
