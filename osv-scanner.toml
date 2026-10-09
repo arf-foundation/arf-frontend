@@ -6,9 +6,10 @@
 id = "GHSA-vfj7-8cjw-p6xm"
 ignoreUntil = 2026-11-02T00:00:00Z
 reason = """braces <= 3.0.3: stack-exhaustion DoS via deeply nested patterns; the \
-advisory lists no patched version (checked 2026-10-03). `yarn why braces` shows it \
-reached only through build/lint tooling -- fast-glob via next-pwa/globby, \
-@typescript-eslint/typescript-estree and eslint-config-next -- which expand \
-repository-controlled glob patterns at build time. No attacker-supplied pattern \
-reaches it, and it is not part of the deployed runtime. Re-check for a patched \
-release by 2026-11-02."""
+advisory lists no patched version (re-checked 2026-10-09). yarn.lock reaches it only \
+through devDependencies, via micromatch <- fast-glob: eslint-config-next (directly \
+and through typescript-eslint) and next-pwa (globby, and del via \
+clean-webpack-plugin). They expand repository-controlled glob patterns at lint or \
+build time. No attacker-supplied pattern reaches it, and it is not deployed: none of \
+the 20 server .nft.json traces of a production build names braces, micromatch or \
+fast-glob (checked 2026-10-09). Re-check for a patched release by 2026-11-02."""
