@@ -106,11 +106,21 @@ export const test = base.extend<{ problems: Problems }>({
 
 export { expect };
 
-/* Navigate and wait until the page has settled: fonts and client hydration
-   included, so later checks see the page a visitor sees. */
+/* Navigate and wait until the page has settled: fonts, client hydration and
+   finite animations included, so later checks see the page a visitor sees. */
 export async function visit(page: Page, path: string) {
   const response = await page.goto(path, { waitUntil: "load" });
   await page.waitForLoadState("networkidle");
   await page.evaluate(() => document.fonts.ready);
+  // Without View Transitions (CI's Linux WebKit), RouteTransition fades the
+  // whole page in on mount (.arf-route-fade, 260ms). axe sampling mid-fade
+  // measured every colour partly transparent (#3358e8 as #5574ec, 4.12:1)
+  // and failed at random. Wait for finite CSS animations and transitions to
+  // end; endless decorative ones are ignored.
+  await page.waitForFunction(() =>
+    document.getAnimations().every(
+      (a) => a.playState !== "running" || a.effect?.getTiming().iterations === Infinity,
+    ),
+  );
   return response;
 }
