@@ -66,7 +66,7 @@ export function SandboxCard({
         </pre>
       )}
       {error && (
-        <p className="mt-3 text-sm text-[#b0453a]">
+        <p className="mt-3 text-sm text-[#b0453a] dark:text-[#e0806f]">
           Failed to reach sandbox: {error}
         </p>
       )}

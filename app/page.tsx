@@ -403,7 +403,7 @@ export default function LandingPage() {
           {[
             {
               label: "Problem",
-              tone: "text-[#b0453a]",
+              tone: "text-[#b0453a] dark:text-[#e0806f]",
               body: "AI agents make autonomous decisions that are difficult to govern, audit, and control.",
             },
             {

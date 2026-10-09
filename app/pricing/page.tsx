@@ -178,7 +178,7 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="arf-card overflow-x-auto">
+        <div className="arf-card overflow-x-auto" tabIndex={0} role="region" aria-label="Plan comparison table, scrolls sideways">
           <table className="w-full min-w-[720px] border-collapse text-left">
             <caption className="sr-only">What the Sandbox, the Pilot snapshot and the Write-access review include</caption>
             <thead>
