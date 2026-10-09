@@ -256,7 +256,8 @@ main > div:first-child {
    every .dark surface, including the 10% brand tints behind badges.
    Backgrounds, borders, gradients and the focus ring keep the brand values.
    Unlayered, so it outranks Tailwind's layered text-arf-* utilities. */
-.dark .text-arf-blue {
+.dark .text-arf-blue,
+.dark .hover\:text-arf-blue:hover {
   color: #8a9eff;
 }
 .dark .text-arf-purple {
