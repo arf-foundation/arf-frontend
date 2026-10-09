@@ -22,8 +22,9 @@ const isDark = () => document.documentElement.classList.contains("dark");
  * A 30-second silent loop of one governed write, recorded from a real run of
  * the ONTAP MCP admission proxy against a simulated cluster.
  *
- * - Nothing loads until the frame is near the viewport (preload="none" plus
- *   IntersectionObserver), so it never competes with the hero for LCP.
+ * - Neither the poster nor the clip is requested until the frame is within
+ *   300px of the viewport (IntersectionObserver; poster and sources both wait
+ *   for it, and preload="none"). Before that, the box is an empty 16:9 panel.
  * - A fixed 16:9 box means no layout shift when the video arrives.
  * - With prefers-reduced-motion it shows the poster and a play button instead
  *   of autoplaying. While it plays, a Pause button is always available
@@ -98,7 +99,10 @@ export default function HowItWorksVideo() {
           loop
           playsInline
           preload="none"
-          poster={`${clip}-poster.webp`}
+          // A poster attribute is fetched as soon as it is set, whatever preload
+          // says, so it waits for `near` too. By then the theme is the client's:
+          // only the matching poster is ever requested.
+          poster={near ? `${clip}-poster.webp` : undefined}
           aria-describedby="how-it-works-transcript"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
