@@ -84,7 +84,7 @@ function AgentResponseCard({ output }: { output: ARFAgentOutput }) {
           {output.policy_flags.map((flag) => (
             <span
               key={flag}
-              className="rounded-md bg-[#b0453a]/10 px-2 py-0.5 font-mono text-[10px] text-[#b0453a]"
+              className="rounded-md bg-[#b0453a]/10 px-2 py-0.5 font-mono text-[10px] text-[#b0453a] dark:text-[#e0806f]"
             >
               {flag}
             </span>
@@ -244,7 +244,7 @@ export default function ChatWidget() {
                     {m.text}
                   </div>
                 ) : 'error' in m ? (
-                  <div key={i} className="max-w-[90%] rounded-2xl rounded-bl-sm bg-[#b0453a]/10 px-3.5 py-2.5 text-[13.5px] text-[#b0453a]">
+                  <div key={i} className="max-w-[90%] rounded-2xl rounded-bl-sm bg-[#b0453a]/10 px-3.5 py-2.5 text-[13.5px] text-[#b0453a] dark:text-[#e0806f]">
                     {m.error}
                   </div>
                 ) : (

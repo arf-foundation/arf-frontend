@@ -12,10 +12,13 @@
     "lint": "eslint",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "e2e": "playwright test"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@browserbasehq/sdk": "^2.16.0",
+    "@playwright/test": "1.62.1",
     "@tailwindcss/oxide-linux-x64-gnu": "^4.3.0",
     "@tailwindcss/postcss": "^4.3.0",
     "@tailwindcss/typography": "^0.5.20",
@@ -62,8 +65,10 @@
     "nanoid": "^3.3.18",
     "next": "^16.3.6",
     "postcss": "^8.5.18",
+    "postcss-selector-parser": "^7.1.6",
     "serialize-javascript": "^7.0.3",
-    "sharp": "^0.35.4",
+    "sharp": "^0.35.5",
+    "source-map-js": "^1.2.2",
     "ws": "^8.21.0"
   }
 }

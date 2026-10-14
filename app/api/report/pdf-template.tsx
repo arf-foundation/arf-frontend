@@ -20,7 +20,7 @@ const COLOR = {
   raised: '#f5f4f1',
   line: '#e4e1db',
   high: '#b3392a',
-  medium: '#a66a1e',
+  medium: '#9c6219',
   low: '#3f7a5c',
 };
 

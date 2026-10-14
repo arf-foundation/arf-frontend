@@ -32,10 +32,16 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
-        });
+        // The Cache API rejects 206 Partial Content. Vercel returns
+        // 206 for <video> range requests, so cache.put threw here on
+        // every walkthrough play. Only complete 200 responses are
+        // cacheable.
+        if (response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone).catch(() => {});
+          });
+        }
         return response;
       })
       .catch(() => {

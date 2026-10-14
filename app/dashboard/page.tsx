@@ -767,7 +767,7 @@ export default function Dashboard() {
           {/* HTTP Warning (unchanged logic) */}
           {isHttpWarning && (
             <div className="rounded-lg border border-[#b3392a]/30 bg-[#b3392a]/10 p-3 text-center">
-              <p className="text-sm text-[#b3392a]">
+              <p className="text-sm text-[#b3392a] dark:text-[#f08a7a]">
                 ⚠️ Security warning: You are viewing this page over HTTP.
                 Sensitive data (simulated) could be intercepted.{" "}
                 <a
@@ -998,7 +998,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-[#a66a1e]">
+                    <div className="text-2xl font-bold text-[#9c6219] dark:text-[#d39b4a]">
                       {mockMemoryStats.cache_hits}
                     </div>
                     <div className="text-xs text-[color:var(--text-muted)]">
@@ -1066,12 +1066,12 @@ export default function Dashboard() {
                           <td className="px-2 py-2 text-right font-mono text-[color:var(--text-secondary)]">
                             {inc.value}
                           </td>
-                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">
+                          <td className="px-2 py-2 text-right font-mono text-[#9c6219] dark:text-[#d39b4a]">
                             {inc.risk.toFixed(2)}
                           </td>
                           <td className="px-2 py-2 text-right">
                             <span
-                              className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === "ESCALATE" ? "bg-[#b3392a]" : inc.action === "DENY" ? "bg-[#a66a1e]" : "bg-[#3f7a5c]"}`}
+                              className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === "ESCALATE" ? "bg-[#b3392a]" : inc.action === "DENY" ? "bg-[#9c6219]" : "bg-[#3f7a5c]"}`}
                             >
                               {inc.action}
                             </span>
@@ -1100,7 +1100,7 @@ export default function Dashboard() {
                           </p>
                         </div>
                         <span
-                          className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === "ESCALATE" ? "bg-[#b3392a]" : inc.action === "DENY" ? "bg-[#a66a1e]" : "bg-[#3f7a5c]"}`}
+                          className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white ${inc.action === "ESCALATE" ? "bg-[#b3392a]" : inc.action === "DENY" ? "bg-[#9c6219]" : "bg-[#3f7a5c]"}`}
                         >
                           {inc.action}
                         </span>
@@ -1114,7 +1114,7 @@ export default function Dashboard() {
                         </span>
                         <span>
                           Risk:{" "}
-                          <span className="font-mono text-[#a66a1e]">
+                          <span className="font-mono text-[#9c6219] dark:text-[#d39b4a]">
                             {inc.risk.toFixed(2)}
                           </span>
                         </span>
@@ -1143,7 +1143,7 @@ export default function Dashboard() {
               <DashboardMetricCard
                 title="Policy Violations (Last 7 days)"
                 icon={AlertTriangle}
-                iconClassName="text-[#a66a1e]"
+                iconClassName="text-[#9c6219] dark:text-[#d39b4a]"
                 footer="Simulated data – real engine provides live policy enforcement. Click a violation to see why it fired."
               >
                 <div className="space-y-3">
@@ -1164,7 +1164,7 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span
-                          className={`rounded-full px-2 py-0.5 text-xs text-white ${v.severity === "high" ? "bg-[#b3392a]" : v.severity === "medium" ? "bg-[#a66a1e]" : "bg-arf-blue"}`}
+                          className={`rounded-full px-2 py-0.5 text-xs text-white ${v.severity === "high" ? "bg-[#b3392a]" : v.severity === "medium" ? "bg-[#9c6219]" : "bg-arf-blue"}`}
                         >
                           {v.severity.toUpperCase()}
                         </span>
@@ -1221,12 +1221,12 @@ export default function Dashboard() {
                           <td className="px-2 py-2 text-[color:var(--text-secondary)]">
                             {log.action}
                           </td>
-                          <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">
+                          <td className="px-2 py-2 text-right font-mono text-[#9c6219] dark:text-[#d39b4a]">
                             {log.riskScore.toFixed(2)}
                           </td>
                           <td className="px-2 py-2 text-right">
                             <span
-                              className={`rounded-full px-2 py-0.5 text-xs text-white ${log.decision === "ESCALATE" ? "bg-[#b3392a]" : log.decision === "DENY" ? "bg-[#a66a1e]" : "bg-[#3f7a5c]"}`}
+                              className={`rounded-full px-2 py-0.5 text-xs text-white ${log.decision === "ESCALATE" ? "bg-[#b3392a]" : log.decision === "DENY" ? "bg-[#9c6219]" : "bg-[#3f7a5c]"}`}
                             >
                               {log.decision}
                             </span>
@@ -1263,7 +1263,7 @@ export default function Dashboard() {
               <DashboardMetricCard
                 title="Cooldown & Rate Limits (Sandbox)"
                 icon={Clock}
-                iconClassName="text-[#a66a1e]"
+                iconClassName="text-[#9c6219] dark:text-[#d39b4a]"
               >
                 <div className="space-y-3">
                   {MOCK_COOLDOWNS.map((c) => (
@@ -1282,7 +1282,7 @@ export default function Dashboard() {
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="rounded-full bg-[#a66a1e] px-2 py-0.5 text-xs text-white">
+                        <span className="rounded-full bg-[#9c6219] px-2 py-0.5 text-xs text-white">
                           {c.status}
                         </span>
                         <ChevronRight className="h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)]" />
@@ -1426,7 +1426,7 @@ export default function Dashboard() {
                     🔍 Simulated sandbox report — reporting period: last 7 days.
                   </div>
                   {reportDownloadError && (
-                    <p className="text-center text-sm text-[#b3392a]">
+                    <p className="text-center text-sm text-[#b3392a] dark:text-[#f08a7a]">
                       Couldn&rsquo;t generate the PDF: {reportDownloadError}
                     </p>
                   )}
@@ -1533,7 +1533,7 @@ export default function Dashboard() {
                             <td className="px-2 py-2 text-[color:var(--text-secondary)]">
                               {log.action}
                             </td>
-                            <td className="px-2 py-2 text-right font-mono text-[#a66a1e]">
+                            <td className="px-2 py-2 text-right font-mono text-[#9c6219] dark:text-[#d39b4a]">
                               {log.riskScore.toFixed(2)}
                             </td>
                             <td className="px-2 py-2 text-[color:var(--text-secondary)]">

@@ -181,7 +181,7 @@ export default function HistoryPage() {
             <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
               <Calendar className="h-5 w-5 text-arf-purple" /> Recent Decisions (Simulated)
             </h2>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Recent decisions table, scrolls sideways">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[color:var(--hairline)]">
@@ -196,11 +196,11 @@ export default function HistoryPage() {
                     <tr key={decision.id} className="border-b border-[color:var(--hairline)] transition hover:bg-[color:var(--surface-sunken)]">
                       <td className="whitespace-nowrap px-2 py-2 text-[color:var(--text-secondary)]">{decision.timestamp}</td>
                       <td className="px-2 py-2 text-[color:var(--text-secondary)]">{decision.service}</td>
-                      <td className="px-2 py-2 text-right font-mono text-amber-500">{(decision.risk * 100).toFixed(0)}%</td>
+                      <td className="px-2 py-2 text-right font-mono text-[#9c6219] dark:text-amber-500">{(decision.risk * 100).toFixed(0)}%</td>
                       <td className="px-2 py-2 text-right">
                         <span className={`rounded-full px-2 py-0.5 text-xs font-medium text-white ${
                           decision.action === 'ESCALATE' ? 'bg-[#b3392a]' :
-                          decision.action === 'DENY' ? 'bg-[#a66a1e]' :
+                          decision.action === 'DENY' ? 'bg-[#9c6219]' :
                           'bg-[#3f7a5c]'
                         }`}>
                           {decision.action}

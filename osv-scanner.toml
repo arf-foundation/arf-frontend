@@ -1,0 +1,17 @@
+# OSV-Scanner exceptions. Every entry is time-boxed (ignoreUntil, at most ~30
+# days out) and must say why the advisory is not exploitable in this repo, so
+# it is re-reviewed instead of silently lingering.
+
+[[IgnoredVulns]]
+id = "GHSA-vfj7-8cjw-p6xm"
+ignoreUntil = 2026-11-02T00:00:00Z
+reason = """braces <= 3.0.3: stack-exhaustion DoS via deeply nested patterns; the \
+advisory lists no patched version (re-checked 2026-10-09). yarn.lock reaches it by \
+six paths, all from devDependencies and all via fast-glob -> micromatch: the direct \
+@typescript-eslint/parser and @typescript-eslint/eslint-plugin 8.26.1 (through \
+typescript-estree 8.26.1), eslint-config-next (through @next/eslint-plugin-next) and \
+next-pwa (through globby 11). They expand repository-controlled glob patterns at \
+lint or build time. No attacker-supplied pattern reaches it, and it is not deployed: \
+none of the 20 server .nft.json traces of a production build names braces, \
+micromatch or fast-glob (checked 2026-10-09). Re-check for a patched release by \
+2026-11-02."""
