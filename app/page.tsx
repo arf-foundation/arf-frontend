@@ -476,7 +476,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Why ARF? ────────────────────────────────────────────────────────── */}
-      <section id="why-arf" aria-labelledby="why-arf-heading" className="arf-shell grid gap-16 pb-24 lg:grid-cols-[0.9fr_1.1fr]">
+      <section id="why-arf" aria-labelledby="why-arf-heading" className="arf-shell scroll-mt-24 grid gap-16 pb-24 lg:grid-cols-[0.9fr_1.1fr]">
         <h2 id="why-arf-heading" className="max-w-[12ch] text-h2 font-semibold">Why ARF?</h2>
         <div>
           <p className="mb-6 text-[clamp(1.9rem,3.4vw,3.25rem)] font-bold leading-[1.1] tracking-[-0.025em] text-pretty">
