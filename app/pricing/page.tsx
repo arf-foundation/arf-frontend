@@ -45,9 +45,9 @@ const TIERS = [
   },
   {
     name: 'Pilot snapshot',
-    meta: 'Free · 3 founding slots',
+    meta: 'Free · limited founding availability',
     price: 'Free',
-    note: 'In exchange for a written reference',
+    note: 'Scope and availability confirmed on a call',
     items: [
       'One agent, five named write tools',
       'Which actions could run unattended, which need approval',
@@ -61,9 +61,10 @@ const TIERS = [
     name: 'Write-access review',
     meta: 'Fixed price · one agent',
     price: '$4,500',
-    note: 'One agent, fixed price; delivery date agreed at scoping',
+    note: '50% deposit after agreed scope; delivery date reserved on a call',
     items: [
-      'Every write path in the agreed tool inventory',
+      'Up to 10 named writes, one environment/provider',
+      'Up to 200 supplied records in one format',
       'Whether each can be undone, from evidence',
       'Past writes risk-scored, where they map to ARF\'s action model',
       'Unattended vs. approval-required, action by action',
@@ -75,20 +76,20 @@ const TIERS = [
 ] as const;
 
 const COMPARISON = [
-  { label: 'What you get', sandbox: 'Simulated decisions', pilot: 'A five-tool write-access map', enterprise: 'A map of every write path in the agreed tool inventory' },
+  { label: 'What you get', sandbox: 'Simulated decisions', pilot: 'A five-tool write-access map', enterprise: 'A map of up to 10 agreed write operations' },
   { label: 'What we need', sandbox: 'Synthetic or redacted payloads', pilot: 'Tool list + representative traces', enterprise: 'Tool definitions + action history' },
   { label: 'Access to your systems', sandbox: 'None', pilot: 'Read-only material only', enterprise: 'Read-only material only' },
   { label: 'Enforcement', sandbox: 'Simulated only', pilot: 'None — analysis only', enterprise: 'None in the review; a gate is by invitation afterwards' },
   { label: 'Deliverable', sandbox: 'API responses', pilot: 'Short written summary', enterprise: 'Report, recoverability map, scored history, gap list' },
   { label: 'Support', sandbox: 'Community', pilot: 'Founder-led', enterprise: 'Founder-led' },
-  { label: 'Commercials', sandbox: 'Free', pilot: 'Free, reference agreed in writing', enterprise: '$4,500 fixed, card or invoice' },
+  { label: 'Commercials', sandbox: 'Free', pilot: 'Free, scope and feedback agreed first', enterprise: '$4,500 fixed; 50% deposit; card or invoice' },
 ] as const;
 
 const MODEL = [
   {
     n: '01',
     title: 'Start with a snapshot',
-    body: 'Five named write tools, analysed from your tool list and representative traces. Free for three teams, in exchange for a written reference.',
+    body: 'Five named write tools, analysed from read-only material within an agreed short scope. Limited founding availability, confirmed on a call. Honest feedback is welcome; a public reference is optional.',
   },
   {
     n: '02',
@@ -105,7 +106,7 @@ const MODEL = [
 const FAQ = [
   {
     q: 'What does the review deliver?',
-    a: 'A report on one agent: every write path in the agreed tool inventory, whether each can be undone, which should run unattended and which should wait for a human, and the gaps between your current controls and that map. Where your action history maps to ARF\'s action model, each past write is risk-scored; writes that do not map are listed, not scored. The review does not certify every possible agent action or install a production gate.',
+    a: 'A review of one agent, up to 10 named write operations in one environment/provider, and up to 200 supplied records in one format. You receive an inventory and recoverability map, a decision memo, supported findings and evidence index, one readout and a factual correction pass. Scoring is conditional on a supported action model; unmapped writes and unknowns are listed. The review does not certify the agent or install a production gate.',
   },
   {
     q: 'Do you need write access to our systems?',
@@ -125,7 +126,7 @@ const FAQ = [
   },
   {
     q: 'How do we pay?',
-    a: 'Card or a simple invoice. The review is $4,500 for one agent, fixed before work starts; a larger scope is quoted after we see the tool list.',
+    a: 'Card or a simple invoice. The review is $4,500: $2,250 before reserving work after scope is agreed, and $2,250 due seven calendar days after delivery under the agreed proposal. Start and delivery depend on complete inputs and reserved capacity. Cancellation, handling and acceptance terms are agreed before payment; additional tools, formats or providers need a new scope.',
   },
 ] as const;
 

@@ -121,7 +121,7 @@ const TRUST = [
   {
     icon: FileText,
     title: "Cryptographic audit trail",
-    body: "Every governed decision signed, timestamped and attributed. Exported entries can be verified independently.",
+    body: "Inspect timestamped decision records. Signed exports support independent integrity checks where signing is configured.",
   },
 ] as const;
 
@@ -139,7 +139,7 @@ const GOVERNANCE = [
   {
     icon: Brain,
     title: "Explainable reasoning",
-    body: "Every risk score comes with its inputs: the prior, the evidence behind it, and the expected loss of allowing, denying or escalating. Never a black box.",
+    body: "Understand the assumptions and evidence behind a recommendation. Estimates and tool-specific priors are kept distinct from observed outcomes.",
   },
 ] as const;
 
@@ -208,12 +208,12 @@ const TIERS = [
   },
   {
     name: "Pilot snapshot",
-    meta: "Free · 3 founding slots",
+    meta: "Free · limited founding availability",
     price: "Free",
     items: [
       "One agent, five named write tools",
       "Which actions could run unattended",
-      "In exchange for a written reference",
+      "Read-only material and honest feedback",
     ],
     cta: { label: "Request Pilot Access", href: "/signup" },
     dominant: false,
@@ -223,7 +223,7 @@ const TIERS = [
     meta: "Fixed price · one agent",
     price: "$4,500",
     items: [
-      "Every write path in the agreed tool inventory",
+      "Up to 10 named writes, one environment/provider",
       "Unattended vs. approval-required, action by action",
       "Explicit gaps, on an agreed delivery date",
     ],
@@ -476,19 +476,26 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Why ARF? ────────────────────────────────────────────────────────── */}
-      <section className="arf-shell grid gap-16 pb-24 lg:grid-cols-[0.9fr_1.1fr]">
-        <h2 className="max-w-[12ch] text-h2 font-semibold">Why ARF?</h2>
+      <section id="why-arf" aria-labelledby="why-arf-heading" className="arf-shell grid gap-16 pb-24 lg:grid-cols-[0.9fr_1.1fr]">
+        <h2 id="why-arf-heading" className="max-w-[12ch] text-h2 font-semibold">Why ARF?</h2>
         <div>
-          <p className="mb-5 text-[21px] font-semibold leading-[1.45] tracking-[-0.014em] text-pretty">
-            Foundation models are probabilistic. Enterprise operations require
-            deterministic control. ARF bridges that gap.
+          <p className="mb-6 text-[clamp(1.9rem,3.4vw,3.25rem)] font-bold leading-[1.1] tracking-[-0.025em] text-pretty">
+            Know what your agent can change. Prove what happened.
           </p>
-          <p className="text-body text-[color:var(--text-secondary)] text-pretty">
-            Autonomous AI promises unprecedented speed and scale, but without
-            governance it introduces unacceptable operational risk. ARF provides
-            the missing control plane — translating probabilistic model outputs
-            into verifiable, auditable actions that align with your business
-            policies.
+          <p className="mb-6 text-body text-[color:var(--text-secondary)] text-pretty">
+            Keep your IAM, agent approvals and tracing. ARF examines the write itself:
+            its exact target, recovery path, required authority and evidence of the result.
+            Give the customer reviewing your agent something they can inspect.
+          </p>
+          <ul className="space-y-4 text-[15px] leading-[1.6] text-[color:var(--text-secondary)]">
+            <li><strong className="text-[color:var(--text-primary)]">A boundary for each write.</strong> Map the agreed operations and where human approval or refusal is needed.</li>
+            <li><strong className="text-[color:var(--text-primary)]">Recovery judged from evidence.</strong> Distinguish a usable recovery path from an assumption that an action can be undone.</li>
+            <li><strong className="text-[color:var(--text-primary)]">An independently checked result.</strong> On modeled execution routes, record before dispatch and check provider state afterward; an unconfirmed result stays unverified.</li>
+          </ul>
+          <p className="mt-6 rounded-xl border border-arf-blue/20 bg-arf-blue/5 p-4 text-sm leading-relaxed text-[color:var(--text-secondary)]">
+            Demonstrated for modeled ONTAP operations on a simulated cluster.
+            The read-only review maps your own agent and its gaps; it does not install a gate.
+            Production enforcement is scoped and validated separately.
           </p>
         </div>
       </section>
