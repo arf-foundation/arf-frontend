@@ -200,7 +200,7 @@ export default function SignupPage() {
         <div className="mb-4 text-center sm:mb-5">
           <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Request Pilot Access</h1>
           <p className="mb-3 text-sm text-[color:var(--text-muted)] sm:text-base">
-            For a free pilot snapshot (three founding slots) or the $4,500 write-access review.
+            For a free pilot snapshot (availability confirmed on a call) or the $4,500 write-access review.
             Tell us about one agent and the production writes it makes. The founder replies personally, with no commitment required.
           </p>
           {/* Trust bar */}
@@ -560,10 +560,10 @@ export default function SignupPage() {
                   <div className="flex items-start gap-2">
                     <Shield size={18} className="mt-0.5 flex-shrink-0 text-arf-blue" />
                     <div>
-                      <p className="mb-1 font-semibold text-[color:var(--text-primary)]">Three founding snapshot slots</p>
+                      <p className="mb-1 font-semibold text-[color:var(--text-primary)]">Founder-led snapshot availability</p>
                       <p>
                         The founder reads every request. If your agent is a fit, you’ll get an email to book a 30‑minute scoping call.
-                        The snapshot is free and uses read-only material; the review is $4,500 for one agent, fixed before work starts.
+                        The snapshot uses read-only material. The $4,500 review covers up to ten agreed writes for one agent and environment/provider; scope, inputs, payment and delivery are agreed before work starts.
                       </p>
                     </div>
                   </div>
