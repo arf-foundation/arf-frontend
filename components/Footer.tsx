@@ -144,7 +144,7 @@ export default function Footer() {
           >
             <Image
               src="/GitHub_Lockup_White.svg"
-              alt="GitHub Enterprise"
+              alt="ARF AI on GitHub"
               width={416}
               height={95}
               className="h-8 w-auto"
