@@ -335,19 +335,19 @@ export default function LandingPage() {
           No longer paired with a decision-path visual here -- that content
           duplicated the Architecture section's pipeline one scroll down.
           Single canonical version now lives there (components/ArchitecturePipeline). */}
-      <section className="arf-hero-wash">
-        <div className="arf-shell py-[88px] pb-[104px]">
-          <div className="mx-auto max-w-[680px] text-center">
-            <h1 className="mx-auto mb-6 max-w-[20ch] text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[1.03] tracking-[-0.033em] text-pretty">
+      <section className="arf-hero-wash arf-landing-hero">
+        <div className="arf-shell py-20 sm:py-24 lg:py-28">
+          <div className="mx-auto max-w-[760px] text-center">
+            <h1 className="mx-auto mb-7 max-w-[21ch] text-[clamp(2.5rem,5.5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.04em] text-balance">
               Give production changes{" "}
               <span className="arf-gradient-text">a boundary your customer can inspect</span>
             </h1>
-            <p className="mx-auto mb-9 max-w-[52ch] text-[18.5px] leading-[1.6] text-[color:var(--text-secondary)] text-pretty">
+            <p className="mx-auto mb-9 max-w-[46ch] text-[17px] leading-[1.65] text-[color:var(--text-secondary)] sm:text-[18.5px] text-pretty">
               Map one storage write path: what can change, what can be undone,
               who approves, and what gets recorded.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link href="/signup" className="arf-btn-primary">
+              <Link href="/signup" className="arf-btn-primary max-w-full justify-center ring-1 ring-inset ring-white/20 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue">
                 Request the $4,500 write-path review <ArrowRight size={18} />
               </Link>
               <Link
@@ -367,11 +367,11 @@ export default function LandingPage() {
       {/* ─── Trust & compliance strip: the 3-second social-proof bar ─────────── */}
       <section className="bg-arf-dark py-[46px]">
         <div className="arf-shell grid gap-10 md:grid-cols-3">
-          {TRUST.map((item) => (
+          {TRUST.map((item, idx) => (
             <Link
               key={item.title}
               href={item.href}
-              className="group flex gap-4 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7fa0ff]"
+              className={`group flex gap-4 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7fa0ff] ${idx > 0 ? "lg:border-l lg:border-white/15 lg:pl-6" : ""}`}
             >
               <item.icon
                 className="mt-0.5 h-6 w-6 flex-shrink-0 text-[#7fa0ff]"

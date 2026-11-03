@@ -479,6 +479,34 @@ main > div:first-child {
         transparent 70%
       );
   }
+  /* Homepage only: pricing keeps the shared hero wash above. */
+  .arf-landing-hero {
+    border-bottom: 1px solid var(--hairline);
+    background-image:
+      radial-gradient(
+        ellipse 70% 90% at 50% -25%,
+        rgba(51, 88, 232, 0.14),
+        transparent 80%
+      ),
+      radial-gradient(
+        ellipse 45% 60% at 85% 50%,
+        rgba(122, 75, 224, 0.06),
+        transparent 80%
+      );
+  }
+  .dark .arf-landing-hero {
+    background-image:
+      radial-gradient(
+        ellipse 70% 90% at 50% -25%,
+        rgba(51, 88, 232, 0.23),
+        transparent 80%
+      ),
+      radial-gradient(
+        ellipse 45% 60% at 85% 50%,
+        rgba(122, 75, 224, 0.12),
+        transparent 80%
+      );
+  }
   .arf-dark-wash {
     background-image:
       radial-gradient(
