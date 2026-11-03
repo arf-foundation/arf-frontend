@@ -57,8 +57,8 @@ export default function FAQPage() {
               answer="No. The sandbox API returns only mock data and is rate‑limited. It is intended for demonstration and testing only. For production use, you need pilot access to the real engine."
             />
             <FAQItem
-              question="What is expected loss minimisation?"
-              answer="The system evaluates the potential cost of each possible action based on configurable parameters and the current risk assessment. It then selects the action with the lowest expected impact, producing a human‑readable, auditable justification."
+              question="What is the model-relative loss index?"
+              answer="It compares allowing, denying or escalating under stated model assumptions (normalized, tail-weighted when configured, configuration-pinned). The index depends on configured costs, priors and available evidence. It is not a measured monetary loss or proof that an action is safe."
             />
           </div>
         </section>

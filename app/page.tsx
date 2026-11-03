@@ -111,16 +111,19 @@ const TRUST = [
   {
     icon: Shield,
     title: "Mapped to SOC 2 criteria",
+    href: "/changelog",
     body: "Each trust services criterion is mapped to the control and code that address it. Not yet audited.",
   },
   {
     icon: Lock,
     title: "Deterministic enforcement",
+    href: "/#architecture",
     body: "On a governed path, policy gates run mechanically before an action reaches infrastructure. Not advisory.",
   },
   {
     icon: FileText,
     title: "Cryptographic audit trail",
+    href: "/faq",
     body: "Inspect timestamped decision records. Signed exports support independent integrity checks where signing is configured.",
   },
 ] as const;
@@ -139,7 +142,7 @@ const GOVERNANCE = [
   {
     icon: Brain,
     title: "Explainable reasoning",
-    body: "Understand the assumptions and evidence behind a recommendation. Estimates and tool-specific priors are kept distinct from observed outcomes.",
+    body: "Understand the assumptions and evidence behind a recommendation. Estimates and tool-specific priors are kept distinct from observed outcomes. A model-relative loss index (normalized, tail-weighted when configured, configuration-pinned) depends on those assumptions.",
   },
 ] as const;
 
@@ -366,12 +369,15 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link href="/signup" className="arf-btn-primary">
-                Request Pilot Access <ArrowRight size={18} />
+                Request the $4,500 write-path review <ArrowRight size={18} />
               </Link>
-              <Link href="/dashboard" className="arf-btn-secondary">
-                Console
+              <Link href="#pricing" className="arf-btn-secondary">
+                See what a review produces
               </Link>
             </div>
+            <p className="mt-4 text-xs text-[color:var(--text-secondary)]">
+              Early access · unaudited · no certification claimed
+            </p>
           </div>
         </div>
       </section>
@@ -380,7 +386,11 @@ export default function LandingPage() {
       <section className="bg-arf-dark py-[46px]">
         <div className="arf-shell grid gap-10 md:grid-cols-3">
           {TRUST.map((item) => (
-            <div key={item.title} className="flex gap-4">
+            <Link
+              key={item.title}
+              href={item.href}
+              className="group flex gap-4 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7fa0ff]"
+            >
               <item.icon
                 className="mt-0.5 h-6 w-6 flex-shrink-0 text-[#7fa0ff]"
                 strokeWidth={1.5}
@@ -388,12 +398,17 @@ export default function LandingPage() {
               <div>
                 <h2 className="mb-1.5 text-[15.5px] font-semibold tracking-[-0.012em] text-white">
                   {item.title}
+                  <ArrowRight
+                    aria-hidden="true"
+                    size={14}
+                    className="ml-2 inline-block opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                  />
                 </h2>
                 <p className="text-[13.5px] leading-[1.55] text-white/70">
                   {item.body}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -600,6 +615,18 @@ export default function LandingPage() {
             <p className="max-w-[52ch] self-end text-body text-[color:var(--text-secondary)] text-pretty">
               The three properties a compliance officer will ask about in the
               first meeting. Each one is a mechanism, not a policy document.
+            </p>
+          </div>
+          <div className="mb-8">
+            <ul aria-label="Decision states" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {["Authorized", "Provider reported", "Durably recorded", "Unresolved"].map((state) => (
+                <li key={state} className="rounded-lg border border-[color:var(--hairline)] bg-[color:var(--surface-canvas)] px-3 py-3 text-center text-sm font-medium">
+                  {state}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-sm text-[color:var(--text-secondary)]">
+              Approved is not the same as done. ARF keeps the difference visible.
             </p>
           </div>
           <div className="grid gap-[22px] md:grid-cols-3">
