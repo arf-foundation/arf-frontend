@@ -168,7 +168,7 @@ export default function NavBar() {
                 ? "Switch to light theme"
                 : "Switch to dark theme"
             }
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)] active:scale-90"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] text-[color:var(--text-secondary)] transition hover:border-arf-blue hover:bg-[color:var(--surface-raised)] hover:text-[color:var(--text-primary)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue dark:focus-visible:outline-[#a8b8ff] active:scale-90"
             suppressHydrationWarning
           >
             {isHydrated && (theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />)}
@@ -194,7 +194,7 @@ export default function NavBar() {
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav-menu"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] transition active:scale-90 md:hidden"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] transition hover:border-arf-blue hover:bg-[color:var(--surface-raised)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue dark:focus-visible:outline-[#a8b8ff] active:scale-90 md:hidden"
           >
             {mobileOpen ? (
               <X className="h-4 w-4" />

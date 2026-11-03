@@ -336,7 +336,7 @@ export default function LandingPage() {
           duplicated the Architecture section's pipeline one scroll down.
           Single canonical version now lives there (components/ArchitecturePipeline). */}
       <section className="arf-hero-wash arf-landing-hero">
-        <div className="arf-shell py-20 sm:py-24 lg:py-28">
+        <div className="arf-shell pt-20 pb-12 sm:pt-24 sm:pb-16 lg:pt-28 lg:pb-20">
           <div className="mx-auto max-w-[760px] text-center">
             <h1 className="mx-auto mb-7 max-w-[21ch] text-[clamp(2.5rem,5.5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.04em] text-balance">
               Give production changes{" "}
@@ -347,7 +347,7 @@ export default function LandingPage() {
               who approves, and what gets recorded.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link href="/signup" className="arf-btn-primary max-w-full justify-center ring-1 ring-inset ring-white/20 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue">
+              <Link href="/signup" className="arf-btn-primary max-w-full justify-center ring-1 ring-inset ring-white/20 hover:bg-none hover:bg-[color:var(--color-arf-blue-deep)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue dark:focus-visible:outline-[#a8b8ff]">
                 Request the $4,500 write-path review <ArrowRight size={18} />
               </Link>
               <Link
@@ -366,7 +366,8 @@ export default function LandingPage() {
 
       {/* ─── Trust & compliance strip: the 3-second social-proof bar ─────────── */}
       <section className="bg-arf-dark py-[46px]">
-        <div className="arf-shell grid gap-10 md:grid-cols-3">
+        {/* Keep text left of the fixed 56px chat launcher, including when stacked. */}
+        <div className="arf-shell grid gap-10 pr-24 md:grid-cols-3">
           {TRUST.map((item, idx) => (
             <Link
               key={item.title}
