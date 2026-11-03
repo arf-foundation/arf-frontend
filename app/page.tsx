@@ -331,47 +331,29 @@ export default function LandingPage() {
 
   return (
     <div className="arf-page-root">
-      {/* ─── Hero: badge, headline, ONE subheadline, two CTAs ──────────────────
+      {/* ─── Hero: headline, one subheadline, primary CTA and secondary link ──
           No longer paired with a decision-path visual here -- that content
           duplicated the Architecture section's pipeline one scroll down.
           Single canonical version now lives there (components/ArchitecturePipeline). */}
-      {/* ─── "What's new" strip — surfaces recent shipped capability to
-          first-time visitors (ICPs evaluating trust/maturity) without
-          adding a 5th item to NavBar's deliberately-curated 4-link set. */}
-      <div className="border-b border-[color:var(--hairline)] bg-[color:var(--surface-raised)] py-2.5 text-center text-sm">
-        <Link
-          href="/changelog"
-          className="inline-flex items-center gap-2 text-[color:var(--text-secondary)] transition hover:text-arf-blue"
-        >
-          <span className="rounded-full bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.05em] text-white">
-            New
-          </span>
-          Bounded write access for ONTAP storage agents, on a simulated cluster
-          <ArrowRight size={13} />
-        </Link>
-      </div>
-
       <section className="arf-hero-wash">
         <div className="arf-shell py-[88px] pb-[104px]">
           <div className="mx-auto max-w-[680px] text-center">
-            <p className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-arf-blue/25 bg-[color:var(--surface-raised)]/75 px-3 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-arf-blue">
-              <span className="h-1.5 w-1.5 rounded-full bg-arf-blue" />
-              For infrastructure-agent teams
-            </p>
             <h1 className="mx-auto mb-6 max-w-[20ch] text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[1.03] tracking-[-0.033em] text-pretty">
               Give production changes{" "}
               <span className="arf-gradient-text">a boundary your customer can inspect</span>
             </h1>
             <p className="mx-auto mb-9 max-w-[52ch] text-[18.5px] leading-[1.6] text-[color:var(--text-secondary)] text-pretty">
-              Start with one named write path. Map what the agent can change,
-              whether the action can be undone, when a person must approve,
-              and what record remains. Storage first.
+              Map one storage write path: what can change, what can be undone,
+              who approves, and what gets recorded.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link href="/signup" className="arf-btn-primary">
                 Request the $4,500 write-path review <ArrowRight size={18} />
               </Link>
-              <Link href="#pricing" className="arf-btn-secondary">
+              <Link
+                href="#pricing"
+                className="rounded-sm px-2 py-3 text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--hairline)] underline-offset-4 hover:text-arf-blue focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue"
+              >
                 See what a review produces
               </Link>
             </div>
@@ -618,9 +600,9 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="mb-8">
-            <ul aria-label="Decision states" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <ul aria-label="Decision states" className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
               {["Authorized", "Provider reported", "Durably recorded", "Unresolved"].map((state) => (
-                <li key={state} className="rounded-lg border border-[color:var(--hairline)] bg-[color:var(--surface-canvas)] px-3 py-3 text-center text-sm font-medium">
+                <li key={state}>
                   {state}
                 </li>
               ))}
