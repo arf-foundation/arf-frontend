@@ -110,9 +110,9 @@ const CAPABILITIES = [
 const TRUST = [
   {
     icon: Shield,
-    title: "Mapped to SOC 2 criteria",
-    href: "/changelog",
-    body: "Each trust services criterion is mapped to the control and code that address it. Not yet audited.",
+    title: "Controls and limitations",
+    href: "/faq",
+    body: "Review the demo boundary, model assumptions, and engagement limits before choosing a write path. Not yet audited.",
   },
   {
     icon: Lock,
