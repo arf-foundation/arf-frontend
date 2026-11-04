@@ -110,17 +110,20 @@ const CAPABILITIES = [
 const TRUST = [
   {
     icon: Shield,
-    title: "Mapped to SOC 2 criteria",
-    body: "Each trust services criterion is mapped to the control and code that address it. Not yet audited.",
+    title: "Controls and limitations",
+    href: "/faq",
+    body: "Review the demo boundary, model assumptions, and engagement limits before choosing a write path. Not yet audited.",
   },
   {
     icon: Lock,
     title: "Deterministic enforcement",
+    href: "/#architecture",
     body: "On a governed path, policy gates run mechanically before an action reaches infrastructure. Not advisory.",
   },
   {
     icon: FileText,
     title: "Cryptographic audit trail",
+    href: "/faq",
     body: "Inspect timestamped decision records. Signed exports support independent integrity checks where signing is configured.",
   },
 ] as const;
@@ -139,7 +142,7 @@ const GOVERNANCE = [
   {
     icon: Brain,
     title: "Explainable reasoning",
-    body: "Understand the assumptions and evidence behind a recommendation. Estimates and tool-specific priors are kept distinct from observed outcomes.",
+    body: "Understand the assumptions and evidence behind a recommendation. Estimates and tool-specific priors are kept distinct from observed outcomes. A model-relative loss index (normalized, tail-weighted when configured, configuration-pinned) depends on those assumptions.",
   },
 ] as const;
 
@@ -328,59 +331,49 @@ export default function LandingPage() {
 
   return (
     <div className="arf-page-root">
-      {/* ─── Hero: badge, headline, ONE subheadline, two CTAs ──────────────────
+      {/* ─── Hero: headline, one subheadline, primary CTA and secondary link ──
           No longer paired with a decision-path visual here -- that content
           duplicated the Architecture section's pipeline one scroll down.
           Single canonical version now lives there (components/ArchitecturePipeline). */}
-      {/* ─── "What's new" strip — surfaces recent shipped capability to
-          first-time visitors (ICPs evaluating trust/maturity) without
-          adding a 5th item to NavBar's deliberately-curated 4-link set. */}
-      <div className="border-b border-[color:var(--hairline)] bg-[color:var(--surface-raised)] py-2.5 text-center text-sm">
-        <Link
-          href="/changelog"
-          className="inline-flex items-center gap-2 text-[color:var(--text-secondary)] transition hover:text-arf-blue"
-        >
-          <span className="rounded-full bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.05em] text-white">
-            New
-          </span>
-          Bounded write access for ONTAP storage agents, on a simulated cluster
-          <ArrowRight size={13} />
-        </Link>
-      </div>
-
-      <section className="arf-hero-wash">
-        <div className="arf-shell py-[88px] pb-[104px]">
-          <div className="mx-auto max-w-[680px] text-center">
-            <p className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-arf-blue/25 bg-[color:var(--surface-raised)]/75 px-3 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-arf-blue">
-              <span className="h-1.5 w-1.5 rounded-full bg-arf-blue" />
-              For infrastructure-agent teams
-            </p>
-            <h1 className="mx-auto mb-6 max-w-[20ch] text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[1.03] tracking-[-0.033em] text-pretty">
+      <section className="arf-hero-wash arf-landing-hero">
+        <div className="arf-shell pt-20 pb-12 sm:pt-24 sm:pb-16 lg:pt-28 lg:pb-20">
+          <div className="mx-auto max-w-[760px] text-center">
+            <h1 className="mx-auto mb-7 max-w-[21ch] text-[clamp(2.5rem,5.5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.04em] text-balance">
               Give production changes{" "}
               <span className="arf-gradient-text">a boundary your customer can inspect</span>
             </h1>
-            <p className="mx-auto mb-9 max-w-[52ch] text-[18.5px] leading-[1.6] text-[color:var(--text-secondary)] text-pretty">
-              Start with one named write path. Map what the agent can change,
-              whether the action can be undone, when a person must approve,
-              and what record remains. Storage first.
+            <p className="mx-auto mb-9 max-w-[46ch] text-[17px] leading-[1.65] text-[color:var(--text-secondary)] sm:text-[18.5px] text-pretty">
+              Map one storage write path: what can change, what can be undone,
+              who approves, and what gets recorded.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link href="/signup" className="arf-btn-primary">
-                Request Pilot Access <ArrowRight size={18} />
+              <Link href="/signup" className="arf-btn-primary max-w-full justify-center ring-1 ring-inset ring-white/20 hover:bg-none hover:bg-[color:var(--color-arf-blue-deep)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue dark:focus-visible:outline-[#a8b8ff]">
+                Request the $4,500 write-path review <ArrowRight size={18} />
               </Link>
-              <Link href="/dashboard" className="arf-btn-secondary">
-                Console
+              <Link
+                href="#pricing"
+                className="rounded-sm px-2 py-3 text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--hairline)] underline-offset-4 hover:text-arf-blue focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue"
+              >
+                See what a review produces
               </Link>
             </div>
+            <p className="mt-4 text-xs text-[color:var(--text-secondary)]">
+              Early access · unaudited · no certification claimed
+            </p>
           </div>
         </div>
       </section>
 
       {/* ─── Trust & compliance strip: the 3-second social-proof bar ─────────── */}
       <section className="bg-arf-dark py-[46px]">
-        <div className="arf-shell grid gap-10 md:grid-cols-3">
-          {TRUST.map((item) => (
-            <div key={item.title} className="flex gap-4">
+        {/* Keep text left of the fixed 56px chat launcher, including when stacked. */}
+        <div className="arf-shell grid gap-10 pr-24 md:grid-cols-3">
+          {TRUST.map((item, idx) => (
+            <Link
+              key={item.title}
+              href={item.href}
+              className={`group flex gap-4 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7fa0ff] ${idx > 0 ? "lg:border-l lg:border-white/15 lg:pl-6" : ""}`}
+            >
               <item.icon
                 className="mt-0.5 h-6 w-6 flex-shrink-0 text-[#7fa0ff]"
                 strokeWidth={1.5}
@@ -388,12 +381,17 @@ export default function LandingPage() {
               <div>
                 <h2 className="mb-1.5 text-[15.5px] font-semibold tracking-[-0.012em] text-white">
                   {item.title}
+                  <ArrowRight
+                    aria-hidden="true"
+                    size={14}
+                    className="ml-2 inline-block opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                  />
                 </h2>
                 <p className="text-[13.5px] leading-[1.55] text-white/70">
                   {item.body}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -600,6 +598,18 @@ export default function LandingPage() {
             <p className="max-w-[52ch] self-end text-body text-[color:var(--text-secondary)] text-pretty">
               The three properties a compliance officer will ask about in the
               first meeting. Each one is a mechanism, not a policy document.
+            </p>
+          </div>
+          <div className="mb-8">
+            <ul aria-label="Decision states" className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
+              {["Authorized", "Provider reported", "Durably recorded", "Unresolved"].map((state) => (
+                <li key={state}>
+                  {state}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-sm text-[color:var(--text-secondary)]">
+              Approved is not the same as done. ARF keeps the difference visible.
             </p>
           </div>
           <div className="grid gap-[22px] md:grid-cols-3">
