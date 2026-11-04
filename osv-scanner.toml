@@ -1,3 +1,35 @@
 # OSV-Scanner exceptions. Every entry is time-boxed (ignoreUntil, at most ~30
 # days out) and must say why the advisory is not exploitable in this repo, so
 # it is re-reviewed instead of silently lingering.
+
+[[IgnoredVulns]]
+id = "GHSA-gcqx-w48m-w2h4"
+ignoreUntil = 2026-12-02T00:00:00Z
+reason = """deepmerge 4.3.1: mergeObject() prototype poisoning of returned objects; the \
+advisory lists no fixed version (last_affected 4.3.1, checked 2026-11-02). It is \
+reached only through devDependencies: next-pwa -> workbox-webpack-plugin -> \
+workbox-build -> @rollup/plugin-node-resolve (service-worker build) and jest -> \
+jest-config. Both merge repository-controlled configuration at build or test time; \
+no request data reaches it and application code does not import it. Re-check for a \
+fixed release by 2026-12-02."""
+
+[[IgnoredVulns]]
+id = "GHSA-3g3m-2fjr-6pw4"
+ignoreUntil = 2026-12-02T00:00:00Z
+reason = """glob 10.5.0: AbortSignal cancellation bypass allows post-timeout filesystem \
+traversal; fixed only in glob 14.0.2, which the dependents' ^10.5.0 range excludes \
+(checked 2026-11-02). Reached only through jest (@jest/reporters, jest-config, \
+jest-runtime), a devDependency that walks this repository's own test files; it is \
+not part of the build output or the deployed site. Remove when jest accepts a \
+fixed glob, or by 2026-12-02."""
+
+[[IgnoredVulns]]
+id = "GHSA-g3hv-75wg-m249"
+ignoreUntil = 2026-12-02T00:00:00Z
+reason = """minimatch 3.1.5, 5.1.9, 9.0.9 and 10.2.5: denial of service via globparts \
+amplification; fixed only in 11.0.1, outside every dependent's range (checked \
+2026-11-02). Reached only through devDependencies: the eslint stack (eslint, \
+@eslint/*, eslint-plugin-*, @typescript-eslint/typescript-estree), jest via glob, \
+and next-pwa's workbox build via ejs -> jake -> filelist. Every pattern is \
+repository-controlled at lint, test or build time; none comes from a request. \
+Re-check by 2026-12-02."""
