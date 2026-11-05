@@ -464,8 +464,8 @@ function semanticMemoryExplanation(stats: typeof mockMemoryStats): {
         heading: "Effect on this decision",
         body: (
           <>
-            None. Incident memory stays out of risk scores and decisions until a
-            validated embedding replaces the placeholder.
+            None. These sandbox memory values do not affect the displayed risk
+            score or decision.
           </>
         ),
       },
