@@ -296,8 +296,8 @@ const mockMemoryStats = {
 // NOT claimed, because they aren't true of the OSS/sandbox path:
 //   - that this specific number was computed live by that engine (it's a
 //     illustrative derivation from the mock riskScore, labeled as such)
-//   - that "similar past incidents" retrieval is semantic/NLP similarity
-//     (it's metric-fingerprint similarity -- see the Semantic Memory card)
+//   - that "similar past incidents" retrieval is meaningful: the default
+//     vectors are placeholders (see the Incident Memory card)
 // ----------------------------------------------------------------------
 const SANDBOX_FOOTER =
   "Sandbox illustration — this reflects the real ARF engine's methodology applied to simulated inputs, not a live production evaluation.";
@@ -436,17 +436,17 @@ function semanticMemoryExplanation(stats: typeof mockMemoryStats): {
   footer: string;
 } {
   return {
-    title: "Semantic Memory — how similar incidents are found",
-    summary: `ARF found ${stats.similar_incidents} related past incidents for this request, with a top similarity score of ${stats.rag_similarity.toFixed(2)}.`,
+    title: "Incident Memory — what it does today",
+    summary: `Illustrative sandbox values, not a real retrieval: ${stats.similar_incidents} neighbours, top similarity ${stats.rag_similarity.toFixed(2)}. Incident memory has no effect on this decision.`,
     sections: [
       {
         heading: "Retrieval method",
         body: (
           <>
-            Incidents are indexed in a FAISS nearest-neighbor index (
-            {stats.memory_usage}) and ranked by similarity s = 1 / (1 +
-            distance) between the current incident&rsquo;s fingerprint and each
-            stored one.
+            Incidents can be indexed in a FAISS nearest-neighbor index (
+            {stats.memory_usage}) and ranked by s = 1 / (1 + distance) between
+            their vectors. The numbers on this card are sandbox illustrations,
+            not a real retrieval.
           </>
         ),
       },
@@ -454,22 +454,18 @@ function semanticMemoryExplanation(stats: typeof mockMemoryStats): {
         heading: 'What "similar" means',
         body: (
           <>
-            In the open-source/sandbox tier, incident fingerprints are built
-            from structured metrics — component, metric type, error rate,
-            latency — not natural-language understanding. Two incidents are
-            similar because their operational signature matches, not because a
-            language model read and compared their descriptions.
+            The default vectors are repeatable placeholders, not a model of
+            meaning. Identical metrics produce the same vector, but a nearby
+            vector doesn&rsquo;t show that two incidents are related.
           </>
         ),
       },
       {
-        heading: "Why it matters for this decision",
+        heading: "Effect on this decision",
         body: (
           <>
-            Retrieved incidents feed a weighted success-rate estimate that
-            adjusts for each action&rsquo;s own causal effect, so a policy that
-            &ldquo;worked&rdquo; several times isn&rsquo;t credited for outcomes
-            that would have happened anyway.
+            None. These sandbox memory values do not affect the displayed risk
+            score or decision.
           </>
         ),
       },
@@ -977,7 +973,7 @@ export default function Dashboard() {
               )}
 
               <DashboardMetricCard
-                title="Semantic Memory (Sandbox)"
+                title="Incident Memory (Sandbox)"
                 icon={Network}
               >
                 <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-4">
@@ -986,7 +982,7 @@ export default function Dashboard() {
                       {mockMemoryStats.similar_incidents}
                     </div>
                     <div className="text-xs text-[color:var(--text-muted)]">
-                      Similar Incidents
+                      Neighbours (illustrative)
                     </div>
                   </div>
                   <div>
@@ -994,7 +990,7 @@ export default function Dashboard() {
                       {mockMemoryStats.rag_similarity.toFixed(2)}
                     </div>
                     <div className="text-xs text-[color:var(--text-muted)]">
-                      RAG Similarity
+                      Similarity (illustrative)
                     </div>
                   </div>
                   <div>
