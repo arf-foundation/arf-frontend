@@ -1,6 +1,13 @@
 {
   "entries": [
     {
+      "date": "2026-11-10",
+      "title": "ARF R1 — Decision Safety: release preparation",
+      "description": "Preparation is underway for ARF AI's next named public release after Axiom, targeting late December 2026. The proposed focus is explicit decision-versus-execution boundaries, inspectable evidence and audit records, reliable state recovery, and tenant-scoped operator-attested learning for qualified pilots. These capabilities are under independent safety, integration, and security review. R1 is not released, the scope and timing may change, and no autonomous execution or production certification is claimed.",
+      "type": "public",
+      "status": "planned"
+    },
+    {
       "date": "2026-09-29",
       "title": "Bounded write access for ONTAP storage agents",
       "description": "ARF can now sit between an AI agent and NetApp ONTAP's MCP tools. Read tools pass through. Six storage writes are modeled: creating a volume, resizing it or taking it offline, creating a snapshot, and deleting a volume, a snapshot or a SnapMirror relationship. Each is checked against live cluster state, given an approval floor by whether it can be undone, and committed to the decision record before it runs, then checked by an independent read. A result that read cannot confirm is reported as unverified, or as unknown when the outcome itself is uncertain. Every other write tool is refused rather than sent for approval, and an approval admits only the exact call it was given for. Demonstrated end to end against a simulated cluster; it has not yet run against a live one.",
