@@ -21,6 +21,7 @@ interface ChangelogEntry {
   title: string;
   description: string;
   type: "public" | "pilot";
+  status?: "planned";
   link?: string;
 }
 
@@ -30,6 +31,14 @@ interface ChangelogEntry {
 // silently disappear if changelog.json is later edited, reverted, or fails
 // to load.
 const DEFAULT_ENTRIES: ChangelogEntry[] = [
+  {
+    date: "2026-11-10",
+    title: "ARF R1 — Decision Safety: release preparation",
+    description:
+      "Preparation is underway for ARF AI's next named public release after Axiom, targeting late December 2026. The proposed focus is explicit decision-versus-execution boundaries, inspectable evidence and audit records, reliable state recovery, and tenant-scoped operator-attested learning for qualified pilots. These capabilities are under independent safety, integration, and security review. R1 is not released, the scope and timing may change, and no autonomous execution or production certification is claimed.",
+    type: "public",
+    status: "planned",
+  },
   {
     date: "2026-08-29",
     title: "v4.3.7 — Reversibility Governance & Audit Integrity",
@@ -209,6 +218,11 @@ export default function ChangelogPage() {
                     <Calendar size={14} />
                     {formatDate(entry.date)}
                   </span>
+                  {entry.status === "planned" && (
+                    <span className="rounded-md border border-[color:var(--hairline)] px-2 py-1 text-xs font-semibold tracking-wide text-[color:var(--text-secondary)]">
+                      PLANNED — NOT RELEASED
+                    </span>
+                  )}
                   {entry.link && (
                     <a
                       href={entry.link}
