@@ -11,6 +11,43 @@
 
 ---
 
+## Next named release: R1 — Decision Safety (preparation)
+
+**Status: planned, not released.** R1 is the next **named** public release after
+[Axiom v4.3.2](https://github.com/arf-foundation/agentic_reliability_framework/releases/tag/v4.3.2-axiom),
+with a **late-December 2026 target** subject to independent release gates.
+
+The intended public focus is clear advisory/execution boundaries, inspectable
+decision and evidence records, reliable state handling, and tenant-scoped
+operator-attested outcome learning for qualified pilots. These are **planned
+capabilities, not an availability claim**. Operator attestation is not independent
+verification; it never by itself grants autonomous execution authority.
+
+The [changelog](/app/changelog/page.tsx) and its
+[JSON data](public/data/changelog.json) carry a separately labeled
+`PLANNED — NOT RELEASED` entry. Do not change it to a shipped release or
+update the site's Axiom release footer until the founder authorizes a verified
+release. Public notes deliberately exclude proprietary model parameters,
+decision rules, unreleased implementation details, private endpoints, keys,
+customer data, and internal architecture.
+
+### Developer and release-preparation checks
+
+The normal validation sequence is `yarn install`, `yarn lint`,
+`yarn test --coverage`, and `yarn build`, on the CI-supported Node 20
+environment. GitHub Actions is the source of truth for these checks.
+On Windows PowerShell, the current `build` script uses a POSIX environment
+assignment; see the Windows workaround under **Known Limitations** below.
+No build, test, deployment, or production verification is implied by a
+documentation-only update.
+
+Before publishing R1, confirm public labels distinguish simulation, advisory
+evaluation, operator attestation, independently verified execution evidence,
+and authorization to execute. Publishing the changelog is not itself proof
+that any of these features is enabled in production.
+
+---
+
 ## Overview
 
 ARF Frontend provides a user‑friendly dashboard to **visualise risk metrics, simulate incident evaluations, and explore governance decisions** – all using **demo data or the public sandbox API**. It showcases ARF capabilities without exposing the protected Bayesian inference engine.
