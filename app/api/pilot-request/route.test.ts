@@ -65,10 +65,22 @@ it('preserves the previous payload and existing Notion select strings', async ()
   expect(properties['Cloud Environment'].select.name).toBe('On‑premises / Private cloud');
 });
 
+it.each([undefined, '', '  '])('accepts a write without optional details (%j)', async (decision) => {
+  const response = await submit({ ...intake, offer: 'write-access-review', decision });
+
+  expect(response.status).toBe(200);
+  expect(mockCreate).toHaveBeenCalledTimes(1);
+  expect(mockCreate.mock.calls[0][0].properties['Use Case'].rich_text).toEqual([
+    { text: { content: 'Requested offer: Write-Access Review\n' } },
+    { text: { content: `Intended write: ${intake.intendedWrite}` } },
+  ]);
+});
+
 it.each([
   { offer: 'unknown' },
   { intendedWrite: '   ' },
   { decision: 'x'.repeat(501) },
+  { decision: null },
   { email: 'invalid' },
   { agreeToTerms: false },
 ])('rejects incomplete or unsupported intake before writing: %j', async (change) => {

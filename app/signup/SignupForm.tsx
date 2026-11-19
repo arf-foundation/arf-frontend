@@ -58,8 +58,8 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
     const intendedWrite = draft.intendedWrite.trim();
     const decision = draft.decision.trim();
     setError(null);
-    if (!intendedWrite || !decision) {
-      setError('Enter the intended write and the decision it is holding up.');
+    if (!intendedWrite) {
+      setError('Enter the agent write you want to discuss.');
       return;
     }
     setStatus('sending');
@@ -71,7 +71,7 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
           offer,
           email: draft.email.trim(),
           intendedWrite,
-          decision,
+          ...(decision ? { decision } : {}),
           agreeToTerms: data.get('agreeToTerms') === 'on',
         }),
       });
@@ -118,8 +118,8 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
             <>
               <h1 className="max-w-[23ch] text-h2 font-semibold text-balance">{heading}</h1>
               <p className="mb-7 mt-3 max-w-[56ch] text-[color:var(--text-secondary)]">
-                Start with one agent and a brief description of the write. We’ll follow up by email to discuss scope.
-                Share only a summary here. Keep credentials and customer records out of this form.
+                Tell us about one write. We’ll email you to discuss the scope and next steps.
+                Please leave out credentials and customer records.
               </p>
               <form method="post" action="/api/pilot-request" onSubmit={submit} className="arf-card space-y-6 p-5 sm:p-8">
                 <fieldset className="min-w-0" disabled={disabled}>
@@ -135,21 +135,21 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
                   </div>
                 </fieldset>
                 <div>
+                  <label htmlFor="intended-write" className="font-semibold">Which agent write are you deciding whether to allow?</label>
+                  <textarea id="intended-write" name="intendedWrite" rows={3} maxLength={500} className={FIELD_CLASS}
+                    placeholder="For example, delete a volume after a migration." required value={values.intendedWrite}
+                    disabled={disabled} onChange={(event) => updateDraft('intendedWrite', event.target.value)} />
+                </div>
+                <div>
                   <label htmlFor="email" className="font-semibold">Work email</label>
                   <input id="email" name="email" type="email" autoComplete="email" maxLength={254}
                     className={FIELD_CLASS} required value={values.email} disabled={disabled}
                     onChange={(event) => updateDraft('email', event.target.value)} />
                 </div>
                 <div>
-                  <label htmlFor="intended-write" className="font-semibold">What write does the agent need to make?</label>
-                  <textarea id="intended-write" name="intendedWrite" rows={3} maxLength={500} className={FIELD_CLASS}
-                    placeholder="For example, delete a volume after a migration." required value={values.intendedWrite}
-                    disabled={disabled} onChange={(event) => updateDraft('intendedWrite', event.target.value)} />
-                </div>
-                <div>
-                  <label htmlFor="decision" className="font-semibold">What decision is it holding up?</label>
-                  <textarea id="decision" name="decision" rows={3} maxLength={500} className={FIELD_CLASS}
-                    placeholder="For example, customer sign-off on this write before rollout." required value={values.decision}
+                  <label htmlFor="decision" className="font-semibold">What decision is it holding up? <span className="font-normal text-[color:var(--text-secondary)]">Optional</span></label>
+                  <textarea id="decision" name="decision" rows={2} maxLength={500} className={FIELD_CLASS}
+                    placeholder="For example, customer sign-off before rollout." value={values.decision}
                     disabled={disabled} onChange={(event) => updateDraft('decision', event.target.value)} />
                 </div>
                 <div className="flex items-start gap-3 text-sm">

@@ -73,18 +73,22 @@ export async function POST(request: Request) {
     let title: string;
     let context = typeof useCase === 'string' && useCase ? [richText(useCase)] : [];
     if (isRequestOffer(offer)) {
-      if (!boundedText(intendedWrite) || !boundedText(decision) || agreeToTerms !== true) {
+      if (!boundedText(intendedWrite) || agreeToTerms !== true) {
         return NextResponse.json(
-          { error: 'Enter the intended write and pending decision, and agree to the terms.' },
+          { error: 'Enter the intended write and agree to the terms.' },
           { status: 400 },
         );
       }
+      if (decision !== undefined && (typeof decision !== 'string' || decision.length > MAX_FIELD_LENGTH)) {
+        return NextResponse.json({ error: 'Keep optional details within 500 characters.' }, { status: 400 });
+      }
+      const pendingDecision = typeof decision === 'string' ? decision.trim() : '';
       title = `${OFFER_LABELS[offer]} request`;
       context = [
         richText(`Requested offer: ${OFFER_LABELS[offer]}\n`),
-        richText(`Intended write: ${intendedWrite.trim()}\n`),
-        richText(`Pending decision: ${decision.trim()}`),
+        richText(`Intended write: ${intendedWrite.trim()}${pendingDecision ? '\n' : ''}`),
       ];
+      if (pendingDecision) context.push(richText(`Pending decision: ${pendingDecision}`));
     } else if (!boundedText(fullName) || !boundedText(company) ||
       (typeof useCase === 'string' && useCase.length > MAX_FIELD_LENGTH)) {
       return NextResponse.json(

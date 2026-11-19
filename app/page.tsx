@@ -6,7 +6,7 @@ import { ArrowRight, ChevronDown, Cpu, FileText, Network, Shield } from "lucide-
 import { CapabilityCard, SandboxCard, ConsoleCard, SpecsCard } from "@arf/ui";
 import ArchitecturePipeline from "../components/ArchitecturePipeline";
 import ReviewProof from "../components/ReviewProof";
-import { REVIEW_REQUEST_PATH, SNAPSHOT_REQUEST_PATH } from "../lib/engagement-offers";
+import { REVIEW_EXAMPLE_PATH, REVIEW_REQUEST_PATH, SNAPSHOT_REQUEST_PATH } from "../lib/engagement-offers";
 
 const CURL_COMMAND = `curl -X POST https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
@@ -149,11 +149,11 @@ export default function LandingPage() {
       <section className="arf-hero-wash arf-landing-hero">
         <div className="arf-shell pb-10 pt-16 sm:pb-14 sm:pt-24">
           <h1 className="max-w-[20ch] text-[clamp(2.4rem,5.5vw,4rem)] font-semibold leading-[1.05] tracking-[-0.04em] text-balance">
-            Show your customer what your <span className="arf-gradient-text">storage agent can change</span>
+            What would you need to verify before <span className="arf-gradient-text">your storage agent writes?</span>
           </h1>
           <p className="mt-5 max-w-[60ch] text-lg leading-relaxed text-[color:var(--text-secondary)] text-pretty">
-            Get a read-only review of one agent’s writes, including who should approve them,
-            what recovery evidence exists and what your customer still needs to decide.
+            The $4,500 read-only review shows who should approve each write, what recovery evidence exists,
+            and which writes should stay on hold.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link href={REVIEW_REQUEST_PATH} className="arf-btn-primary max-w-full justify-center">
@@ -190,6 +190,20 @@ export default function LandingPage() {
                 Request a free five-tool snapshot
               </Link>
             </div>
+            <figure className="mt-6 rounded-xl border border-[color:var(--hairline)] bg-[color:var(--surface-sunken)] p-4 sm:p-5">
+              <figcaption className="mb-3 text-sm font-semibold">From the sample decision memo</figcaption>
+              <dl className="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-[max-content_1fr]">
+                <dt className="font-semibold">Proposed write</dt>
+                <dd className="text-[color:var(--text-secondary)]">Delete the source volume.</dd>
+                <dt className="font-semibold">Evidence reviewed</dt>
+                <dd className="text-[color:var(--text-secondary)]">Healthy mirror report. New file absent on the replica.</dd>
+                <dt className="font-semibold">Open question</dt>
+                <dd className="text-[color:var(--text-secondary)]">Can the storage owner recover the current data?</dd>
+              </dl>
+              <Link href={REVIEW_EXAMPLE_PATH} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-arf-blue underline underline-offset-4">
+                Read the full sample <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+            </figure>
           </div>
         </div>
       </section>

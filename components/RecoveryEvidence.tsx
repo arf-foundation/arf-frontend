@@ -6,21 +6,21 @@ import { Activity, FileSearch, Hand } from 'lucide-react';
 const STEPS = [
   {
     id: 'report',
-    label: 'Provider report',
+    label: 'Mirror reported healthy',
     title: 'The mirror reported healthy',
     detail: 'ONTAP reported a healthy mirror. That status describes the relationship between the volumes.',
     Icon: Activity,
   },
   {
     id: 'file',
-    label: 'File check',
+    label: 'New file absent on replica',
     title: 'The new file was missing on the replica',
     detail: 'A direct read found the file on the source and absent from the replica.',
     Icon: FileSearch,
   },
   {
     id: 'decision',
-    label: 'ARF decision',
+    label: 'Source deletion held',
     title: 'ARF held the source deletion',
     detail: 'Recoverability of the current data remained unresolved. The source was preserved.',
     Icon: Hand,
@@ -33,7 +33,9 @@ export default function RecoveryEvidence() {
 
   return (
     <div>
-      <div className="mb-4 grid grid-cols-3 gap-2" role="group" aria-label="FSx recovery evidence steps">
+      <div className="relative mb-4 grid grid-cols-3 gap-2" role="group" aria-label="FSx recovery evidence steps">
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-1.5 h-0.5 w-1/3 rounded-full bg-arf-blue motion-safe:transition-transform motion-safe:duration-200"
+          style={{ transform: `translateX(${active * 100}%)` }} />
         {STEPS.map(({ id, label, Icon }, index) => (
           <button
             key={id}
