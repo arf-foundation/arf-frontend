@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: baseUrl, changeFrequency: 'weekly', priority: 1 },
     { url: `${baseUrl}/pricing`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/write-access-review`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/dashboard`, changeFrequency: 'daily', priority: 0.8 },
     { url: `${baseUrl}/signup`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/faq`, changeFrequency: 'monthly', priority: 0.6 },

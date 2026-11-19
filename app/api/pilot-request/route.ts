@@ -1,14 +1,23 @@
 import { Client } from '@notionhq/client';
 import { NextResponse } from 'next/server';
 import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
+import { isRequestOffer, OFFER_LABELS } from '../../../lib/engagement-offers';
 
-function cleanSelect(value: string | null | undefined): string | null {
-  if (!value) return null;
-  return value.replace(/,/g, '');
+function select(value: unknown) {
+  const name = typeof value === 'string' ? value.replace(/,/g, '').trim() : '';
+  return name ? { name } : null;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_FIELD_LENGTH = 500;
+
+function boundedText(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0 && value.length <= MAX_FIELD_LENGTH;
+}
+
+function richText(content: string) {
+  return { text: { content } };
+}
 
 /* Public, unauthenticated endpoint writing directly to a real Notion
    database on every request. A lead-gen form's legitimate usage is "submit
@@ -30,8 +39,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = await request.json();
+    const body: unknown = await request.json().catch(() => null);
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return NextResponse.json({ error: 'Please submit a request form.' }, { status: 400 });
+    }
     const {
+      offer,
+      intendedWrite,
+      decision,
+      agreeToTerms,
       fullName,
       email,
       company,
@@ -46,21 +62,37 @@ export async function POST(request: Request) {
       companySize,
       headquarters,
       governanceOwner,
-    } = body;
+    } = body as Record<string, unknown>;
 
-    if (!fullName || !email || !company) {
-      return NextResponse.json(
-        { error: 'Full name, email, and company are required.' },
-        { status: 400 }
-      );
+    if (offer !== undefined && !isRequestOffer(offer)) {
+      return NextResponse.json({ error: 'Please select an available offer.' }, { status: 400 });
     }
-    if (typeof email !== 'string' || !EMAIL_RE.test(email)) {
+    if (typeof email !== 'string' || email.length > 254 || !EMAIL_RE.test(email)) {
       return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
     }
-    for (const [field, value] of Object.entries({ fullName, company, useCase })) {
-      if (typeof value === 'string' && value.length > MAX_FIELD_LENGTH) {
-        return NextResponse.json({ error: `${field} is too long.` }, { status: 400 });
+    let title: string;
+    let context = typeof useCase === 'string' && useCase ? [richText(useCase)] : [];
+    if (isRequestOffer(offer)) {
+      if (!boundedText(intendedWrite) || !boundedText(decision) || agreeToTerms !== true) {
+        return NextResponse.json(
+          { error: 'Enter the intended write and pending decision, and agree to the terms.' },
+          { status: 400 },
+        );
       }
+      title = `${OFFER_LABELS[offer]} request`;
+      context = [
+        richText(`Requested offer: ${OFFER_LABELS[offer]}\n`),
+        richText(`Intended write: ${intendedWrite.trim()}\n`),
+        richText(`Pending decision: ${decision.trim()}`),
+      ];
+    } else if (!boundedText(fullName) || !boundedText(company) ||
+      (typeof useCase === 'string' && useCase.length > MAX_FIELD_LENGTH)) {
+      return NextResponse.json(
+        { error: 'Enter a full name and company. Keep each field within 500 characters.' },
+        { status: 400 },
+      );
+    } else {
+      title = fullName;
     }
 
     const notion = new Client({ auth: process.env.NOTION_API_KEY });
@@ -69,49 +101,46 @@ export async function POST(request: Request) {
       parent: { database_id: process.env.NOTION_DATABASE_ID as string },
       properties: {
         'Full Name': {
-          title: [{ text: { content: fullName } }],
+          title: [richText(title)],
         },
         Email: {
           email: email,
         },
         Company: {
-          rich_text: [{ text: { content: company } }],
+          rich_text: boundedText(company) ? [richText(company)] : [],
         },
         Industry: {
-          select: industry ? { name: cleanSelect(industry) } : null,
+          select: select(industry),
         },
         'Job Role': {
-          select: jobRole ? { name: cleanSelect(jobRole) } : null,
+          select: select(jobRole),
         },
         'Use Case': {
-          rich_text: useCase ? [{ text: { content: useCase } }] : [],
+          rich_text: context,
         },
         'Expected Volume': {
-          select: expectedVolume ? { name: cleanSelect(expectedVolume) } : null,
+          select: select(expectedVolume),
         },
         'Cloud Environment': {
-          select: cloudEnvironment ? { name: cleanSelect(cloudEnvironment) } : null,
+          select: select(cloudEnvironment),
         },
         'AI Maturity': {
-          select: aiMaturity ? { name: cleanSelect(aiMaturity) } : null,
+          select: select(aiMaturity),
         },
         'Budget Approved': {
-          select: budgetApproved ? { name: cleanSelect(budgetApproved) } : null,
+          select: select(budgetApproved),
         },
         Timeline: {
-          select: timeline ? { name: cleanSelect(timeline) } : null,
+          select: select(timeline),
         },
-        // The two hard ICP gates a data provider can answer, asked
-        // directly so an inbound request arrives already scoreable.
         'Company Size': {
-          select: companySize ? { name: cleanSelect(companySize) } : null,
+          select: select(companySize),
         },
         Headquarters: {
-          select: headquarters ? { name: cleanSelect(headquarters) } : null,
+          select: select(headquarters),
         },
-        // The buying reason itself: the absence of a governance owner.
         'Governance Owner': {
-          select: governanceOwner ? { name: cleanSelect(governanceOwner) } : null,
+          select: select(governanceOwner),
         },
       },
     });

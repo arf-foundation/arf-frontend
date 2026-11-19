@@ -15,6 +15,7 @@ export const PUBLIC_ROUTES = [
   "/privacy",
   "/signup",
   "/terms",
+  "/write-access-review",
 ] as const;
 
 export function isLocal(url: string): boolean {

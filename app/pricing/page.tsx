@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { REVIEW_EXAMPLE_PATH, REVIEW_REQUEST_PATH, SNAPSHOT_REQUEST_PATH } from '../../lib/engagement-offers';
 
 /* ============================================================================
    /pricing — ported to the landing-page design system.
@@ -54,23 +55,22 @@ const TIERS = [
       'A short written summary',
       'Founder-led, from read-only material',
     ],
-    cta: { label: 'Request Pilot Access', href: '/signup' },
+    cta: { label: 'Request the free snapshot', href: SNAPSHOT_REQUEST_PATH },
     dominant: false,
   },
   {
     name: 'Write-access review',
-    meta: 'Fixed price · one agent',
+    meta: 'Read-only · one agent',
     price: '$4,500',
-    note: '50% deposit after agreed scope; delivery date reserved on a call',
+    note: '50% deposit after you agree to the scope',
     items: [
       'Up to 10 named writes, one environment/provider',
       'Up to 200 supplied records in one format',
-      'Whether each can be undone, from evidence',
-      'Past writes risk-scored, where they map to ARF\'s action model',
-      'Unattended vs. approval-required, action by action',
-      'Explicit gaps and next steps',
+      'Write inventory and recoverability map',
+      'Decision memo and evidence index',
+      'Unresolved items, owners, and next steps',
     ],
-    cta: { label: 'Talk to us', href: '/signup' },
+    cta: { label: 'Request the $4,500 review', href: REVIEW_REQUEST_PATH },
     dominant: true,
   },
 ] as const;
@@ -80,7 +80,7 @@ const COMPARISON = [
   { label: 'What we need', sandbox: 'Synthetic or redacted payloads', pilot: 'Tool list + representative traces', enterprise: 'Tool definitions + action history' },
   { label: 'Access to your systems', sandbox: 'None', pilot: 'Read-only material only', enterprise: 'Read-only material only' },
   { label: 'Enforcement', sandbox: 'Simulated only', pilot: 'None — analysis only', enterprise: 'None in the review; a gate is by invitation afterwards' },
-  { label: 'Deliverable', sandbox: 'API responses', pilot: 'Short written summary', enterprise: 'Report, recoverability map, scored history, gap list' },
+  { label: 'Deliverable', sandbox: 'API responses', pilot: 'Short written summary', enterprise: 'Write inventory, recoverability map, decision memo and evidence index with unresolved items' },
   { label: 'Support', sandbox: 'Community', pilot: 'Founder-led', enterprise: 'Founder-led' },
   { label: 'Commercials', sandbox: 'Free', pilot: 'Free, scope and feedback agreed first', enterprise: '$4,500 fixed; 50% deposit; card or invoice' },
 ] as const;
@@ -94,7 +94,7 @@ const MODEL = [
   {
     n: '02',
     title: 'Then a fixed-price review',
-    body: 'One agent\'s production write paths, mapped action by action: which can run unattended, which should wait for a human, and what evidence remains when it acts.',
+    body: 'Review each agreed write against your existing controls. See the recommended approval boundaries, evidence for recovery, and questions to resolve before rollout.',
   },
   {
     n: '03',
@@ -106,7 +106,7 @@ const MODEL = [
 const FAQ = [
   {
     q: 'What does the review deliver?',
-    a: 'A review of one agent, up to 10 named write operations in one environment/provider, and up to 200 supplied records in one format. You receive an inventory and recoverability map, a decision memo, supported findings and evidence index, one readout and a factual correction pass. Scoring is conditional on a supported action model; unmapped writes and unknowns are listed. The review does not certify the agent or install a production gate.',
+    a: 'A read-only review of one agent, up to 10 named writes in one environment/provider, and up to 200 supplied records in one format. You receive a write inventory and recoverability map, a decision memo, qualitative findings, an evidence index with unresolved items, one readout and a factual correction pass. A production gate is scoped separately.',
   },
   {
     q: 'Do you need write access to our systems?',
@@ -167,6 +167,11 @@ export default function PricingPage() {
             ),
           )}
         </div>
+        <p className="mt-6 text-center">
+          <Link href={REVIEW_EXAMPLE_PATH} className="rounded-sm font-semibold text-arf-blue underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4">
+            See a sample Write-Access Review finding
+          </Link>
+        </p>
       </section>
 
       {/* ─── Comparison ──────────────────────────────────────────────────── */}

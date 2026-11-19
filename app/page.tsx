@@ -23,6 +23,11 @@ import { useInView } from "./hooks/useInView";
 import ArchitecturePipeline from "../components/ArchitecturePipeline";
 import HowItWorksVideo from "../components/HowItWorksVideo";
 import {
+  REVIEW_EXAMPLE_PATH,
+  REVIEW_REQUEST_PATH,
+  SNAPSHOT_REQUEST_PATH,
+} from "../lib/engagement-offers";
+import {
   CapabilityCard,
   TierBody,
   SandboxCard,
@@ -34,8 +39,8 @@ import {
    DESIGN NOTES (full write-up in design_handoff_arf_enterprise_refresh/DESIGN_RATIONALE.md)
 
    Spacing rhythm — deliberately uneven, replacing the old uniform py-20:
-     hero 88/104 → trust strip 46 (tight, scannable) → logo row 64/88 →
-     problem 112 → why 96 → why-now 112 → industries 120 → capabilities 120 →
+     hero → evidence card → trust strip 46 (tight, scannable) →
+     problem 112 → why 96 → industries 120 → capabilities 120 →
      governance 104 on its own surface → quote band 104 → pricing 112 →
      explore 104 → footer 72.
    The eye accelerates through the scannable bands and slows on the two proof
@@ -218,19 +223,19 @@ const TIERS = [
       "Which actions could run unattended",
       "Read-only material and honest feedback",
     ],
-    cta: { label: "Request Pilot Access", href: "/signup" },
+    cta: { label: "Request the free snapshot", href: SNAPSHOT_REQUEST_PATH },
     dominant: false,
   },
   {
     name: "Write-access review",
-    meta: "Fixed price · one agent",
+    meta: "Read-only · one agent",
     price: "$4,500",
     items: [
       "Up to 10 named writes, one environment/provider",
-      "Unattended vs. approval-required, action by action",
-      "Explicit gaps, on an agreed delivery date",
+      "Write inventory and recoverability map",
+      "Evidence, unresolved items, and next steps",
     ],
-    cta: { label: "Talk to us", href: "/signup" },
+    cta: { label: "Request the $4,500 review", href: REVIEW_REQUEST_PATH },
     dominant: true,
   },
 ] as const;
@@ -347,11 +352,11 @@ export default function LandingPage() {
               who approves, and what gets recorded.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link href="/signup" className="arf-btn-primary max-w-full justify-center ring-1 ring-inset ring-white/20 hover:bg-none hover:bg-[color:var(--color-arf-blue-deep)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue dark:focus-visible:outline-[#a8b8ff]">
+              <Link href={REVIEW_REQUEST_PATH} className="arf-btn-primary max-w-full justify-center ring-1 ring-inset ring-white/20 hover:bg-none hover:bg-[color:var(--color-arf-blue-deep)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue dark:focus-visible:outline-[#a8b8ff]">
                 Request the $4,500 write-path review <ArrowRight size={18} />
               </Link>
               <Link
-                href="#pricing"
+                href={REVIEW_EXAMPLE_PATH}
                 className="rounded-sm px-2 py-3 text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--hairline)] underline-offset-4 hover:text-arf-blue focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue"
               >
                 See what a review produces
@@ -360,6 +365,26 @@ export default function LandingPage() {
             <p className="mt-4 text-xs text-[color:var(--text-secondary)]">
               Early access · unaudited · no certification claimed
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="arf-shell pb-10 sm:pb-14" aria-labelledby="fsx-finding">
+        <div className="grid items-start gap-5 rounded-2xl border border-arf-blue/20 bg-gradient-to-br from-arf-blue/8 to-arf-purple/8 p-6 sm:p-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12">
+          <div>
+            <p className="arf-eyebrow mb-3">Disposable AWS FSx experiment</p>
+            <h2 id="fsx-finding" className="max-w-[22ch] text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
+              The mirror reported healthy. The new file was missing.
+            </h2>
+          </div>
+          <div className="max-w-[60ch]">
+            <p className="text-[color:var(--text-secondary)] leading-relaxed">
+              A direct file check found the test file on the source and absent from its replica.
+              ARF held the requested source deletion. Recovery of current data remained unverified.
+            </p>
+            <Link href={REVIEW_EXAMPLE_PATH} className="mt-4 inline-flex items-center gap-2 rounded-sm font-semibold text-arf-blue underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4">
+              See the sample finding <ArrowRight size={16} aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>
@@ -495,26 +520,6 @@ export default function LandingPage() {
             The read-only review maps your own agent and its gaps; it does not install a gate.
             Production enforcement is scoped and validated separately.
           </p>
-        </div>
-      </section>
-
-      {/* ─── Why Now? ────────────────────────────────────────────────────────── */}
-      <section className="arf-shell pb-[112px]">
-        <div className="grid gap-16 rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 px-14 py-[60px] lg:grid-cols-[0.9fr_1.1fr]">
-          <h2 className="max-w-[12ch] text-h2 font-semibold">Why now?</h2>
-          <div>
-            <p className="mb-4.5 text-body text-[color:var(--text-primary)]/85 text-pretty">
-              Autonomous AI is moving from copilots to autonomous workflows. As
-              AI gains the ability to act — not just recommend — organisations
-              need infrastructure that governs execution, manages operational
-              risk, and provides auditability by design.
-            </p>
-            <p className="text-body text-[color:var(--text-secondary)] text-pretty">
-              ARF AI delivers that control plane. Built for the era where AI
-              doesn&rsquo;t just answer questions — it deploys code, modifies
-              infrastructure, and makes decisions that affect business outcomes.
-            </p>
-          </div>
         </div>
       </section>
 
