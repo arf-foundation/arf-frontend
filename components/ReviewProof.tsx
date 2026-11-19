@@ -27,7 +27,7 @@ export default function ReviewProof() {
               type="button"
               aria-pressed={id === example}
               aria-controls="review-proof-clip"
-              className="flex flex-wrap items-baseline gap-x-2 gap-y-1 rounded-lg border border-[color:var(--hairline)] px-3 py-2.5 text-left text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arf-blue aria-pressed:border-arf-blue aria-pressed:bg-arf-blue/10 aria-pressed:text-arf-blue"
+              className="flex flex-wrap items-baseline gap-x-2 gap-y-1 rounded-lg border border-[color:var(--hairline)] px-3 py-2.5 text-left text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arf-blue aria-pressed:border-arf-blue aria-pressed:bg-arf-blue/10"
               onClick={() => setExample(id)}
             >
               {label} <span className="font-normal text-[color:var(--text-secondary)]">{duration}</span>
