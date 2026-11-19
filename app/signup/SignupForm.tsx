@@ -20,7 +20,7 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
   useEffect(() => {
     let restored = EMPTY_DRAFT;
     try {
-      const saved = localStorage.getItem(DRAFT_KEY) ?? localStorage.getItem(LEGACY_DRAFT_KEY);
+      const saved = sessionStorage.getItem(DRAFT_KEY) ?? localStorage.getItem(DRAFT_KEY) ?? localStorage.getItem(LEGACY_DRAFT_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         restored = {
@@ -29,7 +29,10 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
             : typeof parsed?.useCase === 'string' ? parsed.useCase.slice(0, 500) : '',
           decision: typeof parsed?.decision === 'string' ? parsed.decision.slice(0, 500) : '',
         };
+        sessionStorage.setItem(DRAFT_KEY, JSON.stringify(restored));
       }
+      localStorage.removeItem(DRAFT_KEY);
+      localStorage.removeItem(LEGACY_DRAFT_KEY);
     } catch {
       // The form works with unavailable browser storage or an unreadable draft.
     }
@@ -45,7 +48,7 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
     const next = { ...(draft ?? EMPTY_DRAFT), [field]: value };
     setDraft(next);
     try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(next));
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(next));
     } catch {
       // Local draft storage is optional.
     }
@@ -84,8 +87,7 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
       }
       setStatus('sent');
       try {
-        localStorage.removeItem(DRAFT_KEY);
-        localStorage.removeItem(LEGACY_DRAFT_KEY);
+        sessionStorage.removeItem(DRAFT_KEY);
       } catch {
         // A storage error cannot undo a confirmed submission.
       }

@@ -300,5 +300,5 @@ Convert raw operational events into structured, conservative, auditable institut
 
 - Version string: ARF_IMO_v1.3
 - Log prompt hash.
-- Log output alongside version.
+- Log only the prompt version and hash alongside operational status. Do not log chat content.
 - Runtime requirement: temperature = 0.

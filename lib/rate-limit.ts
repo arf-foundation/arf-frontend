@@ -44,41 +44,53 @@ interface RateLimiterOptions {
   windowMs: number;
 }
 
-/* Returns an async isRateLimited(key) -- true means reject the request.
-   One Ratelimit/Map is built per call, at module load in each route (a
-   direct replacement for that route's old top-level `const
-   requestTimestamps = new Map()` singleton), not per request. */
+export type RateLimitResult = 'allowed' | 'limited' | 'unavailable';
+
 export function createRateLimiter({ prefix, maxRequests, windowMs }: RateLimiterOptions): (
   key: string,
-) => Promise<boolean> {
+) => Promise<RateLimitResult> {
   if (redis) {
     const ratelimit = new Ratelimit({
       redis,
       limiter: Ratelimit.slidingWindow(maxRequests, `${Math.max(1, Math.round(windowMs / 1000))} s`),
       prefix: `arf-frontend:${prefix}`,
     });
-    return async (key: string): Promise<boolean> => {
+    return async (key: string): Promise<RateLimitResult> => {
       try {
-        const { success } = await ratelimit.limit(key);
-        return !success;
-      } catch (error) {
+        const { success, reason } = await ratelimit.limit(key);
+        if (reason === 'timeout') {
+          console.warn(`[rate-limit] Upstash timed out for prefix "${prefix}".`);
+          return 'unavailable';
+        }
+        return success ? 'allowed' : 'limited';
+      } catch {
         // Fail closed: an Upstash outage should not silently turn into an
         // unlimited-abuse window on an endpoint that costs real money
         // (chat) or writes to a real backend (pilot-request, report) on
         // every request.
-        console.error(`[rate-limit] Upstash check failed for prefix "${prefix}"; failing closed.`, error);
-        return true;
+        console.error(`[rate-limit] Upstash check failed for prefix "${prefix}"; failing closed.`);
+        return 'unavailable';
       }
     };
   }
 
   const requestTimestamps = new Map<string, number[]>();
-  return async (key: string): Promise<boolean> => {
+  const maxKeys = 4096;
+  let nextPrune = 0;
+  return async (key: string): Promise<RateLimitResult> => {
     const now = Date.now();
+    if (now >= nextPrune) {
+      for (const [client, timestamps] of requestTimestamps) {
+        if (now - timestamps[timestamps.length - 1] >= windowMs) requestTimestamps.delete(client);
+      }
+      nextPrune = now + windowMs;
+    }
     const recent = (requestTimestamps.get(key) ?? []).filter((t) => now - t < windowMs);
+    if (!requestTimestamps.has(key) && requestTimestamps.size >= maxKeys) return 'unavailable';
+    if (recent.length >= maxRequests) return 'limited';
     recent.push(now);
     requestTimestamps.set(key, recent);
-    return recent.length > maxRequests;
+    return 'allowed';
   };
 }
 
@@ -90,5 +102,5 @@ export function createRateLimiter({ prefix, maxRequests, windowMs }: RateLimiter
    there's no client-controlled header to defend against here the way
    there would be behind a self-hosted proxy. */
 export function clientKeyFromRequest(req: Request): string {
-  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
 }

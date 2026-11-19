@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { MAX_CHAT_MESSAGE_LENGTH } from "../../lib/chat-contract";
 
 interface HealingIntent {
   intent_type: string;
@@ -95,6 +96,7 @@ export default function AgentPage() {
         <textarea
           className="w-full p-3 border rounded-md font-mono transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
           rows={6}
+          maxLength={MAX_CHAT_MESSAGE_LENGTH}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Describe an incident..."

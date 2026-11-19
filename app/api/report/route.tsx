@@ -3,11 +3,12 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { CompliancePdfDocument } from './pdf-template';
 import { MOCK_AUDIT_LOGS, MOCK_POLICY_VIOLATIONS, withinRange } from '../../../lib/governanceMockData';
 import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
+import { readJsonObject } from '../../../lib/request-json';
 
 // Real PDF generation from real (mock) data on every request. A dashboard
 // export button's legitimate usage is a handful of requests per session,
 // not a sustained stream. See lib/rate-limit.ts.
-const isRateLimited = createRateLimiter({
+const checkRateLimit = createRateLimiter({
   prefix: 'report',
   windowMs: 10 * 60 * 1000,
   maxRequests: 15,
@@ -20,18 +21,20 @@ const MOCK_DATA_MAX = '2026-05-14';
 
 export async function POST(request: Request) {
   const clientKey = clientKeyFromRequest(request);
-  if (await isRateLimited(clientKey)) {
-    return NextResponse.json({ error: 'Too many requests. Please wait a few minutes and try again.' }, { status: 429 });
+  const rate = await checkRateLimit(clientKey);
+  if (rate !== 'allowed') {
+    return NextResponse.json(
+      { error: rate === 'limited' ? 'Too many requests. Please wait a few minutes and try again.' : 'Report generation is temporarily unavailable.' },
+      { status: rate === 'limited' ? 429 : 503 },
+    );
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
+  const body = await readJsonObject(request, 2048);
+  if (!body) {
     return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
   }
 
-  const { startDate, endDate } = (body ?? {}) as { startDate?: unknown; endDate?: unknown };
+  const { startDate, endDate } = body;
 
   if (typeof startDate !== 'string' || typeof endDate !== 'string' || !DATE_RE.test(startDate) || !DATE_RE.test(endDate)) {
     return NextResponse.json({ error: 'startDate and endDate are required, as YYYY-MM-DD strings.' }, { status: 400 });

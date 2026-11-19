@@ -5,6 +5,8 @@ import { join } from 'node:path';
 import { ConnectError, getToken } from '@vercel/connect';
 import Anthropic from '@anthropic-ai/sdk';
 import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
+import { isAgentOutput, MAX_CHAT_MESSAGE_LENGTH } from '../../../lib/chat-contract';
+import { readJsonObject } from '../../../lib/request-json';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,10 +41,15 @@ const MODEL: Anthropic.Model = 'claude-haiku-4-5-20251001';
 // /agent is public and unauthenticated, and every request costs real money
 // against a metered connector -- see lib/rate-limit.ts for what backs this
 // and why the in-memory fallback is soft.
-const isRateLimited = createRateLimiter({
+const checkRateLimit = createRateLimiter({
   prefix: 'chat',
   windowMs: 10 * 60 * 1000,
   maxRequests: 5,
+});
+const checkChatBudget = createRateLimiter({
+  prefix: 'chat-budget',
+  windowMs: 60 * 60 * 1000,
+  maxRequests: 120,
 });
 
 /* prompt.txt says "Return only the JSON object. No markdown." but smaller/
@@ -68,21 +75,27 @@ function extractJson(text: string): unknown {
 
 export async function POST(req: Request) {
   const clientKey = clientKeyFromRequest(req);
-  if (await isRateLimited(clientKey)) {
+  const rate = await checkRateLimit(clientKey);
+  if (rate !== 'allowed') {
     return NextResponse.json(
-      { error: 'Too many requests. Please wait a few minutes and try again.' },
-      { status: 429 },
+      { error: rate === 'limited' ? 'Too many requests. Please wait a few minutes and try again.' : 'Chat is temporarily unavailable.' },
+      { status: rate === 'limited' ? 429 : 503 },
     );
   }
 
   try {
-    const { message } = await req.json();
-    if (!message || typeof message !== 'string') {
-      return NextResponse.json({ error: 'message required' }, { status: 400 });
+    const body = await readJsonObject(req, 26_000);
+    const message = body?.message;
+    if (typeof message !== 'string' || !message.trim() || message.length > MAX_CHAT_MESSAGE_LENGTH) {
+      return NextResponse.json({ error: `Enter a message of up to ${MAX_CHAT_MESSAGE_LENGTH} characters.` }, { status: 400 });
+    }
+    const budget = await checkChatBudget('public');
+    if (budget !== 'allowed') {
+      return NextResponse.json({ error: 'The public chat is temporarily unavailable.' }, { status: budget === 'limited' ? 429 : 503 });
     }
 
     const apiKey = await getToken(CONNECTOR, { subject: { type: 'app' } });
-    const anthropic = new Anthropic({ apiKey });
+    const anthropic = new Anthropic({ apiKey, timeout: 20_000, maxRetries: 0 });
 
     const response = await anthropic.messages.create({
       model: MODEL,
@@ -104,21 +117,24 @@ export async function POST(req: Request) {
       console.error('ARF agent: model output was not valid JSON', {
         promptVersion: PROMPT_VERSION,
         promptHash: PROMPT_HASH,
-        raw: textBlock.text,
       });
       return NextResponse.json({ error: 'Agent returned malformed output' }, { status: 502 });
     }
 
-    // "Log output alongside version" per prompt.txt's versioning requirements.
-    console.log('ARF agent evaluation', { promptVersion: PROMPT_VERSION, promptHash: PROMPT_HASH, output: parsed });
+    if (!isAgentOutput(parsed)) {
+      console.warn('ARF agent: model output failed schema validation', { promptVersion: PROMPT_VERSION, promptHash: PROMPT_HASH });
+      return NextResponse.json({ error: 'Agent returned malformed output' }, { status: 502 });
+    }
+
+    console.log('ARF agent evaluation', { promptVersion: PROMPT_VERSION, promptHash: PROMPT_HASH });
 
     return NextResponse.json(parsed);
   } catch (error) {
     if (error instanceof ConnectError) {
-      console.error('Vercel Connect error:', error.message);
+      console.error('Vercel Connect request failed');
       return NextResponse.json({ error: 'Agent temporarily unavailable (connector error)' }, { status: 502 });
     }
-    console.error('Error:', error);
+    console.error('ARF agent request failed');
     return NextResponse.json({ error: 'Agent failed' }, { status: 500 });
   }
 }

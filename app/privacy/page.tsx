@@ -111,6 +111,9 @@ export default function PrivacyPage() {
                   <strong>GitHub</strong> – repository links
                 </li>
                 <li>
+                  <strong>Notion</strong> – stores submitted pilot and review requests so ARF can follow up.
+                </li>
+                <li>
                   <strong>Slack</strong> – community (no data shared unless you
                   click)
                 </li>
@@ -122,9 +125,7 @@ export default function PrivacyPage() {
                   <strong>Sandbox usage logs</strong>: 30 days
                 </li>
                 <li>
-                  <strong>AI agent chat logs</strong>: retained in server logs
-                  for 30 days for abuse monitoring and debugging; not stored in
-                  a database or used for model training
+                  <strong>AI agent chat diagnostics</strong>: server logs record operational status and prompt version metadata.
                 </li>
                 <li>
                   <strong>Pilot signup data</strong>: up to 12 months (if you
@@ -162,15 +163,14 @@ export default function PrivacyPage() {
                   <code>arf-theme</code> – your light/dark preference
                 </li>
                 <li>
-                  <code>arf-pilot-form</code> – a draft of the pilot signup
-                  form, so a half-completed form survives a refresh. Cleared on
-                  submission.
-                </li>
-                <li>
                   <code>github-*</code> – a short-lived cache of publicly
                   available repository data shown on the site
                 </li>
               </ul>
+              <p>
+                The request form saves a draft in session storage for the current tab and clears it after submission.
+                Opening the form migrates and removes any draft saved by the previous version.
+              </p>
               <p>
                 You can clear these at any time through your browser&rsquo;s
                 site-data controls, with no loss beyond the preference and draft

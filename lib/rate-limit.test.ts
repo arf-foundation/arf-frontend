@@ -25,19 +25,19 @@ describe('createRateLimiter: in-memory fallback (Upstash not configured)', () =>
     const { createRateLimiter } = await import('./rate-limit');
     const isRateLimited = createRateLimiter({ prefix: 'test', maxRequests: 3, windowMs: 60_000 });
 
-    expect(await isRateLimited('k')).toBe(false);
-    expect(await isRateLimited('k')).toBe(false);
-    expect(await isRateLimited('k')).toBe(false);
-    expect(await isRateLimited('k')).toBe(true);
+    expect(await isRateLimited('k')).toBe('allowed');
+    expect(await isRateLimited('k')).toBe('allowed');
+    expect(await isRateLimited('k')).toBe('allowed');
+    expect(await isRateLimited('k')).toBe('limited');
   });
 
   it('tracks different keys independently', async () => {
     const { createRateLimiter } = await import('./rate-limit');
     const isRateLimited = createRateLimiter({ prefix: 'test', maxRequests: 1, windowMs: 60_000 });
 
-    expect(await isRateLimited('a')).toBe(false);
-    expect(await isRateLimited('b')).toBe(false); // unaffected by 'a's budget
-    expect(await isRateLimited('a')).toBe(true); // 'a' is now over its own budget
+    expect(await isRateLimited('a')).toBe('allowed');
+    expect(await isRateLimited('b')).toBe('allowed'); // unaffected by 'a's budget
+    expect(await isRateLimited('a')).toBe('limited'); // 'a' is now over its own budget
   });
 
   it('two createRateLimiter() calls never share state, even for the same key', async () => {
@@ -47,8 +47,8 @@ describe('createRateLimiter: in-memory fallback (Upstash not configured)', () =>
     const routeA = createRateLimiter({ prefix: 'route-a', maxRequests: 1, windowMs: 60_000 });
     const routeB = createRateLimiter({ prefix: 'route-b', maxRequests: 1, windowMs: 60_000 });
 
-    expect(await routeA('k')).toBe(false);
-    expect(await routeB('k')).toBe(false);
+    expect(await routeA('k')).toBe('allowed');
+    expect(await routeB('k')).toBe('allowed');
   });
 
   it('allows requests again once the window has elapsed', async () => {
@@ -57,10 +57,10 @@ describe('createRateLimiter: in-memory fallback (Upstash not configured)', () =>
       const { createRateLimiter } = await import('./rate-limit');
       const isRateLimited = createRateLimiter({ prefix: 'test', maxRequests: 1, windowMs: 1000 });
 
-      expect(await isRateLimited('k')).toBe(false);
-      expect(await isRateLimited('k')).toBe(true);
+      expect(await isRateLimited('k')).toBe('allowed');
+      expect(await isRateLimited('k')).toBe('limited');
       jest.advanceTimersByTime(1001);
-      expect(await isRateLimited('k')).toBe(false);
+      expect(await isRateLimited('k')).toBe('allowed');
     } finally {
       jest.useRealTimers();
     }
@@ -104,7 +104,7 @@ describe('createRateLimiter: Upstash-backed (configured)', () => {
     const { createRateLimiter } = await import('./rate-limit');
     const isRateLimited = createRateLimiter({ prefix: 'test', maxRequests: 5, windowMs: 60_000 });
 
-    expect(await isRateLimited('k')).toBe(false);
+    expect(await isRateLimited('k')).toBe('allowed');
     expect(limitMock).toHaveBeenCalledWith('k');
   });
 
@@ -113,7 +113,7 @@ describe('createRateLimiter: Upstash-backed (configured)', () => {
     const { createRateLimiter } = await import('./rate-limit');
     const isRateLimited = createRateLimiter({ prefix: 'test', maxRequests: 5, windowMs: 60_000 });
 
-    expect(await isRateLimited('k')).toBe(true);
+    expect(await isRateLimited('k')).toBe('limited');
   });
 
   it('fails closed when the Upstash call itself throws', async () => {
@@ -123,10 +123,22 @@ describe('createRateLimiter: Upstash-backed (configured)', () => {
       const { createRateLimiter } = await import('./rate-limit');
       const isRateLimited = createRateLimiter({ prefix: 'test', maxRequests: 5, windowMs: 60_000 });
 
-      expect(await isRateLimited('k')).toBe(true);
+      expect(await isRateLimited('k')).toBe('unavailable');
       expect(errorSpy).toHaveBeenCalled();
     } finally {
       errorSpy.mockRestore();
+    }
+  });
+
+  it('rejects the SDK timeout result even when success is true', async () => {
+    limitMock.mockResolvedValue({ success: true, reason: 'timeout' });
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const { createRateLimiter } = await import('./rate-limit');
+      const isRateLimited = createRateLimiter({ prefix: 'test', maxRequests: 5, windowMs: 60_000 });
+      expect(await isRateLimited('k')).toBe('unavailable');
+    } finally {
+      warnSpy.mockRestore();
     }
   });
 });

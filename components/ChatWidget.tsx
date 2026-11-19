@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { MessageCircle, Send, X } from 'lucide-react';
+import { MAX_CHAT_MESSAGE_LENGTH } from '../lib/chat-contract';
 
 /* ============================================================================
    Site-wide floating chat widget for the ARF Institutional Memory Agent.
@@ -276,7 +277,8 @@ export default function ChatWidget() {
           <div className="flex flex-shrink-0 items-end gap-2 border-t border-[color:var(--hairline)] bg-[color:var(--surface-raised)] p-3">
             <textarea
               ref={inputRef}
-              value={input}
+                value={input}
+                maxLength={MAX_CHAT_MESSAGE_LENGTH}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onInputKeyDown}
               placeholder="Describe an incident…"

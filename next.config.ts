@@ -52,6 +52,7 @@ const securityHeaders = [
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: https://api.qrserver.com https://*.licdn.com https://*.ytimg.com https://*.githubusercontent.com https://*.vercel.app;
       font-src 'self' data:;
+      object-src 'none';
       connect-src 'self' https://api.github.com https://*.vercel.app;
       frame-src 'self' https://www.linkedin.com https://www.youtube.com https://www.youtube-nocookie.com;
       frame-ancestors 'none';
@@ -73,13 +74,13 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/v1/:path*',
+        source: '/api/v1/evaluate',
         // The old a-r-f-... domain 404s (verified directly): the HF org
         // renamed A-R-F -> ARF-AI. HF's own space API still lists the old
         // domain as a "READY" mapping, but hitting it directly returns HF's
         // generic 404 page, not the space -- only the new canonical host
         // actually works. Confirmed against HF's api/spaces endpoint.
-        destination: 'https://arf-ai-arf-sandbox-api.hf.space/v1/:path*',
+        destination: 'https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate',
       },
     ];
   },

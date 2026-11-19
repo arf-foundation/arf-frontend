@@ -66,7 +66,7 @@ The dashboard will be available at http://localhost:3000.
 
 ## Architecture & Data Flow
 
-- **Next.js rewrites** – All `/api/v1/*` requests are proxied to the public sandbox API (`https://arf-ai-arf-sandbox-api.hf.space`). No API keys are exposed.
+- **Next.js rewrites** – `/api/v1/evaluate` is proxied to the public sandbox API (`https://arf-ai-arf-sandbox-api.hf.space`). No API keys are exposed.
 - **Sandbox API** – Returns a sanitised, mock evaluation (rate‑limited, no real Bayesian inference). The frontend transforms the sandbox response into the `EvaluateResponse` format used by the UI.
 - **Mock data** – Components like `RecentDecisions`, `MemoryStats`, and `RiskChart` use local mock data because the sandbox does not provide history or memory endpoints.
 - **Institutional Memory Agent** (`/agent`) – `POST /api/chat` calls Claude directly via a Vercel Connect connector, using the deterministic evaluation prompt in `app/api/chat/prompt.txt`. This is a real LLM call, separate from the sandbox API and from the protected ARF engine.

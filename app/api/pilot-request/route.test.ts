@@ -31,7 +31,7 @@ function submit(body: Record<string, unknown>) {
 
 beforeEach(() => {
   mockCreate.mockReset().mockResolvedValue({});
-  mockIsRateLimited.mockReset().mockResolvedValue(false);
+  mockIsRateLimited.mockReset().mockResolvedValue('allowed');
 });
 
 it.each([
@@ -78,8 +78,22 @@ it.each([
 });
 
 it('retains the public rate limit for the short form', async () => {
-  mockIsRateLimited.mockResolvedValue(true);
+  mockIsRateLimited.mockResolvedValue('limited');
   const response = await submit({ ...intake, offer: 'pilot-snapshot' });
   expect(response.status).toBe(429);
   expect(mockCreate).not.toHaveBeenCalled();
+});
+
+it('reports an unavailable limiter before writing to Notion', async () => {
+  mockIsRateLimited.mockResolvedValue('unavailable');
+  expect((await submit({ ...intake, offer: 'pilot-snapshot' })).status).toBe(503);
+  expect(mockCreate).not.toHaveBeenCalled();
+});
+
+it('ignores legacy fields on short forms and discards unknown legacy options', async () => {
+  expect((await submit({ ...intake, offer: 'write-access-review', cloudEnvironment: 'AWS' })).status).toBe(200);
+  expect(mockCreate.mock.calls[0][0].properties['Cloud Environment'].select).toBeNull();
+
+  expect((await submit({ fullName: 'Example', company: 'Example', email: intake.email, cloudEnvironment: 'Unknown option' })).status).toBe(200);
+  expect(mockCreate.mock.calls[1][0].properties['Cloud Environment'].select).toBeNull();
 });

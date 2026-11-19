@@ -2,10 +2,24 @@ import { Client } from '@notionhq/client';
 import { NextResponse } from 'next/server';
 import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
 import { isRequestOffer, OFFER_LABELS } from '../../../lib/engagement-offers';
+import { readJsonObject } from '../../../lib/request-json';
 
-function select(value: unknown) {
+const legacyOptions = {
+  industry: ['Fintech / Banking', 'Healthcare / Life Sciences', 'Cloud Infrastructure / DevOps', 'E‑commerce / Retail', 'Manufacturing / IoT', 'Government / Defense', 'Consulting / Services', 'Other'],
+  jobRole: ['CTO / VP Engineering', 'Director of AI / ML', 'Platform / SRE Lead', 'Solutions Architect', 'ML / AI Engineer', 'Security / Compliance Lead', 'Consultant / Advisor', 'Other'],
+  companySize: ['1-9', '10-50', '51-200', '201-1000', '1000+'],
+  headquarters: ['New York City metro', 'Elsewhere in the US', 'Outside the US'],
+  expectedVolume: ['< 1000', '1000 – 10000', '10000 – 100000', '> 100000'],
+  cloudEnvironment: ['AWS', 'Azure', 'GCP', 'On‑premises / Private cloud', 'Multi‑cloud'],
+  aiMaturity: ['Exploring / Proof of concept', 'Advisory AI in production', 'Limited autonomous actions', 'Full autonomous operations'],
+  governanceOwner: ['Nobody yet', 'Part of an existing role', 'Dedicated person or team'],
+  budgetApproved: ['Yes approved', 'In discussion', 'Not yet'],
+  timeline: ['Immediate (< 1 month)', '1–3 months', '3–6 months', '> 6 months / exploratory'],
+};
+
+function select(value: unknown, options: readonly string[]) {
   const name = typeof value === 'string' ? value.replace(/,/g, '').trim() : '';
-  return name ? { name } : null;
+  return options.includes(name) ? { name } : null;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,7 +37,7 @@ function richText(content: string) {
    database on every request. A lead-gen form's legitimate usage is "submit
    once, maybe retry" -- a generous window still catches sustained abuse
    without blocking a real user. See lib/rate-limit.ts. */
-const isRateLimited = createRateLimiter({
+const checkRateLimit = createRateLimiter({
   prefix: 'pilot-request',
   windowMs: 10 * 60 * 1000,
   maxRequests: 5,
@@ -31,16 +45,17 @@ const isRateLimited = createRateLimiter({
 
 export async function POST(request: Request) {
   const clientKey = clientKeyFromRequest(request);
-  if (await isRateLimited(clientKey)) {
+  const rate = await checkRateLimit(clientKey);
+  if (rate !== 'allowed') {
     return NextResponse.json(
-      { error: 'Too many requests. Please wait a few minutes and try again.' },
-      { status: 429 },
+      { error: rate === 'limited' ? 'Too many requests. Please wait a few minutes and try again.' : 'Requests are temporarily unavailable.' },
+      { status: rate === 'limited' ? 429 : 503 },
     );
   }
 
   try {
-    const body: unknown = await request.json().catch(() => null);
-    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    const body = await readJsonObject(request, 16_000);
+    if (!body) {
       return NextResponse.json({ error: 'Please submit a request form.' }, { status: 400 });
     }
     const {
@@ -50,19 +65,8 @@ export async function POST(request: Request) {
       agreeToTerms,
       fullName,
       email,
-      company,
-      industry,
-      jobRole,
       useCase,
-      expectedVolume,
-      cloudEnvironment,
-      aiMaturity,
-      budgetApproved,
-      timeline,
-      companySize,
-      headquarters,
-      governanceOwner,
-    } = body as Record<string, unknown>;
+    } = body;
 
     if (offer !== undefined && !isRequestOffer(offer)) {
       return NextResponse.json({ error: 'Please select an available offer.' }, { status: 400 });
@@ -70,6 +74,8 @@ export async function POST(request: Request) {
     if (typeof email !== 'string' || email.length > 254 || !EMAIL_RE.test(email)) {
       return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
     }
+    const legacy: Record<string, unknown> = isRequestOffer(offer) ? {} : body;
+    const company = legacy.company;
     let title: string;
     let context = typeof useCase === 'string' && useCase ? [richText(useCase)] : [];
     if (isRequestOffer(offer)) {
@@ -110,47 +116,44 @@ export async function POST(request: Request) {
           rich_text: boundedText(company) ? [richText(company)] : [],
         },
         Industry: {
-          select: select(industry),
+          select: select(legacy.industry, legacyOptions.industry),
         },
         'Job Role': {
-          select: select(jobRole),
+          select: select(legacy.jobRole, legacyOptions.jobRole),
         },
         'Use Case': {
           rich_text: context,
         },
         'Expected Volume': {
-          select: select(expectedVolume),
+          select: select(legacy.expectedVolume, legacyOptions.expectedVolume),
         },
         'Cloud Environment': {
-          select: select(cloudEnvironment),
+          select: select(legacy.cloudEnvironment, legacyOptions.cloudEnvironment),
         },
         'AI Maturity': {
-          select: select(aiMaturity),
+          select: select(legacy.aiMaturity, legacyOptions.aiMaturity),
         },
         'Budget Approved': {
-          select: select(budgetApproved),
+          select: select(legacy.budgetApproved, legacyOptions.budgetApproved),
         },
         Timeline: {
-          select: select(timeline),
+          select: select(legacy.timeline, legacyOptions.timeline),
         },
         'Company Size': {
-          select: select(companySize),
+          select: select(legacy.companySize, legacyOptions.companySize),
         },
         Headquarters: {
-          select: select(headquarters),
+          select: select(legacy.headquarters, legacyOptions.headquarters),
         },
         'Governance Owner': {
-          select: select(governanceOwner),
+          select: select(legacy.governanceOwner, legacyOptions.governanceOwner),
         },
       },
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: unknown) {
-    // Was returning the raw Notion error message to the client -- could
-    // leak internal details (database schema, field names, auth hints).
-    // Logged server-side only now; client gets a generic message.
-    console.error('Notion API error:', error);
+  } catch {
+    console.error('Pilot request storage failed');
     return NextResponse.json(
       { error: 'Something went wrong submitting your request. Please try again or email juan@arf-ai.com directly.' },
       { status: 500 }
