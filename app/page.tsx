@@ -116,7 +116,7 @@ export default function LandingPage() {
     setSandboxLoading(true);
     setSandboxError(null);
     try {
-      // Relative path through next.config.ts's rewrite (/api/v1/:path* ->
+      // Relative path through next.config.ts's rewrite (/api/v1/evaluate ->
       // the sandbox API), not the absolute URL: the CSP's connect-src does
       // not allowlist the sandbox's own domain, so a direct browser fetch
       // to it is silently blocked. The displayed CURL_COMMAND above keeps

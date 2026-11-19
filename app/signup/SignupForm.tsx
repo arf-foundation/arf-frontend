@@ -21,6 +21,8 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
     let restored = EMPTY_DRAFT;
     try {
       const saved = sessionStorage.getItem(DRAFT_KEY) ?? localStorage.getItem(DRAFT_KEY) ?? localStorage.getItem(LEGACY_DRAFT_KEY);
+      localStorage.removeItem(DRAFT_KEY);
+      localStorage.removeItem(LEGACY_DRAFT_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         restored = {
@@ -31,8 +33,6 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
         };
         sessionStorage.setItem(DRAFT_KEY, JSON.stringify(restored));
       }
-      localStorage.removeItem(DRAFT_KEY);
-      localStorage.removeItem(LEGACY_DRAFT_KEY);
     } catch {
       // The form works with unavailable browser storage or an unreadable draft.
     }
