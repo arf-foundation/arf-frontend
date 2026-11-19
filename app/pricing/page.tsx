@@ -3,46 +3,28 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { REVIEW_EXAMPLE_PATH, REVIEW_REQUEST_PATH, SNAPSHOT_REQUEST_PATH } from '../../lib/engagement-offers';
 
-/* ============================================================================
-   /pricing — ported to the landing-page design system.
-
-   Same tokens, same three card weights, same rhythm. Two additions this page
-   needs and the landing page does not:
-     • a comparison table, because the buying question here is "what changes
-       between steps", and the honest answer is depth: five tools, then every
-       write path in the agreed tool inventory.
-     • the "how it works" explainer, because a snapshot -> review -> gate
-       ladder reads faster as three cards than as prose.
-
-   Enterprise is dominant via a 2px gradient border, not a "Recommended" badge.
-   Server component — no hooks needed here.
-
-   List only what is offered today. No SLA, SSO, named support engineer,
-   in-perimeter deployment or success-fee pricing is offered, so none appears
-   here. The review is $4,500 per agent; the continuous gate is by invitation.
-   ========================================================================= */
-
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
-    'A free pilot snapshot of five write tools, then a fixed-price review of one agent\'s production write paths. A continuous gate is available by invitation after a review.',
+    'See the $4,500 read-only Write-Access Review, free five-tool snapshot and simulated sandbox.',
   alternates: { canonical: '/pricing' },
 };
 
 const TIERS = [
   {
-    name: 'Sandbox',
-    meta: 'Simulation only',
-    price: 'Free',
-    note: 'No agreement required',
+    name: 'Write-access review',
+    meta: 'Read-only · one agent',
+    price: '$4,500',
+    note: '50% deposit after you agree to the scope',
     items: [
-      '1,000 evaluations / month',
-      'Mock responses — not production',
-      'Public API + Governance Console',
-      'Community support',
+      'Up to 10 named writes, one environment/provider',
+      'Up to 200 supplied records in one format',
+      'Write inventory and recoverability map',
+      'Decision memo and evidence index',
+      'Unresolved items, owners, and next steps',
     ],
-    cta: { label: 'Try the sandbox', href: '/#explore' },
-    dominant: false,
+    cta: { label: 'Request the $4,500 review', href: REVIEW_REQUEST_PATH },
+    dominant: true,
   },
   {
     name: 'Pilot snapshot',
@@ -59,19 +41,18 @@ const TIERS = [
     dominant: false,
   },
   {
-    name: 'Write-access review',
-    meta: 'Read-only · one agent',
-    price: '$4,500',
-    note: '50% deposit after you agree to the scope',
+    name: 'Sandbox',
+    meta: 'Simulation only',
+    price: 'Free',
+    note: 'No agreement required',
     items: [
-      'Up to 10 named writes, one environment/provider',
-      'Up to 200 supplied records in one format',
-      'Write inventory and recoverability map',
-      'Decision memo and evidence index',
-      'Unresolved items, owners, and next steps',
+      '1,000 evaluations / month',
+      'Mock responses — not production',
+      'Public API + Governance Console',
+      'Community support',
     ],
-    cta: { label: 'Request the $4,500 review', href: REVIEW_REQUEST_PATH },
-    dominant: true,
+    cta: { label: 'Try the sandbox', href: '/#explore' },
+    dominant: false,
   },
 ] as const;
 
@@ -83,24 +64,6 @@ const COMPARISON = [
   { label: 'Deliverable', sandbox: 'API responses', pilot: 'Short written summary', enterprise: 'Write inventory, recoverability map, decision memo and evidence index with unresolved items' },
   { label: 'Support', sandbox: 'Community', pilot: 'Founder-led', enterprise: 'Founder-led' },
   { label: 'Commercials', sandbox: 'Free', pilot: 'Free, scope and feedback agreed first', enterprise: '$4,500 fixed; 50% deposit; card or invoice' },
-] as const;
-
-const MODEL = [
-  {
-    n: '01',
-    title: 'Start with a snapshot',
-    body: 'Five named write tools, analysed from read-only material within an agreed short scope. Limited founding availability, confirmed on a call. Honest feedback is welcome; a public reference is optional.',
-  },
-  {
-    n: '02',
-    title: 'Then a fixed-price review',
-    body: 'Review each agreed write against your existing controls. See the recommended approval boundaries, evidence for recovery, and questions to resolve before rollout.',
-  },
-  {
-    n: '03',
-    title: 'A continuous gate, by invitation',
-    body: 'After a review, ARF can gate your agent\'s write path where that path is modeled — demonstrated today for ONTAP storage operations against a simulated cluster. Scoped and priced per engagement.',
-  },
 ] as const;
 
 const FAQ = [
@@ -141,8 +104,8 @@ export default function PricingPage() {
             Start with evidence about <span className="arf-gradient-text">your own agent</span>
           </h1>
           <p className="mx-auto max-w-[62ch] text-lg leading-[1.6] text-[color:var(--text-secondary)] text-pretty">
-            A free snapshot of five write tools, then a fixed-price review of one agent&rsquo;s production write
-            paths. A continuous gate is available by invitation after a review.
+            The $4,500 read-only review covers one agent&rsquo;s production write paths. Start with the free
+            five-tool snapshot or simulated sandbox when you need a smaller first step.
           </p>
         </div>
       </section>
@@ -210,31 +173,6 @@ export default function PricingPage() {
               ))}
             </tbody>
           </table>
-        </div>
-      </section>
-
-      {/* ─── Commercial model ────────────────────────────────────────────── */}
-      <section className="arf-shell pb-[112px]">
-        <div className="rounded-[18px] border border-arf-blue/15 bg-gradient-to-br from-arf-blue/10 to-arf-purple/10 p-14">
-          <h2 className="mb-3 text-[30px] font-semibold leading-[1.14] tracking-[-0.024em]">
-            How it works
-          </h2>
-          <p className="mb-10 max-w-[66ch] text-base leading-[1.65] text-[color:var(--text-primary)]/85 text-pretty">
-            ARF is not sold per seat. You start with evidence about your own agent, and pay only for the depth you
-            need.
-          </p>
-          <div className="grid gap-[22px] md:grid-cols-3">
-            {MODEL.map((item) => (
-              <div
-                key={item.n}
-                className="rounded-2xl border border-[color:var(--hairline)] bg-[color:var(--surface-raised)] p-7"
-              >
-                <p className="mb-4 font-mono text-[11px] font-medium text-arf-blue">{item.n}</p>
-                <h3 className="mb-2.5 text-lg font-semibold tracking-[-0.016em]">{item.title}</h3>
-                <p className="text-small text-[color:var(--text-secondary)]">{item.body}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 

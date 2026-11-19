@@ -214,8 +214,8 @@ export default function RootLayout({
         <main id="main">
           <RouteTransition>{children}</RouteTransition>
         </main>
-        <Footer />
         <ChatWidget />
+        <Footer />
         <Analytics />
         <ServiceWorkerRegister />
       </body>

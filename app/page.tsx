@@ -2,59 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import {
-  ArrowRight,
-  Brain,
-  Building2,
-  Compass,
-  Cpu,
-  Factory,
-  FileText,
-  Globe,
-  HeartPulse,
-  Landmark,
-  Lock,
-  Network,
-  Server,
-  Shield,
-  ShieldCheck,
-} from "lucide-react";
-import { useInView } from "./hooks/useInView";
+import { ArrowRight, ChevronDown, Cpu, FileText, Network, Shield } from "lucide-react";
+import { CapabilityCard, SandboxCard, ConsoleCard, SpecsCard } from "@arf/ui";
 import ArchitecturePipeline from "../components/ArchitecturePipeline";
-import HowItWorksVideo from "../components/HowItWorksVideo";
-import {
-  REVIEW_EXAMPLE_PATH,
-  REVIEW_REQUEST_PATH,
-  SNAPSHOT_REQUEST_PATH,
-} from "../lib/engagement-offers";
-import {
-  CapabilityCard,
-  TierBody,
-  SandboxCard,
-  ConsoleCard,
-  SpecsCard,
-} from "@arf/ui";
+import ReviewProof from "../components/ReviewProof";
+import { REVIEW_REQUEST_PATH, SNAPSHOT_REQUEST_PATH } from "../lib/engagement-offers";
 
-/* ============================================================================
-   DESIGN NOTES (full write-up in design_handoff_arf_enterprise_refresh/DESIGN_RATIONALE.md)
-
-   Spacing rhythm — deliberately uneven, replacing the old uniform py-20:
-     hero → evidence card → trust strip 46 (tight, scannable) →
-     problem 112 → why 96 → industries 120 → capabilities 120 →
-     governance 104 on its own surface → quote band 104 → pricing 112 →
-     explore 104 → footer 72.
-   The eye accelerates through the scannable bands and slows on the two proof
-   sections (governance, quote), which is where enterprise buyers stop.
-
-   Card weights — three, not one:
-     .arf-card-substantial  capabilities + governance (soft shadow, hover lift)
-     .arf-card-light        explore/demo cards (lighter, exploratory)
-     .arf-card-anchored     dark trust strip, quote band
-   ========================================================================= */
-
-// arf-ai-... not a-r-f-...: the HF org renamed A-R-F -> ARF-AI and the old
-// domain 404s directly (verified against HF's api/spaces endpoint), even
-// though HF still lists it as a "READY" mapping.
 const CURL_COMMAND = `curl -X POST https://arf-ai-arf-sandbox-api.hf.space/v1/evaluate \\
   -H "Content-Type: application/json" \\
   -d '{"service_name":"api","event_type":"latency","severity":"high","metrics":{"latency_ms":450}}'`;
@@ -112,71 +65,6 @@ const CAPABILITIES = [
   },
 ] as const;
 
-const TRUST = [
-  {
-    icon: Shield,
-    title: "Controls and limitations",
-    href: "/faq",
-    body: "Review the demo boundary, model assumptions, and engagement limits before choosing a write path. Not yet audited.",
-  },
-  {
-    icon: Lock,
-    title: "Deterministic enforcement",
-    href: "/#architecture",
-    body: "On a governed path, policy gates run mechanically before an action reaches infrastructure. Not advisory.",
-  },
-  {
-    icon: FileText,
-    title: "Cryptographic audit trail",
-    href: "/faq",
-    body: "Inspect timestamped decision records. Signed exports support independent integrity checks where signing is configured.",
-  },
-] as const;
-
-const GOVERNANCE = [
-  {
-    icon: FileText,
-    title: "Tamper-evident audit trail",
-    body: "Every governed decision is recorded, timestamped, and attributed — including the action proposed alongside the one that ran. Anyone holding an export can verify its integrity, for forensic review or compliance preparation.",
-  },
-  {
-    icon: Lock,
-    title: "Mechanical enforcement",
-    body: "On a governed write path, gates cannot be silently overridden: every override is recorded with its approver. Enforcement is deterministic — not advisory.",
-  },
-  {
-    icon: Brain,
-    title: "Explainable reasoning",
-    body: "Understand the assumptions and evidence behind a recommendation. Estimates and tool-specific priors are kept distinct from observed outcomes. A model-relative loss index (normalized, tail-weighted when configured, configuration-pinned) depends on those assumptions.",
-  },
-] as const;
-
-const WHO_FOR = [
-  {
-    icon: Server,
-    title: "Platform & SRE leads",
-    body: "You decide what AI-assisted tooling is allowed to do in production, and you need that decision enforced, not just documented.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Founders and CTOs with nobody to delegate this to",
-    body: "A customer's security review asks who governs your agents' actions in production. At thirty people the answer is you — and it has to be something you can show, not describe.",
-  },
-  {
-    icon: Compass,
-    title: "Teams adopting AI-driven operations",
-    body: "You want the speed of autonomous AI without losing the ability to explain, in writing, what happened and why.",
-  },
-] as const;
-
-const INDUSTRIES = [
-  { name: "Financial Services", icon: Building2 },
-  { name: "Healthcare", icon: HeartPulse },
-  { name: "Government & Defence", icon: Landmark },
-  { name: "Critical Infrastructure", icon: Factory },
-  { name: "Enterprise AI Platforms", icon: Globe },
-] as const;
-
 const SPECS = [
   "Core Governance Engine",
   "API Control Plane",
@@ -186,60 +74,6 @@ const SPECS = [
 
 /* Each fact is pinned by a test of the ONTAP gate and shown in its demo.
    No customer numbers until they are real. */
-const BY_DESIGN = [
-  {
-    title: "Recorded before it runs",
-    body: "Every modeled write is committed to the record before it executes, then checked by an independent read. A write that read cannot confirm is reported as unverified, not as a success.",
-  },
-  {
-    title: "Unmodeled writes are refused",
-    body: "A tool ARF cannot model is neither forwarded nor sent for approval — no one is asked to approve what they cannot judge.",
-  },
-  {
-    title: "One approval, one action",
-    body: "An approval admits exactly the call it was given for: not another volume, and not the same call once its recovery path is gone.",
-  },
-] as const;
-
-const TIERS = [
-  {
-    name: "Sandbox",
-    meta: "Simulation only",
-    price: "Free",
-    items: [
-      "1,000 evaluations / month",
-      "Mock responses — not production",
-      "Community support",
-    ],
-    cta: { label: "Try the sandbox", href: "#explore" },
-    dominant: false,
-  },
-  {
-    name: "Pilot snapshot",
-    meta: "Free · limited founding availability",
-    price: "Free",
-    items: [
-      "One agent, five named write tools",
-      "Which actions could run unattended",
-      "Read-only material and honest feedback",
-    ],
-    cta: { label: "Request the free snapshot", href: SNAPSHOT_REQUEST_PATH },
-    dominant: false,
-  },
-  {
-    name: "Write-access review",
-    meta: "Read-only · one agent",
-    price: "$4,500",
-    items: [
-      "Up to 10 named writes, one environment/provider",
-      "Write inventory and recoverability map",
-      "Evidence, unresolved items, and next steps",
-    ],
-    cta: { label: "Request the $4,500 review", href: REVIEW_REQUEST_PATH },
-    dominant: true,
-  },
-] as const;
-
 export default function LandingPage() {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
@@ -309,432 +143,89 @@ export default function LandingPage() {
     }
   };
 
-  const { ref: capsRef, inView: capsInView } = useInView({
-    threshold: 0.15,
-    once: true,
-  });
-  const { ref: govRef, inView: govInView } = useInView({
-    threshold: 0.15,
-    once: true,
-  });
-  const { ref: pricingRef, inView: pricingInView } = useInView({
-    threshold: 0.15,
-    once: true,
-  });
-  const { ref: whoRef, inView: whoInView } = useInView({
-    threshold: 0.15,
-    once: true,
-  });
-  const { ref: industriesRef, inView: industriesInView } = useInView({
-    threshold: 0.15,
-    once: true,
-  });
-  const { ref: quoteRef, inView: quoteInView } = useInView({
-    threshold: 0.4,
-    once: true,
-  });
 
   return (
     <div className="arf-page-root">
-      {/* ─── Hero: headline, one subheadline, primary CTA and secondary link ──
-          No longer paired with a decision-path visual here -- that content
-          duplicated the Architecture section's pipeline one scroll down.
-          Single canonical version now lives there (components/ArchitecturePipeline). */}
       <section className="arf-hero-wash arf-landing-hero">
-        <div className="arf-shell pt-20 pb-12 sm:pt-24 sm:pb-16 lg:pt-28 lg:pb-20">
-          <div className="mx-auto max-w-[760px] text-center">
-            <h1 className="mx-auto mb-7 max-w-[21ch] text-[clamp(2.5rem,5.5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.04em] text-balance">
-              Give production changes{" "}
-              <span className="arf-gradient-text">a boundary your customer can inspect</span>
-            </h1>
-            <p className="mx-auto mb-9 max-w-[46ch] text-[17px] leading-[1.65] text-[color:var(--text-secondary)] sm:text-[18.5px] text-pretty">
-              Map one storage write path: what can change, what can be undone,
-              who approves, and what gets recorded.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link href={REVIEW_REQUEST_PATH} className="arf-btn-primary max-w-full justify-center ring-1 ring-inset ring-white/20 hover:bg-none hover:bg-[color:var(--color-arf-blue-deep)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue dark:focus-visible:outline-[#a8b8ff]">
-                Request the $4,500 write-path review <ArrowRight size={18} />
-              </Link>
-              <Link
-                href={REVIEW_EXAMPLE_PATH}
-                className="rounded-sm px-2 py-3 text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--hairline)] underline-offset-4 hover:text-arf-blue focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue"
-              >
-                See what a review produces
-              </Link>
-            </div>
-            <p className="mt-4 text-xs text-[color:var(--text-secondary)]">
-              Early access · unaudited · no certification claimed
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="arf-shell pb-10 sm:pb-14" aria-labelledby="fsx-finding">
-        <div className="grid items-start gap-5 rounded-2xl border border-arf-blue/20 bg-gradient-to-br from-arf-blue/8 to-arf-purple/8 p-6 sm:p-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12">
-          <div>
-            <p className="arf-eyebrow mb-3">Disposable AWS FSx experiment</p>
-            <h2 id="fsx-finding" className="max-w-[22ch] text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
-              The mirror reported healthy. The new file was missing.
-            </h2>
-          </div>
-          <div className="max-w-[60ch]">
-            <p className="text-[color:var(--text-secondary)] leading-relaxed">
-              A direct file check found the test file on the source and absent from its replica.
-              ARF held the requested source deletion. Recovery of current data remained unverified.
-            </p>
-            <Link href={REVIEW_EXAMPLE_PATH} className="mt-4 inline-flex items-center gap-2 rounded-sm font-semibold text-arf-blue underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4">
-              See the sample finding <ArrowRight size={16} aria-hidden="true" />
+        <div className="arf-shell pb-10 pt-16 sm:pb-14 sm:pt-24">
+          <h1 className="max-w-[20ch] text-[clamp(2.4rem,5.5vw,4rem)] font-semibold leading-[1.05] tracking-[-0.04em] text-balance">
+            Show your customer what your <span className="arf-gradient-text">storage agent can change</span>
+          </h1>
+          <p className="mt-5 max-w-[60ch] text-lg leading-relaxed text-[color:var(--text-secondary)] text-pretty">
+            Get a read-only review of one agent’s writes, including who should approve them,
+            what recovery evidence exists and what your customer still needs to decide.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <Link href={REVIEW_REQUEST_PATH} className="arf-btn-primary max-w-full justify-center">
+              Request the $4,500 review <ArrowRight size={18} aria-hidden="true" />
+            </Link>
+            <Link href="#proof" className="arf-btn-secondary max-w-full justify-center">
+              Watch the evidence
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* ─── Trust & compliance strip: the 3-second social-proof bar ─────────── */}
-      <section className="bg-arf-dark py-[46px]">
-        {/* Keep text left of the fixed 56px chat launcher, including when stacked. */}
-        <div className="arf-shell grid gap-10 pr-24 md:grid-cols-3">
-          {TRUST.map((item, idx) => (
-            <Link
-              key={item.title}
-              href={item.href}
-              className={`group flex gap-4 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7fa0ff] ${idx > 0 ? "lg:border-l lg:border-white/15 lg:pl-6" : ""}`}
-            >
-              <item.icon
-                className="mt-0.5 h-6 w-6 flex-shrink-0 text-[#7fa0ff]"
-                strokeWidth={1.5}
-              />
-              <div>
-                <h2 className="mb-1.5 text-[15.5px] font-semibold tracking-[-0.012em] text-white">
-                  {item.title}
-                  <ArrowRight
-                    aria-hidden="true"
-                    size={14}
-                    className="ml-2 inline-block opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-                  />
-                </h2>
-                <p className="text-[13.5px] leading-[1.55] text-white/70">
-                  {item.body}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── Problem / Solution / Outcome ────────────────────────────────────── */}
-      <section className="arf-shell pb-[112px]">
-        <div className="arf-card grid md:grid-cols-3">
-          {[
-            {
-              label: "Problem",
-              tone: "text-[#b0453a] dark:text-[#e0806f]",
-              body: "AI agents make autonomous decisions that are difficult to govern, audit, and control.",
-            },
-            {
-              label: "Solution",
-              tone: "text-arf-blue",
-              body: "ARF applies deterministic policy enforcement before each governed action runs, and refuses the actions it cannot model.",
-            },
-            {
-              label: "Outcome",
-              tone: "text-arf-purple",
-              body: "Every governed decision becomes explainable, auditable, and operationally trustworthy.",
-            },
-          ].map((item, idx) => (
-            <div
-              key={item.label}
-              className={`p-10 ${idx < 2 ? "border-b border-[color:var(--hairline)] md:border-b-0 md:border-r" : ""}`}
-            >
-              <p
-                className={`mb-3.5 font-mono text-[11px] font-medium uppercase tracking-[0.14em] ${item.tone}`}
-              >
-                {item.label}
-              </p>
-              <p className="text-[17px] leading-[1.55] text-pretty">
-                {item.body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── Who ARF is for — audience, not proof; arf-card-light per the card-
-          weight system (exploratory/secondary), sitting between the Problem/
-          Solution/Outcome trio and Why ARF? so "is this me" resolves before
-          "why this approach". See DESIGN_RATIONALE.md §3/§6/§9. ────────────── */}
-      <section ref={whoRef} className="arf-shell pb-24">
-        <div className="mb-10 grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="arf-eyebrow mb-3.5">Audience</p>
-            <h2 className="text-h2 font-semibold">Who ARF is for</h2>
-          </div>
-          <p className="max-w-[56ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
-            Built for the moment AI agents stop recommending and start acting on
-            production infrastructure.
+          <p className="mt-4 text-sm text-[color:var(--text-secondary)]">
+            Early access · unaudited · no certification claimed
           </p>
         </div>
-        <div className="grid gap-[22px] md:grid-cols-3">
-          {WHO_FOR.map((item, idx) => (
-            <div
-              key={item.title}
-              className={`arf-card-light arf-reveal p-8 ${whoInView ? "arf-reveal-in" : ""}`}
-              style={{ transitionDelay: whoInView ? `${idx * 90}ms` : "0ms" }}
-            >
-              <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-[11px] bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple">
-                <item.icon className="h-5 w-5 text-white" strokeWidth={1.75} />
-              </div>
-              <h3 className="mb-3 text-[19px] font-semibold tracking-[-0.016em]">
-                {item.title}
-              </h3>
-              <p className="text-[15px] leading-[1.6] text-[color:var(--text-secondary)]">
-                {item.body}
-              </p>
+      </section>
+
+      <ReviewProof />
+
+      <section id="pricing" className="arf-shell scroll-mt-24 py-10 sm:py-14">
+        <div className="grid items-start gap-6 border-y border-[color:var(--hairline)] py-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12">
+          <div>
+            <p className="arf-eyebrow mb-3">$4,500 · Read-only review</p>
+            <h2 className="text-h2 font-semibold">Turn a blocked write into a decision</h2>
+          </div>
+          <div className="max-w-[64ch]">
+            <p className="leading-relaxed text-[color:var(--text-secondary)]">
+              Bring one agent in one environment or provider, up to ten named writes and 200 records.
+              Leave with a write inventory, recoverability map and an evidence-backed decision memo.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <Link href="/pricing" className="rounded-sm font-semibold text-arf-blue underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4">
+                See the scope and price
+              </Link>
+              <Link href={SNAPSHOT_REQUEST_PATH} className="rounded-sm font-medium text-[color:var(--text-secondary)] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4">
+                Request a free five-tool snapshot
+              </Link>
             </div>
-          ))}
+          </div>
         </div>
-        <p className="mt-8 text-[13.5px] text-[color:var(--text-muted)]">
-          Not there yet? The sandbox below is exactly for that — ARF is built
-          for the step after evaluation, not instead of it.
+      </section>
+
+      <section className="arf-shell space-y-3 pb-12 sm:pb-18" aria-label="Technical details">
+        <details id="architecture" className="group scroll-mt-24 rounded-xl border border-[color:var(--hairline)]">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-5 py-4 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arf-blue">
+            How ARF works
+            <ChevronDown size={18} className="shrink-0 group-open:rotate-180 motion-safe:transition-transform" aria-hidden="true" />
+          </summary>
+          <div className="min-w-0 border-t border-[color:var(--hairline)] p-4 sm:p-6">
+            <ArchitecturePipeline />
+          </div>
+        </details>
+        <details id="capabilities" className="group scroll-mt-24 rounded-xl border border-[color:var(--hairline)]">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-5 py-4 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arf-blue">
+            Technical capabilities
+            <ChevronDown size={18} className="shrink-0 group-open:rotate-180 motion-safe:transition-transform" aria-hidden="true" />
+          </summary>
+          <div className="min-w-0 border-t border-[color:var(--hairline)] p-4 sm:p-6">
+            <p className="mb-4 max-w-[64ch] text-[color:var(--text-secondary)]">
+              Explore these views on simulated data. Enforcement runs on a separately scoped write path.
+            </p>
+            <div className="grid gap-4 md:grid-cols-2">
+              {CAPABILITIES.map((capability) => <CapabilityCard key={capability.n} {...capability} />)}
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section id="explore" className="arf-shell scroll-mt-24 pb-12 sm:pb-18">
+        <h2 className="text-h2 font-semibold">Explore the sandbox</h2>
+        <p className="mb-5 mt-2 text-sm text-[color:var(--text-secondary)]">
+          The public API and console use simulated data.
         </p>
-      </section>
-
-      {/* ─── Why ARF? ────────────────────────────────────────────────────────── */}
-      <section id="why-arf" aria-labelledby="why-arf-heading" className="arf-shell scroll-mt-24 grid gap-16 pb-24 lg:grid-cols-[0.9fr_1.1fr]">
-        <h2 id="why-arf-heading" className="max-w-[12ch] text-h2 font-semibold">Why ARF?</h2>
-        <div>
-          <p className="mb-6 text-[clamp(1.9rem,3.4vw,3.25rem)] font-bold leading-[1.1] tracking-[-0.025em] text-pretty">
-            Know what your agent can change. Prove what happened.
-          </p>
-          <p className="mb-6 text-body text-[color:var(--text-secondary)] text-pretty">
-            Keep your IAM, agent approvals and tracing. ARF examines the write itself:
-            its exact target, recovery path, required authority and evidence of the result.
-            Give the customer reviewing your agent something they can inspect.
-          </p>
-          <ul className="space-y-4 text-[15px] leading-[1.6] text-[color:var(--text-secondary)]">
-            <li><strong className="text-[color:var(--text-primary)]">A boundary for each write.</strong> Map the agreed operations and where human approval or refusal is needed.</li>
-            <li><strong className="text-[color:var(--text-primary)]">Recovery judged from evidence.</strong> Distinguish a usable recovery path from an assumption that an action can be undone.</li>
-            <li><strong className="text-[color:var(--text-primary)]">An independently checked result.</strong> On modeled execution routes, record before dispatch and check provider state afterward; an unconfirmed result stays unverified.</li>
-          </ul>
-          <p className="mt-6 rounded-xl border border-arf-blue/20 bg-arf-blue/5 p-4 text-sm leading-relaxed text-[color:var(--text-secondary)]">
-            Demonstrated for modeled ONTAP operations on a simulated cluster.
-            The read-only review maps your own agent and its gaps; it does not install a gate.
-            Production enforcement is scoped and validated separately.
-          </p>
-        </div>
-      </section>
-
-      {/* ─── Industries ──────────────────────────────────────────────────────── */}
-      <section ref={industriesRef} className="arf-shell pb-[120px]">
-        <div className="mb-7 flex flex-wrap items-baseline justify-between gap-6">
-          <h2 className="text-[27px] font-semibold tracking-[-0.022em]">
-            Built for teams answerable to regulated markets
-          </h2>
-          <p className="text-sm text-[color:var(--text-muted)]">
-            You may not be the regulated enterprise — your customer is,
-            and their security review is the deadline.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2.5">
-          {INDUSTRIES.map((ind, idx) => (
-            <div
-              key={ind.name}
-              className={`arf-reveal flex items-center gap-3 rounded-full border border-[color:var(--hairline)] bg-[color:var(--surface-raised)] px-5 py-3 shadow-[0_10px_24px_-22px_rgba(25,24,22,0.5)] ${industriesInView ? "arf-reveal-in" : ""}`}
-              style={{
-                transitionDelay: industriesInView ? `${idx * 60}ms` : "0ms",
-              }}
-            >
-              <ind.icon className="h-4 w-4 text-arf-blue" strokeWidth={1.75} />
-              <span className="text-sm font-semibold tracking-[-0.01em]">
-                {ind.name}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── Architecture — one animated pipeline, no restated copies ─────────── */}
-      <section id="architecture" className="arf-shell pb-[120px]">
-        <p className="arf-eyebrow mb-3.5">Architecture</p>
-        <h2 className="mb-11 text-h2 font-semibold">How ARF works</h2>
-        <div className="mb-10">
-          <HowItWorksVideo />
-        </div>
-        <div className="arf-card p-5 sm:p-8 lg:p-11">
-          <ArchitecturePipeline />
-        </div>
-      </section>
-
-      {/* ─── Enterprise capabilities ─────────────────────────────────────────── */}
-      <section id="capabilities" ref={capsRef} className="arf-shell pb-[120px]">
-        <div className="mb-10 grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="arf-eyebrow mb-3.5">Product</p>
-            <h2 className="text-h2 font-semibold">Enterprise capabilities</h2>
-          </div>
-          <p className="max-w-[56ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
-            Four subsystems, one control plane. Explore them on simulated data
-            in the Governance Console; enforcement runs on your agent&rsquo;s own
-            write path, scoped per engagement.
-          </p>
-        </div>
-        <div className="grid gap-[22px] md:grid-cols-2">
-          {CAPABILITIES.map((cap, idx) => (
-            <div
-              key={cap.n}
-              className={`arf-reveal ${capsInView ? "arf-reveal-in" : ""}`}
-              style={{ transitionDelay: capsInView ? `${idx * 90}ms` : "0ms" }}
-            >
-              <CapabilityCard {...cap} />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── Enterprise-grade governance — the proof section, most visual weight ─ */}
-      <section
-        ref={govRef}
-        className="border-y border-[color:var(--hairline)] bg-[color:var(--surface-raised)] py-[104px]"
-      >
-        <div className="arf-shell">
-          <div className="mb-11 grid gap-16 lg:grid-cols-[0.85fr_1.15fr]">
-            <h2 className="max-w-[14ch] text-h2-lg font-semibold">
-              Enterprise-grade governance
-            </h2>
-            <p className="max-w-[52ch] self-end text-body text-[color:var(--text-secondary)] text-pretty">
-              The three properties a compliance officer will ask about in the
-              first meeting. Each one is a mechanism, not a policy document.
-            </p>
-          </div>
-          <div className="mb-8">
-            <ul aria-label="Decision states" className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
-              {["Authorized", "Provider reported", "Durably recorded", "Unresolved"].map((state) => (
-                <li key={state}>
-                  {state}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-3 text-sm text-[color:var(--text-secondary)]">
-              Approved is not the same as done. ARF keeps the difference visible.
-            </p>
-          </div>
-          <div className="grid gap-[22px] md:grid-cols-3">
-            {GOVERNANCE.map((item, idx) => (
-              <div
-                key={item.title}
-                className={`arf-card-substantial arf-reveal arf-reveal-deliberate bg-[color:var(--surface-canvas)] p-9 ${govInView ? "arf-reveal-in" : ""}`}
-                style={{
-                  transitionDelay: govInView ? `${idx * 110}ms` : "0ms",
-                }}
-              >
-                <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-[11px] bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple">
-                  <item.icon
-                    className="h-5 w-5 text-white"
-                    strokeWidth={1.75}
-                  />
-                </div>
-                <h3 className="mb-3 text-[19px] font-semibold tracking-[-0.016em]">
-                  {item.title}
-                </h3>
-                <p className="text-[15px] leading-[1.6] text-[color:var(--text-secondary)]">
-                  {item.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── By design — what the demo proves (no placeholder quotes or stats) ── */}
-      <section ref={quoteRef} className="arf-dark-wash bg-arf-dark py-[104px]">
-        <div className="arf-shell grid items-center gap-16 lg:grid-cols-[1.15fr_0.85fr]">
-          <div>
-            <p className="mb-6 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-white/60">
-              By design · shown on a simulated ONTAP cluster
-            </p>
-            <p className="mb-7 font-serif text-[clamp(1.75rem,3vw,2.125rem)] font-light leading-[1.35] tracking-[-0.01em] text-white text-pretty">
-              Every modeled write is checked against whether it can be undone
-              — before it runs, not after.
-            </p>
-            <p className="max-w-[52ch] text-[14.5px] leading-[1.6] text-white/65">
-              These are properties of the engine, demonstrated end to end. No
-              customer quotes or numbers appear here until they are real.
-            </p>
-          </div>
-          <div
-            className={`arf-reveal rounded-2xl border border-white/15 bg-white/[0.06] p-8 ${quoteInView ? "arf-reveal-in" : ""}`}
-          >
-            <p className="mb-6 font-mono text-[10.5px] font-medium uppercase tracking-[0.13em] text-white/60">
-              What the demo proves
-            </p>
-            <dl className="flex flex-col gap-5">
-              {BY_DESIGN.map((fact, idx) => (
-                <div
-                  key={fact.title}
-                  className={idx > 0 ? "border-t border-white/15 pt-5" : ""}
-                >
-                  <dt className="mb-1 text-[17px] font-semibold leading-[1.3] tracking-[-0.014em] text-white">
-                    {fact.title}
-                  </dt>
-                  <dd className="text-[13.5px] leading-[1.5] text-white/70">
-                    {fact.body}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Access models ───────────────────────────────────────────────────── */}
-      <section id="pricing" ref={pricingRef} className="arf-shell py-[112px]">
-        <div className="mb-11 grid gap-16 lg:grid-cols-[0.9fr_1.1fr]">
-          <h2 className="max-w-[12ch] text-h2 font-semibold">Access models</h2>
-          <p className="max-w-[56ch] self-end text-base leading-[1.65] text-[color:var(--text-secondary)] text-pretty">
-            A free snapshot of five write tools, then a fixed-price review of
-            one agent&rsquo;s production write paths. A continuous gate is
-            available by invitation after a review.
-          </p>
-        </div>
-        <div className="grid items-start gap-[22px] md:grid-cols-3">
-          {TIERS.map((tier, idx) => {
-            const delay = {
-              transitionDelay: pricingInView ? `${idx * 90}ms` : "0ms",
-            };
-            return tier.dominant ? (
-              <div
-                key={tier.name}
-                className={`arf-reveal rounded-2xl bg-gradient-to-br from-arf-blue to-arf-purple p-0.5 shadow-[0_30px_60px_-30px_rgba(51,88,232,0.6)] ${pricingInView ? "arf-reveal-in" : ""}`}
-                style={delay}
-              >
-                <div className="rounded-[14px] bg-[color:var(--surface-raised)] p-9">
-                  <TierBody {...tier} renderLink={Link} />
-                </div>
-              </div>
-            ) : (
-              <div
-                key={tier.name}
-                className={`arf-card-light arf-reveal p-8 ${pricingInView ? "arf-reveal-in" : ""}`}
-                style={delay}
-              >
-                <TierBody {...tier} renderLink={Link} />
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ─── Explore ARF — API / Console / Specs, one sandbox notice ─────────── */}
-      <section id="explore" className="arf-shell pb-[104px]">
-        <div className="mb-8 flex flex-wrap items-baseline justify-between gap-8">
-          <h2 className="text-h2 font-semibold">Explore ARF</h2>
-          <p className="max-w-[50ch] text-[13.5px] leading-[1.6] text-[color:var(--text-secondary)] lg:text-right">
-            The public sandbox returns simulated responses only. Real
-            enforcement is scoped per engagement, on your agent&rsquo;s own
-            write path.
-          </p>
-        </div>
-        <div className="grid gap-[22px] lg:grid-cols-[1.2fr_0.9fr_0.9fr]">
-          {/* API */}
+        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.9fr_0.9fr]">
           <SandboxCard
             curlCommand={CURL_COMMAND}
             loading={sandboxLoading}
@@ -744,17 +235,13 @@ export default function LandingPage() {
             onTryLive={fetchSandboxResponse}
             onCopy={handleCopy}
           />
-
-          {/* Console */}
           <ConsoleCard href="/dashboard" renderLink={Link} />
-
-          {/* Specs */}
           <SpecsCard specs={SPECS} href="/signup" renderLink={Link} />
         </div>
       </section>
 
       {copyError && (
-        <div className="animate-slide-up fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg bg-[#b0453a] px-4 py-2 text-sm text-white shadow-lg">
+        <div role="status" className="fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg bg-[#b0453a] px-4 py-2 text-sm text-white shadow-lg">
           {copyError}
         </div>
       )}

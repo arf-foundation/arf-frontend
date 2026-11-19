@@ -114,12 +114,13 @@ export default function ChatWidget() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // /dashboard has its own fixed bottom-0 mobile nav bar (DashboardBottomNav,
-  // md:hidden, z-40) -- push the launcher up above it there so they don't
-  // overlap. Everywhere else the default bottom-5 is fine.
   const pathname = usePathname();
+  const inlineLauncher = pathname === '/' || pathname === '/pricing' ||
+    pathname === '/signup' || pathname === '/write-access-review';
+  // The dashboard's mobile navigation occupies the bottom of its viewport.
   const launcherBottomClass = pathname?.startsWith('/dashboard') ? 'bottom-20 sm:bottom-6' : 'bottom-5 sm:bottom-6';
 
+  const launcherRef = useRef<HTMLButtonElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const isMounted = useRef(true);
@@ -142,7 +143,10 @@ export default function ChatWidget() {
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') {
+        setOpen(false);
+        launcherRef.current?.focus();
+      }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
@@ -184,17 +188,21 @@ export default function ChatWidget() {
   };
 
   return (
-    <div className="arf-page-root">
+    <div className={inlineLauncher ? 'arf-page-root arf-shell flex justify-end pb-8' : 'arf-page-root'}>
       {/* Launcher */}
       <button
         type="button"
+        ref={launcherRef}
         onClick={() => setOpen((v) => !v)}
-        aria-label={open ? 'Close ARF agent chat' : 'Open ARF agent chat'}
+        aria-label={inlineLauncher ? undefined : open ? 'Close ARF agent chat' : 'Open ARF agent chat'}
         aria-expanded={open}
         aria-controls="arf-chat-panel"
-        className={`fixed right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple text-white shadow-[0_16px_34px_-16px_rgba(51,88,232,0.75)] transition hover:brightness-110 sm:right-6 ${launcherBottomClass}`}
+        className={inlineLauncher
+          ? 'arf-btn-secondary max-w-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-arf-blue'
+          : `fixed right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple text-white shadow-[0_16px_34px_-16px_rgba(51,88,232,0.75)] transition hover:brightness-110 sm:right-6 ${launcherBottomClass}`}
       >
-        {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+        {open ? <X size={inlineLauncher ? 18 : 24} aria-hidden="true" /> : <MessageCircle size={inlineLauncher ? 18 : 24} aria-hidden="true" />}
+        {inlineLauncher && <span>Ask the ARF agent</span>}
       </button>
 
       {/* Panel: full-screen on mobile, floating card on sm+ */}
@@ -216,9 +224,12 @@ export default function ChatWidget() {
             </div>
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                launcherRef.current?.focus();
+              }}
               aria-label="Close"
-              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-white/70 transition hover:bg-white/10 hover:text-white sm:hidden"
+              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-white/70 transition hover:bg-white/10 hover:text-white ${inlineLauncher ? '' : 'sm:hidden'}`}
             >
               <X className="h-5 w-5" />
             </button>
