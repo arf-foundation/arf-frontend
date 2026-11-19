@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import HowItWorksVideo from './HowItWorksVideo';
+import RecoveryEvidence from './RecoveryEvidence';
 import { REVIEW_EXAMPLE_PATH } from '../lib/engagement-offers';
 
 const EXAMPLES = [
@@ -56,14 +57,14 @@ export default function ReviewProof() {
               </figure>
             ) : <HowItWorksVideo />}
             <div className="min-w-0">
-              <h3 className="text-xl font-semibold text-balance">
-                {example === 'fsx' ? 'The mirror reported healthy' : 'Approval applies to one write'}
-              </h3>
-              <p className="mt-2 leading-relaxed text-[color:var(--text-secondary)]">
-                {example === 'fsx'
-                  ? 'A direct check found the new file on the source and absent from the replica. ARF held the requested source deletion. Recoverability of current data remained open.'
-                  : 'In the simulation, ARF holds a volume deletion for approval and checks the observed result after the approved call.'}
-              </p>
+              {example === 'fsx' ? <RecoveryEvidence /> : (
+                <>
+                  <h3 className="text-xl font-semibold text-balance">Approval applies to one write</h3>
+                  <p className="mt-2 leading-relaxed text-[color:var(--text-secondary)]">
+                    In the simulation, ARF holds a volume deletion for approval and checks the observed result after the approved call.
+                  </p>
+                </>
+              )}
               <Link href={REVIEW_EXAMPLE_PATH} className="mt-4 inline-flex items-center gap-2 rounded-sm font-semibold text-arf-blue underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4">
                 Read the sample finding <ArrowRight size={16} aria-hidden="true" />
               </Link>
