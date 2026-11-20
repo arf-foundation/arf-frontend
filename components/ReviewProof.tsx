@@ -16,6 +16,7 @@ type Example = (typeof EXAMPLES)[number]['id'];
 
 export default function ReviewProof() {
   const [example, setExample] = useState<Example>('fsx');
+  const [fsxPlayed, setFsxPlayed] = useState(false);
 
   return (
     <section id="proof" className="arf-shell scroll-mt-24 py-10 sm:py-14" aria-labelledby="proof-title">
@@ -29,7 +30,11 @@ export default function ReviewProof() {
               aria-pressed={id === example}
               aria-controls="review-proof-clip"
               className="flex flex-wrap items-baseline gap-x-2 gap-y-1 rounded-lg border border-[color:var(--hairline)] px-3 py-2.5 text-left text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arf-blue aria-pressed:border-arf-blue aria-pressed:bg-arf-blue/10"
-              onClick={() => setExample(id)}
+              onClick={() => {
+                if (id === example) return;
+                setFsxPlayed(false);
+                setExample(id);
+              }}
             >
               {label} <span className="font-normal text-[color:var(--text-secondary)]">{duration}</span>
             </button>
@@ -39,21 +44,34 @@ export default function ReviewProof() {
           <div key={example} className="grid min-w-0 gap-6 p-4 motion-safe:animate-[arf-proof-in_220ms_ease-out] sm:p-6 lg:grid-cols-[1.25fr_1fr] lg:items-center lg:gap-9">
             {example === 'fsx' ? (
               <figure className="m-0 min-w-0">
-                <video
-                  className="aspect-video w-full rounded-xl bg-arf-dark object-contain"
-                  controls
-                  muted
-                  playsInline
-                  preload="none"
-                  poster="/media/fsx-mirror-readback-poster.webp"
-                  aria-label="FSx experiment showing the reported mirror state"
-                  aria-describedby="fsx-video-caption"
-                >
-                  <source src="/media/fsx-mirror-readback.mp4" type="video/mp4" />
-                </video>
+                <div className="relative">
+                  <video
+                    className="aspect-video w-full rounded-xl bg-arf-dark object-contain"
+                    controls
+                    muted
+                    playsInline
+                    preload="none"
+                    onPlay={() => setFsxPlayed(true)}
+                    poster="/media/fsx-mirror-readback-poster.webp"
+                    aria-label="FSx experiment showing the reported mirror state"
+                    aria-describedby="fsx-video-caption"
+                  >
+                    <source src="/media/fsx-mirror-readback.mp4" type="video/mp4" />
+                  </video>
+                  {!fsxPlayed && (
+                    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+                      <span className="absolute left-[14%] top-[44%] h-[3.5%] w-[10%] rounded-sm border-2 border-[#f8ce6a]" />
+                      <span className="absolute left-[14%] top-[14%] rounded bg-[#131c23] px-2 py-1 text-xs font-medium text-[#f8ce6a]">Mirror health field</span>
+                    </div>
+                  )}
+                </div>
                 <figcaption id="fsx-video-caption" className="mt-2 text-sm text-[color:var(--text-secondary)]">
-                  Silent terminal excerpt from a disposable AWS experiment. The sample finding links the separate file check.
+                  Silent terminal excerpt from a disposable AWS experiment.
                 </figcaption>
+                <details className="mt-2 text-sm text-[color:var(--text-secondary)]">
+                  <summary className="cursor-pointer font-semibold text-arf-blue">Read the clip transcript</summary>
+                  <p className="mt-2">SnapMirror reports <code>healthy: true</code> and <code>state: snapmirrored</code>. Its report describes the mirror relationship. The separate file check is in the evidence steps.</p>
+                </details>
               </figure>
             ) : <HowItWorksVideo />}
             <div className="min-w-0">
