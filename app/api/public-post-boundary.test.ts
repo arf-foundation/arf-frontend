@@ -30,6 +30,10 @@ describe.each([
     [{ Origin: 'null', 'Content-Type': 'application/json' }, 403],
     [{ 'Sec-Fetch-Site': 'cross-site', 'Content-Type': 'application/json' }, 403],
     [{ 'Sec-Fetch-Site': 'same-site', 'Content-Type': 'application/json' }, 403],
+    [{
+      Host: 'www.example.test', 'X-Forwarded-Host': 'external.example.test',
+      Origin: 'https://external.example.test', 'Content-Type': 'application/json',
+    }, 403],
     [{ 'Content-Type': 'text/plain' }, 415],
     [{ 'Content-Type': 'application/jsonp' }, 415],
   ] as const)('refuses incompatible requests before rate lookup (%j)', async (headers, status) => {
@@ -39,6 +43,7 @@ describe.each([
 
   it.each([
     { Origin: 'https://www.example.test', 'Sec-Fetch-Site': 'same-origin', 'Content-Type': 'application/json; charset=UTF-8' },
+    { Host: 'preview.example.test', Origin: 'https://preview.example.test', 'Content-Type': 'application/json' },
     { 'Content-Type': 'Application/JSON' },
   ])('keeps allowed JSON behind the existing rate limiter (%j)', async (headers) => {
     expect((await post(request(headers as Record<string, string>))).status).toBe(429);

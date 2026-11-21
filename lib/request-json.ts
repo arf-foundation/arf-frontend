@@ -3,7 +3,10 @@ import { NextResponse } from 'next/server';
 export function rejectInvalidJsonPost(request: Request) {
   const origin = request.headers.get('origin');
   const site = request.headers.get('sec-fetch-site');
-  if ((origin !== null && origin !== new URL(request.url).origin) ||
+  const url = new URL(request.url);
+  // Next.js can use the internal server hostname in request.url.
+  const host = request.headers.get('host')?.toLowerCase() ?? url.host;
+  if ((origin !== null && origin !== `${url.protocol}//${host}`) ||
       site === 'cross-site' || site === 'same-site') {
     return NextResponse.json({ error: 'Submit this request from the ARF site.' }, { status: 403 });
   }
