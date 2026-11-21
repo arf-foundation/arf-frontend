@@ -68,8 +68,7 @@ export default function AgentPage() {
           ARF Institutional Memory Agent
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mb-4">
-          Paste an incident description → get structured governance output (risk
-          score, execution mode, etc.)
+          Explore a redacted incident in this advisory demo. It cannot authorize or execute changes.
         </p>
 
         <div className="flex gap-2 mb-4 flex-wrap">
@@ -99,9 +98,13 @@ export default function AgentPage() {
           maxLength={MAX_CHAT_MESSAGE_LENGTH}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Describe an incident..."
+          placeholder="Describe a redacted incident..."
           aria-label="Incident description"
+          aria-describedby="incident-data-note"
         />
+        <p id="incident-data-note" className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          Keep credentials and customer records out of the description.
+        </p>
 
         <button
           onClick={analyze}
@@ -114,7 +117,7 @@ export default function AgentPage() {
 
         {output && (
           <div className="mt-8 animate-fade-in">
-            <h2 className="text-xl font-semibold mb-2">Governance Output</h2>
+            <h2 className="text-xl font-semibold mb-2">Advisory assessment</h2>
             {"error" in output ? (
               <div className="bg-red-50 p-4 rounded-md text-red-700">
                 {output.error}
@@ -129,7 +132,7 @@ export default function AgentPage() {
                     </div>
                   </div>
                   <div className="bg-white dark:bg-gray-800 p-3 rounded shadow transition hover:shadow-md">
-                    <div className="text-sm text-gray-500">Execution Mode</div>
+                    <div className="text-sm text-gray-500">Suggested mode</div>
                     <div className="text-2xl font-bold">
                       {output.healing_intent?.execution_mode_recommended ??
                         "N/A"}

@@ -16,6 +16,7 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [error, setError] = useState<string | null>(null);
   const confirmation = useRef<HTMLHeadingElement>(null);
+  const errorMessage = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let restored = EMPTY_DRAFT;
@@ -43,6 +44,10 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
   useEffect(() => {
     if (status === 'sent') confirmation.current?.focus();
   }, [status]);
+
+  useEffect(() => {
+    if (error) errorMessage.current?.focus();
+  }, [error, status]);
 
   function updateDraft(field: keyof typeof EMPTY_DRAFT, value: string) {
     const next = { ...(draft ?? EMPTY_DRAFT), [field]: value };
@@ -81,7 +86,7 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
       if (!response.ok) {
         setError(response.status === 429
           ? 'Please wait a few minutes before trying again.'
-          : 'Your request could not be sent. Try again or email juan@arf-ai.com.');
+          : 'Your request could not be sent. Try again in a moment.');
         setStatus('idle');
         return;
       }
@@ -123,15 +128,21 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
                 Start with one agent and a brief description of the write. We’ll follow up by email to discuss scope.
                 Share only a summary here. Keep credentials and customer records out of this form.
               </p>
-              <form method="post" action="/api/pilot-request" onSubmit={submit} className="arf-card space-y-6 p-5 sm:p-8">
+              <form method="post" action="/api/pilot-request" onSubmit={submit}
+                aria-busy={status === 'sending'} className="arf-card space-y-6 p-5 sm:p-8">
                 <fieldset className="min-w-0" disabled={disabled}>
                   <legend className="mb-2 font-semibold">I’m interested in</legend>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid gap-2 sm:grid-cols-2">
                     {(['write-access-review', 'pilot-snapshot'] as const).map((value) => (
-                      <label key={value} className="flex items-center gap-2 rounded-lg border border-[color:var(--hairline)] px-3 py-2.5 text-sm">
+                      <label key={value} className={`flex cursor-pointer items-start gap-3 rounded-lg border px-3 py-3 text-sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-arf-blue ${offer === value ? 'border-arf-blue bg-arf-blue/5' : 'border-[color:var(--hairline)]'}`}>
                         <input type="radio" name="offer" value={value} required checked={offer === value}
-                          onChange={() => setOffer(value)} className="accent-arf-blue" />
-                        {OFFER_LABELS[value]} · {value === 'write-access-review' ? '$4,500' : 'Free'}
+                          onChange={() => setOffer(value)} className="mt-1 accent-arf-blue" />
+                        <span>
+                          <span className="block font-semibold">{OFFER_LABELS[value]} · {value === 'write-access-review' ? '$4,500' : 'Free'}</span>
+                          <span className="mt-1 block text-[color:var(--text-secondary)]">
+                            {value === 'write-access-review' ? 'Written findings on a scoped set of writes.' : 'A first look at one agent’s write path.'}
+                          </span>
+                        </span>
                       </label>
                     ))}
                   </div>
@@ -162,12 +173,16 @@ export default function SignupForm({ initialOffer }: { initialOffer: RequestOffe
                     {' '}and <Link href="/privacy" className="text-arf-blue underline">Privacy Policy</Link>.
                   </label>
                 </div>
-                {error && <p role="alert" className="text-sm text-[#a72f28] dark:text-[#ffaca5]">{error}</p>}
+                {error && (
+                  <div ref={errorMessage} tabIndex={-1} role="alert" className="rounded-lg border border-current px-4 py-3 text-sm text-[#a72f28] dark:text-[#ffaca5]">
+                    {error}{' '}<a href="mailto:juan@arf-ai.com" className="underline underline-offset-4">Email ARF</a>
+                  </div>
+                )}
                 <div className="flex flex-wrap items-center gap-4">
                   <button type="submit" disabled={disabled} className="arf-btn-primary max-w-full justify-center disabled:opacity-60">
                     {status === 'sending' ? 'Sending request…' : 'Send request'} <ArrowRight size={18} aria-hidden="true" />
                   </button>
-                  <a href="mailto:juan@arf-ai.com" className="text-sm text-arf-blue underline underline-offset-4">Email ARF</a>
+                  {!error && <a href="mailto:juan@arf-ai.com" className="text-sm text-arf-blue underline underline-offset-4">Email ARF</a>}
                 </div>
               </form>
             </>

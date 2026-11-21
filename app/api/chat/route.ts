@@ -6,7 +6,7 @@ import { ConnectError, getToken } from '@vercel/connect';
 import Anthropic from '@anthropic-ai/sdk';
 import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
 import { isAgentOutput, MAX_CHAT_MESSAGE_LENGTH } from '../../../lib/chat-contract';
-import { readJsonObject } from '../../../lib/request-json';
+import { readJsonObject, rejectInvalidJsonPost } from '../../../lib/request-json';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,6 +74,9 @@ function extractJson(text: string): unknown {
 }
 
 export async function POST(req: Request) {
+  const rejected = rejectInvalidJsonPost(req);
+  if (rejected) return rejected;
+
   const clientKey = clientKeyFromRequest(req);
   const rate = await checkRateLimit(clientKey);
   if (rate !== 'allowed') {
