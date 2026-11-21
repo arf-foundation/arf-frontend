@@ -49,12 +49,14 @@ Two API routes need credentials to work in production, and are inert (or error) 
 | `POST /api/chat` (used by the `/agent` page) | Vercel Connect connector (`VERCEL_OIDC_TOKEN`, injected automatically on Vercel deploys) | Calls Claude for the public Institutional Memory Agent demo |
 
 `POST /api/chat`, `POST /api/pilot-request`, and `POST /api/report` are all
-public and unauthenticated, and are rate-limited (see `lib/rate-limit.ts`).
-Optionally set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (a
-free Upstash Redis database) for a real cap enforced across every
-serverless instance; without them, rate limiting falls back to an
-in-memory counter scoped to one warm instance — soft, not a hard guarantee,
-but not broken either.
+public and unauthenticated. They require JSON and refuse cross-origin browser
+submissions. Production builds and hosted Vercel deployments require
+`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` for shared rate limiting.
+Verify both settings before promoting a release. Missing settings, Redis
+errors and timeouts return HTTP 503. Local development and unit tests can use
+per-instance counters. Playwright sets `ARF_ALLOW_LOCAL_RATE_LIMIT=1` for its
+loopback server when testing a production build. Leave that setting unset on
+deployments. See `lib/request-json.ts` and `lib/rate-limit.ts`.
 
 ### Run the development server
 

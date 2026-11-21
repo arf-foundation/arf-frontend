@@ -1,3 +1,26 @@
+import { NextResponse } from 'next/server';
+
+export function rejectInvalidJsonPost(request: Request) {
+  const origin = request.headers.get('origin');
+  const site = request.headers.get('sec-fetch-site');
+  const url = new URL(request.url);
+  // Next.js can use the internal server hostname in request.url.
+  const host = request.headers.get('host')?.toLowerCase() ?? url.host;
+  // Browser Fetch Metadata can confirm same origin when TLS ends at the proxy.
+  const sameOriginBehindTls = site === 'same-origin' && url.protocol === 'http:' &&
+    origin === `https://${host}`;
+  if ((origin !== null && origin !== `${url.protocol}//${host}` && !sameOriginBehindTls) ||
+      site === 'cross-site' || site === 'same-site') {
+    return NextResponse.json({ error: 'Submit this request from the ARF site.' }, { status: 403 });
+  }
+
+  const mediaType = request.headers.get('content-type')?.split(';', 1)[0].trim().toLowerCase();
+  if (mediaType !== 'application/json') {
+    return NextResponse.json({ error: 'This endpoint requires a JSON request.' }, { status: 415 });
+  }
+  return null;
+}
+
 export function isJsonObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

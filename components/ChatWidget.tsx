@@ -67,7 +67,7 @@ function AgentResponseCard({ output }: { output: ARFAgentOutput }) {
         <span
           className={`rounded-full px-2.5 py-1 font-mono text-[10.5px] font-medium uppercase tracking-[0.08em] ${EXECUTION_MODE_STYLE[output.healing_intent.execution_mode_recommended]}`}
         >
-          {output.healing_intent.execution_mode_recommended}
+          Suggested: {output.healing_intent.execution_mode_recommended}
         </span>
         <span className="font-mono text-[10.5px] uppercase tracking-[0.08em] text-[color:var(--text-muted)]">
           risk {output.risk_score.toFixed(2)} · confidence {output.similarity_confidence.toFixed(2)}
@@ -221,7 +221,7 @@ export default function ChatWidget() {
               <p className="font-mono text-[10px] font-medium uppercase tracking-[0.13em] text-white/60">
                 ARF Institutional Memory Agent
               </p>
-              <p className="text-[13.5px] text-white/85">Paste an incident, get a governed decision</p>
+              <p className="text-[13.5px] text-white/85">Explore an incident in advisory mode</p>
             </div>
             <button
               type="button"
@@ -241,8 +241,7 @@ export default function ChatWidget() {
             {messages.length === 0 && (
               <div className="flex h-full flex-col items-center justify-center gap-2 px-4 text-center">
                 <p className="text-[13.5px] text-[color:var(--text-secondary)]">
-                  Describe an operational incident and ARF will return a structured, policy-aware governance
-                  decision — risk score, execution mode, and reasoning.
+                  See a risk estimate, suggested mode, and rationale. This demo cannot authorize or execute changes.
                 </p>
                 <p className="font-mono text-[10.5px] uppercase tracking-[0.08em] text-[color:var(--text-muted)]">
                   Each message is evaluated independently
@@ -274,27 +273,33 @@ export default function ChatWidget() {
           </div>
 
           {/* Composer */}
-          <div className="flex flex-shrink-0 items-end gap-2 border-t border-[color:var(--hairline)] bg-[color:var(--surface-raised)] p-3">
-            <textarea
-              ref={inputRef}
+          <div className="flex-shrink-0 border-t border-[color:var(--hairline)] bg-[color:var(--surface-raised)] p-3">
+            <p id="chat-data-note" className="mb-2 text-xs text-[color:var(--text-secondary)]">
+              Keep credentials and customer records out of the message.
+            </p>
+            <div className="flex items-end gap-2">
+              <textarea
+                ref={inputRef}
                 value={input}
                 maxLength={MAX_CHAT_MESSAGE_LENGTH}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={onInputKeyDown}
-              placeholder="Describe an incident…"
-              aria-label="Message the ARF agent"
-              rows={1}
-              className="max-h-28 flex-1 resize-none rounded-xl border border-[color:var(--hairline)] bg-[color:var(--surface-canvas)] px-3 py-2.5 text-[13.5px] text-[color:var(--text-primary)] outline-none focus-visible:border-[color:var(--color-arf-blue)]"
-            />
-            <button
-              type="button"
-              onClick={send}
-              disabled={loading || !input.trim()}
-              aria-label="Send"
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple text-white transition hover:brightness-110 disabled:opacity-40"
-            >
-              <Send className="h-4 w-4" />
-            </button>
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={onInputKeyDown}
+                placeholder="Describe a redacted incident…"
+                aria-label="Message the ARF agent"
+                aria-describedby="chat-data-note"
+                rows={1}
+                className="max-h-28 flex-1 resize-none rounded-xl border border-[color:var(--hairline)] bg-[color:var(--surface-canvas)] px-3 py-2.5 text-[13.5px] text-[color:var(--text-primary)] outline-none focus-visible:border-[color:var(--color-arf-blue)]"
+              />
+              <button
+                type="button"
+                onClick={send}
+                disabled={loading || !input.trim()}
+                aria-label="Send"
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-arf-blue bg-gradient-to-br from-arf-blue to-arf-purple text-white transition hover:brightness-110 disabled:opacity-40"
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       )}

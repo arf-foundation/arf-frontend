@@ -143,6 +143,60 @@ describe('createRateLimiter: Upstash-backed (configured)', () => {
   });
 });
 
+describe('hosted rate limits require shared storage', () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = { ...originalEnv };
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    delete process.env.VERCEL_ENV;
+    delete process.env.VERCEL;
+    delete process.env.ARF_ALLOW_LOCAL_RATE_LIMIT;
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+    jest.restoreAllMocks();
+  });
+
+  it.each(['production', 'preview'])('fails closed with missing or partial Redis settings in %s', async (environment) => {
+    process.env.VERCEL_ENV = environment;
+    if (environment === 'preview') process.env.UPSTASH_REDIS_REST_URL = 'https://example.upstash.io';
+    const { createRateLimiter } = await import('./rate-limit');
+    const limit = createRateLimiter({ prefix: 'test', maxRequests: 5, windowMs: 1000 });
+    expect(await limit('first')).toBe('unavailable');
+    expect(await limit('other')).toBe('unavailable');
+  });
+
+  it('fails closed with the generic Vercel deployment marker alone', async () => {
+    process.env.VERCEL = '1';
+    const { createRateLimiter } = await import('./rate-limit');
+    const limit = createRateLimiter({ prefix: 'test', maxRequests: 5, windowMs: 1000 });
+    expect(await limit('first')).toBe('unavailable');
+  });
+
+  it('fails closed in a production build even without platform markers', async () => {
+    process.env = { ...process.env, NODE_ENV: 'production' };
+    const { createRateLimiter } = await import('./rate-limit');
+    const limit = createRateLimiter({ prefix: 'test', maxRequests: 5, windowMs: 1000 });
+    expect(await limit('first')).toBe('unavailable');
+  });
+
+  it.each([[undefined, 'allowed'], ['preview', 'unavailable']] as const)(
+    'restricts the local E2E opt-in to non-hosted builds (%s)',
+    async (environment, expected) => {
+      process.env = { ...process.env, NODE_ENV: 'production', ARF_ALLOW_LOCAL_RATE_LIMIT: '1' };
+      if (environment) process.env.VERCEL_ENV = environment;
+      const { createRateLimiter } = await import('./rate-limit');
+      const limit = createRateLimiter({ prefix: 'test', maxRequests: 5, windowMs: 1000 });
+      expect(await limit('first')).toBe(expected);
+    },
+  );
+});
+
 describe('clientKeyFromRequest', () => {
   it('extracts and trims the first IP from a comma-separated x-forwarded-for', async () => {
     const { clientKeyFromRequest } = await import('./rate-limit');

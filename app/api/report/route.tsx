@@ -3,7 +3,7 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { CompliancePdfDocument } from './pdf-template';
 import { MOCK_AUDIT_LOGS, MOCK_POLICY_VIOLATIONS, withinRange } from '../../../lib/governanceMockData';
 import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
-import { readJsonObject } from '../../../lib/request-json';
+import { readJsonObject, rejectInvalidJsonPost } from '../../../lib/request-json';
 
 // Real PDF generation from real (mock) data on every request. A dashboard
 // export button's legitimate usage is a handful of requests per session,
@@ -20,6 +20,9 @@ const MOCK_DATA_MIN = '2026-05-13';
 const MOCK_DATA_MAX = '2026-05-14';
 
 export async function POST(request: Request) {
+  const rejected = rejectInvalidJsonPost(request);
+  if (rejected) return rejected;
+
   const clientKey = clientKeyFromRequest(request);
   const rate = await checkRateLimit(clientKey);
   if (rate !== 'allowed') {

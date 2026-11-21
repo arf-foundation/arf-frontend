@@ -43,12 +43,14 @@ import withPWA from "next-pwa";
    of those routes, or a new one, starts rendering user- or model-supplied
    content into markup. */
 const securityHeaders = [
+  // Application scripts and the hosted Vercel Analytics loader share the
+  // site's origin. Embedded media and GitHub data have their own directives.
   {
     key: "Content-Security-Policy",
     value: `
       default-src 'self';
       manifest-src 'self' https://vercel.com;
-      script-src 'self' https://cdn.plot.ly https://platform.linkedin.com https://www.youtube.com https://api.github.com https://challenges.cloudflare.com 'unsafe-inline';
+      script-src 'self' 'unsafe-inline';
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: https://api.qrserver.com https://*.licdn.com https://*.ytimg.com https://*.githubusercontent.com https://*.vercel.app;
       font-src 'self' data:;

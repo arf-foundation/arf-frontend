@@ -2,7 +2,7 @@ import { Client } from '@notionhq/client';
 import { NextResponse } from 'next/server';
 import { clientKeyFromRequest, createRateLimiter } from '../../../lib/rate-limit';
 import { isRequestOffer, OFFER_LABELS } from '../../../lib/engagement-offers';
-import { readJsonObject } from '../../../lib/request-json';
+import { readJsonObject, rejectInvalidJsonPost } from '../../../lib/request-json';
 
 const legacyOptions = {
   industry: ['Fintech / Banking', 'Healthcare / Life Sciences', 'Cloud Infrastructure / DevOps', 'E‑commerce / Retail', 'Manufacturing / IoT', 'Government / Defense', 'Consulting / Services', 'Other'],
@@ -44,6 +44,9 @@ const checkRateLimit = createRateLimiter({
 });
 
 export async function POST(request: Request) {
+  const rejected = rejectInvalidJsonPost(request);
+  if (rejected) return rejected;
+
   const clientKey = clientKeyFromRequest(request);
   const rate = await checkRateLimit(clientKey);
   if (rate !== 'allowed') {

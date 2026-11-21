@@ -38,6 +38,7 @@ export default defineConfig({
     : {
         command: `npx next start --port ${PORT} --hostname 127.0.0.1`,
         url: `http://127.0.0.1:${PORT}`,
+        env: { ARF_ALLOW_LOCAL_RATE_LIMIT: '1' },
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
       },
