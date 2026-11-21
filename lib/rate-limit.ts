@@ -15,7 +15,7 @@ import { Redis } from '@upstash/redis';
    start/redeploy resetting one) each got their own fresh budget --
    bounding abuse from a single hot instance, never a true global cap.
 
-   Vercel Preview and Production require both variables. Local and CI
+   Production builds require both variables by default. Local and CI
    runs can use per-instance counters. See README.md. */
 
 const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL;
@@ -24,12 +24,14 @@ const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const redis = UPSTASH_URL && UPSTASH_TOKEN ? new Redis({ url: UPSTASH_URL, token: UPSTASH_TOKEN }) : null;
 const hosted = process.env.VERCEL_ENV === 'production' || process.env.VERCEL_ENV === 'preview' ||
   (process.env.VERCEL === '1' && process.env.VERCEL_ENV !== 'development');
+const allowLocal = !hosted &&
+  (process.env.NODE_ENV !== 'production' || process.env.ARF_ALLOW_LOCAL_RATE_LIMIT === '1');
 
 if (!redis) {
   console.warn(
-    hosted
-      ? '[rate-limit] Missing Upstash configuration on Vercel; requests will be refused.'
-      : '[rate-limit] UPSTASH_REDIS_REST_URL/UPSTASH_REDIS_REST_TOKEN not set; using local rate limiting.',
+    allowLocal
+      ? '[rate-limit] UPSTASH_REDIS_REST_URL/UPSTASH_REDIS_REST_TOKEN not set; using local rate limiting.'
+      : '[rate-limit] Missing Upstash configuration; requests will be refused.',
   );
 }
 
@@ -74,7 +76,7 @@ export function createRateLimiter({ prefix, maxRequests, windowMs }: RateLimiter
     };
   }
 
-  if (hosted) return async () => 'unavailable';
+  if (!allowLocal) return async () => 'unavailable';
 
   const requestTimestamps = new Map<string, number[]>();
   const maxKeys = 4096;

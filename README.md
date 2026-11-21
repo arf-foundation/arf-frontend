@@ -50,12 +50,13 @@ Two API routes need credentials to work in production, and are inert (or error) 
 
 `POST /api/chat`, `POST /api/pilot-request`, and `POST /api/report` are all
 public and unauthenticated. They require JSON and refuse cross-origin browser
-submissions. Vercel Preview and Production require both
+submissions. Production builds and hosted Vercel deployments require
 `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` for shared rate limiting.
-Verify both settings and the Vercel system environment marker before promoting
-a release. Missing settings, Redis errors and timeouts return HTTP 503.
-Local and CI runs can use per-instance counters when Redis is absent. See
-`lib/request-json.ts` and `lib/rate-limit.ts`.
+Verify both settings before promoting a release. Missing settings, Redis
+errors and timeouts return HTTP 503. Local development and unit tests can use
+per-instance counters. Playwright sets `ARF_ALLOW_LOCAL_RATE_LIMIT=1` for its
+loopback server when testing a production build. Leave that setting unset on
+deployments. See `lib/request-json.ts` and `lib/rate-limit.ts`.
 
 ### Run the development server
 
