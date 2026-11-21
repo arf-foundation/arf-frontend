@@ -28,3 +28,14 @@ test('the public agent labels its advisory boundary near the incident input', as
     .toHaveAccessibleDescription('Keep credentials and customer records out of the description.');
   problems.expectNone();
 });
+
+test('the homepage serves the narrowed script policy and hydrates', async ({ page, problems }) => {
+  const response = await visit(page, '/');
+  const policy = response?.headers()['content-security-policy'];
+  expect(policy?.match(/(?:^|;)\s*script-src\s+([^;]+)/)?.[1]).toBe("'self' 'unsafe-inline'");
+  const foreignScripts = await page.locator('script[src]').evaluateAll(scripts => scripts
+    .map(script => new URL((script as HTMLScriptElement).src).origin)
+    .filter(origin => origin !== window.location.origin));
+  expect(foreignScripts).toEqual([]);
+  problems.expectNone();
+});

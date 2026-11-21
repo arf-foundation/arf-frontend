@@ -6,7 +6,10 @@ export function rejectInvalidJsonPost(request: Request) {
   const url = new URL(request.url);
   // Next.js can use the internal server hostname in request.url.
   const host = request.headers.get('host')?.toLowerCase() ?? url.host;
-  if ((origin !== null && origin !== `${url.protocol}//${host}`) ||
+  // Browser Fetch Metadata can confirm same origin when TLS ends at the proxy.
+  const sameOriginBehindTls = site === 'same-origin' && url.protocol === 'http:' &&
+    origin === `https://${host}`;
+  if ((origin !== null && origin !== `${url.protocol}//${host}` && !sameOriginBehindTls) ||
       site === 'cross-site' || site === 'same-site') {
     return NextResponse.json({ error: 'Submit this request from the ARF site.' }, { status: 403 });
   }

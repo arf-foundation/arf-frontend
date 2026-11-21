@@ -19,8 +19,8 @@ describe.each([
   ['pilot-request', signup],
   ['report', report],
 ] as const)('/api/%s request boundary', (route, post) => {
-  function request(headers: Record<string, string>) {
-    return new Request(`https://www.example.test/api/${route}`, { method: 'POST', headers, body: '{}' });
+  function request(headers: Record<string, string>, protocol = 'https') {
+    return new Request(`${protocol}://www.example.test/api/${route}`, { method: 'POST', headers, body: '{}' });
   }
 
   beforeEach(() => mockLimit.mockReset().mockResolvedValue('limited'));
@@ -48,5 +48,20 @@ describe.each([
   ])('keeps allowed JSON behind the existing rate limiter (%j)', async (headers) => {
     expect((await post(request(headers as Record<string, string>))).status).toBe(429);
     expect(mockLimit).toHaveBeenCalledTimes(1);
+  });
+
+  it('requires same-origin browser evidence when TLS terminates before the handler', async () => {
+    const headers = {
+      Host: 'public.example.test', Origin: 'https://public.example.test', 'Content-Type': 'application/json',
+    };
+    expect((await post(request(headers, 'http'))).status).toBe(403);
+    expect(mockLimit).not.toHaveBeenCalled();
+    expect((await post(request({ ...headers, 'Sec-Fetch-Site': 'same-origin' }, 'http'))).status).toBe(429);
+    expect(mockLimit).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns 503 when the shared rate check is unavailable', async () => {
+    mockLimit.mockResolvedValue('unavailable');
+    expect((await post(request({ 'Content-Type': 'application/json' }))).status).toBe(503);
   });
 });
